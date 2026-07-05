@@ -1,0 +1,41 @@
+---
+description: Padrões Vue — components, pages e composables do AgroPulse
+globs: src/**/*.vue,src/composables/**/*
+alwaysApply: false
+---
+
+# Vue — AgroPulse
+
+## Components e Pages
+
+- `<script setup lang="ts">` obrigatório
+- Props/emits tipados com `defineProps` / `defineEmits`
+- Apenas UI + delegação a composables — sem HTTP, sem regra de negócio
+- Estilos `<style scoped>` — global só em `css/`
+- Preferir Quasar (`q-btn`, `q-input`, `q-table`)
+
+## Composables
+
+- Prefixo `use`, arquivo `use{Nome}.ts`
+- Facade sobre stores via `storeToRefs`
+- Feedback UI (Notify) e navegação pós-ação aqui — não em store/service
+- Sem HTTP direto — delegar à store
+
+## Exemplo correto
+
+```vue
+<script setup lang="ts">
+import { useAuth } from 'composables/useAuth';
+const { sair } = useAuth();
+</script>
+```
+
+## Antipadrões
+
+```vue
+<script setup lang="ts">
+import { api } from 'boot/axios'; // ❌ PROIBIDO
+</script>
+```
+
+Ver `docs/ai/single-responsibility.md`.

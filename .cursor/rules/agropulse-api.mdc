@@ -1,0 +1,43 @@
+---
+description: Regras de API e HTTP — services, axios e composables de dados
+globs: src/services/**/*,src/boot/axios.ts,src/stores/**/*
+alwaysApply: false
+---
+
+# API e HTTP — AgroPulse
+
+## Regras
+
+- HTTP **somente** em `services/` via `import { api } from 'boot/axios'`
+- Services retornam `Promise<T>` tipado — sem Notify, router ou DOM
+- Stores chamam services em `actions` — sem axios direto
+- Interceptor em `boot/axios.ts` faz unwrap de `ApiResponse<T>` e normaliza `ApiError`
+- Erros: propagar tipados — nunca catch vazio
+- DTOs separados de entidades quando API ≠ domínio — mapear no service ou `utils/mappers/`
+- Token via request interceptor — nunca manual por service
+- Buscas canceláveis: passar `AbortSignal`
+
+## Padrão de service
+
+```typescript
+export const clientesService = {
+  listar(): Promise<Cliente[]> {
+    return api.get<Cliente[]>('/clientes').then((r) => r.data);
+  },
+};
+```
+
+## Antipadrões
+
+```typescript
+// ❌ HTTP no componente/composable
+await api.get('/clientes');
+
+// ❌ UI no service
+Notify.create({ message: 'Salvo' });
+
+// ❌ any
+.catch((e: any) => {})
+```
+
+Ver `docs/ai/api.md` para especificação completa.

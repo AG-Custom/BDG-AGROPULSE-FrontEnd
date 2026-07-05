@@ -1,0 +1,58 @@
+---
+description: Regras centrais do AgroPulse Frontend — arquitetura, camadas e padrões obrigatórios
+alwaysApply: true
+---
+
+# AgroPulse Frontend — Regras Centrais
+
+Documentação completa em `docs/ai/`. Leia antes de gerar código.
+
+## Stack
+
+Vue 3 (Composition API + `<script setup>`) · Quasar · Pinia · Vue Router · Axios · TypeScript strict · Vite
+
+## Fluxo obrigatório de dados
+
+```
+Component/Page → Composable → Store → Service → boot/axios → API
+```
+
+## Proibições críticas
+
+- **NUNCA** importar `boot/axios` ou `services/` em `.vue` (pages, layouts, components)
+- **NUNCA** colocar HTTP, regra de negócio ou Notify/router em services
+- **NUNCA** colocar Notify/router em stores
+- **NUNCA** usar `any` sem justificativa
+- **NUNCA** duplicar lógica — extrair composable, util ou store
+- **NUNCA** usar caminhos relativos longos — usar aliases (`composables/`, `types/`, etc.)
+
+## Obrigações
+
+- **SEMPRE** tipagem forte (`strict: true`)
+- **SEMPRE** seguir estrutura de pastas: `pages/`, `services/`, `stores/`, `composables/`, `types/`
+- **SEMPRE** nomes: `{Dominio}Page.vue`, `{dominio}.service.ts`, `use{Nome}.ts`
+- **SEMPRE** reutilizar composables existentes (`useAuth`, `useNotificacao`, `useTratarErroFormulario`)
+- **SEMPRE** componentes pequenos (~150 linhas max) — dividir se maior
+- **SEMPRE** guards de auth em `router/index.ts`, permissões via `constants/permissoes.ts`
+
+## Onde colocar cada coisa
+
+| O quê | Onde |
+|---|---|
+| Tela roteada | `pages/{dominio}/{Nome}Page.vue` |
+| UI reutilizável | `components/ui/` ou `components/shared/` |
+| Lógica reativa | `composables/use{Nome}.ts` |
+| Estado global | `stores/{dominio}.store.ts` |
+| Chamada API | `services/{dominio}.service.ts` |
+| Tipos domínio | `types/entidades/` |
+| Tipos HTTP | `types/api/` |
+| Funções puras | `utils/` |
+| Constantes | `constants/` |
+
+## Docs detalhadas
+
+- `docs/ai/architecture.md`
+- `docs/ai/folder-structure.md`
+- `docs/ai/single-responsibility.md`
+- `docs/ai/api.md`
+- `docs/ai/cursor.rules.md`
