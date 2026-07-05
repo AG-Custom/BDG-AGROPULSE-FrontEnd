@@ -1,10 +1,14 @@
-import type { ApiError } from 'types/api/api';
-
-export function useTratarErroFormulario() {
-  function mensagem(error: unknown): string {
-    const apiError = error as Partial<ApiError>;
-    return apiError.detail ?? apiError.title ?? 'Não foi possível concluir a operação.';
-  }
-
-  return { mensagem };
-}
+import { extrairApiError, MENSAGEM_ERRO_PADRAO } from 'utils/api-error';
+
+export function useTratarErroFormulario() {
+  function mensagem(error: unknown): string {
+    return extrairApiError(error)?.message ?? MENSAGEM_ERRO_PADRAO;
+  }
+
+  function errosPorCampo(error: unknown): Record<string, string> {
+    return extrairApiError(error)?.fields ?? {};
+  }
+
+  return { mensagem, errosPorCampo };
+}
+

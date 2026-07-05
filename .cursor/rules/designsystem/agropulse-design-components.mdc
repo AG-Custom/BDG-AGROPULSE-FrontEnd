@@ -1,0 +1,51 @@
+---
+description: Componentes UI — padrões Quasar e wrappers AgroPulse
+globs: src/components/**/*.vue,src/pages/**/*.vue,src/layouts/**/*.vue
+alwaysApply: false
+---
+
+# Componentes UI — AgroPulse
+
+Base: Quasar 2. Wrappers em `components/ui/` e `components/shared/`.
+
+## Padrões obrigatórios
+
+### Button
+- Primary: `color="primary" unelevated`
+- Secundário: `outline` ou `flat`
+- Destrutivo: `color="negative" unelevated`
+- Loading: `:loading` — nunca spinner separado
+- ❌ `glossy`, `elevated`, cores hex inline
+
+### Input
+- `outlined` sempre (exceto search borderless compacto)
+- Label + hint/error
+- `:rules` ou erros API inline
+
+### Table
+- `flat bordered`, `#no-data` com empty state
+- `:loading` (linear progress) — sem overlay
+- Números alinhados à direita, formatados via utils
+
+### Card
+- `flat bordered` ou `.agro-surface-raised`
+- ❌ `shadow-10`
+
+### Modal
+- `q-dialog` + `q-card`, fade only
+- `persistent` para exclusão
+- ❌ `transition-show="scale"`
+
+### Feedback
+- Toast: `useNotificacao()`
+- Empty: ícone 48px + título + descrição + CTA
+- ❌ tela branca vazia
+
+## Reutilizar antes de criar
+
+- `AppPageHeader` — título de page
+- `MetricTile` — KPI dashboard
+- `useNotificacao` — toasts
+- `useTratarErroFormulario` — erros
+
+Ver `docs/ai/design-system/03-components.md`.

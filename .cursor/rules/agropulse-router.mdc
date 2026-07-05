@@ -1,0 +1,28 @@
+---
+description: Router e navegacao — evitar tela branca ao trocar layouts
+globs: src/router/**/*,src/App.vue,src/layouts/**/*
+alwaysApply: false
+---
+
+# Navegacao — AgroPulse
+
+## Regras obrigatorias
+
+- **NUNCA** registrar dois layouts diferentes no mesmo `path` (ex.: dois `path: '/'`)
+- **SEMPRE** rotas auth em paths dedicados: `/login`, `/cadastro`, `/confirm-email`
+- **SEMPRE** usar `meta.layout: 'auth' | 'main'` nas rotas com layout
+- **SEMPRE** `App.vue` com `:key` baseado em `meta.layout`
+- **SEMPRE** `:key="$route.name"` no `<router-view>` dentro de layouts
+- **SEMPRE** redirecionar apos login com `router.replace({ name: 'dashboard' })`
+
+## Sintoma: tela branca
+
+Ver `docs/ai/troubleshooting.md` — NAV-001, NAV-002.
+
+## Estrutura correta
+
+```
+App.vue (key por meta.layout)
+├── AuthLayout  → /login, /cadastro, /confirm-email
+└── MainLayout  → / (dashboard)
+```

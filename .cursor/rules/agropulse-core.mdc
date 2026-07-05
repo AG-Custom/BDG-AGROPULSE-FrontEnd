@@ -54,5 +54,5 @@ Component/Page → Composable → Store → Service → boot/axios → API
 - `docs/ai/architecture.md`
 - `docs/ai/folder-structure.md`
 - `docs/ai/single-responsibility.md`
-- `docs/ai/api.md`
+- `docs/ai/api.md` — inclui caminho do **contrato backend**: `new_agropulse_backend/api-contract/`
 - `docs/ai/cursor.rules.md`

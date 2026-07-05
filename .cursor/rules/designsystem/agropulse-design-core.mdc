@@ -1,0 +1,57 @@
+---
+description: Design System AgroPulse — princípios, tokens e regras visuais obrigatórias
+alwaysApply: true
+---
+
+# AgroPulse Design System
+
+Documentação completa: `docs/ai/design-system/`
+
+## Identidade
+
+Premium SaaS agro — verde campo, neutros quentes, limpo e data-centric. **Sem** blur, glassmorphism, animações pesadas ou loading fullscreen.
+
+## Regras imperativas
+
+- **NUNCA** hardcodar cores, spacing, radius ou shadow — usar tokens `var(--*)` de `src/css/tokens/`
+- **SEMPRE** inputs `outlined`, buttons primary `unelevated`, cards `flat bordered`
+- **NUNCA** `Notify.create` direto — usar `useNotificacao()`
+- **NUNCA** loading overlay fullscreen ou `backdrop-filter: blur()`
+- **NUNCA** animações > 240ms, bounce ou scale em modais
+- **SEMPRE** empty state em listas/tabelas vazias
+- **SEMPRE** labels visíveis em inputs — placeholder não substitui label
+- **SEMPRE** icon buttons com `aria-label`
+- **SEMPRE** skeleton (layout conhecido) ou button `:loading` — nunca spinner fullscreen
+
+## Tokens essenciais
+
+```
+Cores:     var(--color-primary-500)  var(--color-surface-default)
+           var(--color-border-default)  var(--color-text-primary)
+Spacing:   var(--spacing-4)  var(--spacing-6)  var(--page-padding)
+Radius:    var(--radius-md)
+Shadow:    var(--shadow-sm)
+Motion:    var(--duration-fast)  var(--duration-normal)
+```
+
+## Layout
+
+- Header 56px flat + border-bottom
+- Sidebar 260px, nav item ativo com bg primary.50
+- Page: `.agro-page` + `AppPageHeader` + `.agro-section`
+- Container max 1440px
+
+## Componentes Quasar
+
+| Uso | Config |
+|---|---|
+| Botão primário | `color="primary" unelevated` |
+| Botão cancelar | `flat` |
+| Input | `outlined` |
+| Tabela | `flat bordered` + `#no-data` slot |
+| Modal | fade, overlay sólido sem blur |
+| Toast | via `useNotificacao()` |
+
+## Índice docs
+
+`docs/ai/design-system/01-foundations.md` … `15-best-practices.md`

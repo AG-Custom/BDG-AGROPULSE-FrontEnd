@@ -1,0 +1,39 @@
+// AgroPulse Design Tokens — Breakpoints
+
+$breakpoint-xs: 0;
+$breakpoint-sm: 600px;
+$breakpoint-md: 960px;
+$breakpoint-lg: 1280px;
+$breakpoint-xl: 1536px;
+
+:root {
+  --breakpoint-xs: #{$breakpoint-xs};
+  --breakpoint-sm: #{$breakpoint-sm};
+  --breakpoint-md: #{$breakpoint-md};
+  --breakpoint-lg: #{$breakpoint-lg};
+  --breakpoint-xl: #{$breakpoint-xl};
+}
+
+@mixin bp-sm {
+  @media (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin bp-md {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin bp-lg {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin bp-xl {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}

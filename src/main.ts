@@ -2,7 +2,7 @@ import '@quasar/extras/material-icons/material-icons.css';
 import 'quasar/src/css/index.sass';
 import 'css/app.scss';
 
-import { Quasar } from 'quasar';
+import { Notify, Quasar } from 'quasar';
 import { createApp } from 'vue';
 
 import App from './App.vue';
@@ -13,7 +13,15 @@ import { pinia } from './stores';
 const app = createApp(App);
 
 app.use(Quasar, {
-  plugins: {},
+  plugins: {
+    Notify,
+  },
+  config: {
+    notify: {
+      position: 'top-right',
+      timeout: 4000,
+    },
+  },
 });
 app.use(pinia);
 app.use(router);

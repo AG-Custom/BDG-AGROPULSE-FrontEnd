@@ -1,0 +1,52 @@
+---
+description: Tokens de design — proibição de valores hardcoded em estilos
+globs: src/**/*.vue,src/css/**/*
+alwaysApply: false
+---
+
+# Design Tokens — AgroPulse
+
+Implementação: `src/css/tokens/`
+
+## Proibido em `<style>` e SCSS
+
+```css
+/* ❌ */
+color: #256d3d;
+padding: 24px;
+border-radius: 8px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+transition: all 0.5s ease;
+background: white;
+```
+
+## Obrigatório
+
+```css
+/* ✅ */
+color: var(--color-primary-500);
+padding: var(--spacing-6);
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-sm);
+transition: var(--transition-bg);
+background: var(--color-surface-default);
+```
+
+## Mapa rápido
+
+| Necessidade | Token |
+|---|---|
+| Fundo app | `var(--color-bg-default)` |
+| Card/panel | `var(--color-surface-default)` |
+| Borda | `var(--color-border-default)` |
+| Texto principal | `var(--color-text-primary)` |
+| Texto secundário | `var(--color-text-secondary)` |
+| Hover bg | `var(--color-hover)` |
+| Gap seção | `var(--section-gap)` |
+| Padding card | `var(--card-padding)` |
+
+## Quasar
+
+Cores Quasar (`color="primary"`) já mapeiam para tokens via `quasar.variables.scss`.
+
+Ver `docs/ai/design-system/02-tokens.md`.

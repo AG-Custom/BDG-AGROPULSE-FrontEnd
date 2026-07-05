@@ -253,6 +253,29 @@ index.html
     → app.mount('#app')
 ```
 
+### Fluxo de cadastro e onboarding
+
+```
+/cadastro
+  → authService.register
+  → sessionStorage pendingEmail
+
+/confirm-email?userId&token
+  → authService.confirmarEmail (204)
+  → formulário email + senha
+  → authService.login → empresaId null
+  → redirect /onboarding
+
+/onboarding
+  → onboardingService.criarEmpresa
+  → authService.refresh (atualiza JWT)
+  → redirect /dashboard
+```
+
+Guards: `precisaOnboarding` bloqueia dashboard; `temEmpresa` bloqueia retorno ao onboarding.
+
+Contrato API (rotas, DTOs, enums): `C:\Users\Guilherme\Documents\new_agropulse_backend\api-contract\` — ver índice em `docs/ai/api.md#contrato-da-api-fonte-da-verdade`.
+
 ### Navegação com autenticação
 
 ```
@@ -489,6 +512,7 @@ const clientes = ref([]); // compartilhado entre instâncias — usar Pinia
 
 ## Referências internas
 
+- [Troubleshooting / Problemas conhecidos](./troubleshooting.md)
 - [Estrutura de pastas](./folder-structure.md)
 - [Chamadas HTTP e API](./api.md)
 - [Responsabilidade única](./single-responsibility.md)

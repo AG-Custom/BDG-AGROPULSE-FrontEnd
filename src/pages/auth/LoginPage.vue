@@ -1,56 +1,72 @@
 <template>
-  <q-page class="login-page">
-    <section class="login-panel">
-      <div>
-        <div class="text-h4 text-weight-semibold">AgroPulse</div>
-        <div class="text-body1 text-grey-7">Gestão agrícola integrada</div>
-      </div>
+  <q-page class="auth-page">
+    <auth-card subtitulo="Gestão agrícola integrada">
+      <q-form class="auth-form" @submit.prevent="enviar">
+        <q-input
+          v-model="email"
+          outlined
+          label="E-mail"
+          class="field-required"
+          type="email"
+          autocomplete="email"
+          :disable="carregando"
+          aria-required="true"
+          :rules="[obrigatorio, emailValidator]"
+        />
 
-      <q-form class="q-gutter-md" @submit.prevent="entrar">
-        <q-input v-model="usuario" outlined label="Usuário" />
-        <q-input v-model="senha" outlined label="Senha" type="password" />
-        <q-btn color="primary" unelevated type="submit" class="full-width" label="Entrar" />
+        <q-input
+          v-model="senha"
+          outlined
+          label="Senha"
+          class="field-required"
+          :type="mostrarSenha ? 'text' : 'password'"
+          autocomplete="current-password"
+          :disable="carregando"
+          aria-required="true"
+          :rules="[obrigatorio]"
+        >
+          <template #append>
+            <q-icon
+              :name="mostrarSenha ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="mostrarSenha = !mostrarSenha"
+            />
+          </template>
+        </q-input>
+
+        <q-btn
+          color="primary"
+          unelevated
+          type="submit"
+          class="full-width"
+          label="Entrar"
+          :loading="carregando"
+        />
       </q-form>
-    </section>
+
+      <template #footer>
+        <span class="text-body-md text-secondary">
+          Ainda não tem conta?
+          <router-link :to="{ name: 'cadastro' }" class="auth-link">Cadastre-se</router-link>
+        </span>
+      </template>
+    </auth-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { useAuth } from 'composables/useAuth';
+import AuthCard from 'components/shared/AuthCard.vue';
+import { useAutenticacao } from 'composables/useAutenticacao';
 import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { email as emailValidator, obrigatorio } from 'utils/validators';
 
-const route = useRoute();
-const router = useRouter();
-const { entrarSessaoLocal } = useAuth();
-const usuario = ref('');
+const { carregando, login } = useAutenticacao();
+
+const email = ref('');
 const senha = ref('');
+const mostrarSenha = ref(false);
 
-function entrar(): void {
-  entrarSessaoLocal();
-  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/';
-  void router.push(redirect);
+async function enviar(): Promise<void> {
+  await login({ email: email.value.trim(), senha: senha.value });
 }
 </script>
-
-<style scoped>
-.login-page {
-  align-items: center;
-  background: #eef4ea;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 24px;
-}
-
-.login-panel {
-  background: #ffffff;
-  border: 1px solid #dce5d8;
-  border-radius: 8px;
-  display: grid;
-  gap: 28px;
-  max-width: 420px;
-  padding: 32px;
-  width: 100%;
-}
-</style>

@@ -1,0 +1,30 @@
+// AgroPulse Design Tokens — Animação (rápido, leve, sem impacto na performance)
+
+$duration-instant: 0ms;
+$duration-fast: 150ms;
+$duration-normal: 180ms;
+$duration-slow: 240ms;
+
+$ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+:root {
+  --duration-instant: #{$duration-instant};
+  --duration-fast: #{$duration-fast};
+  --duration-normal: #{$duration-normal};
+  --duration-slow: #{$duration-slow};
+
+  --ease-default: #{$ease-default};
+  --ease-in: #{$ease-in};
+  --ease-out: #{$ease-out};
+  --ease-in-out: #{$ease-in-out};
+
+  --transition-color: color var(--duration-fast) var(--ease-default);
+  --transition-bg: background-color var(--duration-fast) var(--ease-default);
+  --transition-border: border-color var(--duration-fast) var(--ease-default);
+  --transition-opacity: opacity var(--duration-fast) var(--ease-default);
+  --transition-transform: transform var(--duration-normal) var(--ease-out);
+  --transition-shadow: box-shadow var(--duration-fast) var(--ease-default);
+}

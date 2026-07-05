@@ -1,0 +1,17 @@
+@forward 'colors';
+@forward 'typography';
+@forward 'spacing';
+@forward 'borders';
+@forward 'shadows';
+@forward 'motion';
+@forward 'z-index';
+@forward 'breakpoints';
+
+@use 'colors';
+@use 'typography';
+@use 'spacing';
+@use 'borders';
+@use 'shadows';
+@use 'motion';
+@use 'z-index';
+@use 'breakpoints';

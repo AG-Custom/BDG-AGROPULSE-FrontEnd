@@ -1,46 +1,68 @@
-import axios, { AxiosError } from 'axios';
-
-import type { ApiError, ApiResponse, ValidationProblemDetails } from 'types/api/api';
-
-const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:5293';
-
-export const api = axios.create({
-  baseURL,
-  headers: {
-    Accept: 'application/json',
-  },
-});
-
-api.interceptors.response.use(
-  (response) => {
-    const data = response.data as ApiResponse<unknown> | unknown;
-
-    if (data && typeof data === 'object' && 'data' in data) {
-      return { ...response, data: (data as ApiResponse<unknown>).data };
-    }
-
-    return response;
-  },
-  (error: AxiosError<ValidationProblemDetails | ApiError>) => {
-    return Promise.reject(normalizeApiError(error));
-  },
-);
-
-function normalizeApiError(error: AxiosError<ValidationProblemDetails | ApiError>): ApiError {
-  if (!error.response) {
-    return {
-      title: 'Erro de conexão',
-      detail: 'Não foi possível conectar à API do AgroPulse.',
-      status: 0,
-    };
-  }
-
-  const data = error.response.data;
-
-  return {
-    title: data?.title ?? 'Erro inesperado',
-    detail: data?.detail ?? error.message,
-    status: error.response.status,
-    errors: 'errors' in (data ?? {}) ? (data as ValidationProblemDetails).errors : undefined,
-  };
-}
+import axios, { AxiosError } from 'axios';
+
+import {
+  extrairApiError,
+  isApiError,
+  isEnvelopeComFalha,
+  isMensagemGenericaAxios,
+  normalizeAxiosError,
+  parseApiErrorFromBody,
+  unwrapEnvelopeData,
+} from 'utils/api-error';
+import { obterAccessToken } from 'utils/auth-storage';
+
+import type { ApiError, ApiErrorBody, ApiEnvelope, ValidationProblemDetails } from 'types/api/api';
+
+const baseURL = import.meta.env.VITE_API_URL ?? 'https://localhost:7206/api';
+
+export const api = axios.create({
+  baseURL,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use((config) => {
+  const token = obterAccessToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => {
+    if (response.status === 204) {
+      return response;
+    }
+
+    if (isEnvelopeComFalha(response.data)) {
+      return Promise.reject(parseApiErrorFromBody(response.data, response.status));
+    }
+
+    const unwrapped = unwrapEnvelopeData(response.data);
+
+    if (unwrapped !== response.data) {
+      return { ...response, data: unwrapped };
+    }
+
+    return response;
+  },
+  (error: AxiosError<ValidationProblemDetails | ApiEnvelope<unknown> | ApiErrorBody> | ApiError) => {
+    if (isApiError(error) && !isMensagemGenericaAxios(error.message)) {
+      return Promise.reject(error);
+    }
+
+    const fromBody = extrairApiError(error);
+
+    if (fromBody) {
+      return Promise.reject(fromBody);
+    }
+
+    return Promise.reject(normalizeAxiosError(error as AxiosError));
+  },
+);
+

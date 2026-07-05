@@ -4,6 +4,39 @@
 
 ---
 
+## Contrato da API (fonte da verdade)
+
+O contrato oficial de rotas, DTOs, enums e erros **não** fica neste repositório. Está no backend:
+
+| | |
+|---|---|
+| **Caminho local** | `C:\Users\Guilherme\Documents\new_agropulse_backend\api-contract\` |
+| **Projeto irmão** | `new_agropulse_backend/api-contract/` (mesmo nível do frontend) |
+| **Índice** | `api-contract/README.md` |
+
+### Arquivos do contrato
+
+| Arquivo | Quando consultar |
+|---|---|
+| `auth.md` | Login, registro, confirm-email, refresh, seleção de unidade |
+| `onboarding.md` | Cadastro de empresa e dashboard inicial |
+| `empresas.md` | Empresas, CNPJs, unidades, módulos |
+| `enums.md` | Valores de enums (strings na API) |
+| `integration.md` | Como integrar o contrato no front-end |
+| `CHANGELOG.md` | Alterações recentes do contrato |
+
+### Ambiente de desenvolvimento
+
+| Config | Valor |
+|---|---|
+| `VITE_API_URL` (`.env.local`) | `https://localhost:7206/api` |
+| Frontend (Vite) | `http://localhost:9000` |
+| Swagger (referência ao vivo) | `https://localhost:7206/swagger` |
+
+**Regra para IA:** antes de criar ou alterar service/DTO, **ler o `.md` correspondente** em `api-contract/`. Se o backend não estiver no workspace do Cursor, pedir ao usuário para abrir a pasta ou colar o trecho do contrato.
+
+---
+
 ## Regra absoluta
 
 **Nunca faça chamadas HTTP diretamente em componentes, pages ou layouts.**

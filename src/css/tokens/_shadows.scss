@@ -1,0 +1,25 @@
+// AgroPulse Design Tokens — Elevação (sombras sutis, premium sem peso visual)
+
+$shadow-none: none;
+$shadow-xs: 0 1px 2px rgba(23, 33, 26, 0.04);
+$shadow-sm: 0 1px 3px rgba(23, 33, 26, 0.06), 0 1px 2px rgba(23, 33, 26, 0.04);
+$shadow-md: 0 4px 8px rgba(23, 33, 26, 0.06), 0 2px 4px rgba(23, 33, 26, 0.04);
+$shadow-lg: 0 8px 16px rgba(23, 33, 26, 0.08), 0 4px 8px rgba(23, 33, 26, 0.04);
+$shadow-xl: 0 16px 32px rgba(23, 33, 26, 0.1), 0 8px 16px rgba(23, 33, 26, 0.06);
+$shadow-card-hover: 0 4px 12px rgba(42, 143, 74, 0.08);
+$shadow-brand: 0 8px 24px rgba(23, 33, 26, 0.06);
+
+:root {
+  --shadow-none: #{$shadow-none};
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+  --shadow-card-hover: #{$shadow-card-hover};
+  --shadow-brand: #{$shadow-brand};
+
+  --opacity-disabled: 0.48;
+  --opacity-overlay: 0.48;
+  --opacity-hover-overlay: 0.06;
+}

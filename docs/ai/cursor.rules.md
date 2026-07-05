@@ -123,6 +123,13 @@ Antes de finalizar, verifique:
 
 ---
 
+## Design System
+
+Ao criar ou modificar UI, consulte também:
+
+- [Design System](./design-system/README.md)
+- Regras Cursor: `.cursor/rules/designsystem/`
+
 ## Prioridade de leitura
 
 Ao iniciar qualquer tarefa, consulte nesta ordem:
@@ -132,3 +139,4 @@ Ao iniciar qualquer tarefa, consulte nesta ordem:
 3. [folder-structure.md](./folder-structure.md)
 4. [single-responsibility.md](./single-responsibility.md)
 5. [api.md](./api.md)
+6. [design-system/](./design-system/) — ao trabalhar com UI

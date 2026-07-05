@@ -12,15 +12,35 @@ export const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore();
 
-  if (to.meta.publica) {
-    return true;
-  }
-
   if (!authStore.verificado) {
     await authStore.verificar();
   }
 
-  if (!authStore.autenticado) {
+  const autenticado = authStore.autenticado;
+  const precisaOnboarding = authStore.precisaOnboarding;
+  const temEmpresa = authStore.temEmpresa;
+
+  if (autenticado && precisaOnboarding && !to.meta.onboarding) {
+    return { name: 'onboarding' };
+  }
+
+  if (autenticado && temEmpresa && to.meta.onboarding) {
+    return { name: 'dashboard' };
+  }
+
+  if (to.meta.convidado && autenticado && temEmpresa) {
+    return { name: 'dashboard' };
+  }
+
+  if (to.meta.publica) {
+    return true;
+  }
+
+  if (to.meta.requerAuth && !autenticado) {
+    return { name: 'login', query: { redirect: to.fullPath } };
+  }
+
+  if (!autenticado) {
     return { name: 'login', query: { redirect: to.fullPath } };
   }
 

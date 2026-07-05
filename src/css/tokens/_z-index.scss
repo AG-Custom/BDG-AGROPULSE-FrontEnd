@@ -1,0 +1,14 @@
+// AgroPulse Design Tokens — Z-Index
+
+:root {
+  --z-index-base: 0;
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-header: 300;
+  --z-index-sidebar: 350;
+  --z-index-overlay: 400;
+  --z-index-modal: 500;
+  --z-index-popover: 600;
+  --z-index-toast: 700;
+  --z-index-tooltip: 800;
+}

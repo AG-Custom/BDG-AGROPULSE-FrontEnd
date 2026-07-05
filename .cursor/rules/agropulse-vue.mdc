@@ -13,6 +13,8 @@ alwaysApply: false
 - Apenas UI + delegação a composables — sem HTTP, sem regra de negócio
 - Estilos `<style scoped>` — global só em `css/`
 - Preferir Quasar (`q-btn`, `q-input`, `q-table`)
+- **Campos numéricos/formatados:** usar `mask` + `maxlength` + `inputmode="numeric"` via `constants/masks.ts` — ver `docs/ai/design-system/10-forms.md`
+- **Campos obrigatórios:** prop `label` + classe `field-required` — nunca slot `#label` com componente
 
 ## Composables
 

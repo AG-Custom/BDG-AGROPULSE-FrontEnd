@@ -6,6 +6,14 @@ alwaysApply: false
 
 # API e HTTP — AgroPulse
 
+## Contrato backend (fonte da verdade)
+
+Antes de criar/alterar services ou DTOs, consultar:
+
+`C:\Users\Guilherme\Documents\new_agropulse_backend\api-contract\`
+
+Arquivos: `auth.md`, `onboarding.md`, `empresas.md`, `enums.md`. Índice completo em `docs/ai/api.md`.
+
 ## Regras
 
 - HTTP **somente** em `services/` via `import { api } from 'boot/axios'`
