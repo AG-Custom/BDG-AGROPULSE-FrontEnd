@@ -81,8 +81,10 @@ body {
 
 // ─── Layout de página ───
 .agro-page {
+  box-sizing: border-box;
+  max-width: none;
   padding: var(--page-padding);
-  max-width: var(--container-max-width);
+  width: 100%;
 }
 
 .agro-section {

@@ -34,9 +34,7 @@ export interface UnidadeDisponivelDto {
   matriz: boolean;
 }
 
-export interface LoginResponseDto {
-  accessToken: string;
-  refreshToken: string;
+export interface AuthSessionDto {
   expiresAt: string;
   empresaId: string | null;
   unidadeId: string | null;
@@ -45,25 +43,20 @@ export interface LoginResponseDto {
   usuario: AuthUsuarioDto;
 }
 
-export interface RefreshResponseDto {
-  accessToken: string;
-  refreshToken: string;
+export interface AuthContextSessionDto {
   expiresAt: string;
   empresaId: string | null;
   unidadeId: string | null;
   requiresUnidadeSelection: boolean;
   unidadesDisponiveis: UnidadeDisponivelDto[] | null;
-}
-
-export interface RefreshPayload {
-  refreshToken: string;
 }
 
 export interface SessaoPersistida {
-  accessToken: string;
-  refreshToken: string;
   expiresAt: string;
   empresaId: string | null;
   unidadeId: string | null;
   usuario: AuthUsuarioDto;
 }
+
+export type LoginResponseDto = AuthSessionDto;
+export type RefreshResponseDto = AuthContextSessionDto;

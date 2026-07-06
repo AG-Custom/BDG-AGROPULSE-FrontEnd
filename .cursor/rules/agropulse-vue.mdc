@@ -15,6 +15,7 @@ alwaysApply: false
 - Preferir Quasar (`q-btn`, `q-input`, `q-table`)
 - **Campos numéricos/formatados:** usar `mask` + `maxlength` + `inputmode="numeric"` via `constants/masks.ts` — ver `docs/ai/design-system/10-forms.md`
 - **Campos obrigatórios:** prop `label` + classe `field-required` — nunca slot `#label` com componente
+- **NUNCA** persistir JWT em `localStorage`/`sessionStorage` — usar cookies HttpOnly + `withCredentials`
 
 ## Composables
 

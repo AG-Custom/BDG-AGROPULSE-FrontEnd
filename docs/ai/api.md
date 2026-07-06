@@ -29,11 +29,31 @@ O contrato oficial de rotas, DTOs, enums e erros **não** fica neste repositóri
 
 | Config | Valor |
 |---|---|
-| `VITE_API_URL` (`.env.local`) | `https://localhost:7206/api` |
+| `VITE_API_URL` (`.env.local`) | `/api` (proxy Vite → backend) |
 | Frontend (Vite) | `http://localhost:9000` |
+| Backend HTTPS | `https://localhost:7206` |
 | Swagger (referência ao vivo) | `https://localhost:7206/swagger` |
 
+O Vite faz proxy de `/api` para o backend — cookies HttpOnly funcionam como **same-origin** no dev.
+
 **Regra para IA:** antes de criar ou alterar service/DTO, **ler o `.md` correspondente** em `api-contract/`. Se o backend não estiver no workspace do Cursor, pedir ao usuário para abrir a pasta ou colar o trecho do contrato.
+
+---
+
+## Autenticação (cookies HttpOnly)
+
+**Nunca** persistir JWT em `localStorage` ou `sessionStorage`.
+
+| O quê | Como |
+|---|---|
+| Tokens | Cookies `HttpOnly` definidos pelo backend no login/refresh |
+| Axios | `withCredentials: true` em `boot/axios.ts` |
+| Contexto UI | `sessionStorage` só com `usuario`, `empresaId`, `unidadeId`, `expiresAt` |
+| Sessão ao recarregar | `GET /auth/session` (cookie enviado automaticamente) |
+| Logout | `POST /auth/logout` + limpar contexto local |
+| 401 | Interceptor tenta `POST /auth/refresh` (cookie) e repete a request |
+
+**Proibido:** interceptor `Authorization: Bearer` lendo token do storage.
 
 ---
 
@@ -162,63 +182,34 @@ api.interceptors.response.use(
 
 **Por quê:** services sempre recebem `response.data` já unwrapped — sem repetir `.data.data` em cada chamada.
 
-### Request — Autenticação (padrão a implementar)
+### Request — Autenticação
+
+Tokens via **cookies HttpOnly** — o browser envia automaticamente com `withCredentials: true`:
 
 ```typescript
-api.interceptors.request.use((config) => {
-  const token = obterToken(); // de storage seguro ou store
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
+  withCredentials: true,
 });
 ```
 
-**Onde obter token:** preferir função utilitária em `utils/auth-storage.ts` ou getter da store via lazy import para evitar dependência circular.
+**Não** montar header `Authorization` manualmente no frontend.
 
-**Por quê no interceptor:** todo endpoint autenticado recebe token automaticamente — services permanecem limpos.
+### Response — Refresh automático (401)
 
-### Response — Refresh token (padrão a implementar)
-
-Fluxo recomendado:
+Implementado em `boot/axios.ts`:
 
 ```
-401 Unauthorized
-  → interceptor detecta
-  → tenta POST /auth/refresh com refresh token
-  → sucesso: atualiza tokens, reexecuta request original
-  → falha: limpa sessão, redireciona para login
-```
-
-```typescript
-let refreshPromise: Promise<string> | null = null;
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      refreshPromise ??= authService.refresh().finally(() => {
-        refreshPromise = null;
-      });
-
-      const newToken = await refreshPromise;
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
-      return api(originalRequest);
-    }
-
-    return Promise.reject(normalizeApiError(error));
-  },
-);
+401 Unauthorized (rota autenticada)
+  → POST /auth/refresh (cookie refresh)
+  → sucesso: repete request original
+  → falha: limpa sessionStorage e rejeita
 ```
 
 **Regras:**
-- Usar fila/mutex para evitar múltiplos refresh simultâneos
+- Mutex para evitar múltiplos refresh simultâneos
 - Máximo 1 retry por request
-- Logout em falha de refresh
+- Rotas públicas de auth não disparam refresh
 
 ---
 

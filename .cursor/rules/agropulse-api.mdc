@@ -12,6 +12,8 @@ Antes de criar/alterar services ou DTOs, consultar:
 
 `C:\Users\Guilherme\Documents\new_agropulse_backend\api-contract\`
 
+Auth: tokens em cookies HttpOnly — frontend usa `withCredentials: true`, sem JWT no storage.
+
 Arquivos: `auth.md`, `onboarding.md`, `empresas.md`, `enums.md`. Índice completo em `docs/ai/api.md`.
 
 ## Regras

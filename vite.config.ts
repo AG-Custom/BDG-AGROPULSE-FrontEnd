@@ -14,6 +14,16 @@ export default defineConfig({
       sassVariables: quasarVariables,
     }),
   ],
+  server: {
+    port: 9000,
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7206',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
       assets: fileURLToPath(new URL('./src/assets', import.meta.url)),

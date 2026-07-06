@@ -1,17 +1,9 @@
+import type { AuthContextSessionDto, AuthSessionDto, SessaoPersistida } from 'types/dtos/auth.dto';
+import type { UsuarioLogado } from 'types/entidades/usuario';
 import { Permissoes } from 'constants/permissoes';
 
-import type {
-  AuthUsuarioDto,
-  LoginResponseDto,
-  RefreshResponseDto,
-  SessaoPersistida,
-} from 'types/dtos/auth.dto';
-import type { UsuarioLogado } from 'types/entidades/usuario';
-
-export function loginParaSessao(resposta: LoginResponseDto): SessaoPersistida {
+export function loginParaSessao(resposta: AuthSessionDto): SessaoPersistida {
   return {
-    accessToken: resposta.accessToken,
-    refreshToken: resposta.refreshToken,
     expiresAt: resposta.expiresAt,
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
@@ -19,18 +11,19 @@ export function loginParaSessao(resposta: LoginResponseDto): SessaoPersistida {
   };
 }
 
-export function refreshParaSessao(resposta: RefreshResponseDto, sessaoAtual: SessaoPersistida): SessaoPersistida {
+export function refreshParaSessao(
+  resposta: AuthContextSessionDto,
+  sessaoAtual: SessaoPersistida,
+): SessaoPersistida {
   return {
     ...sessaoAtual,
-    accessToken: resposta.accessToken,
-    refreshToken: resposta.refreshToken,
     expiresAt: resposta.expiresAt,
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
   };
 }
 
-export function usuarioDtoParaLogado(usuario: AuthUsuarioDto): UsuarioLogado {
+export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): UsuarioLogado {
   return {
     id: usuario.id,
     nome: usuario.nome,

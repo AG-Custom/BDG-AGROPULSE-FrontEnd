@@ -3,7 +3,7 @@ import type { AuthUsuarioDto, SessaoPersistida } from 'types/dtos/auth.dto';
 const CHAVE_SESSAO = 'agropulse.sessao';
 
 export function obterSessao(): SessaoPersistida | null {
-  const raw = localStorage.getItem(CHAVE_SESSAO);
+  const raw = sessionStorage.getItem(CHAVE_SESSAO);
   if (!raw) {
     return null;
   }
@@ -17,19 +17,11 @@ export function obterSessao(): SessaoPersistida | null {
 }
 
 export function salvarSessao(sessao: SessaoPersistida): void {
-  localStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao));
+  sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao));
 }
 
 export function limparSessao(): void {
-  localStorage.removeItem(CHAVE_SESSAO);
-}
-
-export function obterAccessToken(): string | null {
-  return obterSessao()?.accessToken ?? null;
-}
-
-export function obterRefreshToken(): string | null {
-  return obterSessao()?.refreshToken ?? null;
+  sessionStorage.removeItem(CHAVE_SESSAO);
 }
 
 export function sessaoExpirada(expiresAt: string): boolean {

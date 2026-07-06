@@ -4,14 +4,7 @@ import { authService } from 'services/auth.service';
 import type { ConfirmEmailPayload, LoginPayload, RegisterPayload, SessaoPersistida } from 'types/dtos/auth.dto';
 import type { UsuarioLogado } from 'types/entidades/usuario';
 import { loginParaSessao, refreshParaSessao, usuarioDtoParaLogado } from 'utils/auth.mapper';
-import {
-  limparSessao,
-  obterRefreshToken,
-  obterSessao,
-  obterUsuarioPersistido,
-  salvarSessao,
-  sessaoExpirada,
-} from 'utils/auth-storage';
+import { limparSessao, obterSessao, salvarSessao } from 'utils/auth-storage';
 
 interface AuthState {
   autenticado: boolean;
@@ -44,29 +37,23 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async verificar() {
-      const sessao = obterSessao();
-
-      if (!sessao || sessaoExpirada(sessao.expiresAt)) {
+      try {
+        const sessaoRemota = await authService.obterSessao();
+        const sessao = loginParaSessao(sessaoRemota);
+        salvarSessao(sessao);
+        this.aplicarSessao(sessao);
+      } catch {
+        limparSessao();
         this.limparEstado();
         this.verificado = true;
-        return;
       }
-
-      const usuarioPersistido = obterUsuarioPersistido();
-
-      if (usuarioPersistido) {
-        this.aplicarSessao(sessao);
-        return;
-      }
-
-      this.limparEstado();
-      this.verificado = true;
     },
 
     async entrar(payload: LoginPayload) {
       const resposta = await authService.login(payload);
-      salvarSessao(loginParaSessao(resposta));
-      this.aplicarSessao(loginParaSessao(resposta));
+      const sessao = loginParaSessao(resposta);
+      salvarSessao(sessao);
+      this.aplicarSessao(sessao);
     },
 
     async cadastrar(payload: RegisterPayload) {
@@ -78,15 +65,14 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async renovarTokens() {
-      const refreshToken = obterRefreshToken();
-      const sessao = obterSessao();
+      const sessaoAtual = obterSessao();
 
-      if (!refreshToken || !sessao) {
+      if (!sessaoAtual) {
         throw new Error('Sessão inválida para renovação.');
       }
 
-      const resposta = await authService.refresh({ refreshToken });
-      const novaSessao = refreshParaSessao(resposta, sessao);
+      const resposta = await authService.refresh();
+      const novaSessao = refreshParaSessao(resposta, sessaoAtual);
       salvarSessao(novaSessao);
       this.empresaId = novaSessao.empresaId;
       this.unidadeId = novaSessao.unidadeId;
@@ -96,7 +82,13 @@ export const useAuthStore = defineStore('auth', {
       return this.permissoes.includes(permissao);
     },
 
-    sair() {
+    async sair() {
+      try {
+        await authService.logout();
+      } catch {
+        // Cookies podem já estar inválidos; limpar estado local mesmo assim.
+      }
+
       limparSessao();
       this.limparEstado();
       this.verificado = true;

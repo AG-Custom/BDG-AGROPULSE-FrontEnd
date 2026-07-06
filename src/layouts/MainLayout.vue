@@ -94,6 +94,7 @@ function sair(): void {
 
 .main-layout__content {
   background: var(--color-bg-default);
+  width: 100%;
 }
 
 .main-layout__logo-mobile {
