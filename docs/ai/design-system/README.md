@@ -14,10 +14,12 @@
 
 O AgroPulse transmite **confiança profissional** para produtores, gestores e operadores rurais. A interface evoca:
 
-- **Campo e crescimento** — verde primário `#256d3d`
+- **Campo e crescimento** — verde primário `#1e8a4a`
+- **Identidade brand-forward** — verde-floresta escuro (`forest.800`–`950`) no shell (sidebar, painel de marca do login)
 - **Tecnologia confiável** — azul secundário `#2f5f73`
-- **Produtividade e colheita** — accent âmbar `#c47f2c` (uso pontual)
+- **Produtividade e colheita** — accent âmbar `#d98a20` (uso pontual)
 - **Neutralidade quente** — cinzas com subtom verde, nunca cinza frio corporativo genérico
+- **Tipografia com personalidade** — **Sora** no display/headings, **Inter** no corpo, **JetBrains Mono** em valores numéricos de dados
 
 **Evitar:** glassmorphism, gradientes chamativos, animações longas, skeleton em toda tela, spinners fullscreen, backdrop-filter blur.
 

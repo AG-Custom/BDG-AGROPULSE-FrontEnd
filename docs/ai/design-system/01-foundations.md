@@ -12,20 +12,30 @@ O agronegócio opera entre **campo, clima e dados**. Cores frias genéricas (cin
 
 ---
 
-### Primárias — Verde campo
+### Primárias — Verde campo rico
 
 | Token | Hex | Uso |
 |---|---|---|
-| `color.primary.50` | `#eef6f1` | Background sutil de destaque |
-| `color.primary.100` | `#d5eadc` | Hover leve, badges |
-| `color.primary.200` | `#aed9be` | Bordas ativas suaves |
-| `color.primary.300` | `#7ec099` | Ícones secundários |
-| `color.primary.400` | `#4fa872` | Hover de botão primário |
-| `color.primary.500` | `#256d3d` | **Cor principal** — botões, links, focus |
-| `color.primary.600` | `#1f5a34` | Hover/active primário |
-| `color.primary.700` | `#19482a` | Texto sobre fundo claro |
-| `color.primary.800` | `#133620` | Headers escuros |
-| `color.primary.900` | `#0d2416` | Máximo contraste |
+| `color.primary.50` | `#edf7f0` | Background sutil de destaque |
+| `color.primary.100` | `#d2ecdb` | Hover leve, badges |
+| `color.primary.200` | `#a6d9b9` | Bordas ativas suaves |
+| `color.primary.300` | `#72c294` | Ícones secundários, foco sobre fundo escuro |
+| `color.primary.400` | `#3fa96a` | Hover de botão primário, gradiente do logo |
+| `color.primary.500` | `#1e8a4a` | **Cor principal** — botões, links, focus |
+| `color.primary.600` | `#177239` | Hover/active primário |
+| `color.primary.700` | `#135c30` | Texto sobre fundo claro |
+| `color.primary.800` | `#0f4525` | Headers escuros |
+| `color.primary.900` | `#0b2f1a` | Máximo contraste |
+
+### Forest — Shell escuro
+
+Família dedicada ao chrome escuro brand-forward: sidebar e painel de marca do login.
+
+| Token | Hex | Uso |
+|---|---|---|
+| `color.forest.800` | `#143321` | Início de gradiente do painel de marca |
+| `color.forest.900` | `#0f2818` | Background da sidebar (`--color-sidebar-bg`), theme-color |
+| `color.forest.950` | `#0a1f12` | Fundo mais profundo (`--color-sidebar-bg-deep`), fim de gradiente |
 
 ### Secundárias — Azul profundo
 
@@ -34,11 +44,16 @@ O agronegócio opera entre **campo, clima e dados**. Cores frias genéricas (cin
 | `color.secondary.500` | `#2f5f73` | Ações secundárias, gráficos, tags info |
 | `color.secondary.700` | `#1f3f4d` | Texto sobre fundo info |
 
+Escala completa `50–900` disponível como CSS vars (`--color-secondary-*`).
+
 ### Accent — Colheita
 
 | Token | Hex | Uso |
 |---|---|---|
-| `color.accent.500` | `#c47f2c` | Destaques sazonais, KPIs de safra, CTA secundário |
+| `color.accent.400` | `#e3a03c` | Indicador de nav ativo, ícones sobre fundo escuro (`--color-sidebar-accent`) |
+| `color.accent.500` | `#d98a20` | Destaques sazonais, KPIs de safra, CTA secundário |
+
+Escala completa `50–900` disponível como CSS vars (`--color-accent-*`): 50 `#fdf5ea`, 100 `#fae7c9`, 200 `#f4d09a`, 300 `#ecb666`, 400 `#e3a03c`, 500 `#d98a20`, 600 `#ad6b18`, 700 `#8b5514`, 800 `#693f0f`, 900 `#4a2c0b`.
 
 **Regra:** accent em no máximo 5% da interface visível. Nunca como cor dominante.
 
@@ -65,7 +80,7 @@ O agronegócio opera entre **campo, clima e dados**. Cores frias genéricas (cin
 | `color.warning.500` | `#b7791f` | Alertas, pendências, safra em risco |
 | `color.info.500` | `#2f6f95` | Informações neutras, dicas |
 
-Cada semântica possui variantes `.50` (background) e `.700` (texto sobre `.50`).
+Cada semântica possui variantes `.50` (background) e `.700` (texto sobre `.50`). `color.success.700` = `#177239` — alinhado ao `primary.600`.
 
 ### Superfícies e interação
 
@@ -75,24 +90,46 @@ Cada semântica possui variantes `.50` (background) e `.700` (texto sobre `.50`)
 | `color.bg.auth` | `#eef4ea` | Telas de autenticação |
 | `color.surface.default` | `neutral.0` | Cards, panels, modais |
 | `color.surface.sunken` | `neutral.100` | Áreas inset (filtros, sidebar sections) |
-| `color.overlay` | `rgba(23,33,26,0.48)` | Backdrop de modal — **sem blur** |
-| `color.hover` | `rgba(37,109,61,0.06)` | Hover genérico |
-| `color.active` | `rgba(37,109,61,0.12)` | Estado pressed |
+| `color.overlay` | `rgba(10,31,18,0.5)` | Backdrop de modal — **sem blur** |
+| `color.hover` | `rgba(30,138,74,0.06)` | Hover genérico |
+| `color.hover.strong` | `rgba(30,138,74,0.1)` | Hover mais evidente |
+| `color.active` | `rgba(30,138,74,0.12)` | Estado pressed |
 | `color.disabled.bg` | `neutral.100` | Fundo disabled |
 | `color.disabled.text` | `neutral.400` | Texto disabled |
-| `color.focus.ring` | `rgba(37,109,61,0.35)` | Anel de foco |
+| `color.focus.ring` | `rgba(30,138,74,0.35)` | Anel de foco |
+
+### Sidebar (shell verde-floresta)
+
+Tokens dedicados ao chrome escuro — nunca reutilizar tokens de texto/borda claros na sidebar.
+
+| Token | Valor | Uso |
+|---|---|---|
+| `color.sidebar.bg` | `forest.900` (`#0f2818`) | Background da sidebar |
+| `color.sidebar.bg.deep` | `forest.950` (`#0a1f12`) | Fundo mais profundo |
+| `color.sidebar.border` | `rgba(255,255,255,0.08)` | Divisores internos |
+| `color.sidebar.text` | `#e6f0e8` | Texto principal (nome do usuário) |
+| `color.sidebar.text.secondary` | `#a3bfa9` | Texto secundário (email, nav em repouso) |
+| `color.sidebar.text.muted` | `#7d9a84` | Labels overline de seção |
+| `color.sidebar.item.hover` | `rgba(255,255,255,0.06)` | Hover de nav item |
+| `color.sidebar.item.active.bg` | `rgba(63,169,106,0.18)` | Background do nav item ativo |
+| `color.sidebar.item.active.text` | `#ffffff` | Texto do nav item ativo |
+| `color.sidebar.accent` | `accent.400` (`#e3a03c`) | Indicador border-left e ícone do item ativo |
 
 ---
 
 ## Tipografia
 
-### Fonte
+### Fontes
 
-**Inter** — legibilidade em dashboards densos, números tabulares, amplo suporte latin.
+| Papel | Fonte | Weights (Google Fonts) | Uso |
+|---|---|---|---|
+| Display/headings | **Sora** | 500/600/700/800 | `typography.display`, H1–H3, wordmark do logo, taglines |
+| Corpo | **Inter** | 400/500/600/700 | Body, labels, formulários, tabelas |
+| Dados numéricos | **JetBrains Mono** | 500/600 | KPIs, moedas, valores de métricas (`.text-metric`) |
 
-Fallback: `ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif`
+Fallback base: `ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif`
 
-Monospace (código, IDs): **JetBrains Mono** — apenas dados técnicos.
+As três famílias são carregadas via Google Fonts em `index.html`.
 
 ### Escala
 
@@ -150,6 +187,19 @@ Monospace (código, IDs): **JetBrains Mono** — apenas dados técnicos.
 | Body SM | `typography.body.sm` | `text-caption` |
 | Caption | `typography.caption` | `text-caption text-grey-7` |
 | Overline | `typography.overline` | `.text-overline` |
+| Metric | `typography.metric` | — (custom `.text-metric`) |
+
+### Metric — valores numéricos de dados
+
+KPIs, moedas e valores de métricas usam JetBrains Mono via classe global `.text-metric` (`app.scss`):
+
+| Token | Valor |
+|---|---|
+| `typography.metric.family` | `font.family.mono` (JetBrains Mono) |
+| `typography.metric.weight` | 600 |
+| `typography.metric.letter-spacing` | -0.02em |
+
+A classe inclui `font-variant-numeric: tabular-nums` para alinhamento de dígitos.
 
 ---
 
@@ -200,11 +250,13 @@ Micro-ajustes permitidos em múltiplos de **4px** (`spacing.1` = 4px).
 
 | Token | Valor | Uso |
 |---|---|---|
-| `radius.sm` | 4px | Badges, chips pequenos |
-| `radius.md` | 8px | **Padrão** — cards, inputs, buttons |
-| `radius.lg` | 12px | Modais, panels grandes |
-| `radius.xl` | 16px | Feature cards hero |
-| `radius.full` | 9999px | Avatares, pills |
+| `radius.sm` | 6px | Badges, chips pequenos |
+| `radius.md` | 10px | **Padrão (assinatura visual)** — cards, inputs, buttons |
+| `radius.lg` | 14px | Modais, panels grandes, MetricTile |
+| `radius.xl` | 18px | Feature cards hero |
+| `radius.full` | 9999px | Avatares, pills, chip da empresa no header |
+
+O `radius.md` (10px) é alinhado às variáveis Quasar `$generic-border-radius`, `$button-border-radius` e `$input-border-radius` — sem divergência entre tokens e Quasar.
 
 ### Width
 
@@ -212,6 +264,7 @@ Micro-ajustes permitidos em múltiplos de **4px** (`spacing.1` = 4px).
 |---|---|
 | `border.width.thin` | 1px |
 | `border.width.medium` | 2px (focus ring) |
+| `border.width.accent` | 3px (barras de destaque: AuthCard, AppPageHeader, nav ativo, card CNPJ principal) |
 
 ### Border Colors
 
@@ -230,7 +283,7 @@ Apenas `solid`. Sem dashed/dotted exceto upload zone.
 
 ## Sombras (Elevation)
 
-Filosofia: **elevação sutil** — premium sem sombras dramáticas.
+Filosofia: **elevação sutil** — premium sem sombras dramáticas. Todas as sombras usam tint verde-floresta `rgba(10,31,18,…)` em vez de preto puro.
 
 | Token | Uso |
 |---|---|
@@ -240,6 +293,8 @@ Filosofia: **elevação sutil** — premium sem sombras dramáticas.
 | `shadow.md` | Dropdowns, popovers |
 | `shadow.lg` | Modais, drawers |
 | `shadow.xl` | Raramente — menus flutuantes grandes |
+| `shadow.card.hover` | Cards interativos em hover — `0 4px 12px rgba(30,138,74,0.1) + 0 2px 4px rgba(10,31,18,0.04)` |
+| `shadow.brand` | Painéis de marca — `0 8px 24px rgba(15,40,24,0.08)` |
 
 **Regra:** máximo 1 nível de elevação por viewport. Não empilhar sombras.
 
@@ -250,7 +305,7 @@ Filosofia: **elevação sutil** — premium sem sombras dramáticas.
 | Token | Valor | Uso |
 |---|---|---|
 | `opacity.disabled` | 0.48 | Elementos disabled |
-| `opacity.overlay` | 0.48 | Backdrop modal |
+| `opacity.overlay` | 0.5 | Backdrop modal |
 
 ---
 

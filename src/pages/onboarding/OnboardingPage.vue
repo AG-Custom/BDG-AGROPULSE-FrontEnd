@@ -3,7 +3,7 @@
     <section class="onboarding-panel agro-surface-raised">
       <header class="onboarding-panel__header">
         <div class="text-h5">Configure sua operação</div>
-        <p class="text-body2 text-grey-7">
+        <p class="text-body2 text-secondary">
           Cadastre sua empresa e as unidades para começar a usar o AgroPulse.
         </p>
       </header>

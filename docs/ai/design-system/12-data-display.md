@@ -8,8 +8,14 @@
 
 ### Padrão AgroPulse
 
+Estilo global (`app.scss`): thead com fundo `color.bg.subtle`, th uppercase xs semibold letter-spacing wide em `color.text.secondary`, hover de linha `color.hover` com transição, células com `tabular-nums`, paginação em `color.text.secondary` sm, radius `radius.md`.
+
+Primeiro carregamento: `AgroTableSkeleton` no lugar da tabela; recargas usam `:loading`.
+
 ```vue
+<agro-table-skeleton v-if="carregandoInicial" />
 <q-table
+  v-else
   flat
   bordered
   row-key="id"
@@ -64,21 +70,34 @@
 
 Ativar para > 500 rows. Quasar `virtual-scroll` prop.
 
+### Barra de filtros
+
+Filtros acima da tabela usam a classe global `.agro-filter-bar` (`app.scss`) — flex wrap, gap `spacing.4`, margin-bottom `spacing.5`:
+
+```vue
+<div class="agro-filter-bar">
+  <q-input v-model="busca" outlined dense placeholder="Buscar..." />
+  <q-select v-model="status" outlined dense :options="statusOpcoes" label="Status" />
+</div>
+```
+
+Usada em `FornecedoresListPage`.
+
 ---
 
 ## Cards
 
 ### MetricTile (KPI)
 
-Componente existente — label + value. Padrão dashboard.
+Componente existente — padrão dashboard. Props: `label`, `value`, `icon`, `trend?`, `accent?`.
 
-Futuro:
+Valor em JetBrains Mono (`typography.metric.*`, `tabular-nums`); ícone 24px em container 44px.
+
 ```vue
 <metric-tile
   label="Área plantada"
   value="1.240 ha"
   trend="+12%"
-  trend-direction="up"
   icon="agriculture"
 />
 ```
@@ -155,7 +174,7 @@ Dashboard grid:
 
 Métricas prioritárias primeiro (esquerda/topo). Máximo 8 tiles por dashboard view.
 
-Números: `font.weight.bold`, `font.size.2xl`.
+Números: classe `.text-metric` (JetBrains Mono, weight 600, tabular-nums), `font.size.2xl`.
 Labels: `text-caption`.
 
 ---

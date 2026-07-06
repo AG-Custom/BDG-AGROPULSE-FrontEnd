@@ -1,17 +1,22 @@
 // AgroPulse Design Tokens — Cores
 // Nunca usar valores hex/rgb diretamente nos componentes — sempre var(--color-*)
 
-// ─── Primárias (Verde campo — confiança, crescimento) ───
-$color-primary-50: #eef6f1;
-$color-primary-100: #d5eadc;
-$color-primary-200: #aed9be;
-$color-primary-300: #7ec099;
-$color-primary-400: #3dba6a;
-$color-primary-500: #2a8f4a;
-$color-primary-600: #1f5a34;
-$color-primary-700: #19482a;
-$color-primary-800: #133620;
-$color-primary-900: #0d2416;
+// ─── Primárias (Verde campo rico — confiança, crescimento) ───
+$color-primary-50: #edf7f0;
+$color-primary-100: #d2ecdb;
+$color-primary-200: #a6d9b9;
+$color-primary-300: #72c294;
+$color-primary-400: #3fa96a;
+$color-primary-500: #1e8a4a;
+$color-primary-600: #177239;
+$color-primary-700: #135c30;
+$color-primary-800: #0f4525;
+$color-primary-900: #0b2f1a;
+
+// ─── Floresta (shell escuro — sidebar, painéis de marca) ───
+$color-forest-800: #143321;
+$color-forest-900: #0f2818;
+$color-forest-950: #0a1f12;
 
 // ─── Secundárias (Azul profundo — água, tecnologia) ───
 $color-secondary-50: #eef4f7;
@@ -25,17 +30,17 @@ $color-secondary-700: #1f3f4d;
 $color-secondary-800: #172f3a;
 $color-secondary-900: #0f1f27;
 
-// ─── Accent (Colheita — destaque, CTA secundário) ───
-$color-accent-50: #fdf6ee;
-$color-accent-100: #f9e8d4;
-$color-accent-200: #f0cfa8;
-$color-accent-300: #e4b078;
-$color-accent-400: #d5964f;
-$color-accent-500: #d4922f;
-$color-accent-600: #a66a24;
-$color-accent-700: #88551d;
-$color-accent-800: #6a4016;
-$color-accent-900: #4c2b0f;
+// ─── Accent (Colheita — calor, destaque, assinatura visual) ───
+$color-accent-50: #fdf5ea;
+$color-accent-100: #fae7c9;
+$color-accent-200: #f4d09a;
+$color-accent-300: #ecb666;
+$color-accent-400: #e3a03c;
+$color-accent-500: #d98a20;
+$color-accent-600: #ad6b18;
+$color-accent-700: #8b5514;
+$color-accent-800: #693f0f;
+$color-accent-900: #4a2c0b;
 
 // ─── Neutras (Verde-cinza quente — premium agro, não cinza frio) ───
 $color-neutral-0: #ffffff;
@@ -53,7 +58,7 @@ $color-neutral-900: #17211a;
 // ─── Semânticas ───
 $color-success-50: #eef7f0;
 $color-success-500: #2f7d45;
-$color-success-700: #1f5a34;
+$color-success-700: #177239;
 
 $color-error-50: #fdf0ef;
 $color-error-500: #b3261e;
@@ -74,14 +79,14 @@ $color-bg-auth: #eef4ea;
 $color-surface-default: $color-neutral-0;
 $color-surface-raised: $color-neutral-0;
 $color-surface-sunken: $color-neutral-100;
-$color-overlay: rgba(23, 33, 26, 0.48);
-$color-hover: rgba(42, 143, 74, 0.06);
-$color-hover-strong: rgba(42, 143, 74, 0.1);
-$color-active: rgba(42, 143, 74, 0.12);
+$color-overlay: rgba(10, 31, 18, 0.5);
+$color-hover: rgba(30, 138, 74, 0.06);
+$color-hover-strong: rgba(30, 138, 74, 0.1);
+$color-active: rgba(30, 138, 74, 0.12);
 $color-disabled-bg: $color-neutral-100;
 $color-disabled-text: $color-neutral-400;
 $color-disabled-border: $color-neutral-200;
-$color-focus-ring: rgba(42, 143, 74, 0.35);
+$color-focus-ring: rgba(30, 138, 74, 0.35);
 $color-icon-bg-primary: $color-primary-50;
 $color-icon-bg-accent: $color-accent-50;
 $color-bg-auth-gradient: linear-gradient(
@@ -90,6 +95,18 @@ $color-bg-auth-gradient: linear-gradient(
   #{$color-bg-auth} 40%,
   #{$color-accent-50} 100%
 );
+
+// ─── Sidebar (shell verde-floresta) ───
+$color-sidebar-bg: $color-forest-900;
+$color-sidebar-bg-deep: $color-forest-950;
+$color-sidebar-border: rgba(255, 255, 255, 0.08);
+$color-sidebar-text: #e6f0e8;
+$color-sidebar-text-secondary: #a3bfa9;
+$color-sidebar-text-muted: #7d9a84;
+$color-sidebar-item-hover: rgba(255, 255, 255, 0.06);
+$color-sidebar-item-active-bg: rgba(63, 169, 106, 0.18);
+$color-sidebar-item-active-text: $color-neutral-0;
+$color-sidebar-accent: $color-accent-400;
 
 // ─── Texto ───
 $color-text-primary: $color-neutral-900;
@@ -118,16 +135,31 @@ $color-border-error: $color-error-500;
   --color-primary-800: #{$color-primary-800};
   --color-primary-900: #{$color-primary-900};
 
+  --color-forest-800: #{$color-forest-800};
+  --color-forest-900: #{$color-forest-900};
+  --color-forest-950: #{$color-forest-950};
+
   --color-secondary-50: #{$color-secondary-50};
+  --color-secondary-100: #{$color-secondary-100};
+  --color-secondary-200: #{$color-secondary-200};
+  --color-secondary-300: #{$color-secondary-300};
+  --color-secondary-400: #{$color-secondary-400};
   --color-secondary-500: #{$color-secondary-500};
+  --color-secondary-600: #{$color-secondary-600};
   --color-secondary-700: #{$color-secondary-700};
+  --color-secondary-800: #{$color-secondary-800};
+  --color-secondary-900: #{$color-secondary-900};
 
   --color-accent-50: #{$color-accent-50};
   --color-accent-100: #{$color-accent-100};
   --color-accent-200: #{$color-accent-200};
+  --color-accent-300: #{$color-accent-300};
+  --color-accent-400: #{$color-accent-400};
   --color-accent-500: #{$color-accent-500};
   --color-accent-600: #{$color-accent-600};
   --color-accent-700: #{$color-accent-700};
+  --color-accent-800: #{$color-accent-800};
+  --color-accent-900: #{$color-accent-900};
 
   --color-icon-bg-primary: #{$color-icon-bg-primary};
   --color-icon-bg-accent: #{$color-icon-bg-accent};
@@ -175,6 +207,17 @@ $color-border-error: $color-error-500;
   --color-disabled-text: #{$color-disabled-text};
   --color-disabled-border: #{$color-disabled-border};
   --color-focus-ring: #{$color-focus-ring};
+
+  --color-sidebar-bg: #{$color-sidebar-bg};
+  --color-sidebar-bg-deep: #{$color-sidebar-bg-deep};
+  --color-sidebar-border: #{$color-sidebar-border};
+  --color-sidebar-text: #{$color-sidebar-text};
+  --color-sidebar-text-secondary: #{$color-sidebar-text-secondary};
+  --color-sidebar-text-muted: #{$color-sidebar-text-muted};
+  --color-sidebar-item-hover: #{$color-sidebar-item-hover};
+  --color-sidebar-item-active-bg: #{$color-sidebar-item-active-bg};
+  --color-sidebar-item-active-text: #{$color-sidebar-item-active-text};
+  --color-sidebar-accent: #{$color-sidebar-accent};
 
   --color-text-primary: #{$color-text-primary};
   --color-text-secondary: #{$color-text-secondary};

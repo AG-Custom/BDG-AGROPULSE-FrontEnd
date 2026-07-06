@@ -28,7 +28,7 @@ defineProps<{
   background: var(--color-surface-default);
   border: var(--border-width-thin) solid var(--color-border-default);
   border-radius: var(--radius-lg);
-  border-top: 3px solid var(--color-accent-500);
+  border-top: var(--border-width-accent) solid var(--color-accent-500);
   box-shadow: var(--shadow-brand);
   display: grid;
   gap: var(--spacing-6);

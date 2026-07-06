@@ -30,14 +30,25 @@ color.primary.600   color.primary.700   color.primary.800
 color.primary.900
 ```
 
+### Forest (shell escuro)
+```
+color.forest.800  color.forest.900  color.forest.950
+```
+
 ### Secundárias
 ```
-color.secondary.50  color.secondary.500  color.secondary.700
+color.secondary.50  color.secondary.100  color.secondary.200
+color.secondary.300 color.secondary.400  color.secondary.500  ← base
+color.secondary.600 color.secondary.700  color.secondary.800
+color.secondary.900
 ```
 
 ### Accent
 ```
-color.accent.500
+color.accent.50   color.accent.100   color.accent.200
+color.accent.300  color.accent.400   color.accent.500  ← base
+color.accent.600  color.accent.700   color.accent.800
+color.accent.900
 ```
 
 ### Neutras
@@ -65,6 +76,15 @@ color.active           color.disabled.bg      color.disabled.text
 color.disabled.border  color.focus.ring
 ```
 
+### Sidebar (shell verde-floresta)
+```
+color.sidebar.bg              color.sidebar.bg.deep
+color.sidebar.border          color.sidebar.text
+color.sidebar.text.secondary  color.sidebar.text.muted
+color.sidebar.item.hover      color.sidebar.item.active.bg
+color.sidebar.item.active.text  color.sidebar.accent
+```
+
 ### Texto
 ```
 color.text.primary    color.text.secondary   color.text.tertiary
@@ -83,7 +103,7 @@ color.border.focus    color.border.error
 ## Tipografia
 
 ```
-font.family.base          font.family.mono
+font.family.base          font.family.display       font.family.mono
 font.weight.regular       font.weight.medium
 font.weight.semibold      font.weight.bold
 font.size.xs … font.size.4xl
@@ -94,7 +114,11 @@ typography.display
 typography.h1 … typography.h6
 typography.body.lg   typography.body.md   typography.body.sm
 typography.caption   typography.overline
+typography.metric.family  typography.metric.weight  typography.metric.letter-spacing
 ```
+
+`font.family.base` = Inter · `font.family.display` = Sora · `font.family.mono` = JetBrains Mono.
+Os tokens `typography.metric.*` alimentam a classe global `.text-metric` (KPIs, moedas).
 
 ---
 
@@ -119,9 +143,11 @@ card.padding          form.gap
 
 ```
 radius.none  radius.sm  radius.md  radius.lg  radius.xl  radius.full
-border.width.thin  border.width.medium
+border.width.thin  border.width.medium  border.width.accent
 border.style.default
 ```
+
+`radius.md` = 10px (assinatura visual). `border.width.accent` = 3px (barras de destaque).
 
 ---
 
@@ -129,8 +155,11 @@ border.style.default
 
 ```
 shadow.none  shadow.xs  shadow.sm  shadow.md  shadow.lg  shadow.xl
+shadow.card-hover  shadow.brand
 opacity.disabled  opacity.overlay
 ```
+
+Sombras com tint verde-floresta `rgba(10,31,18,…)` — nunca preto puro.
 
 ---
 

@@ -58,7 +58,7 @@
 }
 
 .app-sidebar__label {
-  color: var(--color-text-tertiary);
+  color: var(--color-sidebar-text-muted);
   padding: var(--spacing-2) var(--spacing-4);
 }
 
@@ -68,25 +68,25 @@
 
 .app-sidebar__item {
   border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
+  color: var(--color-sidebar-text-secondary);
   margin-bottom: var(--spacing-1);
   min-height: 40px;
   transition: var(--transition-bg), var(--transition-color);
 }
 
 .app-sidebar__item:hover {
-  background: var(--color-hover);
-  color: var(--color-text-primary);
+  background: var(--color-sidebar-item-hover);
+  color: var(--color-sidebar-text);
 }
 
 :deep(.app-sidebar__item--active) {
-  background: var(--color-primary-50);
-  border-left: 3px solid var(--color-primary-500);
-  color: var(--color-primary-700);
+  background: var(--color-sidebar-item-active-bg);
+  border-left: var(--border-width-accent) solid var(--color-sidebar-accent);
+  color: var(--color-sidebar-item-active-text);
   font-weight: var(--font-weight-medium);
 }
 
 :deep(.app-sidebar__item--active .q-icon) {
-  color: var(--color-primary-600);
+  color: var(--color-sidebar-accent);
 }
 </style>

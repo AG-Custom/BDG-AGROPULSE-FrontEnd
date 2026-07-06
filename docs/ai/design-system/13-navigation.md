@@ -4,27 +4,35 @@
 
 ## Sidebar (`AppSidebar.vue`)
 
+Shell **verde-floresta escuro** (`color.sidebar.bg` = forest.900) — todos os elementos usam tokens `color.sidebar.*`.
+
 ### Estrutura
 
 ```
 ┌─────────────────────┐
-│ 🌿 AgroPulse        │  ← brand block (MainLayout)
-│ Gestão agrícola     │
+│ 🌿 AgroPulse        │  ← brand block (MainLayout): logo inverse,
+│ Nome do usuário     │     nome em sidebar.text, email em
+│ email@empresa.com   │     sidebar.text.secondary
+│ [Unidade ativa ▾]   │  ← UnidadeSwitcher
 ├─────────────────────┤
+│ PRINCIPAL           │  ← label overline (sidebar.text.muted)
 │ ▣ Dashboard         │  ← nav items
-│ ○ Clientes          │
-│ ○ Produtos          │
-│ ○ Pedidos           │
-│ ○ Safras            │
-├─────────────────────┤
-│ ⚙ Configurações     │  ← secondary nav (bottom)
+│ CADASTROS           │
+│ ○ Unidades          │
+│ ○ Fornecedores      │
 └─────────────────────┘
 ```
 
 ### Item de navegação
 
 ```vue
-<q-item clickable :to="{ name: 'dashboard' }" exact active-class="nav-item--active">
+<q-item
+  clickable
+  :to="{ name: 'dashboard' }"
+  exact
+  active-class="app-sidebar__item--active"
+  class="app-sidebar__item"
+>
   <q-item-section avatar>
     <q-icon name="dashboard" size="20px" />
   </q-item-section>
@@ -32,11 +40,14 @@
 </q-item>
 ```
 
-### Estado ativo
-- Background: `color.primary.50`
-- Text: `color.primary.600`, weight medium
-- Icon: `color.primary.500`
-- Border-left: 3px `color.primary.500` (futuro)
+### Estados
+- Default: texto `color.sidebar.text.secondary`, radius `radius.md`
+- Hover: background `color.sidebar.item.hover` (branco 6%), texto `color.sidebar.text`
+- Ativo: background `color.sidebar.item.active.bg` (rgba verde 18%), border-left `border.width.accent` `color.sidebar.accent` (accent.400), texto branco (`color.sidebar.item.active.text`), ícone `color.sidebar.accent`, weight medium
+
+### UnidadeSwitcher
+
+Troca de unidade operacional no brand block: label overline "Unidade ativa" (`color.sidebar.text.muted`) + `q-select` outlined dense adaptado ao fundo escuro — fundo `color.sidebar.item.hover`, bordas `color.sidebar.border`, focus `color.primary.300`, ícone `storefront` no prepend.
 
 ### Permissões
 Itens filtrados por `usePermissao()` — ocultar módulos sem acesso, não mostrar disabled.
@@ -49,11 +60,13 @@ Itens filtrados por `usePermissao()` — ocultar módulos sem acesso, não mostr
 
 | Zona | Conteúdo |
 |---|---|
-| Left | Menu toggle (lt-md) + título/logo |
+| Left | Menu toggle + logo compacto (mobile) |
 | Center | — (vazio, reservado para breadcrumb futuro) |
-| Right | Notificações (futuro) + perfil + logout |
+| Right | `EmpresaHeaderLink` + logout |
 
-Altura: 56px. Flat, border-bottom.
+Altura: 56px. Flat, border-bottom — permanece **claro** (contraste intencional com a sidebar escura).
+
+`EmpresaHeaderLink`: chip pill (fundo `color.bg.subtle`, borda `color.border.default`, `radius.full`, ícone `color.primary.600`, hover verde suave) que leva a Empresa/CNPJs.
 
 ---
 

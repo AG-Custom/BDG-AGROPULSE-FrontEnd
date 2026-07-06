@@ -9,7 +9,7 @@
 .not-found-page {
   align-items: center;
   display: grid;
-  gap: 16px;
+  gap: var(--spacing-4);
   justify-content: center;
   min-height: 100vh;
 }

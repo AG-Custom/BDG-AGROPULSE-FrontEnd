@@ -124,6 +124,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.text-metric {
+  font-family: var(--typography-metric-family);
+  font-weight: var(--typography-metric-weight);
+  letter-spacing: var(--typography-metric-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
 // ─── Padrão de fundo auth/hero ───
 .agro-bg-pattern {
   background-color: var(--color-bg-auth);
@@ -149,15 +156,22 @@ body {
   transition: var(--transition-bg), var(--transition-shadow), var(--transition-transform);
 
   &.q-btn--unelevated.bg-primary:not(.disabled):hover {
-    filter: brightness(1.05);
+    box-shadow: var(--shadow-card-hover);
+    filter: brightness(0.94);
   }
 }
 
 .q-field--outlined .q-field__control {
+  background: var(--color-surface-default);
   border-radius: var(--radius-md);
 
   &:before {
     border-color: var(--color-border-default);
+    transition: var(--transition-border);
+  }
+
+  &:hover:before {
+    border-color: var(--color-border-strong);
   }
 }
 
@@ -170,23 +184,80 @@ body {
   font-weight: var(--font-weight-medium);
 }
 
-.q-header,
-.q-drawer {
-  background: var(--color-surface-default) !important;
-  color: var(--color-text-primary) !important;
+.q-field__bottom {
+  color: var(--color-text-tertiary);
 }
 
 .q-header {
+  background: var(--color-surface-default) !important;
   border-bottom: var(--border-width-thin) solid var(--color-border-default);
+  color: var(--color-text-primary) !important;
 }
 
 .q-drawer {
-  border-right: var(--border-width-thin) solid var(--color-border-default);
+  background: var(--color-sidebar-bg) !important;
+  border-right: none;
+  color: var(--color-sidebar-text) !important;
 }
 
 .q-card--flat.q-card--bordered {
   border-color: var(--color-border-default);
   border-radius: var(--radius-md);
+}
+
+// ─── Tabelas de dados ───
+.q-table--flat.q-table--bordered {
+  border-color: var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.q-table thead tr {
+  background: var(--color-bg-subtle);
+}
+
+.q-table thead th {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.q-table tbody tr {
+  transition: var(--transition-bg);
+}
+
+.q-table tbody tr:hover {
+  background: var(--color-hover);
+}
+
+.q-table tbody td {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-table__bottom {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+// ─── Barra de filtros de listagem ───
+.agro-filter-bar {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-5);
+}
+
+// ─── Ações de formulário (rodapé) ───
+.agro-form-actions {
+  border-top: var(--border-width-thin) solid var(--color-border-default);
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-5);
 }
 
 .auth-link {

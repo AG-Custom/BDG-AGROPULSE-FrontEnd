@@ -35,7 +35,7 @@
       </div>
       <div class="col-12 col-md-6 unidade-matriz">
         <q-toggle v-model="unidade.matriz" label="Unidade matriz" @update:model-value="onMatrizChange" />
-        <q-icon name="info" size="18px" color="grey-7" class="unidade-matriz__info" aria-label="Sobre unidade matriz">
+        <q-icon name="info" size="18px" class="unidade-matriz__info text-tertiary" aria-label="Sobre unidade matriz">
           <q-tooltip max-width="280px">
             Unidade matriz é a unidade principal (sede) da empresa dentro do AgroPulse.
           </q-tooltip>

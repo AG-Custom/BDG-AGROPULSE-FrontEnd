@@ -30,10 +30,10 @@
 
     <q-drawer v-model="drawer" :width="260" class="main-layout__drawer">
       <div class="main-layout__drawer-brand">
-        <agro-logo size="md" />
+        <agro-logo size="md" inverse />
         <div v-if="usuario" class="main-layout__user">
           <div class="main-layout__user-name">{{ nomeUsuario }}</div>
-          <div class="text-caption text-secondary">{{ usuario.email }}</div>
+          <div class="main-layout__user-email">{{ usuario.email }}</div>
         </div>
         <unidade-switcher />
       </div>
@@ -79,11 +79,11 @@ async function sair(): Promise<void> {
 }
 
 .main-layout__drawer {
-  background: var(--color-neutral-50);
+  background: var(--color-sidebar-bg);
 }
 
 .main-layout__drawer-brand {
-  border-bottom: var(--border-width-thin) solid var(--color-border-default);
+  border-bottom: var(--border-width-thin) solid var(--color-sidebar-border);
   display: grid;
   gap: var(--spacing-3);
   padding: var(--spacing-5) var(--spacing-4);
@@ -95,9 +95,15 @@ async function sair(): Promise<void> {
 }
 
 .main-layout__user-name {
-  color: var(--color-text-primary);
+  color: var(--color-sidebar-text);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
+}
+
+.main-layout__user-email {
+  color: var(--color-sidebar-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
 }
 
 .main-layout__content {

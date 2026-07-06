@@ -56,29 +56,33 @@ Conteúdo principal usa `.agro-page` com `padding: var(--page-padding)`.
 
 **Regra:** header nunca sticky com sombra pesada. Borda sutil é suficiente.
 
+**Contraste intencional:** o header permanece claro (surface + border-bottom) enquanto a sidebar é verde-floresta escura — a marca vive no chrome lateral, o conteúdo respira em superfícies claras.
+
 ---
 
 ## Sidebar
+
+Shell **verde-floresta escuro** — assinatura visual brand-forward do AgroPulse.
 
 | Propriedade | Valor |
 |---|---|
 | Largura expandida | `260px` |
 | Largura collapsed | `72px` (futuro) |
-| Background | `color.surface.default` |
-| Borda | `1px color.border.default` right |
+| Background | `color.sidebar.bg` (forest.900) |
+| Borda | sem border-right — contraste com o conteúdo é suficiente |
 | z-index | `z.sidebar` |
 
 **Seções:**
-1. Brand block (logo + tagline) — `padding: spacing.4`
-2. Navegação principal — `AppSidebar.vue`
-3. Footer sidebar (versão, suporte) — opcional
+1. Brand block (logo `inverse` + nome do usuário em `color.sidebar.text` + email em `color.sidebar.text.secondary`) — divisor `color.sidebar.border`
+2. `UnidadeSwitcher` — label overline "Unidade ativa" + `q-select` adaptado ao fundo escuro (ícone storefront no prepend)
+3. Navegação principal — `AppSidebar.vue`, labels de seção overline em `color.sidebar.text.muted`
 
 **Item de nav:**
 - Altura: 40px
-- Padding: `spacing.2 spacing.4`
-- Radius: `radius.sm`
-- Ativo: background `color.primary.50`, texto `color.primary.600`, ícone `color.primary.500`
-- Hover: background `color.hover`
+- Radius: `radius.md`
+- Default: texto `color.sidebar.text.secondary`
+- Hover: background `color.sidebar.item.hover` (branco 6%), texto `color.sidebar.text`
+- Ativo: background `color.sidebar.item.active.bg` (verde translúcido), border-left `border.width.accent` `color.sidebar.accent` (accent.400), texto branco, ícone `color.sidebar.accent`
 
 ---
 
@@ -144,9 +148,9 @@ Telas públicas (login): footer mínimo opcional com copyright.
 
 `AuthLayout.vue` — sem sidebar/header app.
 
-- Background: `color.bg.auth`
-- Panel centralizado: max-width `420px`, padding `spacing.8`
-- Card: `color.surface.default`, border `color.border.default`, radius `radius.md`
+- Painel de marca (`AuthBrandPanel`, ≥1024px): gradiente `forest.800 → forest.950`, logo `inverse`, tagline Sora 2xl clara + subtagline, features com ícones `accent.400` em containers brancos translúcidos (8%) com borda `color.sidebar.border`, decoração SVG "linhas de plantio" em `primary.300` opacity 0.14 + glow radial — **sem blur**
+- Área do formulário: background `color.bg.auth`
+- Card (`AuthCard`): `color.surface.default`, border `color.border.default`, barra de destaque `border.width.accent`, max-width `420px`, padding `spacing.8`
 
 ---
 
@@ -166,7 +170,7 @@ Resumo:
 | Fazer | Evitar |
 |---|---|
 | Bordas sutis + whitespace | Sombras dramáticas |
-| Superfícies brancas sobre fundo sage | Dark mode não solicitado |
+| Superfícies brancas sobre fundo sage | Dark mode não solicitado no conteúdo |
 | Dados organizados em cards flat | Cards com gradiente |
 | Header flat com border-bottom | Header com blur/glass |
-| Sidebar limpa com ícones outlined | Sidebar escura pesada |
+| Sidebar verde-floresta com tokens `color.sidebar.*` | Sidebar escura com cinza genérico ou hex hardcoded |

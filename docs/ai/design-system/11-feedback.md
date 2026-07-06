@@ -76,11 +76,13 @@ Persistente na page até dismiss ou condição resolver.
 | Pattern | Quando |
 |---|---|
 | Button `:loading` | Submit, ação pontual |
-| Table `:loading` | Fetch de dados tabulares |
-| Skeleton | Layout conhecido, fetch > 200ms |
-| Inline spinner | Área < 100px |
+| `AgroTableSkeleton` (props `linhas`/`colunas`) | Primeiro carregamento de listagens |
+| `AgroFormSkeleton` (prop `campos`) | Primeiro carregamento de formulários (modo edição) |
+| Table `:loading` | Recarga de dados tabulares (filtros, paginação) |
+| Skeleton (`q-skeleton`) | Outros layouts conhecidos, fetch > 200ms |
+| Inline spinner | Área < 100px, estados pontuais de auth (ConfirmEmail, SelecionarUnidade) |
 
-**Proibido:** overlay fullscreen, blur loading, progress falso.
+**Proibido:** overlay fullscreen, `q-inner-loading` em forms/listagens, blur loading, progress falso.
 
 ---
 

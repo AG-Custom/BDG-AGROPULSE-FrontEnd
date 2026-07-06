@@ -1,9 +1,14 @@
 <template>
   <aside class="auth-brand">
     <div class="auth-brand__content">
-      <agro-logo size="lg" />
+      <agro-logo size="lg" inverse />
 
-      <p class="auth-brand__tagline">Gestão agrícola integrada para operações que crescem.</p>
+      <div>
+        <p class="auth-brand__tagline">Gestão agrícola integrada para operações que crescem.</p>
+        <p class="auth-brand__subtagline">
+          Do campo à decisão — dados confiáveis, em um só lugar.
+        </p>
+      </div>
 
       <ul class="auth-brand__features">
         <li v-for="item in features" :key="item.title" class="auth-brand__feature">
@@ -19,9 +24,21 @@
     </div>
 
     <div class="auth-brand__decor" aria-hidden="true">
-      <div class="auth-brand__orb auth-brand__orb--primary" />
-      <div class="auth-brand__orb auth-brand__orb--accent" />
-      <div class="auth-brand__grid" />
+      <svg
+        class="auth-brand__field-lines"
+        viewBox="0 0 600 800"
+        preserveAspectRatio="xMidYMax slice"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M-40 780 Q 300 640 640 760" stroke="currentColor" stroke-width="1.5" />
+        <path d="M-40 730 Q 300 580 640 700" stroke="currentColor" stroke-width="1.5" />
+        <path d="M-40 680 Q 300 520 640 640" stroke="currentColor" stroke-width="1.5" />
+        <path d="M-40 630 Q 300 460 640 580" stroke="currentColor" stroke-width="1.5" />
+        <path d="M-40 580 Q 300 400 640 520" stroke="currentColor" stroke-width="1.5" />
+        <path d="M-40 530 Q 300 340 640 460" stroke="currentColor" stroke-width="1.5" />
+      </svg>
+      <div class="auth-brand__glow" />
     </div>
   </aside>
 </template>
@@ -50,6 +67,7 @@ const features = [
 
 <style scoped>
 .auth-brand {
+  background: linear-gradient(160deg, var(--color-forest-800) 0%, var(--color-forest-950) 100%);
   display: none;
   flex: 1;
   overflow: hidden;
@@ -66,10 +84,20 @@ const features = [
 }
 
 .auth-brand__tagline {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-relaxed);
+  color: var(--color-sidebar-text);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-snug);
   margin: 0;
+}
+
+.auth-brand__subtagline {
+  color: var(--color-sidebar-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  margin: var(--spacing-3) 0 0;
 }
 
 .auth-brand__features {
@@ -88,9 +116,10 @@ const features = [
 
 .auth-brand__feature-icon {
   align-items: center;
-  background: var(--color-icon-bg-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border: var(--border-width-thin) solid var(--color-sidebar-border);
   border-radius: var(--radius-md);
-  color: var(--color-primary-600);
+  color: var(--color-accent-400);
   display: flex;
   flex-shrink: 0;
   height: 40px;
@@ -99,14 +128,14 @@ const features = [
 }
 
 .auth-brand__feature-title {
-  color: var(--color-text-primary);
+  color: var(--color-sidebar-text);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-snug);
 }
 
 .auth-brand__feature-desc {
-  color: var(--color-text-secondary);
+  color: var(--color-sidebar-text-secondary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   margin-top: var(--spacing-1);
@@ -118,38 +147,19 @@ const features = [
   position: absolute;
 }
 
-.auth-brand__orb {
-  border-radius: var(--radius-full);
-  filter: blur(0);
+.auth-brand__field-lines {
+  bottom: 0;
+  color: var(--color-primary-300);
+  height: 100%;
+  left: 0;
+  opacity: 0.14;
   position: absolute;
+  width: 100%;
 }
 
-.auth-brand__orb--primary {
-  background: var(--color-primary-100);
-  height: 280px;
-  opacity: 0.6;
-  right: -80px;
-  top: 10%;
-  width: 280px;
-}
-
-.auth-brand__orb--accent {
-  background: var(--color-accent-100);
-  bottom: 15%;
-  height: 200px;
-  left: -60px;
-  opacity: 0.5;
-  width: 200px;
-}
-
-.auth-brand__grid {
-  background-image:
-    linear-gradient(var(--color-primary-100) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-primary-100) 1px, transparent 1px);
-  background-size: 32px 32px;
+.auth-brand__glow {
+  background: radial-gradient(circle at 85% 8%, rgba(63, 169, 106, 0.22) 0%, transparent 55%);
   inset: 0;
-  mask-image: radial-gradient(ellipse at 30% 50%, black 0%, transparent 70%);
-  opacity: 0.35;
   position: absolute;
 }
 

@@ -22,7 +22,7 @@
       <q-input v-model="form.nome" outlined label="Nome" class="field-required" :rules="[obrigatorio]" />
     </div>
   </div>
-  <div class="form-actions">
+  <div class="agro-form-actions">
     <q-btn flat label="Cancelar" @click="cancelar" />
     <q-btn color="primary" unelevated type="submit" label="Salvar" :loading="salvando" />
   </div>
@@ -31,6 +31,8 @@
 
 Gap entre campos: `var(--form-gap)` = 16px.
 Gap entre seções: `var(--section-gap)` = 24px.
+
+Inputs `outlined` têm fundo `color.surface.default` (branco), borda `color.border.strong` no hover e borda 2px `color.primary.500` no focus. Hints (`q-field__bottom`) em `color.text.tertiary` — estilos globais em `app.scss`.
 
 ---
 
@@ -195,16 +197,20 @@ CSS em `src/css/app.scss`:
 
 ## Ações do formulário
 
-Botões de ação (Continuar, Salvar, Voltar) alinhados à **direita**:
+Botões de ação (Continuar, Salvar, Voltar) alinhados à **direita** via classe global `.agro-form-actions` (`app.scss`) — rodapé com border-top:
 
 ```css
-.form-actions,
-.stepper-actions {
+.agro-form-actions {
+  border-top: var(--border-width-thin) solid var(--color-border-default);
   display: flex;
   gap: var(--spacing-3);
   justify-content: flex-end;
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-5);
 }
 ```
+
+Usada em `UnidadeFormPage`, `CnpjFormPage` e `FornecedorFormPage`.
 
 Ordem sugerida (esquerda → direita): secundário (Voltar/Cancelar) → primário (Continuar/Salvar).
 
@@ -244,6 +250,7 @@ Diferente de placeholder — helper é instrução, placeholder é exemplo.
 ## Loading
 
 - **Button loading** durante submit — padrão
+- **Primeiro carregamento** (modo edição): `AgroFormSkeleton` no lugar do form — **não** `q-inner-loading`
 - **Nunca** overlay fullscreen sobre form
 - Disable todos inputs durante submit se operação crítica
 

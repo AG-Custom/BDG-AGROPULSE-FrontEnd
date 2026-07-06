@@ -12,11 +12,12 @@ import type {
 import type { UsuarioLogado } from 'types/entidades/usuario';
 import {
   loginParaSessao,
+  mesclarSessaoRemotaComLocal,
   refreshParaSessao,
   selecionarUnidadeParaSessao,
   usuarioDtoParaLogado,
 } from 'utils/auth.mapper';
-import { limparSessao, obterSessao, salvarSessao } from 'utils/auth-storage';
+import { limparSessao, obterSessao, salvarSessao, sessaoExpirada } from 'utils/auth-storage';
 
 interface AuthState {
   autenticado: boolean;
@@ -75,12 +76,20 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async verificar() {
+      const sessaoLocal = obterSessao();
+
       try {
         const sessaoRemota = await authService.obterSessao();
-        const sessao = loginParaSessao(sessaoRemota);
+        const sessao = mesclarSessaoRemotaComLocal(loginParaSessao(sessaoRemota), sessaoLocal);
         salvarSessao(sessao);
         this.aplicarSessao(sessao);
       } catch {
+        if (sessaoLocal && !sessaoExpirada(sessaoLocal.expiresAt)) {
+          this.aplicarSessao(sessaoLocal);
+          this.verificado = true;
+          return;
+        }
+
         limparSessao();
         this.limparEstado();
         this.verificado = true;

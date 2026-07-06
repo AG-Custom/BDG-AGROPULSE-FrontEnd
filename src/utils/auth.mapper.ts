@@ -32,6 +32,22 @@ export function refreshParaSessao(
   };
 }
 
+export function mesclarSessaoRemotaComLocal(
+  remota: SessaoPersistida,
+  local: SessaoPersistida | null,
+): SessaoPersistida {
+  if (!local?.unidadeId || local.requiresUnidadeSelection || remota.unidadeId) {
+    return remota;
+  }
+
+  return {
+    ...remota,
+    unidadeId: local.unidadeId,
+    requiresUnidadeSelection: false,
+    unidadesDisponiveis: null,
+  };
+}
+
 export function selecionarUnidadeParaSessao(
   resposta: SelecionarUnidadeResponseDto,
   sessaoAtual: SessaoPersistida,

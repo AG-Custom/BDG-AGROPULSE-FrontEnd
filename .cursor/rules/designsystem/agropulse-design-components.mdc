@@ -24,8 +24,10 @@ Base: Quasar 2. Wrappers em `components/ui/` e `components/shared/`.
 
 ### Table
 - `flat bordered`, `#no-data` com empty state
-- `:loading` (linear progress) — sem overlay
-- Números alinhados à direita, formatados via utils
+- Primeiro carregamento: `AgroTableSkeleton` — nunca `q-inner-loading`
+- Recargas: `:loading` (linear progress) — sem overlay
+- Números alinhados à direita, formatados via utils, `tabular-nums`
+- Filtros acima via `.agro-filter-bar`
 
 ### Card
 - `flat bordered` ou `.agro-surface-raised`
@@ -42,10 +44,17 @@ Base: Quasar 2. Wrappers em `components/ui/` e `components/shared/`.
 - Empty: ícone 48px + título + descrição + CTA
 - ❌ tela branca vazia
 
+### Loading
+- Primeiro carregamento: `AgroTableSkeleton` (listagens, props `linhas`/`colunas`) ou `AgroFormSkeleton` (formulários, prop `campos`)
+- ❌ `q-inner-loading` em páginas de form/listagem
+- Form com ações no rodapé `.agro-form-actions`; spinner inline só em estados pontuais de auth
+
 ## Reutilizar antes de criar
 
 - `AppPageHeader` — título de page
-- `MetricTile` — KPI dashboard
+- `MetricTile` — KPI dashboard (valor em JetBrains Mono)
+- `AgroTableSkeleton` / `AgroFormSkeleton` — loading de primeiro carregamento
+- `AgroLogo` — marca (prop `inverse` para fundos escuros)
 - `useNotificacao` — toasts
 - `useTratarErroFormulario` — erros
 

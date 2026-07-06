@@ -10,9 +10,11 @@
 |---|---|---|
 | Text primary / bg default | 4.5:1 | ✅ ~12:1 |
 | Text secondary / bg default | 4.5:1 | ✅ ~5.5:1 |
-| Primary.500 / white | 4.5:1 | ✅ ~5.2:1 |
+| Primary.500 (`#1e8a4a`) / white | 3:1 (UI/texto grande) | ✅ ~4.4:1 — usar primary.600+ para texto corrido sobre branco |
 | Error.500 / white | 4.5:1 | ✅ |
 | Placeholder / bg | 3:1 | ✅ neutral.400 |
+| Sidebar.text / sidebar.bg (forest.900) | 4.5:1 | ✅ ~13:1 |
+| Sidebar.text.secondary / sidebar.bg | 4.5:1 | ✅ ~7.9:1 |
 
 **Regra:** nunca usar `neutral.400` para body text — apenas placeholder e disabled.
 

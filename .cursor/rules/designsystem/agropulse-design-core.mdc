@@ -9,7 +9,7 @@ Documentação completa: `docs/ai/design-system/`
 
 ## Identidade
 
-Premium SaaS agro — verde campo, neutros quentes, limpo e data-centric. **Sem** blur, glassmorphism, animações pesadas ou loading fullscreen.
+Premium SaaS agro — verde campo rico (`#1e8a4a`), shell verde-floresta escuro (sidebar/painel de marca), neutros quentes, limpo e data-centric. Display em **Sora**, corpo em **Inter**, dados numéricos em **JetBrains Mono** (`.text-metric`). **Sem** blur, glassmorphism, animações pesadas ou loading fullscreen.
 
 ## Regras imperativas
 
@@ -21,24 +21,30 @@ Premium SaaS agro — verde campo, neutros quentes, limpo e data-centric. **Sem*
 - **SEMPRE** empty state em listas/tabelas vazias
 - **SEMPRE** labels visíveis em inputs — placeholder não substitui label
 - **SEMPRE** icon buttons com `aria-label`
-- **SEMPRE** skeleton (layout conhecido) ou button `:loading` — nunca spinner fullscreen
+- **SEMPRE** `AgroTableSkeleton`/`AgroFormSkeleton` no primeiro carregamento de listagens/formulários, ou button `:loading` — nunca spinner fullscreen nem `q-inner-loading`
+- **SEMPRE** tokens `--color-sidebar-*`/`--color-forest-*` em chrome escuro — nunca cinza/hex hardcoded
 
 ## Tokens essenciais
 
 ```
 Cores:     var(--color-primary-500)  var(--color-surface-default)
            var(--color-border-default)  var(--color-text-primary)
+Sidebar:   var(--color-sidebar-bg)  var(--color-sidebar-text)
+           var(--color-sidebar-item-active-bg)  var(--color-sidebar-accent)
 Spacing:   var(--spacing-4)  var(--spacing-6)  var(--page-padding)
-Radius:    var(--radius-md)
-Shadow:    var(--shadow-sm)
+Radius:    var(--radius-md)  (10px — assinatura)
+Bordas:    var(--border-width-accent)  (3px — barras de destaque)
+Shadow:    var(--shadow-sm)  var(--shadow-card-hover)
 Motion:    var(--duration-fast)  var(--duration-normal)
+Dados:     .text-metric  (JetBrains Mono, tabular-nums)
 ```
 
 ## Layout
 
-- Header 56px flat + border-bottom
-- Sidebar 260px, nav item ativo com bg primary.50
+- Header 56px flat + border-bottom — permanece claro (contraste intencional)
+- Sidebar 260px verde-floresta escura (tokens `--color-sidebar-*`), sem border-right; nav ativo com bg verde translúcido + border-left 3px accent-400 + texto branco
 - Page: `.agro-page` + `AppPageHeader` + `.agro-section`
+- Classes globais: `.agro-form-actions` (rodapé de form) e `.agro-filter-bar` (filtros de listagem)
 - Container max 1440px
 
 ## Componentes Quasar

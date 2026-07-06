@@ -4,17 +4,17 @@
 
     <section class="agro-section">
       <agro-card>
-        <q-inner-loading :showing="carregandoPagina" color="primary" />
+        <agro-form-skeleton v-if="carregandoPagina" :campos="6" />
 
         <cnpj-formulario
-          v-if="!carregandoPagina"
+          v-else
           ref="formularioRef"
           v-model:formulario="formulario"
           :modo="modo"
           :desabilitar-principal="desabilitarPrincipal"
         />
 
-        <div class="cnpj-form-page__acoes">
+        <div v-if="!carregandoPagina" class="agro-form-actions">
           <agro-btn
             flat
             label="Cancelar"
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import CnpjFormulario from 'components/cnpjs/CnpjFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useCnpjs } from 'composables/useCnpjs';
 import type { CnpjFormModel } from 'types/dtos/cnpj.dto';
 import { cnpjDtoParaForm, criarCnpjFormVazia } from 'utils/mappers/cnpj.mapper';
@@ -122,11 +123,3 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.cnpj-form-page__acoes {
-  display: flex;
-  gap: var(--spacing-3);
-  justify-content: flex-end;
-  margin-top: var(--spacing-6);
-}
-</style>

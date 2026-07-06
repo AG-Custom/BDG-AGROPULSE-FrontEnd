@@ -4,7 +4,7 @@
 
     <section class="agro-section fornecedor-form-page">
       <agro-card>
-        <q-inner-loading :showing="carregandoPagina" color="primary" />
+        <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
 
         <q-banner
           v-if="!carregandoPagina && fornecedorInativo"
@@ -22,7 +22,7 @@
           :somente-leitura="fornecedorInativo"
         />
 
-        <div v-if="!carregandoPagina && !fornecedorInativo" class="fornecedor-form-page__acoes">
+        <div v-if="!carregandoPagina && !fornecedorInativo" class="agro-form-actions">
           <agro-btn
             flat
             label="Cancelar"
@@ -40,7 +40,7 @@
           />
         </div>
 
-        <div v-else-if="!carregandoPagina && fornecedorInativo" class="fornecedor-form-page__acoes">
+        <div v-else-if="!carregandoPagina && fornecedorInativo" class="agro-form-actions">
           <agro-btn
             flat
             label="Voltar"
@@ -63,6 +63,7 @@
 import FornecedorContatosSection from 'components/fornecedores/FornecedorContatosSection.vue';
 import FornecedorFormulario from 'components/fornecedores/FornecedorFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
@@ -172,12 +173,5 @@ onMounted(() => {
   background: var(--color-warning-50);
   color: var(--color-warning-700);
   margin-bottom: var(--spacing-4);
-}
-
-.fornecedor-form-page__acoes {
-  display: flex;
-  gap: var(--spacing-3);
-  justify-content: flex-end;
-  margin-top: var(--spacing-6);
 }
 </style>

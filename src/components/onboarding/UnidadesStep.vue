@@ -3,7 +3,7 @@
     <div class="unidades-step__header">
       <div>
         <div class="text-h6">Unidades operacionais</div>
-        <div class="text-body2 text-grey-7">Cadastre ao menos uma unidade. Marque uma como matriz.</div>
+        <div class="text-body2 text-secondary">Cadastre ao menos uma unidade. Marque uma como matriz.</div>
       </div>
       <agro-btn
         outline

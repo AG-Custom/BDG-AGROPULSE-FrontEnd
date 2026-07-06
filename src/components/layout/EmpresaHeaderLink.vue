@@ -1,9 +1,8 @@
 <template>
   <agro-btn
-    outline
+    flat
     dense
     no-caps
-    color="primary"
     icon="corporate_fare"
     :label="rotulo"
     descricao="Ver dados da empresa e CNPJs"
@@ -43,10 +42,25 @@ onMounted(() => {
 
 <style scoped>
 .empresa-header-link {
+  background: var(--color-bg-subtle);
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
   letter-spacing: normal;
   max-width: 240px;
+  padding: 0 var(--spacing-3);
   text-transform: none;
+  transition: var(--transition-bg), var(--transition-border);
+}
+
+.empresa-header-link:hover {
+  background: var(--color-hover);
+  border-color: var(--color-primary-200);
+}
+
+.empresa-header-link :deep(.q-icon) {
+  color: var(--color-primary-600);
 }
 
 .empresa-header-link :deep(.q-btn__content) {

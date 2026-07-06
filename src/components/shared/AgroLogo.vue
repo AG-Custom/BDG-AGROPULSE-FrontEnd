@@ -1,5 +1,5 @@
 <template>
-  <div class="agro-logo" :class="`agro-logo--${size}`">
+  <div class="agro-logo" :class="[`agro-logo--${size}`, { 'agro-logo--inverse': inverse }]">
     <svg
       class="agro-logo__mark"
       viewBox="0 0 40 40"
@@ -7,20 +7,29 @@
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect width="40" height="40" rx="10" class="agro-logo__bg" />
+      <defs>
+        <linearGradient id="agro-logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0" class="agro-logo__gradient-start" />
+          <stop offset="1" class="agro-logo__gradient-end" />
+        </linearGradient>
+      </defs>
+      <rect width="40" height="40" rx="10" fill="url(#agro-logo-gradient)" />
       <path
-        d="M20 8C14 8 10 13 10 18C10 24 14 28 20 32C26 28 30 24 30 18C30 13 26 8 20 8Z"
+        d="M20 6.5C13.5 9.5 10.5 14.5 11 20.5C11.5 26.5 15 31 20 33.5C25 31 28.5 26.5 29 20.5C29.5 14.5 26.5 9.5 20 6.5Z"
         class="agro-logo__leaf"
       />
       <path
-        d="M20 14V26M14 20H26"
+        d="M8 21H14L17 13.5L21.5 27L24.5 21H32"
         class="agro-logo__pulse"
         fill="none"
-        stroke-width="2"
+        stroke-width="2.4"
         stroke-linecap="round"
+        stroke-linejoin="round"
       />
     </svg>
-    <span v-if="showText" class="agro-logo__text">AgroPulse</span>
+    <span v-if="showText" class="agro-logo__text">
+      Agro<span class="agro-logo__text-accent">Pulse</span>
+    </span>
   </div>
 </template>
 
@@ -29,10 +38,12 @@ withDefaults(
   defineProps<{
     size?: 'sm' | 'md' | 'lg';
     showText?: boolean;
+    inverse?: boolean;
   }>(),
   {
     size: 'md',
     showText: true,
+    inverse: false,
   },
 );
 </script>
@@ -48,12 +59,16 @@ withDefaults(
   flex-shrink: 0;
 }
 
-.agro-logo__bg {
-  fill: var(--color-primary-500);
+.agro-logo__gradient-start {
+  stop-color: var(--color-primary-400);
+}
+
+.agro-logo__gradient-end {
+  stop-color: var(--color-forest-900);
 }
 
 .agro-logo__leaf {
-  fill: var(--color-primary-100);
+  fill: rgba(255, 255, 255, 0.16);
 }
 
 .agro-logo__pulse {
@@ -66,6 +81,18 @@ withDefaults(
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-tight);
+}
+
+.agro-logo__text-accent {
+  color: var(--color-primary-600);
+}
+
+.agro-logo--inverse .agro-logo__text {
+  color: var(--color-sidebar-text);
+}
+
+.agro-logo--inverse .agro-logo__text-accent {
+  color: var(--color-primary-300);
 }
 
 .agro-logo--sm .agro-logo__mark {

@@ -7,13 +7,16 @@
 ### Tokens e consistência
 - ✅ Usar `var(--token)` para toda cor, spacing, radius, shadow
 - ✅ Usar componentes Quasar como base, customizar via tokens
-- ✅ Reutilizar `MetricTile`, `AppPageHeader`, `useNotificacao`
-- ✅ Manter paleta agro (verde, neutro quente, accent mínimo)
+- ✅ Reutilizar `MetricTile`, `AppPageHeader`, `AgroTableSkeleton`, `AgroFormSkeleton`, `useNotificacao`
+- ✅ Manter paleta agro (verde campo, shell verde-floresta, neutro quente, accent mínimo)
+- ✅ Chrome escuro sempre via tokens `--color-sidebar-*` / `--color-forest-*`
+- ✅ Valores numéricos de dados (KPIs, moedas) com `.text-metric` (JetBrains Mono)
 
 ### Performance visual
-- ✅ Skeleton para layouts conhecidos com fetch > 200ms
+- ✅ `AgroTableSkeleton`/`AgroFormSkeleton` no primeiro carregamento de listagens/formulários
+- ✅ Skeleton para outros layouts conhecidos com fetch > 200ms
 - ✅ Button loading para ações
-- ✅ Table linear progress para fetch tabular
+- ✅ Table linear progress para recargas tabulares
 - ✅ Animações ≤ 240ms
 - ✅ Respeitar `prefers-reduced-motion`
 
@@ -44,6 +47,7 @@
 
 ### Performance
 - ❌ Fullscreen loading overlay
+- ❌ `q-inner-loading` em páginas de formulário/listagem (usar os skeletons)
 - ❌ Spinner em tela inteira
 - ❌ Skeleton em fetch < 200ms
 - ❌ Animações > 240ms
@@ -138,7 +142,7 @@ try {
 
 - [ ] Zero valores hardcoded de cor/spacing/radius/shadow
 - [ ] Componentes Quasar usam variantes AgroPulse (outlined, unelevated, flat)
-- [ ] Loading apropriado (button/skeleton/table — não fullscreen)
+- [ ] Loading apropriado (button/`AgroTableSkeleton`/`AgroFormSkeleton`/table `:loading` — não fullscreen nem `q-inner-loading`)
 - [ ] Empty state para listas
 - [ ] Formulários com labels e validação
 - [ ] Responsivo testado (375, 768, 1280px)

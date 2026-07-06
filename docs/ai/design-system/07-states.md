@@ -53,14 +53,14 @@
 | Selected | BG primary.50 |
 | Disabled row | Opacity 0.48 |
 
-### Nav Item
+### Nav Item (sidebar verde-floresta)
 
 | Estado | Visual |
 |---|---|
-| Default | Text neutral.600, icon neutral.500 |
-| Hover | BG color.hover |
-| Active | BG primary.50, text primary.600, icon primary.500, font-weight medium |
-| Disabled | Text neutral.400 |
+| Default | Text sidebar.text.secondary |
+| Hover | BG sidebar.item.hover (branco 6%), text sidebar.text |
+| Active | BG sidebar.item.active.bg (verde translúcido), border-left 3px sidebar.accent, text branco, icon sidebar.accent, font-weight medium |
+| Disabled | Oculto via permissão (não exibir disabled) |
 
 ### Card
 
@@ -77,11 +77,12 @@
 Prioridade (usar o mais específico, nunca todos):
 
 1. **Button loading** — ação em progresso
-2. **Section skeleton** — carregamento de área conhecida
-3. **Table linear progress** — carregamento de dados tabulares
-4. **Inline spinner** — área pequena (< 100px)
+2. **Section skeleton** — primeiro carregamento de área conhecida (`AgroTableSkeleton` para listagens, `AgroFormSkeleton` para formulários)
+3. **Table linear progress** — recarga de dados tabulares (`:loading` do q-table)
+4. **Inline spinner** — área pequena (< 100px), estados pontuais de auth
 5. ~~Fullscreen overlay~~ — **PROIBIDO**
-6. ~~Page transition spinner~~ — **PROIBIDO**
+6. ~~`q-inner-loading` em forms/listagens~~ — **PROIBIDO** (substituído pelos skeletons)
+7. ~~Page transition spinner~~ — **PROIBIDO**
 
 ---
 

@@ -3,7 +3,7 @@
     <q-card-section class="metric-tile__body">
       <div class="metric-tile__top">
         <span class="metric-tile__icon" :class="{ 'metric-tile__icon--accent': accent }">
-          <q-icon :name="icon" size="22px" />
+          <q-icon :name="icon" size="24px" />
         </span>
         <agro-badge v-if="trend" :label="trend" :variant="trendVariant" />
       </div>
@@ -84,9 +84,11 @@ const trendVariant = computed(() => {
 
 .metric-tile__value {
   color: var(--color-text-primary);
-  font-family: var(--font-family-display);
+  font-family: var(--typography-metric-family);
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--typography-metric-weight);
+  letter-spacing: var(--typography-metric-letter-spacing);
   line-height: var(--line-height-tight);
 }
 </style>

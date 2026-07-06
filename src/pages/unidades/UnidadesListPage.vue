@@ -13,7 +13,10 @@
 
     <section class="agro-section">
       <agro-card>
+        <agro-table-skeleton v-if="carregando && unidades.length === 0" :colunas="6" />
+
         <q-table
+          v-else
           flat
           bordered
           row-key="id"
@@ -86,6 +89,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import { TipoUnidadeOpcoes, UnidadeStatus } from 'constants/enums';
 import { useUnidades } from 'composables/useUnidades';
 import type { UnidadeDto } from 'types/dtos/unidade.dto';

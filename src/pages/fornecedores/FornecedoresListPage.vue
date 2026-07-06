@@ -16,7 +16,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <div class="fornecedores-list__filtros">
+        <div class="agro-filter-bar">
           <q-input
             v-model="busca"
             outlined
@@ -43,8 +43,10 @@
           />
         </div>
 
+        <agro-table-skeleton v-if="carregando && fornecedores.length === 0" :colunas="6" />
+
         <empty-state
-          v-if="!carregando && fornecedores.length === 0"
+          v-else-if="!carregando && fornecedores.length === 0"
           titulo="Nenhum fornecedor encontrado"
           :descricao="descricaoVazia"
           icon="local_shipping"
@@ -130,6 +132,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { TipoPessoaFornecedorOpcoes } from 'constants/enums';
 import { useFornecedores } from 'composables/useFornecedores';
@@ -215,13 +218,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.fornecedores-list__filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-4);
-  margin-bottom: var(--spacing-4);
-}
-
 .fornecedores-list__busca {
   flex: 1;
   min-width: 240px;

@@ -15,10 +15,12 @@
     </app-page-header>
 
     <section class="agro-section empresa-cnpjs">
-      <q-inner-loading :showing="carregando" color="primary" />
+      <agro-card v-if="carregando && cnpjs.length === 0">
+        <agro-form-skeleton :campos="4" />
+      </agro-card>
 
       <empty-state
-        v-if="!carregando && cnpjs.length === 0"
+        v-else-if="!carregando && cnpjs.length === 0"
         titulo="Nenhum CNPJ cadastrado"
         descricao="Cadastre o CNPJ da sua empresa para vincular às unidades operacionais."
         icon="business"
@@ -146,6 +148,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCnpjs } from 'composables/useCnpjs';
 import type { CnpjEmpresaDto } from 'types/dtos/cnpj.dto';
@@ -184,7 +187,7 @@ onMounted(() => {
 }
 
 .empresa-cnpjs__principal {
-  border-top: 3px solid var(--color-primary-500);
+  border-top: var(--border-width-accent) solid var(--color-primary-500);
 }
 
 .empresa-cnpjs__principal-header {

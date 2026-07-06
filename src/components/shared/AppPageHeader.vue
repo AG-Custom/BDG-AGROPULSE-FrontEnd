@@ -46,7 +46,7 @@ defineProps<{
 .app-page-header__accent {
   background: var(--color-accent-500);
   border-radius: var(--radius-full);
-  height: 3px;
+  height: var(--border-width-accent);
   margin-top: var(--spacing-1);
   width: 48px;
 }

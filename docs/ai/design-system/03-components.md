@@ -57,7 +57,7 @@ Links inline (usar `<router-link>` ou `q-btn flat` com `to`).
 
 ### ❌ Anti-pattern
 ```vue
-<q-btn style="background: #256d3d" label="Salvar" />
+<q-btn style="background: #1e8a4a" label="Salvar" />
 <q-btn glossy elevated label="Salvar" />
 ```
 
@@ -206,6 +206,8 @@ Sidebar app + drawers contextuais (filtros). Overlay em mobile, persistente em d
 
 Largura: `260px`. Sem animação slide longa — default Quasar OK (240ms max).
 
+Sidebar do app usa fundo verde-floresta escuro (tokens `color.sidebar.*`) — ver [13-navigation.md](./13-navigation.md).
+
 ---
 
 ## Dialog
@@ -329,8 +331,11 @@ Header sticky + rows + paginação + slot de filtros acima.
 ```
 
 ### Comportamento
-- Loading: barra linear no topo (`loading` prop) — **não** overlay opaco
-- Hover row: `color.hover`
+- Primeiro carregamento: `AgroTableSkeleton` no lugar da tabela — **não** `q-inner-loading`
+- Recargas: barra linear no topo (`loading` prop) — **não** overlay opaco
+- Hover row: `color.hover` com transição
+- Header: fundo `color.bg.subtle`, th uppercase xs semibold letter-spacing wide em `color.text.secondary`
+- Células: `tabular-nums`; paginação/bottom em `color.text.secondary` sm
 - Seleção: checkbox coluna esquerda
 - Ações: coluna fixa direita
 - Empty: componente Empty State — nunca tabela vazia sem mensagem
@@ -353,18 +358,31 @@ Implementado via `q-menu` com conteúdo rico. Max-width: 320px.
 
 ---
 
-## Skeleton (`q-skeleton`)
+## Skeleton (`q-skeleton`, `AgroTableSkeleton`, `AgroFormSkeleton`)
+
+### Wrappers AgroPulse
+
+| Componente | Props | Uso |
+|---|---|---|
+| `AgroTableSkeleton` (`components/ui/`) | `linhas` (default 5), `colunas` (default 5) | Primeiro carregamento de listagens — imita tabela com header `bg.subtle` e linhas de 52px |
+| `AgroFormSkeleton` (`components/ui/`) | `campos` (default 6) | Primeiro carregamento de formulários — grid 2 colunas ≥960px, label + QInput skeleton |
+
+```vue
+<agro-table-skeleton v-if="carregandoInicial" :colunas="4" />
+<q-table v-else flat bordered ... />
+```
 
 ### Quando usar
-Carregamento de conteúdo com layout conhecido (cards, tabela, header).
+Carregamento de conteúdo com layout conhecido (cards, tabela, formulário, header).
 
 ### Quando não usar
 - Ações de botão (usar `:loading`)
 - Tela inteira (usar skeleton por seção)
 - Dados que carregam < 200ms (não mostrar skeleton)
+- Recargas de tabela (usar `:loading` linear do q-table)
 
 ### Comportamento
-- Animação: pulse sutil — sem shimmer pesado
+- Animação: fade/pulse sutil — sem shimmer pesado
 - Formato espelha conteúdo final (retângulo para texto, quadrado para avatar)
 
 ---
@@ -372,10 +390,11 @@ Carregamento de conteúdo com layout conhecido (cards, tabela, header).
 ## Spinner (`q-spinner`)
 
 ### Quando usar
-Dentro de botões (`:loading`), inline em áreas pequenas.
+Dentro de botões (`:loading`), inline em estados pontuais de auth (ConfirmEmail, SelecionarUnidade).
 
 ### Quando não usar
 - Fullscreen overlay — **proibido**
+- `q-inner-loading` em páginas de formulário/listagem — usar `AgroFormSkeleton`/`AgroTableSkeleton`
 - Substituir skeleton em layouts conhecidos
 - Múltiplos spinners na mesma viewport
 
@@ -409,13 +428,28 @@ Listas vazias, buscas sem resultado, módulos sem dados configurados.
 
 Componente existente — tile de KPI para dashboards.
 
-Props: `label`, `value`. Futuro: `trend`, `icon`, `variant`.
+Props: `label`, `value`, `icon`, `trend?`, `accent?`.
+
+- Ícone 24px em container 44px (`icon.bg.primary` ou `icon.bg.accent` com `accent`)
+- Valor em JetBrains Mono (`typography.metric.*`) com `tabular-nums`
+- Card `flat bordered` com `radius.lg` + `.agro-card-interactive`
+
+---
+
+## AgroLogo (`AgroLogo.vue`)
+
+Marca AgroPulse — quadrado com gradiente `primary.400 → forest.900`, folha translúcida branca (16%) e linha de pulso (ECG) branca; wordmark em Sora com "Pulse" em `primary.600`.
+
+Props: `size` (`sm`/`md`/`lg`), `showText` (default `true`), `inverse` (default `false`).
+
+- `inverse` — para fundos escuros (sidebar, painel de marca): texto em `sidebar.text`, "Pulse" em `primary.300`
+- Favicon derivado da marca em `public/favicon.svg`; `<meta name="theme-color" content="#0f2818">` (forest.900)
 
 ---
 
 ## AppPageHeader (`AppPageHeader.vue`)
 
-Componente existente — título + subtítulo + slot de ações à direita.
+Componente existente — título + subtítulo + slot de ações à direita, com barra de destaque `border.width.accent`.
 
 ---
 

@@ -48,8 +48,8 @@ Configuração futura: migrar para `material-icons-outlined` se necessário dist
 |---|---|
 | Padrão inline | `color.text.secondary` |
 | Sobre botão primário | `color.text.inverse` |
-| Nav ativo | `color.primary.500` |
-| Nav inativo | `color.text.tertiary` |
+| Nav ativo (sidebar) | `color.sidebar.accent` (accent.400) |
+| Nav inativo (sidebar) | `color.sidebar.text.secondary` |
 | Sucesso | `color.success.500` |
 | Erro | `color.error.500` |
 | Aviso | `color.warning.500` |

@@ -1,18 +1,23 @@
 <template>
   <div v-if="unidades.length > 1" class="unidade-switcher">
+    <div class="unidade-switcher__label text-overline">Unidade ativa</div>
     <q-select
       v-model="unidadeAtivaId"
       outlined
       dense
       emit-value
       map-options
-      label="Unidade"
       :options="opcoes"
       :loading="carregandoLista"
       :disable="carregando"
       aria-label="Selecionar unidade operacional"
+      popup-content-class="unidade-switcher-menu"
       @update:model-value="onTrocar"
-    />
+    >
+      <template #prepend>
+        <q-icon name="storefront" size="18px" />
+      </template>
+    </q-select>
   </div>
 </template>
 
@@ -72,6 +77,39 @@ async function onTrocar(novoId: string | null): Promise<void> {
 
 <style scoped>
 .unidade-switcher {
+  display: grid;
+  gap: var(--spacing-1);
   margin-top: var(--spacing-3);
+}
+
+.unidade-switcher__label {
+  color: var(--color-sidebar-text-muted);
+}
+
+/* Adaptação do q-select ao fundo verde-floresta da sidebar */
+.unidade-switcher :deep(.q-field--outlined .q-field__control) {
+  background: var(--color-sidebar-item-hover);
+}
+
+.unidade-switcher :deep(.q-field--outlined .q-field__control:before) {
+  border-color: var(--color-sidebar-border);
+}
+
+.unidade-switcher :deep(.q-field--outlined .q-field__control:hover:before) {
+  border-color: var(--color-sidebar-text-muted);
+}
+
+.unidade-switcher :deep(.q-field--outlined.q-field--focused .q-field__control:before) {
+  border-color: var(--color-primary-300);
+}
+
+.unidade-switcher :deep(.q-field__native),
+.unidade-switcher :deep(.q-field__prepend .q-icon),
+.unidade-switcher :deep(.q-field__append .q-icon) {
+  color: var(--color-sidebar-text);
+}
+
+.unidade-switcher :deep(.q-field__prepend .q-icon) {
+  color: var(--color-sidebar-text-secondary);
 }
 </style>
