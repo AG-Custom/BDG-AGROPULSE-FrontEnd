@@ -13,6 +13,7 @@ export interface CnpjFormModel {
   razaoSocial: string;
   nomeFantasia: string;
   principal: boolean;
+  ativo: boolean;
 }
 
 export interface CriarCnpjPayload {
@@ -20,4 +21,11 @@ export interface CriarCnpjPayload {
   razaoSocial: string;
   nomeFantasia: string;
   principal: boolean;
+}
+
+export interface EditarCnpjPayload {
+  razaoSocial: string;
+  nomeFantasia: string;
+  principal: boolean;
+  ativo: boolean;
 }

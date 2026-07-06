@@ -1,5 +1,6 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import { messageService } from 'services/message.service';
 import { unidadeService } from 'services/unidade.service';
 import type { UnidadeDto } from 'types/dtos/unidade.dto';
 import { ref } from 'vue';
@@ -39,11 +40,26 @@ export function useUnidades() {
     }
   }
 
+  async function solicitarInativacao(unidade: UnidadeDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Inativar unidade',
+      mensagem: `Deseja inativar a unidade ${unidade.nome}? Essa ação pode ser revertida editando o status da unidade.`,
+      textoConfirmar: 'Inativar',
+      icone: 'warning',
+    });
+
+    if (!confirmou) {
+      return false;
+    }
+
+    return inativar(unidade.id);
+  }
+
   return {
     unidades,
     carregando,
     inativando,
     carregar,
-    inativar,
+    solicitarInativacao,
   };
 }

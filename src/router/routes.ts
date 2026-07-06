@@ -125,6 +125,16 @@ export const routes: RouteRecordRaw[] = [
           permissao: Permissoes.Cnpjs.Visualizar,
         },
       },
+      {
+        path: 'cnpjs/:id/editar',
+        name: 'cnpj-editar',
+        component: () => import('pages/cnpjs/CnpjFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cnpjEditar',
+          breadcrumbPais: ['navegacao.empresa'],
+          permissao: Permissoes.Cnpjs.Visualizar,
+        },
+      },
     ],
   },
   {

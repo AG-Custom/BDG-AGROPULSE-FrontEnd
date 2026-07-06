@@ -1,6 +1,6 @@
 import { api } from 'services/api';
 
-import type { CnpjEmpresaDto, CriarCnpjPayload } from 'types/dtos/cnpj.dto';
+import type { CnpjEmpresaDto, CriarCnpjPayload, EditarCnpjPayload } from 'types/dtos/cnpj.dto';
 
 export const cnpjService = {
   listar(): Promise<CnpjEmpresaDto[]> {
@@ -9,5 +9,13 @@ export const cnpjService = {
 
   criar(payload: CriarCnpjPayload): Promise<CnpjEmpresaDto> {
     return api.post<CnpjEmpresaDto>('/empresas/cnpjs', payload).then((r) => r.data);
+  },
+
+  editar(cnpjId: string, payload: EditarCnpjPayload): Promise<CnpjEmpresaDto> {
+    return api.put<CnpjEmpresaDto>(`/empresas/cnpjs/${cnpjId}`, payload).then((r) => r.data);
+  },
+
+  inativar(cnpjId: string): Promise<void> {
+    return api.post(`/empresas/cnpjs/${cnpjId}/inativar`);
   },
 };

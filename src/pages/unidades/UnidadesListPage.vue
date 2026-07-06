@@ -73,36 +73,13 @@
                 icon="block"
                 color="negative"
                 descricao="Inativar unidade"
-                @click="abrirConfirmacao(props.row)"
+                @click="solicitarInativacao(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <q-dialog v-model="dialogInativar" persistent>
-      <q-card class="unidades-dialog">
-        <q-card-section>
-          <div class="text-h6">Inativar unidade</div>
-          <p class="text-body2 text-secondary q-mt-sm q-mb-none">
-            Deseja inativar a unidade <strong>{{ unidadeSelecionada?.nome }}</strong>?
-            Essa ação pode ser revertida editando o status da unidade.
-          </p>
-        </q-card-section>
-        <q-card-actions align="right">
-          <agro-btn flat label="Cancelar" descricao="Fechar sem inativar a unidade" @click="fecharConfirmacao" />
-          <agro-btn
-            color="negative"
-            unelevated
-            label="Inativar"
-            descricao="Confirmar inativação da unidade"
-            :loading="inativando"
-            @click="confirmarInativacao"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -113,12 +90,9 @@ import { TipoUnidadeOpcoes, UnidadeStatus } from 'constants/enums';
 import { useUnidades } from 'composables/useUnidades';
 import type { UnidadeDto } from 'types/dtos/unidade.dto';
 import type { QTableColumn } from 'quasar';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 
-const { unidades, carregando, inativando, carregar, inativar } = useUnidades();
-
-const dialogInativar = ref(false);
-const unidadeSelecionada = ref<UnidadeDto | null>(null);
+const { unidades, carregando, carregar, solicitarInativacao } = useUnidades();
 
 const colunas: QTableColumn<UnidadeDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
@@ -133,28 +107,6 @@ function rotuloTipo(tipo: string): string {
   return TipoUnidadeOpcoes.find((opcao) => opcao.value === tipo)?.label ?? tipo;
 }
 
-function abrirConfirmacao(unidade: UnidadeDto): void {
-  unidadeSelecionada.value = unidade;
-  dialogInativar.value = true;
-}
-
-function fecharConfirmacao(): void {
-  dialogInativar.value = false;
-  unidadeSelecionada.value = null;
-}
-
-async function confirmarInativacao(): Promise<void> {
-  if (!unidadeSelecionada.value) {
-    return;
-  }
-
-  const sucesso = await inativar(unidadeSelecionada.value.id);
-
-  if (sucesso) {
-    fecharConfirmacao();
-  }
-}
-
 onMounted(() => {
   void carregar();
 });
@@ -163,10 +115,5 @@ onMounted(() => {
 <style scoped>
 .unidades-table__acoes {
   white-space: nowrap;
-}
-
-.unidades-dialog {
-  min-width: 360px;
-  width: min(100%, 420px);
 }
 </style>

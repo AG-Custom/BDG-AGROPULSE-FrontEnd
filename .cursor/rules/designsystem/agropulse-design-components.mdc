@@ -31,13 +31,14 @@ Base: Quasar 2. Wrappers em `components/ui/` e `components/shared/`.
 - `flat bordered` ou `.agro-surface-raised`
 - ❌ `shadow-10`
 
-### Modal
-- `q-dialog` + `q-card`, fade only
-- `persistent` para exclusão
+### Modal / confirmação
+- Confirmações destrutivas (inativar, excluir, trocar contexto): `messageService.confirmar()` via composable — **nunca** `q-dialog` na page
+- Formulários complexos em overlay: `q-dialog` + `q-card`, fade only (casos excepcionais)
 - ❌ `transition-show="scale"`
 
 ### Feedback
 - Toast: `useNotificacao()`
+- Confirmação: `messageService.confirmar()` (SweetAlert2)
 - Empty: ícone 48px + título + descrição + CTA
 - ❌ tela branca vazia
 

@@ -1,9 +1,6 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header
-      titulo="Novo CNPJ"
-      subtitulo="Cadastre um novo CNPJ vinculado à sua empresa."
-    />
+    <app-page-header :titulo="tituloPagina" :subtitulo="subtituloPagina" />
 
     <section class="agro-section">
       <agro-card>
@@ -13,7 +10,8 @@
           v-if="!carregandoPagina"
           ref="formularioRef"
           v-model:formulario="formulario"
-          :desabilitar-principal="possuiPrincipal"
+          :modo="modo"
+          :desabilitar-principal="desabilitarPrincipal"
         />
 
         <div class="cnpj-form-page__acoes">
@@ -27,8 +25,8 @@
           <agro-btn
             color="primary"
             unelevated
-            label="Cadastrar"
-            descricao="Cadastrar novo CNPJ na empresa"
+            :label="modo === 'criar' ? 'Cadastrar' : 'Salvar'"
+            :descricao="modo === 'criar' ? 'Cadastrar novo CNPJ na empresa' : 'Salvar alterações do CNPJ'"
             :loading="salvando"
             @click="salvar"
           />
@@ -43,24 +41,57 @@ import CnpjFormulario from 'components/cnpjs/CnpjFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import { useCnpjs } from 'composables/useCnpjs';
 import type { CnpjFormModel } from 'types/dtos/cnpj.dto';
-import { criarCnpjFormVazia } from 'utils/mappers/cnpj.mapper';
+import { cnpjDtoParaForm, criarCnpjFormVazia } from 'utils/mappers/cnpj.mapper';
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
 const router = useRouter();
-const { cnpjs, carregando, salvando, carregar, criar } = useCnpjs();
+const { cnpjs, carregando, salvando, carregar, criar, editar } = useCnpjs();
 
 const formularioRef = ref<InstanceType<typeof CnpjFormulario> | null>(null);
 const formulario = ref<CnpjFormModel>(criarCnpjFormVazia());
 const carregandoPagina = ref(true);
 
-const possuiPrincipal = computed(() => cnpjs.value.some((cnpj) => cnpj.principal));
+const modo = computed<'criar' | 'editar'>(() => (route.name === 'cnpj-editar' ? 'editar' : 'criar'));
+
+const cnpjId = computed(() => route.params.id as string | undefined);
+
+const tituloPagina = computed(() => (modo.value === 'criar' ? 'Novo CNPJ' : 'Editar CNPJ'));
+
+const subtituloPagina = computed(() =>
+  modo.value === 'criar'
+    ? 'Cadastre um novo CNPJ vinculado à sua empresa.'
+    : 'Atualize os dados do CNPJ selecionado. O número não pode ser alterado.',
+);
+
+const desabilitarPrincipal = computed(() => {
+  if (modo.value === 'editar') {
+    return false;
+  }
+
+  return cnpjs.value.some((cnpj) => cnpj.principal);
+});
 
 async function inicializar(): Promise<void> {
   carregandoPagina.value = true;
 
   await carregar();
-  formulario.value = criarCnpjFormVazia(!possuiPrincipal.value);
+
+  if (modo.value === 'editar') {
+    const cnpj = cnpjs.value.find((item) => item.id === cnpjId.value);
+
+    if (!cnpj) {
+      await router.replace({ name: 'cnpjs' });
+      carregandoPagina.value = false;
+      return;
+    }
+
+    formulario.value = cnpjDtoParaForm(cnpj);
+  } else {
+    const possuiPrincipal = cnpjs.value.some((cnpj) => cnpj.principal);
+    formulario.value = criarCnpjFormVazia(!possuiPrincipal);
+  }
 
   carregandoPagina.value = false;
 }
@@ -76,7 +107,10 @@ async function salvar(): Promise<void> {
     return;
   }
 
-  const sucesso = await criar(formulario.value);
+  const sucesso =
+    modo.value === 'criar'
+      ? await criar(formulario.value)
+      : await editar(cnpjId.value!, formulario.value);
 
   if (sucesso) {
     await router.push({ name: 'cnpjs' });

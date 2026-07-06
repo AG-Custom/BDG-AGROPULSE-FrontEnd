@@ -1,16 +1,17 @@
 <template>
   <q-form ref="formRef" class="cnpj-formulario" greedy>
     <q-input
-      v-model="formulario.numero"
+      v-model="numeroExibicao"
       outlined
       label="CNPJ"
       class="field-required"
-      hint="14 dígitos"
+      hint="O número do CNPJ não pode ser alterado"
       aria-required="true"
-      :mask="MASCARAS.CNPJ"
-      :maxlength="TAMANHO_FORMATADO.CNPJ"
+      :mask="modo === 'criar' ? MASCARAS.CNPJ : undefined"
+      :maxlength="modo === 'criar' ? TAMANHO_FORMATADO.CNPJ : undefined"
       inputmode="numeric"
-      :rules="[obrigatorio, cnpj]"
+      :disable="modo === 'editar'"
+      :rules="modo === 'criar' ? [obrigatorio, cnpj] : undefined"
     />
 
     <q-input
@@ -33,13 +34,17 @@
       :rules="[obrigatorio]"
     />
 
-    <q-toggle
-      v-model="formulario.principal"
-      label="CNPJ principal"
-      :disable="desabilitarPrincipal"
-    />
+    <q-toggle v-model="formulario.principal" label="CNPJ principal" :disable="desabilitarPrincipal" />
     <p v-if="desabilitarPrincipal" class="cnpj-formulario__hint text-caption text-secondary">
       A empresa já possui um CNPJ principal cadastrado.
+    </p>
+
+    <q-toggle v-if="modo === 'editar'" v-model="formulario.ativo" label="CNPJ ativo" />
+    <p
+      v-if="modo === 'editar' && formulario.principal && !formulario.ativo"
+      class="cnpj-formulario__hint text-caption text-secondary"
+    >
+      O CNPJ principal não pode ser inativado.
     </p>
   </q-form>
 </template>
@@ -48,16 +53,33 @@
 import { MASCARAS, TAMANHO_FORMATADO } from 'constants/masks';
 import type { QForm } from 'quasar';
 import type { CnpjFormModel } from 'types/dtos/cnpj.dto';
+import { formatarCnpj } from 'utils/formatters';
 import { cnpj, obrigatorio } from 'utils/validators';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
+  modo: 'criar' | 'editar';
   desabilitarPrincipal?: boolean;
 }>();
 
 const formulario = defineModel<CnpjFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+
+const numeroExibicao = computed({
+  get() {
+    if (props.modo === 'editar') {
+      return formatarCnpj(formulario.value.numero);
+    }
+
+    return formulario.value.numero;
+  },
+  set(valor: string) {
+    if (props.modo === 'criar') {
+      formulario.value.numero = valor;
+    }
+  },
+});
 
 async function validar(): Promise<boolean> {
   return (await formRef.value?.validate()) ?? false;

@@ -42,7 +42,18 @@
                   {{ cnpjPrincipal.razaoSocial }}
                 </h2>
               </div>
-              <agro-badge label="Principal" variant="accent" />
+              <div class="empresa-cnpjs__principal-acoes">
+                <agro-badge label="Principal" variant="accent" />
+                <agro-btn
+                  flat
+                  round
+                  dense
+                  icon="edit"
+                  color="primary"
+                  descricao="Editar CNPJ principal"
+                  :to="{ name: 'cnpj-editar', params: { id: cnpjPrincipal.id } }"
+                />
+              </div>
             </div>
           </template>
 
@@ -82,6 +93,7 @@
             bordered
             row-key="id"
             hide-pagination
+            class="empresa-cnpjs__tabela"
             :rows="outrosCnpjs"
             :columns="colunas"
             :pagination="{ rowsPerPage: 0 }"
@@ -97,6 +109,30 @@
                 <agro-badge
                   :label="props.row.ativo ? 'Ativo' : 'Inativo'"
                   :variant="props.row.ativo ? 'success' : 'default'"
+                />
+              </q-td>
+            </template>
+
+            <template #body-cell-acoes="props">
+              <q-td :props="props" class="empresa-cnpjs__acoes">
+                <agro-btn
+                  flat
+                  round
+                  dense
+                  icon="edit"
+                  color="primary"
+                  descricao="Editar CNPJ"
+                  :to="{ name: 'cnpj-editar', params: { id: props.row.id } }"
+                />
+                <agro-btn
+                  v-if="props.row.ativo"
+                  flat
+                  round
+                  dense
+                  icon="block"
+                  color="negative"
+                  descricao="Inativar CNPJ"
+                  @click="solicitarInativacao(props.row)"
                 />
               </q-td>
             </template>
@@ -117,7 +153,7 @@ import { formatarCnpj } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted } from 'vue';
 
-const { cnpjs, carregando, carregar } = useCnpjs();
+const { cnpjs, carregando, carregar, solicitarInativacao } = useCnpjs();
 
 const cnpjPrincipal = computed(
   () => cnpjs.value.find((cnpj) => cnpj.principal) ?? cnpjs.value[0] ?? null,
@@ -132,6 +168,7 @@ const colunas: QTableColumn<CnpjEmpresaDto>[] = [
   { name: 'razaoSocial', label: 'Razão social', field: 'razaoSocial', align: 'left', sortable: true },
   { name: 'nomeFantasia', label: 'Nome fantasia', field: 'nomeFantasia', align: 'left', sortable: true },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
 onMounted(() => {
@@ -155,6 +192,12 @@ onMounted(() => {
   display: flex;
   gap: var(--spacing-4);
   justify-content: space-between;
+}
+
+.empresa-cnpjs__principal-acoes {
+  align-items: center;
+  display: flex;
+  gap: var(--spacing-2);
 }
 
 .empresa-cnpjs__principal-eyebrow {
@@ -217,5 +260,9 @@ onMounted(() => {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   margin: 0;
+}
+
+.empresa-cnpjs__acoes {
+  white-space: nowrap;
 }
 </style>
