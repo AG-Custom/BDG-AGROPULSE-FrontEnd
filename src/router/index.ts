@@ -18,18 +18,28 @@ router.beforeEach(async (to) => {
 
   const autenticado = authStore.autenticado;
   const precisaOnboarding = authStore.precisaOnboarding;
+  const precisaSelecionarUnidade = authStore.precisaSelecionarUnidade;
   const temEmpresa = authStore.temEmpresa;
+  const temUnidade = authStore.temUnidade;
 
   if (autenticado && precisaOnboarding && !to.meta.onboarding) {
     return { name: 'onboarding' };
   }
 
-  if (autenticado && temEmpresa && to.meta.onboarding) {
+  if (autenticado && precisaSelecionarUnidade && !to.meta.selecaoUnidade) {
+    return { name: 'selecionar-unidade' };
+  }
+
+  if (autenticado && temUnidade && (to.meta.onboarding || to.meta.selecaoUnidade)) {
     return { name: 'dashboard' };
   }
 
-  if (to.meta.convidado && autenticado && temEmpresa) {
+  if (to.meta.convidado && autenticado && temUnidade) {
     return { name: 'dashboard' };
+  }
+
+  if (to.meta.convidado && autenticado && precisaSelecionarUnidade) {
+    return { name: 'selecionar-unidade' };
   }
 
   if (to.meta.publica) {
@@ -42,6 +52,10 @@ router.beforeEach(async (to) => {
 
   if (!autenticado) {
     return { name: 'login', query: { redirect: to.fullPath } };
+  }
+
+  if ((to.meta.requerEmpresa || to.meta.requerUnidade) && autenticado && temEmpresa && !temUnidade) {
+    return { name: 'selecionar-unidade' };
   }
 
   const permissao = to.meta.permissao;

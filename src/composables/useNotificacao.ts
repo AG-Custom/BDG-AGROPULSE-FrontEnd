@@ -1,7 +1,21 @@
+import { messageService } from 'services/message.service';
 import { Notify } from 'quasar';
+import { useRoute } from 'vue-router';
+
+function usarSwal(route: ReturnType<typeof useRoute>): boolean {
+  return !route.matched.some((registro) => registro.meta.convidado || registro.meta.layout === 'auth');
+}
 
 export function useNotificacao() {
+  const route = useRoute();
+  const swal = usarSwal(route);
+
   function sucesso(message: string): void {
+    if (swal) {
+      messageService.sucesso(message);
+      return;
+    }
+
     Notify.create({
       type: 'positive',
       message,
@@ -11,6 +25,11 @@ export function useNotificacao() {
   }
 
   function erro(message: string): void {
+    if (swal) {
+      messageService.erro(message);
+      return;
+    }
+
     Notify.create({
       type: 'negative',
       message,

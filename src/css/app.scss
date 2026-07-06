@@ -1,4 +1,6 @@
 @use 'tokens';
+@import 'sweetalert2/dist/sweetalert2.min.css';
+@import './swal';
 
 :root {
   color: var(--color-text-primary);

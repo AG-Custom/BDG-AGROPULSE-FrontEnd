@@ -40,6 +40,18 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/selecionar-unidade',
+    component: () => import('layouts/AuthLayout.vue'),
+    meta: { requerAuth: true, selecaoUnidade: true, layout: 'auth' },
+    children: [
+      {
+        path: '',
+        name: 'selecionar-unidade',
+        component: () => import('pages/auth/SelecionarUnidadePage.vue'),
+      },
+    ],
+  },
+  {
     path: '/onboarding',
     component: () => import('layouts/OnboardingLayout.vue'),
     meta: { requerAuth: true, onboarding: true, layout: 'onboarding' },
@@ -54,7 +66,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    meta: { layout: 'main', requerEmpresa: true },
+    meta: { layout: 'main', requerEmpresa: true, requerUnidade: true },
     children: [
       {
         path: '',
@@ -63,6 +75,54 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.dashboard',
           permissao: Permissoes.Dashboard.Visualizar,
+        },
+      },
+      {
+        path: 'unidades',
+        name: 'unidades',
+        component: () => import('pages/unidades/UnidadesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidades',
+          permissao: Permissoes.Unidades.Visualizar,
+        },
+      },
+      {
+        path: 'unidades/nova',
+        name: 'unidade-nova',
+        component: () => import('pages/unidades/UnidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeNova',
+          breadcrumbPais: ['navegacao.unidades'],
+          permissao: Permissoes.Unidades.Visualizar,
+        },
+      },
+      {
+        path: 'unidades/:id/editar',
+        name: 'unidade-editar',
+        component: () => import('pages/unidades/UnidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeEditar',
+          breadcrumbPais: ['navegacao.unidades'],
+          permissao: Permissoes.Unidades.Visualizar,
+        },
+      },
+      {
+        path: 'cnpjs',
+        name: 'cnpjs',
+        component: () => import('pages/cnpjs/CnpjsListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.empresa',
+          permissao: Permissoes.Cnpjs.Visualizar,
+        },
+      },
+      {
+        path: 'cnpjs/novo',
+        name: 'cnpj-novo',
+        component: () => import('pages/cnpjs/CnpjFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cnpjNovo',
+          breadcrumbPais: ['navegacao.empresa'],
+          permissao: Permissoes.Cnpjs.Visualizar,
         },
       },
     ],

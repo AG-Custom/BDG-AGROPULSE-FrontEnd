@@ -4,8 +4,19 @@ import { useAuthStore } from 'stores/auth.store';
 
 export function useAuth() {
   const store = useAuthStore();
-  const { autenticado, usuario, permissoes, empresaId, unidadeId, precisaOnboarding, temEmpresa } =
-    storeToRefs(store);
+  const {
+    autenticado,
+    usuario,
+    permissoes,
+    empresaId,
+    unidadeId,
+    requiresUnidadeSelection,
+    unidadesDisponiveis,
+    precisaOnboarding,
+    precisaSelecionarUnidade,
+    temEmpresa,
+    temUnidade,
+  } = storeToRefs(store);
 
   return {
     autenticado,
@@ -13,12 +24,18 @@ export function useAuth() {
     permissoes,
     empresaId,
     unidadeId,
+    requiresUnidadeSelection,
+    unidadesDisponiveis,
     precisaOnboarding,
+    precisaSelecionarUnidade,
     temEmpresa,
+    temUnidade,
     entrar: store.entrar,
     cadastrar: store.cadastrar,
     confirmarEmail: store.confirmarEmail,
     renovarTokens: store.renovarTokens,
+    listarUnidades: store.listarUnidades,
+    selecionarUnidade: store.selecionarUnidade,
     possuiPermissao: store.possuiPermissao,
     sair: store.sair,
     verificar: store.verificar,

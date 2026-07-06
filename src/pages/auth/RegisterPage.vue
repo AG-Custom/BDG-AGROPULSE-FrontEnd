@@ -59,9 +59,9 @@
           :rules="[obrigatorio, senhaContrato]"
         >
           <template #append>
-            <q-icon
+            <agro-icon-btn
               :name="mostrarSenha ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
+              :descricao="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
               @click="mostrarSenha = !mostrarSenha"
             />
           </template>
@@ -79,20 +79,21 @@
           :rules="[obrigatorio, confirmarSenhaRule]"
         >
           <template #append>
-            <q-icon
+            <agro-icon-btn
               :name="mostrarConfirmarSenha ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
+              :descricao="mostrarConfirmarSenha ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'"
               @click="mostrarConfirmarSenha = !mostrarConfirmarSenha"
             />
           </template>
         </q-input>
 
-        <q-btn
+        <agro-btn
           color="primary"
           unelevated
           type="submit"
           class="full-width"
           label="Cadastrar"
+          descricao="Criar nova conta no AgroPulse"
           :loading="carregando"
         />
       </q-form>
@@ -109,6 +110,7 @@
 
 <script setup lang="ts">
 import AuthCard from 'components/shared/AuthCard.vue';
+import AgroIconBtn from 'components/ui/AgroIconBtn.vue';
 import { useAutenticacao } from 'composables/useAutenticacao';
 import { computed, ref } from 'vue';
 import {

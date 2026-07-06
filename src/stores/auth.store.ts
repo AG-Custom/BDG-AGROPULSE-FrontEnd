@@ -1,9 +1,21 @@
 import { defineStore } from 'pinia';
 
 import { authService } from 'services/auth.service';
-import type { ConfirmEmailPayload, LoginPayload, RegisterPayload, SessaoPersistida } from 'types/dtos/auth.dto';
+import type {
+  AuthContextSessionDto,
+  ConfirmEmailPayload,
+  LoginPayload,
+  RegisterPayload,
+  SessaoPersistida,
+  UnidadeDisponivelDto,
+} from 'types/dtos/auth.dto';
 import type { UsuarioLogado } from 'types/entidades/usuario';
-import { loginParaSessao, refreshParaSessao, usuarioDtoParaLogado } from 'utils/auth.mapper';
+import {
+  loginParaSessao,
+  refreshParaSessao,
+  selecionarUnidadeParaSessao,
+  usuarioDtoParaLogado,
+} from 'utils/auth.mapper';
 import { limparSessao, obterSessao, salvarSessao } from 'utils/auth-storage';
 
 interface AuthState {
@@ -12,6 +24,8 @@ interface AuthState {
   usuario: UsuarioLogado | null;
   empresaId: string | null;
   unidadeId: string | null;
+  requiresUnidadeSelection: boolean;
+  unidadesDisponiveis: UnidadeDisponivelDto[] | null;
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -21,19 +35,43 @@ export const useAuthStore = defineStore('auth', {
     usuario: null,
     empresaId: null,
     unidadeId: null,
+    requiresUnidadeSelection: false,
+    unidadesDisponiveis: null,
   }),
   getters: {
     permissoes: (state): string[] => state.usuario?.permissoes ?? [],
     precisaOnboarding: (state): boolean => state.autenticado && !state.empresaId,
     temEmpresa: (state): boolean => !!state.empresaId,
+    temUnidade: (state): boolean => !!state.unidadeId,
+    precisaSelecionarUnidade: (state): boolean =>
+      state.autenticado &&
+      !!state.empresaId &&
+      (state.requiresUnidadeSelection || !state.unidadeId),
   },
   actions: {
     aplicarSessao(sessao: SessaoPersistida) {
       this.usuario = usuarioDtoParaLogado(sessao.usuario);
       this.empresaId = sessao.empresaId;
       this.unidadeId = sessao.unidadeId;
+      this.requiresUnidadeSelection = sessao.requiresUnidadeSelection;
+      this.unidadesDisponiveis = sessao.unidadesDisponiveis;
       this.autenticado = true;
       this.verificado = true;
+    },
+
+    aplicarContextoRefresh(resposta: AuthContextSessionDto) {
+      const sessaoAtual = obterSessao();
+
+      if (!sessaoAtual) {
+        return;
+      }
+
+      const novaSessao = refreshParaSessao(resposta, sessaoAtual);
+      salvarSessao(novaSessao);
+      this.empresaId = novaSessao.empresaId;
+      this.unidadeId = novaSessao.unidadeId;
+      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
+      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
     },
 
     async verificar() {
@@ -64,6 +102,24 @@ export const useAuthStore = defineStore('auth', {
       await authService.confirmarEmail(payload);
     },
 
+    async listarUnidades() {
+      const resposta = await authService.listarUnidades();
+      return resposta.unidades;
+    },
+
+    async selecionarUnidade(unidadeId: string) {
+      const sessaoAtual = obterSessao();
+
+      if (!sessaoAtual) {
+        throw new Error('Sessão inválida para seleção de unidade.');
+      }
+
+      const resposta = await authService.selecionarUnidade({ unidadeId });
+      const novaSessao = selecionarUnidadeParaSessao(resposta, sessaoAtual);
+      salvarSessao(novaSessao);
+      this.aplicarSessao(novaSessao);
+    },
+
     async renovarTokens() {
       const sessaoAtual = obterSessao();
 
@@ -76,6 +132,8 @@ export const useAuthStore = defineStore('auth', {
       salvarSessao(novaSessao);
       this.empresaId = novaSessao.empresaId;
       this.unidadeId = novaSessao.unidadeId;
+      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
+      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
     },
 
     possuiPermissao(permissao: string): boolean {
@@ -99,6 +157,8 @@ export const useAuthStore = defineStore('auth', {
       this.usuario = null;
       this.empresaId = null;
       this.unidadeId = null;
+      this.requiresUnidadeSelection = false;
+      this.unidadesDisponiveis = null;
     },
   },
 });

@@ -5,20 +5,27 @@
         <div class="text-h6">Unidades operacionais</div>
         <div class="text-body2 text-grey-7">Cadastre ao menos uma unidade. Marque uma como matriz.</div>
       </div>
-      <q-btn outline color="primary" icon="add" label="Adicionar unidade" @click="emit('adicionar')" />
+      <agro-btn
+        outline
+        color="primary"
+        icon="add"
+        label="Adicionar unidade"
+        descricao="Incluir mais uma unidade operacional"
+        @click="emit('adicionar')"
+      />
     </div>
 
     <q-card v-for="(unidade, index) in unidades" :key="unidade.id" flat bordered class="unidade-card">
       <q-card-section class="unidade-card__header">
         <div class="text-subtitle1">Unidade {{ index + 1 }}</div>
-        <q-btn
+        <agro-btn
           v-if="unidades.length > 1"
           flat
           round
           dense
           icon="delete"
           color="negative"
-          aria-label="Remover unidade"
+          descricao="Remover unidade"
           @click="emit('remover', unidade.id)"
         />
       </q-card-section>

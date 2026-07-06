@@ -1,5 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
+import type { AuthContextSessionDto } from 'types/dtos/auth.dto';
 import {
   extrairApiError,
   isApiError,
@@ -32,7 +33,9 @@ let refreshEmAndamento: Promise<boolean> | null = null;
 
 async function tentarRefresh(): Promise<boolean> {
   try {
-    await api.post('/auth/refresh');
+    const response = await api.post<AuthContextSessionDto>('/auth/refresh');
+    const { useAuthStore } = await import('stores/auth.store');
+    useAuthStore().aplicarContextoRefresh(response.data);
     return true;
   } catch {
     limparSessao();

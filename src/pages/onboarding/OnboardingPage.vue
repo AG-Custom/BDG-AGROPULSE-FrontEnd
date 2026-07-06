@@ -12,7 +12,7 @@
         <q-step :name="1" title="Empresa" icon="business" :done="passo > 1">
           <empresa-step ref="empresaStepRef" v-model:empresa="empresa" />
           <q-stepper-navigation class="stepper-actions">
-            <q-btn color="primary" unelevated label="Continuar" @click="avancarParaUnidades" />
+            <agro-btn color="primary" unelevated label="Continuar" descricao="Avançar para o cadastro de unidades" @click="avancarParaUnidades" />
           </q-stepper-navigation>
         </q-step>
 
@@ -25,11 +25,12 @@
             @matriz="definirMatriz"
           />
           <q-stepper-navigation class="stepper-actions">
-            <q-btn flat label="Voltar" @click="passo = 1" />
-            <q-btn
+            <agro-btn flat label="Voltar" descricao="Retornar ao cadastro da empresa" @click="passo = 1" />
+            <agro-btn
               color="primary"
               unelevated
               label="Concluir cadastro"
+              descricao="Finalizar configuração da empresa e unidades"
               :loading="salvando"
               @click="concluirCadastro"
             />

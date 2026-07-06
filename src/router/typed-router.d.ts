@@ -6,7 +6,9 @@ declare module 'vue-router' {
     convidado?: boolean;
     requerAuth?: boolean;
     requerEmpresa?: boolean;
+    requerUnidade?: boolean;
     onboarding?: boolean;
+    selecaoUnidade?: boolean;
     layout?: 'auth' | 'main' | 'onboarding';
     breadcrumb?: string;
     breadcrumbPais?: string[];

@@ -7,6 +7,9 @@ import type {
   LoginPayload,
   RegisterPayload,
   RegisterResponseDto,
+  SelecionarUnidadePayload,
+  SelecionarUnidadeResponseDto,
+  UnidadesDisponiveisResponseDto,
 } from 'types/dtos/auth.dto';
 
 export const authService = {
@@ -32,5 +35,15 @@ export const authService = {
 
   obterSessao(): Promise<AuthSessionDto> {
     return api.get<AuthSessionDto>('/auth/session').then((response) => response.data);
+  },
+
+  listarUnidades(): Promise<UnidadesDisponiveisResponseDto> {
+    return api.get<UnidadesDisponiveisResponseDto>('/auth/unidades').then((response) => response.data);
+  },
+
+  selecionarUnidade(payload: SelecionarUnidadePayload): Promise<SelecionarUnidadeResponseDto> {
+    return api
+      .post<SelecionarUnidadeResponseDto>('/auth/selecionar-unidade', payload)
+      .then((response) => response.data);
   },
 };

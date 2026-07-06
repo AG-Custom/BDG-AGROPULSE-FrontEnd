@@ -1,7 +1,7 @@
 <template>
   <q-page class="not-found-page">
     <div class="text-h5">Página não encontrada</div>
-    <q-btn color="primary" flat :to="{ name: 'dashboard' }" label="Voltar" />
+    <agro-btn color="primary" flat :to="{ name: 'dashboard' }" label="Voltar" descricao="Retornar ao painel principal" />
   </q-page>
 </template>
 

@@ -1,4 +1,9 @@
-import type { AuthContextSessionDto, AuthSessionDto, SessaoPersistida } from 'types/dtos/auth.dto';
+import type {
+  AuthContextSessionDto,
+  AuthSessionDto,
+  SelecionarUnidadeResponseDto,
+  SessaoPersistida,
+} from 'types/dtos/auth.dto';
 import type { UsuarioLogado } from 'types/entidades/usuario';
 import { Permissoes } from 'constants/permissoes';
 
@@ -7,6 +12,8 @@ export function loginParaSessao(resposta: AuthSessionDto): SessaoPersistida {
     expiresAt: resposta.expiresAt,
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
+    requiresUnidadeSelection: resposta.requiresUnidadeSelection,
+    unidadesDisponiveis: resposta.unidadesDisponiveis,
     usuario: resposta.usuario,
   };
 }
@@ -20,6 +27,22 @@ export function refreshParaSessao(
     expiresAt: resposta.expiresAt,
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
+    requiresUnidadeSelection: resposta.requiresUnidadeSelection,
+    unidadesDisponiveis: resposta.unidadesDisponiveis,
+  };
+}
+
+export function selecionarUnidadeParaSessao(
+  resposta: SelecionarUnidadeResponseDto,
+  sessaoAtual: SessaoPersistida,
+): SessaoPersistida {
+  return {
+    ...sessaoAtual,
+    expiresAt: resposta.expiresAt,
+    empresaId: resposta.empresaId,
+    unidadeId: resposta.unidadeId,
+    requiresUnidadeSelection: false,
+    unidadesDisponiveis: null,
   };
 }
 
@@ -28,6 +51,10 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
-    permissoes: [Permissoes.Dashboard.Visualizar],
+    permissoes: [
+      Permissoes.Dashboard.Visualizar,
+      Permissoes.Unidades.Visualizar,
+      Permissoes.Cnpjs.Visualizar,
+    ],
   };
 }

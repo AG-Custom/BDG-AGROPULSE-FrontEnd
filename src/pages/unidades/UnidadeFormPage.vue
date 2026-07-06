@@ -1,0 +1,148 @@
+<template>
+  <q-page class="agro-page">
+    <app-page-header :titulo="tituloPagina" :subtitulo="subtituloPagina" />
+
+    <section class="agro-section">
+      <agro-card>
+        <q-inner-loading :showing="carregandoPagina" color="primary" />
+
+        <unidade-formulario
+          v-if="!carregandoPagina"
+          ref="formularioRef"
+          v-model:formulario="formulario"
+          :modo="modo"
+          :cnpjs="cnpjs"
+          :carregando-cnpjs="carregandoCnpjs"
+        />
+
+        <div class="unidade-form-page__acoes">
+          <agro-btn flat label="Cancelar" descricao="Voltar para a listagem sem salvar" :disable="salvando" @click="voltar" />
+          <agro-btn
+            color="primary"
+            unelevated
+            :label="modo === 'criar' ? 'Cadastrar' : 'Salvar'"
+            :descricao="modo === 'criar' ? 'Cadastrar nova unidade' : 'Salvar alterações da unidade'"
+            :loading="salvando"
+            @click="salvar"
+          />
+        </div>
+      </agro-card>
+    </section>
+  </q-page>
+</template>
+
+<script setup lang="ts">
+import UnidadeFormulario from 'components/unidades/UnidadeFormulario.vue';
+import AgroCard from 'components/ui/AgroCard.vue';
+import { useCnpjs } from 'composables/useCnpjs';
+import { useNotificacao } from 'composables/useNotificacao';
+import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import { unidadeService } from 'services/unidade.service';
+import type { UnidadeFormModel } from 'types/dtos/unidade.dto';
+import {
+  criarUnidadeFormVazia,
+  formParaCriarPayload,
+  formParaEditarPayload,
+  unidadeDtoParaForm,
+} from 'utils/mappers/unidade.mapper';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+const { cnpjs, carregando: carregandoCnpjs, carregar: carregarCnpjs } = useCnpjs();
+const { sucesso, erro } = useNotificacao();
+const { mensagem } = useTratarErroFormulario();
+
+const formularioRef = ref<InstanceType<typeof UnidadeFormulario> | null>(null);
+const formulario = ref<UnidadeFormModel>(criarUnidadeFormVazia());
+const carregandoPagina = ref(true);
+const salvando = ref(false);
+
+const modo = computed<'criar' | 'editar'>(() =>
+  route.name === 'unidade-editar' ? 'editar' : 'criar',
+);
+
+const unidadeId = computed(() => route.params.id as string | undefined);
+
+const tituloPagina = computed(() =>
+  modo.value === 'criar' ? 'Nova unidade' : 'Editar unidade',
+);
+
+const subtituloPagina = computed(() =>
+  modo.value === 'criar'
+    ? 'Cadastre uma nova unidade vinculada a um CNPJ da empresa.'
+    : 'Atualize os dados da unidade selecionada.',
+);
+
+async function carregarUnidade(): Promise<void> {
+  if (!unidadeId.value) {
+    return;
+  }
+
+  try {
+    const unidade = await unidadeService.obter(unidadeId.value);
+    formulario.value = unidadeDtoParaForm(unidade);
+  } catch (e) {
+    erro(mensagem(e));
+    await router.replace({ name: 'unidades' });
+  }
+}
+
+async function inicializar(): Promise<void> {
+  carregandoPagina.value = true;
+
+  await carregarCnpjs();
+
+  if (modo.value === 'editar') {
+    await carregarUnidade();
+  } else if (cnpjs.value.length === 1) {
+    formulario.value.cnpjEmpresaId = cnpjs.value[0]!.id;
+  }
+
+  carregandoPagina.value = false;
+}
+
+function voltar(): void {
+  void router.push({ name: 'unidades' });
+}
+
+async function salvar(): Promise<void> {
+  const valido = (await formularioRef.value?.validar()) ?? false;
+
+  if (!valido) {
+    return;
+  }
+
+  salvando.value = true;
+
+  try {
+    if (modo.value === 'criar') {
+      await unidadeService.criar(formParaCriarPayload(formulario.value));
+      sucesso('Unidade cadastrada com sucesso.');
+    } else {
+      await unidadeService.editar(unidadeId.value!, formParaEditarPayload(formulario.value));
+      sucesso('Unidade atualizada com sucesso.');
+    }
+
+    await router.push({ name: 'unidades' });
+  } catch (e) {
+    erro(mensagem(e));
+  } finally {
+    salvando.value = false;
+  }
+}
+
+onMounted(() => {
+  void inicializar();
+});
+</script>
+
+<style scoped>
+.unidade-form-page__acoes {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-6);
+}
+</style>

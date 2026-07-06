@@ -12,7 +12,7 @@ type DestinoPosLogin = 'dashboard' | 'onboarding' | 'redirect';
 export function useAutenticacao() {
   const route = useRoute();
   const router = useRouter();
-  const { entrar, cadastrar, confirmarEmail, precisaOnboarding } = useAuth();
+  const { entrar, cadastrar, confirmarEmail, precisaOnboarding, precisaSelecionarUnidade } = useAuth();
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -28,6 +28,8 @@ export function useAutenticacao() {
         await router.replace(route.query.redirect);
       } else if (destino === 'onboarding' || precisaOnboarding.value) {
         await router.replace({ name: 'onboarding' });
+      } else if (precisaSelecionarUnidade.value) {
+        await router.replace({ name: 'selecionar-unidade' });
       } else {
         await router.replace({ name: 'dashboard' });
       }

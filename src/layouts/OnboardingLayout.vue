@@ -4,12 +4,12 @@
       <q-toolbar class="onboarding-layout__toolbar">
         <agro-logo size="sm" />
         <q-space />
-        <q-btn
+        <agro-btn
           flat
           dense
           icon="logout"
           label="Sair"
-          aria-label="Sair da conta"
+          descricao="Encerrar sessão e voltar ao login"
           class="onboarding-layout__logout"
           @click="sair"
         />
@@ -30,9 +30,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const { sair: sairAuth } = useAuth();
 
-function sair(): void {
-  sairAuth();
-  void router.push({ name: 'login' });
+async function sair(): Promise<void> {
+  await sairAuth();
+  await router.push({ name: 'login' });
 }
 </script>
 

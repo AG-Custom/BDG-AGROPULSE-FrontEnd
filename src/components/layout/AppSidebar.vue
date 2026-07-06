@@ -17,6 +17,23 @@
         </q-item>
       </q-list>
     </div>
+
+    <div class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Cadastros</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'unidades' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="store" size="20px" />
+          </q-item-section>
+          <q-item-section>Unidades</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
   </nav>
 </template>
 

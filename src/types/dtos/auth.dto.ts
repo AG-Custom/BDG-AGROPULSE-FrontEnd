@@ -55,7 +55,23 @@ export interface SessaoPersistida {
   expiresAt: string;
   empresaId: string | null;
   unidadeId: string | null;
+  requiresUnidadeSelection: boolean;
+  unidadesDisponiveis: UnidadeDisponivelDto[] | null;
   usuario: AuthUsuarioDto;
+}
+
+export interface SelecionarUnidadePayload {
+  unidadeId: string;
+}
+
+export interface SelecionarUnidadeResponseDto {
+  expiresAt: string;
+  empresaId: string | null;
+  unidadeId: string | null;
+}
+
+export interface UnidadesDisponiveisResponseDto {
+  unidades: UnidadeDisponivelDto[];
 }
 
 export type LoginResponseDto = AuthSessionDto;

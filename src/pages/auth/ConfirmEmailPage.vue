@@ -8,7 +8,13 @@
           O link de confirmação está incompleto ou expirou. Solicite um novo cadastro ou entre em
           contato com o suporte.
         </p>
-        <q-btn color="primary" unelevated label="Ir para login" :to="{ name: 'login' }" />
+        <agro-btn
+          color="primary"
+          unelevated
+          label="Ir para login"
+          descricao="Acessar a tela de login"
+          :to="{ name: 'login' }"
+        />
       </div>
 
       <div v-else-if="confirmando" class="confirmacao-estado">
@@ -48,20 +54,21 @@
             :rules="[obrigatorio]"
           >
             <template #append>
-              <q-icon
+              <agro-icon-btn
                 :name="mostrarSenha ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
+                :descricao="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
                 @click="mostrarSenha = !mostrarSenha"
               />
             </template>
           </q-input>
 
-          <q-btn
+          <agro-btn
             color="primary"
             unelevated
             type="submit"
             class="full-width"
             label="Continuar para configuração"
+            descricao="Entrar e iniciar a configuração da empresa"
             :loading="carregando"
           />
         </q-form>
@@ -71,7 +78,13 @@
         <q-icon name="error_outline" size="48px" color="negative" />
         <div class="text-h6">Não foi possível confirmar</div>
         <p class="text-body-md text-secondary">Tente novamente ou entre em contato com o suporte.</p>
-        <q-btn color="primary" unelevated label="Ir para login" :to="{ name: 'login' }" />
+        <agro-btn
+          color="primary"
+          unelevated
+          label="Ir para login"
+          descricao="Acessar a tela de login"
+          :to="{ name: 'login' }"
+        />
       </div>
     </auth-card>
   </q-page>
@@ -79,6 +92,7 @@
 
 <script setup lang="ts">
 import AuthCard from 'components/shared/AuthCard.vue';
+import AgroIconBtn from 'components/ui/AgroIconBtn.vue';
 import { useAutenticacao } from 'composables/useAutenticacao';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

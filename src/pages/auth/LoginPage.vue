@@ -26,20 +26,21 @@
           :rules="[obrigatorio]"
         >
           <template #append>
-            <q-icon
+            <agro-icon-btn
               :name="mostrarSenha ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
+              :descricao="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
               @click="mostrarSenha = !mostrarSenha"
             />
           </template>
         </q-input>
 
-        <q-btn
+        <agro-btn
           color="primary"
           unelevated
           type="submit"
           class="full-width"
           label="Entrar"
+          descricao="Acessar sua conta no AgroPulse"
           :loading="carregando"
         />
       </q-form>
@@ -56,6 +57,7 @@
 
 <script setup lang="ts">
 import AuthCard from 'components/shared/AuthCard.vue';
+import AgroIconBtn from 'components/ui/AgroIconBtn.vue';
 import { useAutenticacao } from 'composables/useAutenticacao';
 import { ref } from 'vue';
 import { email as emailValidator, obrigatorio } from 'utils/validators';
