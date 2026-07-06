@@ -1,5 +1,6 @@
 export const MASCARAS = {
   CNPJ: '##.###.###/####-##',
+  CPF: '###.###.###-##',
   CEP: '#####-###',
   TELEFONE_FIXO: '(##) ####-####',
   TELEFONE_CELULAR: '(##) #####-####',
@@ -8,6 +9,7 @@ export const MASCARAS = {
 
 export const TAMANHO_FORMATADO = {
   CNPJ: 18,
+  CPF: 14,
   CEP: 9,
   TELEFONE_FIXO: 14,
   TELEFONE_CELULAR: 15,
@@ -16,6 +18,7 @@ export const TAMANHO_FORMATADO = {
 
 export const DIGITOS = {
   CNPJ: 14,
+  CPF: 11,
   CEP: 8,
   TELEFONE_MIN: 10,
   TELEFONE_MAX: 11,

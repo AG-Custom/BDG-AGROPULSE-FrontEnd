@@ -55,6 +55,7 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.Dashboard.Visualizar,
       Permissoes.Unidades.Visualizar,
       Permissoes.Cnpjs.Visualizar,
+      Permissoes.Fornecedores.Visualizar,
     ],
   };
 }

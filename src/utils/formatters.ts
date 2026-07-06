@@ -6,6 +6,9 @@ export function apenasDigitos(valor: string): string {
   return valor.replace(/\D/g, '');
 }
 
+import type { TipoPessoaFornecedorValor } from 'constants/enums';
+import { TipoPessoaFornecedor } from 'constants/enums';
+
 export function formatarCnpj(valor: string): string {
   const digits = apenasDigitos(valor).slice(0, 14);
   return digits
@@ -13,6 +16,20 @@ export function formatarCnpj(valor: string): string {
     .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
     .replace(/\.(\d{3})(\d)/, '.$1/$2')
     .replace(/(\d{4})(\d)/, '$1-$2');
+}
+
+export function formatarCpf(valor: string): string {
+  const digits = apenasDigitos(valor).slice(0, 11);
+  return digits
+    .replace(/^(\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1-$2');
+}
+
+export function formatarDocumento(tipoPessoa: TipoPessoaFornecedorValor, valor: string): string {
+  return tipoPessoa === TipoPessoaFornecedor.PessoaFisica
+    ? formatarCpf(valor)
+    : formatarCnpj(valor);
 }
 
 export function formatarCep(valor: string): string {

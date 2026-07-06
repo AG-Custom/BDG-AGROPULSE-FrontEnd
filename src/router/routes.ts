@@ -135,6 +135,35 @@ export const routes: RouteRecordRaw[] = [
           permissao: Permissoes.Cnpjs.Visualizar,
         },
       },
+      {
+        path: 'fornecedores',
+        name: 'fornecedores',
+        component: () => import('pages/fornecedores/FornecedoresListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fornecedores',
+          permissao: Permissoes.Fornecedores.Visualizar,
+        },
+      },
+      {
+        path: 'fornecedores/novo',
+        name: 'fornecedor-novo',
+        component: () => import('pages/fornecedores/FornecedorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fornecedorNovo',
+          breadcrumbPais: ['navegacao.fornecedores'],
+          permissao: Permissoes.Fornecedores.Visualizar,
+        },
+      },
+      {
+        path: 'fornecedores/:id/editar',
+        name: 'fornecedor-editar',
+        component: () => import('pages/fornecedores/FornecedorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fornecedorEditar',
+          breadcrumbPais: ['navegacao.fornecedores'],
+          permissao: Permissoes.Fornecedores.Visualizar,
+        },
+      },
     ],
   },
   {

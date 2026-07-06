@@ -8,4 +8,7 @@ export const Permissoes = {
   Cnpjs: {
     Visualizar: 'cnpjs.visualizar',
   },
+  Fornecedores: {
+    Visualizar: 'fornecedores.visualizar',
+  },
 } as const;

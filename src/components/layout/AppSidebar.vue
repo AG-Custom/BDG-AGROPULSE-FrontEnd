@@ -32,6 +32,17 @@
           </q-item-section>
           <q-item-section>Unidades</q-item-section>
         </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fornecedores' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="local_shipping" size="20px" />
+          </q-item-section>
+          <q-item-section>Fornecedores</q-item-section>
+        </q-item>
       </q-list>
     </div>
   </nav>

@@ -38,3 +38,16 @@ export const TimeZoneOpcoes = [
 ];
 
 export const PAIS_PADRAO = 'Brasil';
+
+export const TipoPessoaFornecedor = {
+  PessoaJuridica: 'PessoaJuridica',
+  PessoaFisica: 'PessoaFisica',
+} as const;
+
+export type TipoPessoaFornecedorValor =
+  (typeof TipoPessoaFornecedor)[keyof typeof TipoPessoaFornecedor];
+
+export const TipoPessoaFornecedorOpcoes = [
+  { label: 'Pessoa jurídica (CNPJ)', value: TipoPessoaFornecedor.PessoaJuridica },
+  { label: 'Pessoa física (CPF)', value: TipoPessoaFornecedor.PessoaFisica },
+];

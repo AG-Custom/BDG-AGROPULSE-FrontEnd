@@ -98,3 +98,22 @@ export function cnpj(val: string): true | string {
   const digits = val.replace(/\D/g, '');
   return digits.length === 14 || 'Informe um CNPJ válido com 14 dígitos';
 }
+
+export function cpf(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  return digits.length === 11 || 'Informe um CPF válido com 11 dígitos';
+}
+
+export function documentoFornecedor(tipoPessoa: string) {
+  return (val: string): true | string => {
+    if (!val) {
+      return true;
+    }
+
+    return tipoPessoa === 'PessoaFisica' ? cpf(val) : cnpj(val);
+  };
+}
