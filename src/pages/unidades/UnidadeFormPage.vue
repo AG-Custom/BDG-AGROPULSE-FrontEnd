@@ -10,12 +10,13 @@
           v-else
           ref="formularioRef"
           v-model:formulario="formulario"
-          :modo="modo"
+          :modo="modoFormulario"
+          :somente-leitura="modo === 'visualizar'"
           :cnpjs="cnpjs"
           :carregando-cnpjs="carregandoCnpjs"
         />
 
-        <div v-if="!carregandoPagina" class="agro-form-actions">
+        <div v-if="!carregandoPagina && modo !== 'visualizar'" class="agro-form-actions">
           <agro-btn flat label="Cancelar" descricao="Voltar para a listagem sem salvar" :disable="salvando" @click="voltar" />
           <agro-btn
             color="primary"
@@ -25,6 +26,10 @@
             :loading="salvando"
             @click="salvar"
           />
+        </div>
+
+        <div v-else-if="!carregandoPagina && modo === 'visualizar'" class="agro-form-actions">
+          <agro-btn flat label="Voltar" descricao="Retornar para a listagem de unidades" @click="voltar" />
         </div>
       </agro-card>
     </section>
@@ -60,21 +65,43 @@ const formulario = ref<UnidadeFormModel>(criarUnidadeFormVazia());
 const carregandoPagina = ref(true);
 const salvando = ref(false);
 
-const modo = computed<'criar' | 'editar'>(() =>
-  route.name === 'unidade-editar' ? 'editar' : 'criar',
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'unidade-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'unidade-editar' ? 'editar' : 'criar';
+});
+
+const modoFormulario = computed<'criar' | 'editar'>(() =>
+  modo.value === 'criar' ? 'criar' : 'editar',
 );
 
 const unidadeId = computed(() => route.params.id as string | undefined);
 
-const tituloPagina = computed(() =>
-  modo.value === 'criar' ? 'Nova unidade' : 'Editar unidade',
-);
+const tituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova unidade';
+  }
 
-const subtituloPagina = computed(() =>
-  modo.value === 'criar'
-    ? 'Cadastre uma nova unidade vinculada a um CNPJ da empresa.'
-    : 'Atualize os dados da unidade selecionada.',
-);
+  if (modo.value === 'visualizar') {
+    return 'Visualizar unidade';
+  }
+
+  return 'Editar unidade';
+});
+
+const subtituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Cadastre uma nova unidade vinculada a um CNPJ da empresa.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte os dados da unidade selecionada.';
+  }
+
+  return 'Atualize os dados da unidade selecionada.';
+});
 
 async function carregarUnidade(): Promise<void> {
   if (!unidadeId.value) {
@@ -95,7 +122,7 @@ async function inicializar(): Promise<void> {
 
   await carregarCnpjs();
 
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     await carregarUnidade();
   } else if (cnpjs.value.length === 1) {
     formulario.value.cnpjEmpresaId = cnpjs.value[0]!.id;

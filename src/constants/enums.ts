@@ -51,3 +51,273 @@ export const TipoPessoaFornecedorOpcoes = [
   { label: 'Pessoa jurídica (CNPJ)', value: TipoPessoaFornecedor.PessoaJuridica },
   { label: 'Pessoa física (CPF)', value: TipoPessoaFornecedor.PessoaFisica },
 ];
+
+export const UsuarioStatus = {
+  PendenteConfirmacao: 'PendenteConfirmacao',
+  Ativo: 'Ativo',
+  Inativo: 'Inativo',
+} as const;
+
+export type UsuarioStatusValor = (typeof UsuarioStatus)[keyof typeof UsuarioStatus];
+
+export const UsuarioStatusOpcoes = [
+  { label: 'Pendente de confirmação', value: UsuarioStatus.PendenteConfirmacao },
+  { label: 'Ativo', value: UsuarioStatus.Ativo },
+  { label: 'Inativo', value: UsuarioStatus.Inativo },
+];
+
+export const PerfilUsuario = {
+  Diretor: 'Diretor',
+  Gerente: 'Gerente',
+  Vendedor: 'Vendedor',
+  Administrativo: 'Administrativo',
+  Operacional: 'Operacional',
+  Rh: 'Rh',
+  Administrador: 'Administrador',
+} as const;
+
+export type PerfilUsuarioValor = (typeof PerfilUsuario)[keyof typeof PerfilUsuario];
+
+export const PerfilUsuarioOpcoes = [
+  { label: 'Diretor', value: PerfilUsuario.Diretor },
+  { label: 'Gerente', value: PerfilUsuario.Gerente },
+  { label: 'Vendedor', value: PerfilUsuario.Vendedor },
+  { label: 'Administrativo', value: PerfilUsuario.Administrativo },
+  { label: 'Operacional', value: PerfilUsuario.Operacional },
+  { label: 'RH', value: PerfilUsuario.Rh },
+  { label: 'Administrador (legado)', value: PerfilUsuario.Administrador },
+];
+
+export const PerfilUsuarioCadastroOpcoes = PerfilUsuarioOpcoes.filter(
+  (opcao) => opcao.value !== PerfilUsuario.Administrador,
+);
+
+export function isPerfilUsuarioGlobal(perfil: PerfilUsuarioValor): boolean {
+  return perfil === PerfilUsuario.Administrador;
+}
+
+export const ColaboradorStatus = {
+  Ativo: 'Ativo',
+  Inativo: 'Inativo',
+} as const;
+
+export type ColaboradorStatusValor = (typeof ColaboradorStatus)[keyof typeof ColaboradorStatus];
+
+export const ColaboradorStatusOpcoes = [
+  { label: 'Ativo', value: ColaboradorStatus.Ativo },
+  { label: 'Inativo', value: ColaboradorStatus.Inativo },
+];
+
+export const CargoColaborador = {
+  Diretor: 'Diretor',
+  Gerente: 'Gerente',
+  Vendedor: 'Vendedor',
+  Administrativo: 'Administrativo',
+  Operacional: 'Operacional',
+  Rh: 'Rh',
+  Personalizado: 'Personalizado',
+} as const;
+
+export type CargoColaboradorValor = (typeof CargoColaborador)[keyof typeof CargoColaborador];
+
+export const CargoColaboradorOpcoes = [
+  { label: 'Diretor', value: CargoColaborador.Diretor },
+  { label: 'Gerente', value: CargoColaborador.Gerente },
+  { label: 'Vendedor', value: CargoColaborador.Vendedor },
+  { label: 'Administrativo', value: CargoColaborador.Administrativo },
+  { label: 'Operacional', value: CargoColaborador.Operacional },
+  { label: 'RH', value: CargoColaborador.Rh },
+  { label: 'Personalizado', value: CargoColaborador.Personalizado },
+];
+
+export const TipoPessoaCliente = {
+  PessoaJuridica: 'PessoaJuridica',
+  PessoaFisica: 'PessoaFisica',
+} as const;
+
+export type TipoPessoaClienteValor = (typeof TipoPessoaCliente)[keyof typeof TipoPessoaCliente];
+
+export const TipoPessoaClienteOpcoes = [
+  { label: 'Pessoa jurídica (CNPJ)', value: TipoPessoaCliente.PessoaJuridica },
+  { label: 'Pessoa física (CPF)', value: TipoPessoaCliente.PessoaFisica },
+];
+
+export const TipoCliente = {
+  Balcao: 'Balcao',
+  ProdutorRural: 'ProdutorRural',
+  Revenda: 'Revenda',
+  Cooperativa: 'Cooperativa',
+  Industria: 'Industria',
+  Outro: 'Outro',
+} as const;
+
+export type TipoClienteValor = (typeof TipoCliente)[keyof typeof TipoCliente];
+
+export const TipoClienteOpcoes = [
+  { label: 'Balcão', value: TipoCliente.Balcao },
+  { label: 'Produtor rural', value: TipoCliente.ProdutorRural },
+  { label: 'Revenda', value: TipoCliente.Revenda },
+  { label: 'Cooperativa', value: TipoCliente.Cooperativa },
+  { label: 'Indústria', value: TipoCliente.Industria },
+  { label: 'Outro', value: TipoCliente.Outro },
+];
+
+export const GrupoComercial = {
+  Premium: 'Premium',
+  Standard: 'Standard',
+  Varejo: 'Varejo',
+  Rural: 'Rural',
+  Outro: 'Outro',
+} as const;
+
+export type GrupoComercialValor = (typeof GrupoComercial)[keyof typeof GrupoComercial];
+
+export const GrupoComercialOpcoes = [
+  { label: 'Premium', value: GrupoComercial.Premium },
+  { label: 'Standard', value: GrupoComercial.Standard },
+  { label: 'Varejo', value: GrupoComercial.Varejo },
+  { label: 'Rural', value: GrupoComercial.Rural },
+  { label: 'Outro', value: GrupoComercial.Outro },
+];
+
+export const TipoEnderecoCliente = {
+  Cobranca: 'Cobranca',
+  Entrega: 'Entrega',
+  Propriedade: 'Propriedade',
+} as const;
+
+export type TipoEnderecoClienteValor = (typeof TipoEnderecoCliente)[keyof typeof TipoEnderecoCliente];
+
+export const TipoEnderecoClienteOpcoes = [
+  { label: 'Cobrança', value: TipoEnderecoCliente.Cobranca },
+  { label: 'Entrega', value: TipoEnderecoCliente.Entrega },
+  { label: 'Propriedade', value: TipoEnderecoCliente.Propriedade },
+];
+
+export const TipoProduto = {
+  Insumo: 'Insumo',
+  Revenda: 'Revenda',
+  Produzido: 'Produzido',
+  Servico: 'Servico',
+  Outro: 'Outro',
+} as const;
+
+export type TipoProdutoValor = (typeof TipoProduto)[keyof typeof TipoProduto];
+
+export const TipoProdutoOpcoes = [
+  { label: 'Insumo', value: TipoProduto.Insumo },
+  { label: 'Revenda', value: TipoProduto.Revenda },
+  { label: 'Produzido', value: TipoProduto.Produzido },
+  { label: 'Serviço', value: TipoProduto.Servico },
+  { label: 'Outro', value: TipoProduto.Outro },
+];
+
+export const TipoCodigoProduto = {
+  SKU: 'SKU',
+  EAN: 'EAN',
+  Alternativo: 'Alternativo',
+} as const;
+
+export type TipoCodigoProdutoValor = (typeof TipoCodigoProduto)[keyof typeof TipoCodigoProduto];
+
+export const TipoCodigoProdutoOpcoes = [
+  { label: 'SKU', value: TipoCodigoProduto.SKU },
+  { label: 'EAN', value: TipoCodigoProduto.EAN },
+  { label: 'Alternativo', value: TipoCodigoProduto.Alternativo },
+];
+
+export const TipoDocumentoProduto = {
+  Fispq: 'Fispq',
+  FichaTecnica: 'FichaTecnica',
+  Outro: 'Outro',
+} as const;
+
+export type TipoDocumentoProdutoValor =
+  (typeof TipoDocumentoProduto)[keyof typeof TipoDocumentoProduto];
+
+export const TipoDocumentoProdutoOpcoes = [
+  { label: 'FISPQ', value: TipoDocumentoProduto.Fispq },
+  { label: 'Ficha técnica', value: TipoDocumentoProduto.FichaTecnica },
+  { label: 'Outro', value: TipoDocumentoProduto.Outro },
+];
+
+export const OrigemMercadoria = {
+  Nacional: 'Nacional',
+  EstrangeiraImportacaoDireta: 'EstrangeiraImportacaoDireta',
+  EstrangeiraAdquiridaMercadoInterno: 'EstrangeiraAdquiridaMercadoInterno',
+  NacionalConteudoImportacaoSuperior40: 'NacionalConteudoImportacaoSuperior40',
+  NacionalProcessosBasicos: 'NacionalProcessosBasicos',
+  NacionalConteudoImportacaoInferior40: 'NacionalConteudoImportacaoInferior40',
+  EstrangeiraImportacaoDiretaSemSimilar: 'EstrangeiraImportacaoDiretaSemSimilar',
+  EstrangeiraAdquiridaMercadoInternoSemSimilar: 'EstrangeiraAdquiridaMercadoInternoSemSimilar',
+  NacionalConteudoImportacaoSuperior70: 'NacionalConteudoImportacaoSuperior70',
+} as const;
+
+export type OrigemMercadoriaValor = (typeof OrigemMercadoria)[keyof typeof OrigemMercadoria];
+
+export const OrigemMercadoriaOpcoes = [
+  { label: 'Nacional', value: OrigemMercadoria.Nacional },
+  {
+    label: 'Estrangeira — importação direta',
+    value: OrigemMercadoria.EstrangeiraImportacaoDireta,
+  },
+  {
+    label: 'Estrangeira — mercado interno',
+    value: OrigemMercadoria.EstrangeiraAdquiridaMercadoInterno,
+  },
+  {
+    label: 'Nacional — importação > 40%',
+    value: OrigemMercadoria.NacionalConteudoImportacaoSuperior40,
+  },
+  { label: 'Nacional — processos básicos', value: OrigemMercadoria.NacionalProcessosBasicos },
+  {
+    label: 'Nacional — importação ≤ 40%',
+    value: OrigemMercadoria.NacionalConteudoImportacaoInferior40,
+  },
+  {
+    label: 'Estrangeira — importação sem similar',
+    value: OrigemMercadoria.EstrangeiraImportacaoDiretaSemSimilar,
+  },
+  {
+    label: 'Estrangeira — mercado interno sem similar',
+    value: OrigemMercadoria.EstrangeiraAdquiridaMercadoInternoSemSimilar,
+  },
+  {
+    label: 'Nacional — importação > 70%',
+    value: OrigemMercadoria.NacionalConteudoImportacaoSuperior70,
+  },
+];
+
+export const MetodoCusteio = {
+  CMP: 'CMP',
+  FIFO: 'FIFO',
+  FEFO: 'FEFO',
+} as const;
+
+export type MetodoCusteioValor = (typeof MetodoCusteio)[keyof typeof MetodoCusteio];
+
+export const MetodoCusteioOpcoes = [
+  { label: 'Custo médio ponderado (CMP)', value: MetodoCusteio.CMP },
+  { label: 'FIFO', value: MetodoCusteio.FIFO },
+  { label: 'FEFO', value: MetodoCusteio.FEFO },
+];
+
+export const CanalVenda = {
+  Balcao: 'Balcao',
+  Varejo: 'Varejo',
+  Atacado: 'Atacado',
+  Ecommerce: 'Ecommerce',
+  Representante: 'Representante',
+  Outro: 'Outro',
+} as const;
+
+export type CanalVendaValor = (typeof CanalVenda)[keyof typeof CanalVenda];
+
+export const CanalVendaOpcoes = [
+  { label: 'Balcão', value: CanalVenda.Balcao },
+  { label: 'Varejo', value: CanalVenda.Varejo },
+  { label: 'Atacado', value: CanalVenda.Atacado },
+  { label: 'E-commerce', value: CanalVenda.Ecommerce },
+  { label: 'Representante', value: CanalVenda.Representante },
+  { label: 'Outro', value: CanalVenda.Outro },
+];

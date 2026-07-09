@@ -21,6 +21,15 @@ export interface ContatoFornecedorDto {
   principal: boolean;
 }
 
+export interface AvaliacaoFornecedorDto {
+  id: string;
+  notaPreco: number;
+  notaPrazo: number;
+  notaQualidade: number;
+  observacao: string | null;
+  createdAt: string;
+}
+
 export interface FornecedorDto extends FornecedorResumoDto {
   inscricaoEstadual: string | null;
   inscricaoMunicipal: string | null;
@@ -29,6 +38,7 @@ export interface FornecedorDto extends FornecedorResumoDto {
   endereco: EnderecoDto | null;
   observacoes: string | null;
   contatos: ContatoFornecedorDto[];
+  avaliacoes: AvaliacaoFornecedorDto[];
 }
 
 export interface CriarFornecedorPayload {
@@ -52,6 +62,13 @@ export interface ContatoFornecedorPayload {
   telefone: string;
   cargo: string | null;
   principal: boolean;
+}
+
+export interface AvaliacaoFornecedorPayload {
+  notaPreco: number;
+  notaPrazo: number;
+  notaQualidade: number;
+  observacao: string | null;
 }
 
 export interface ListarFornecedoresParams {
@@ -85,4 +102,11 @@ export interface ContatoFornecedorFormModel {
   telefone: string;
   cargo: string;
   principal: boolean;
+}
+
+export interface AvaliacaoFornecedorFormModel {
+  notaPreco: number;
+  notaPrazo: number;
+  notaQualidade: number;
+  observacao: string;
 }

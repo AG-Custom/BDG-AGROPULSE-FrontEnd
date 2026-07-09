@@ -4,6 +4,7 @@
       <div class="fornecedor-contatos__header">
         <h3 class="fornecedor-contatos__titulo">Contatos</h3>
         <agro-btn
+          v-if="!somenteLeitura"
           color="primary"
           unelevated
           icon="add"
@@ -49,7 +50,7 @@
         </q-td>
       </template>
 
-      <template #body-cell-acoes="props">
+      <template v-if="!somenteLeitura" #body-cell-acoes="props">
         <q-td :props="props" class="fornecedor-contatos__acoes">
           <agro-btn
             flat
@@ -124,11 +125,12 @@ import {
 } from 'utils/mappers/fornecedor.mapper';
 import { formatarTelefone } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
-import { ref, toRef, watch } from 'vue';
+import { computed, ref, toRef, watch } from 'vue';
 
 const props = defineProps<{
   fornecedorId: string;
   contatosIniciais: ContatoFornecedorDto[];
+  somenteLeitura?: boolean;
 }>();
 
 const {
@@ -147,7 +149,8 @@ const contatoEmEdicaoId = ref<string | null>(null);
 const formContato = ref(criarContatoFormVazio());
 const formularioRef = ref<InstanceType<typeof ContatoFornecedorFormulario> | null>(null);
 
-const colunas: QTableColumn<ContatoFornecedorDto>[] = [
+const colunas = computed(() => {
+  const base: QTableColumn<ContatoFornecedorDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'email', label: 'E-mail', field: 'email', align: 'left', sortable: true },
   { name: 'telefone', label: 'Telefone', field: 'telefone', align: 'left' },
@@ -155,6 +158,11 @@ const colunas: QTableColumn<ContatoFornecedorDto>[] = [
   { name: 'principal', label: 'Principal', field: 'principal', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
+  if (props.somenteLeitura) {
+    return base.filter((coluna) => coluna.name !== 'acoes');
+  }
+  return base;
+});
 
 watch(
   toRef(props, 'contatosIniciais'),

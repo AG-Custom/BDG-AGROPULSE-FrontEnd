@@ -6,7 +6,7 @@ export function apenasDigitos(valor: string): string {
   return valor.replace(/\D/g, '');
 }
 
-import type { TipoPessoaFornecedorValor } from 'constants/enums';
+import type { TipoPessoaClienteValor, TipoPessoaFornecedorValor } from 'constants/enums';
 import { TipoPessoaFornecedor } from 'constants/enums';
 
 export function formatarCnpj(valor: string): string {
@@ -26,7 +26,10 @@ export function formatarCpf(valor: string): string {
     .replace(/\.(\d{3})(\d)/, '.$1-$2');
 }
 
-export function formatarDocumento(tipoPessoa: TipoPessoaFornecedorValor, valor: string): string {
+export function formatarDocumento(
+  tipoPessoa: TipoPessoaFornecedorValor | TipoPessoaClienteValor,
+  valor: string,
+): string {
   return tipoPessoa === TipoPessoaFornecedor.PessoaFisica
     ? formatarCpf(valor)
     : formatarCnpj(valor);
@@ -54,6 +57,22 @@ export function slugify(valor: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+export function formatarDataHora(valor: string): string {
+  const data = new Date(valor);
+
+  if (Number.isNaN(data.getTime())) {
+    return valor;
+  }
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(data);
 }
 
 export function gerarCodigoUnidade(tipo: string, nome: string): string {

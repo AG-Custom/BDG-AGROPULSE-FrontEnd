@@ -43,10 +43,154 @@
           </q-item-section>
           <q-item-section>Fornecedores</q-item-section>
         </q-item>
+        <q-item
+          v-if="podeGerenciarClientes"
+          clickable
+          :to="{ name: 'clientes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="groups" size="20px" />
+          </q-item-section>
+          <q-item-section>Clientes</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeAcessarProdutos" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Produtos</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          v-if="podeGerenciarProdutos"
+          clickable
+          :to="{ name: 'produtos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="inventory_2" size="20px" />
+          </q-item-section>
+          <q-item-section>Produtos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCategoriasProduto"
+          clickable
+          :to="{ name: 'categorias-produto' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="category" size="20px" />
+          </q-item-section>
+          <q-item-section>Categorias</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarUnidadesMedida"
+          clickable
+          :to="{ name: 'unidades-medida' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="straighten" size="20px" />
+          </q-item-section>
+          <q-item-section>Unid. de medida</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarTabelasPreco"
+          clickable
+          :to="{ name: 'tabelas-preco' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="sell" size="20px" />
+          </q-item-section>
+          <q-item-section>Tabelas de preço</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeAcessarAdministracao" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Administração</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          v-if="podeGerenciarUsuarios"
+          clickable
+          :to="{ name: 'usuarios' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="manage_accounts" size="20px" />
+          </q-item-section>
+          <q-item-section>Usuários</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarColaboradores"
+          clickable
+          :to="{ name: 'colaboradores' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="badge" size="20px" />
+          </q-item-section>
+          <q-item-section>Colaboradores</q-item-section>
+        </q-item>
       </q-list>
     </div>
   </nav>
 </template>
+
+<script setup lang="ts">
+import { useAuth } from 'composables/useAuth';
+import { Permissoes } from 'constants/permissoes';
+import { computed } from 'vue';
+
+const { possuiPermissao } = useAuth();
+
+const podeGerenciarUsuarios = computed(() =>
+  possuiPermissao(Permissoes.Usuarios.Visualizar),
+);
+
+const podeGerenciarColaboradores = computed(() =>
+  possuiPermissao(Permissoes.Colaboradores.Visualizar),
+);
+
+const podeGerenciarClientes = computed(() =>
+  possuiPermissao(Permissoes.Clientes.Visualizar),
+);
+
+const podeGerenciarProdutos = computed(() =>
+  possuiPermissao(Permissoes.Produtos.Visualizar),
+);
+
+const podeGerenciarCategoriasProduto = computed(() =>
+  possuiPermissao(Permissoes.CategoriasProduto.Visualizar),
+);
+
+const podeGerenciarUnidadesMedida = computed(() =>
+  possuiPermissao(Permissoes.UnidadesMedida.Visualizar),
+);
+
+const podeGerenciarTabelasPreco = computed(() =>
+  possuiPermissao(Permissoes.TabelasPreco.Visualizar),
+);
+
+const podeAcessarProdutos = computed(
+  () =>
+    podeGerenciarProdutos.value ||
+    podeGerenciarCategoriasProduto.value ||
+    podeGerenciarUnidadesMedida.value ||
+    podeGerenciarTabelasPreco.value,
+);
+
+const podeAcessarAdministracao = computed(
+  () => podeGerenciarUsuarios.value || podeGerenciarColaboradores.value,
+);
+</script>
 
 <style scoped>
 .app-sidebar {

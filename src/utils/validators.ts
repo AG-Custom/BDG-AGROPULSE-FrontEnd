@@ -117,3 +117,29 @@ export function documentoFornecedor(tipoPessoa: string) {
     return tipoPessoa === 'PessoaFisica' ? cpf(val) : cnpj(val);
   };
 }
+
+export function ncm(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  return digits.length === 8 || 'Informe um NCM com 8 dígitos';
+}
+
+export function cest(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  return digits.length === 7 || 'Informe um CEST com 7 dígitos';
+}
+
+export function notaAvaliacao(val: number | null | undefined): true | string {
+  if (val === null || val === undefined || val === 0) {
+    return 'Campo obrigatório';
+  }
+
+  return (val >= 1 && val <= 5) || 'A nota deve estar entre 1 e 5';
+}

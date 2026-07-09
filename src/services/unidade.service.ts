@@ -3,12 +3,13 @@ import { api } from 'services/api';
 import type {
   CriarUnidadePayload,
   EditarUnidadePayload,
+  ListarUnidadesParams,
   UnidadeDto,
 } from 'types/dtos/unidade.dto';
 
 export const unidadeService = {
-  listar(): Promise<UnidadeDto[]> {
-    return api.get<UnidadeDto[]>('/empresas/unidades').then((r) => r.data);
+  listar(params?: ListarUnidadesParams): Promise<UnidadeDto[]> {
+    return api.get<UnidadeDto[]>('/empresas/unidades', { params }).then((r) => r.data);
   },
 
   obter(unidadeId: string): Promise<UnidadeDto> {

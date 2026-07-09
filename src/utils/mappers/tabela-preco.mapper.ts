@@ -1,0 +1,101 @@
+import type {
+  EditarTabelaPrecoItemPayload,
+  SalvarTabelaPrecoPayload,
+  TabelaPrecoDto,
+  TabelaPrecoFormModel,
+  TabelaPrecoItemDto,
+  TabelaPrecoItemEdicaoFormModel,
+  TabelaPrecoItemFormModel,
+  TabelaPrecoItemPayload,
+} from 'types/dtos/tabela-preco.dto';
+
+export function criarTabelaPrecoFormVazia(): TabelaPrecoFormModel {
+  return {
+    codigo: '',
+    nome: '',
+    vigenciaInicio: '',
+    vigenciaFim: '',
+    clienteId: null,
+    grupoComercial: null,
+    canalVenda: null,
+    regiao: '',
+  };
+}
+
+export function tabelaPrecoDtoParaForm(dto: TabelaPrecoDto): TabelaPrecoFormModel {
+  return {
+    codigo: dto.codigo,
+    nome: dto.nome,
+    vigenciaInicio: dto.vigenciaInicio,
+    vigenciaFim: dto.vigenciaFim ?? '',
+    clienteId: dto.clienteId,
+    grupoComercial: dto.grupoComercial,
+    canalVenda: dto.canalVenda,
+    regiao: dto.regiao ?? '',
+  };
+}
+
+function parseNumeroOpcional(valor: string): number | null {
+  const texto = valor.trim();
+  if (!texto) {
+    return null;
+  }
+
+  const numero = Number(texto.replace(',', '.'));
+  return Number.isFinite(numero) ? numero : null;
+}
+
+export function formParaSalvarTabelaPrecoPayload(form: TabelaPrecoFormModel): SalvarTabelaPrecoPayload {
+  return {
+    codigo: form.codigo.trim(),
+    nome: form.nome.trim(),
+    vigenciaInicio: form.vigenciaInicio.trim(),
+    vigenciaFim: form.vigenciaFim.trim() || null,
+    clienteId: form.clienteId,
+    grupoComercial: form.grupoComercial,
+    canalVenda: form.canalVenda,
+    regiao: form.regiao.trim() || null,
+  };
+}
+
+export function criarItemFormVazio(): TabelaPrecoItemFormModel {
+  return {
+    produtoId: null,
+    preco: '',
+    margemMinimaPercentual: '',
+  };
+}
+
+export function itemDtoParaForm(dto: TabelaPrecoItemDto): TabelaPrecoItemFormModel {
+  return {
+    produtoId: dto.produtoId,
+    preco: String(dto.preco),
+    margemMinimaPercentual:
+      dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
+  };
+}
+
+export function itemDtoParaEdicaoForm(dto: TabelaPrecoItemDto): TabelaPrecoItemEdicaoFormModel {
+  return {
+    preco: String(dto.preco),
+    margemMinimaPercentual:
+      dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
+  };
+}
+
+export function formParaItemPayload(form: TabelaPrecoItemFormModel): TabelaPrecoItemPayload {
+  return {
+    produtoId: form.produtoId!,
+    preco: Number(form.preco.replace(',', '.')),
+    margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
+  };
+}
+
+export function formParaEditarItemPayload(
+  form: TabelaPrecoItemEdicaoFormModel,
+): EditarTabelaPrecoItemPayload {
+  return {
+    preco: Number(form.preco.replace(',', '.')),
+    margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
+  };
+}

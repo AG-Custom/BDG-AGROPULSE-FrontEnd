@@ -1,6 +1,8 @@
 import { api } from 'services/api';
 
 import type {
+  AvaliacaoFornecedorDto,
+  AvaliacaoFornecedorPayload,
   ContatoFornecedorDto,
   ContatoFornecedorPayload,
   CriarFornecedorPayload,
@@ -57,5 +59,37 @@ export const fornecedorService = {
 
   removerContato(fornecedorId: string, contatoId: string): Promise<void> {
     return api.delete(`/fornecedores/${fornecedorId}/contatos/${contatoId}`);
+  },
+
+  listarAvaliacoes(fornecedorId: string): Promise<AvaliacaoFornecedorDto[]> {
+    return api
+      .get<AvaliacaoFornecedorDto[]>(`/fornecedores/${fornecedorId}/avaliacoes`)
+      .then((r) => r.data);
+  },
+
+  adicionarAvaliacao(
+    fornecedorId: string,
+    payload: AvaliacaoFornecedorPayload,
+  ): Promise<AvaliacaoFornecedorDto> {
+    return api
+      .post<AvaliacaoFornecedorDto>(`/fornecedores/${fornecedorId}/avaliacoes`, payload)
+      .then((r) => r.data);
+  },
+
+  editarAvaliacao(
+    fornecedorId: string,
+    avaliacaoId: string,
+    payload: AvaliacaoFornecedorPayload,
+  ): Promise<AvaliacaoFornecedorDto> {
+    return api
+      .put<AvaliacaoFornecedorDto>(
+        `/fornecedores/${fornecedorId}/avaliacoes/${avaliacaoId}`,
+        payload,
+      )
+      .then((r) => r.data);
+  },
+
+  removerAvaliacao(fornecedorId: string, avaliacaoId: string): Promise<void> {
+    return api.delete(`/fornecedores/${fornecedorId}/avaliacoes/${avaliacaoId}`);
   },
 };

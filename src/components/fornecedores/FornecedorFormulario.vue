@@ -1,6 +1,7 @@
 <template>
-  <q-form ref="formRef" class="fornecedor-formulario" greedy>
-    <h3 class="fornecedor-formulario__secao-titulo">Identificação</h3>
+  <q-form ref="formRef" class="fornecedor-formulario agro-formulario" greedy :class="{ 'agro-formulario--bloqueado': somenteLeitura }">
+    <fieldset class="agro-formulario__fieldset">
+<h3 class="fornecedor-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
         <q-select
@@ -12,7 +13,7 @@
           map-options
           aria-required="true"
           :options="TipoPessoaFornecedorOpcoes"
-          :disable="modo === 'editar' || somenteLeitura"
+          :readonly="modo === 'editar' || somenteLeitura"
           :rules="[obrigatorio]"
         />
       </div>
@@ -26,8 +27,8 @@
           :mask="modo === 'criar' && !somenteLeitura ? mascaraDocumentoAtual : undefined"
           :maxlength="modo === 'criar' && !somenteLeitura ? tamanhoDocumentoAtual : undefined"
           inputmode="numeric"
-          :disable="modo === 'editar' || somenteLeitura"
           :rules="modo === 'criar' ? [obrigatorio, documentoValidator] : undefined"
+          :readonly="modo === 'editar' || somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-6">
@@ -38,8 +39,8 @@
           class="field-required"
           maxlength="200"
           aria-required="true"
-          :disable="somenteLeitura"
           :rules="[obrigatorio]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-6">
@@ -48,7 +49,7 @@
           outlined
           label="Nome fantasia"
           maxlength="200"
-          :disable="somenteLeitura"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-6">
@@ -57,7 +58,7 @@
           outlined
           label="Inscrição estadual"
           maxlength="30"
-          :disable="somenteLeitura"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-6">
@@ -66,7 +67,7 @@
           outlined
           label="Inscrição municipal"
           maxlength="30"
-          :disable="somenteLeitura"
+          :readonly="somenteLeitura"
         />
       </div>
     </div>
@@ -80,8 +81,8 @@
           label="E-mail"
           type="email"
           maxlength="150"
-          :disable="somenteLeitura"
           :rules="[emailValidator]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-6">
@@ -93,8 +94,8 @@
           maxlength="15"
           :mask="mascaraTelefoneAtual"
           inputmode="numeric"
-          :disable="somenteLeitura"
           :rules="[telefoneValidator]"
+          :readonly="somenteLeitura"
         />
       </div>
     </div>
@@ -118,8 +119,8 @@
           :mask="MASCARAS.CEP"
           :maxlength="TAMANHO_FORMATADO.CEP"
           inputmode="numeric"
-          :disable="somenteLeitura"
           :rules="[obrigatorio, cepValidator]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-8">
@@ -129,8 +130,8 @@
           label="Endereço"
           class="field-required"
           aria-required="true"
-          :disable="somenteLeitura"
           :rules="[obrigatorio]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-3">
@@ -143,8 +144,8 @@
           :mask="MASCARAS.NUMERO_ENDERECO"
           :maxlength="TAMANHO_FORMATADO.NUMERO_ENDERECO"
           inputmode="numeric"
-          :disable="somenteLeitura"
           :rules="[obrigatorio, numeroEnderecoValidator]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-5">
@@ -154,8 +155,8 @@
           label="Bairro"
           class="field-required"
           aria-required="true"
-          :disable="somenteLeitura"
           :rules="[obrigatorio]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -163,7 +164,7 @@
           v-model="formulario.complemento"
           outlined
           label="Complemento"
-          :disable="somenteLeitura"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-8">
@@ -173,8 +174,8 @@
           label="Cidade"
           class="field-required"
           aria-required="true"
-          :disable="somenteLeitura"
           :rules="[obrigatorio]"
+          :readonly="somenteLeitura"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -185,8 +186,8 @@
           class="field-required"
           maxlength="2"
           aria-required="true"
-          :disable="somenteLeitura"
           :rules="[obrigatorio, ufValidator]"
+          :readonly="somenteLeitura"
         />
       </div>
     </div>
@@ -199,9 +200,10 @@
       type="textarea"
       maxlength="1000"
       autogrow
-      :disable="somenteLeitura"
-    />
-  </q-form>
+          :readonly="somenteLeitura"
+        />
+  </fieldset>
+</q-form>
 </template>
 
 <script setup lang="ts">
@@ -288,6 +290,18 @@ defineExpose({ validar });
 </script>
 
 <style scoped>
+
+.agro-formulario__fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.agro-formulario__fieldset:disabled {
+  opacity: 1;
+}
+
 .fornecedor-formulario {
   display: grid;
   gap: var(--spacing-4);

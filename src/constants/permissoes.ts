@@ -11,4 +11,25 @@ export const Permissoes = {
   Fornecedores: {
     Visualizar: 'fornecedores.visualizar',
   },
+  Usuarios: {
+    Visualizar: 'usuarios.visualizar',
+  },
+  Colaboradores: {
+    Visualizar: 'colaboradores.visualizar',
+  },
+  Clientes: {
+    Visualizar: 'clientes.visualizar',
+  },
+  Produtos: {
+    Visualizar: 'produtos.visualizar',
+  },
+  CategoriasProduto: {
+    Visualizar: 'categorias-produto.visualizar',
+  },
+  UnidadesMedida: {
+    Visualizar: 'unidades-medida.visualizar',
+  },
+  TabelasPreco: {
+    Visualizar: 'tabelas-preco.visualizar',
+  },
 } as const;

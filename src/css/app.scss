@@ -309,3 +309,71 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Formulário em modo visualização: bloqueia edição sem lavar o contraste */
+.agro-formulario--bloqueado {
+  pointer-events: none;
+  user-select: text;
+}
+
+.agro-formulario--bloqueado .agro-formulario__fieldset:disabled,
+.agro-formulario--bloqueado fieldset:disabled {
+  opacity: 1;
+}
+
+.agro-formulario--bloqueado .q-field--disabled,
+.agro-formulario--bloqueado .q-field--readonly {
+  opacity: 1 !important;
+}
+
+.agro-formulario--bloqueado .q-field--disabled .q-field__control::before,
+.agro-formulario--bloqueado .q-field--readonly .q-field__control::before {
+  border-color: var(--color-border-default);
+  opacity: 1;
+}
+
+.agro-formulario--bloqueado .q-field--disabled .q-field__native,
+.agro-formulario--bloqueado .q-field--disabled .q-field__input,
+.agro-formulario--bloqueado .q-field--disabled .q-field__prefix,
+.agro-formulario--bloqueado .q-field--disabled .q-field__suffix,
+.agro-formulario--bloqueado .q-field--disabled .q-field__marginal,
+.agro-formulario--bloqueado .q-field--disabled .q-select__dropdown-icon,
+.agro-formulario--bloqueado .q-field--readonly .q-field__native,
+.agro-formulario--bloqueado .q-field--readonly .q-field__input,
+.agro-formulario--bloqueado .q-field--readonly .q-field__prefix,
+.agro-formulario--bloqueado .q-field--readonly .q-field__suffix,
+.agro-formulario--bloqueado .q-field--readonly .q-field__marginal {
+  color: var(--color-text-primary) !important;
+  -webkit-text-fill-color: var(--color-text-primary);
+  opacity: 1 !important;
+  cursor: default;
+}
+
+.agro-formulario--bloqueado .q-field--disabled .q-field__label,
+.agro-formulario--bloqueado .q-field--readonly .q-field__label {
+  color: var(--color-text-secondary) !important;
+  opacity: 1 !important;
+}
+
+.agro-formulario--bloqueado .q-field__bottom,
+.agro-formulario--bloqueado .q-field__messages,
+.agro-formulario--bloqueado .q-field__counter {
+  color: var(--color-text-tertiary);
+  opacity: 1;
+}
+
+.agro-formulario--bloqueado .q-chip {
+  opacity: 1;
+}
+
+.agro-formulario--bloqueado .q-toggle,
+.agro-formulario--bloqueado .q-checkbox {
+  opacity: 1 !important;
+}
+
+.agro-formulario--bloqueado .q-toggle__label,
+.agro-formulario--bloqueado .q-checkbox__label {
+  color: var(--color-text-primary);
+  opacity: 1;
+}

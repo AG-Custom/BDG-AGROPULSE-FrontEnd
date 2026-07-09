@@ -105,6 +105,15 @@
                 flat
                 round
                 dense
+                icon="visibility"
+                color="primary"
+                descricao="Visualizar fornecedor"
+                :to="{ name: 'fornecedor-visualizar', params: { id: props.row.id } }"
+              />
+              <agro-btn
+                flat
+                round
+                dense
                 icon="edit"
                 color="primary"
                 descricao="Editar fornecedor"

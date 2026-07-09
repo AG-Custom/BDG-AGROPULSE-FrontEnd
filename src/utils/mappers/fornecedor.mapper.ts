@@ -1,6 +1,9 @@
 import { PAIS_PADRAO, TipoPessoaFornecedor } from 'constants/enums';
 
 import type {
+  AvaliacaoFornecedorDto,
+  AvaliacaoFornecedorFormModel,
+  AvaliacaoFornecedorPayload,
   ContatoFornecedorDto,
   ContatoFornecedorFormModel,
   ContatoFornecedorPayload,
@@ -118,5 +121,34 @@ export function formParaContatoPayload(form: ContatoFornecedorFormModel): Contat
     telefone: apenasDigitos(form.telefone),
     cargo: form.cargo.trim() || null,
     principal: form.principal,
+  };
+}
+
+export function criarAvaliacaoFormVazia(): AvaliacaoFornecedorFormModel {
+  return {
+    notaPreco: 0,
+    notaPrazo: 0,
+    notaQualidade: 0,
+    observacao: '',
+  };
+}
+
+export function avaliacaoDtoParaForm(dto: AvaliacaoFornecedorDto): AvaliacaoFornecedorFormModel {
+  return {
+    notaPreco: dto.notaPreco,
+    notaPrazo: dto.notaPrazo,
+    notaQualidade: dto.notaQualidade,
+    observacao: dto.observacao ?? '',
+  };
+}
+
+export function formParaAvaliacaoPayload(
+  form: AvaliacaoFornecedorFormModel,
+): AvaliacaoFornecedorPayload {
+  return {
+    notaPreco: form.notaPreco!,
+    notaPrazo: form.notaPrazo!,
+    notaQualidade: form.notaQualidade!,
+    observacao: form.observacao.trim() || null,
   };
 }

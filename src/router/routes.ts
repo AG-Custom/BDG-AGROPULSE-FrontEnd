@@ -107,6 +107,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'unidades/:id',
+        name: 'unidade-visualizar',
+        component: () => import('pages/unidades/UnidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeVisualizar',
+          breadcrumbPais: ['navegacao.unidades'],
+          permissao: Permissoes.Unidades.Visualizar,
+        },
+      },
+      {
         path: 'cnpjs',
         name: 'cnpjs',
         component: () => import('pages/cnpjs/CnpjsListPage.vue'),
@@ -162,6 +172,289 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.fornecedorEditar',
           breadcrumbPais: ['navegacao.fornecedores'],
           permissao: Permissoes.Fornecedores.Visualizar,
+        },
+      },
+      {
+        path: 'fornecedores/:id',
+        name: 'fornecedor-visualizar',
+        component: () => import('pages/fornecedores/FornecedorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fornecedorVisualizar',
+          breadcrumbPais: ['navegacao.fornecedores'],
+          permissao: Permissoes.Fornecedores.Visualizar,
+        },
+      },
+      {
+        path: 'clientes',
+        name: 'clientes',
+        component: () => import('pages/clientes/ClientesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.clientes',
+          permissao: Permissoes.Clientes.Visualizar,
+        },
+      },
+      {
+        path: 'clientes/novo',
+        name: 'cliente-novo',
+        component: () => import('pages/clientes/ClienteFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.clienteNovo',
+          breadcrumbPais: ['navegacao.clientes'],
+          permissao: Permissoes.Clientes.Visualizar,
+        },
+      },
+      {
+        path: 'clientes/:id/editar',
+        name: 'cliente-editar',
+        component: () => import('pages/clientes/ClienteFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.clienteEditar',
+          breadcrumbPais: ['navegacao.clientes'],
+          permissao: Permissoes.Clientes.Visualizar,
+        },
+      },
+      {
+        path: 'clientes/:id',
+        name: 'cliente-visualizar',
+        component: () => import('pages/clientes/ClienteFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.clienteVisualizar',
+          breadcrumbPais: ['navegacao.clientes'],
+          permissao: Permissoes.Clientes.Visualizar,
+        },
+      },
+      {
+        path: 'produtos',
+        name: 'produtos',
+        component: () => import('pages/produtos/ProdutosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.produtos',
+          permissao: Permissoes.Produtos.Visualizar,
+        },
+      },
+      {
+        path: 'produtos/novo',
+        name: 'produto-novo',
+        component: () => import('pages/produtos/ProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.produtoNovo',
+          breadcrumbPais: ['navegacao.produtos'],
+          permissao: Permissoes.Produtos.Visualizar,
+        },
+      },
+      {
+        path: 'produtos/:id/editar',
+        name: 'produto-editar',
+        component: () => import('pages/produtos/ProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.produtoEditar',
+          breadcrumbPais: ['navegacao.produtos'],
+          permissao: Permissoes.Produtos.Visualizar,
+        },
+      },
+      {
+        path: 'produtos/:id',
+        name: 'produto-visualizar',
+        component: () => import('pages/produtos/ProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.produtoVisualizar',
+          breadcrumbPais: ['navegacao.produtos'],
+          permissao: Permissoes.Produtos.Visualizar,
+        },
+      },
+      {
+        path: 'categorias-produto',
+        name: 'categorias-produto',
+        component: () => import('pages/categorias-produto/CategoriasProdutoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.categoriasProduto',
+          permissao: Permissoes.CategoriasProduto.Visualizar,
+        },
+      },
+      {
+        path: 'categorias-produto/novo',
+        name: 'categoria-produto-novo',
+        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.categoriaProdutoNovo',
+          breadcrumbPais: ['navegacao.categoriasProduto'],
+          permissao: Permissoes.CategoriasProduto.Visualizar,
+        },
+      },
+      {
+        path: 'categorias-produto/:id/editar',
+        name: 'categoria-produto-editar',
+        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.categoriaProdutoEditar',
+          breadcrumbPais: ['navegacao.categoriasProduto'],
+          permissao: Permissoes.CategoriasProduto.Visualizar,
+        },
+      },
+      {
+        path: 'categorias-produto/:id',
+        name: 'categoria-produto-visualizar',
+        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.categoriaProdutoVisualizar',
+          breadcrumbPais: ['navegacao.categoriasProduto'],
+          permissao: Permissoes.CategoriasProduto.Visualizar,
+        },
+      },
+      {
+        path: 'unidades-medida',
+        name: 'unidades-medida',
+        component: () => import('pages/unidades-medida/UnidadesMedidaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadesMedida',
+          permissao: Permissoes.UnidadesMedida.Visualizar,
+        },
+      },
+      {
+        path: 'unidades-medida/novo',
+        name: 'unidade-medida-novo',
+        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeMedidaNovo',
+          breadcrumbPais: ['navegacao.unidadesMedida'],
+          permissao: Permissoes.UnidadesMedida.Visualizar,
+        },
+      },
+      {
+        path: 'unidades-medida/:id/editar',
+        name: 'unidade-medida-editar',
+        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeMedidaEditar',
+          breadcrumbPais: ['navegacao.unidadesMedida'],
+          permissao: Permissoes.UnidadesMedida.Visualizar,
+        },
+      },
+      {
+        path: 'unidades-medida/:id',
+        name: 'unidade-medida-visualizar',
+        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.unidadeMedidaVisualizar',
+          breadcrumbPais: ['navegacao.unidadesMedida'],
+          permissao: Permissoes.UnidadesMedida.Visualizar,
+        },
+      },
+      {
+        path: 'tabelas-preco',
+        name: 'tabelas-preco',
+        component: () => import('pages/tabelas-preco/TabelasPrecoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.tabelasPreco',
+          permissao: Permissoes.TabelasPreco.Visualizar,
+        },
+      },
+      {
+        path: 'tabelas-preco/novo',
+        name: 'tabela-preco-novo',
+        component: () => import('pages/tabelas-preco/TabelaPrecoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.tabelaPrecoNovo',
+          breadcrumbPais: ['navegacao.tabelasPreco'],
+          permissao: Permissoes.TabelasPreco.Visualizar,
+        },
+      },
+      {
+        path: 'tabelas-preco/:id/editar',
+        name: 'tabela-preco-editar',
+        component: () => import('pages/tabelas-preco/TabelaPrecoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.tabelaPrecoEditar',
+          breadcrumbPais: ['navegacao.tabelasPreco'],
+          permissao: Permissoes.TabelasPreco.Visualizar,
+        },
+      },
+      {
+        path: 'tabelas-preco/:id',
+        name: 'tabela-preco-visualizar',
+        component: () => import('pages/tabelas-preco/TabelaPrecoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.tabelaPrecoVisualizar',
+          breadcrumbPais: ['navegacao.tabelasPreco'],
+          permissao: Permissoes.TabelasPreco.Visualizar,
+        },
+      },
+      {
+        path: 'usuarios',
+        name: 'usuarios',
+        component: () => import('pages/usuarios/UsuariosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.usuarios',
+          permissao: Permissoes.Usuarios.Visualizar,
+        },
+      },
+      {
+        path: 'usuarios/novo',
+        name: 'usuario-novo',
+        component: () => import('pages/usuarios/UsuarioFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.usuarioNovo',
+          breadcrumbPais: ['navegacao.usuarios'],
+          permissao: Permissoes.Usuarios.Visualizar,
+        },
+      },
+      {
+        path: 'usuarios/:id/editar',
+        name: 'usuario-editar',
+        component: () => import('pages/usuarios/UsuarioFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.usuarioEditar',
+          breadcrumbPais: ['navegacao.usuarios'],
+          permissao: Permissoes.Usuarios.Visualizar,
+        },
+      },
+      {
+        path: 'usuarios/:id',
+        name: 'usuario-visualizar',
+        component: () => import('pages/usuarios/UsuarioFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.usuarioVisualizar',
+          breadcrumbPais: ['navegacao.usuarios'],
+          permissao: Permissoes.Usuarios.Visualizar,
+        },
+      },
+      {
+        path: 'colaboradores',
+        name: 'colaboradores',
+        component: () => import('pages/colaboradores/ColaboradoresListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.colaboradores',
+          permissao: Permissoes.Colaboradores.Visualizar,
+        },
+      },
+      {
+        path: 'colaboradores/novo',
+        name: 'colaborador-novo',
+        component: () => import('pages/colaboradores/ColaboradorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.colaboradorNovo',
+          breadcrumbPais: ['navegacao.colaboradores'],
+          permissao: Permissoes.Colaboradores.Visualizar,
+        },
+      },
+      {
+        path: 'colaboradores/:id/editar',
+        name: 'colaborador-editar',
+        component: () => import('pages/colaboradores/ColaboradorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.colaboradorEditar',
+          breadcrumbPais: ['navegacao.colaboradores'],
+          permissao: Permissoes.Colaboradores.Visualizar,
+        },
+      },
+      {
+        path: 'colaboradores/:id',
+        name: 'colaborador-visualizar',
+        component: () => import('pages/colaboradores/ColaboradorFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.colaboradorVisualizar',
+          breadcrumbPais: ['navegacao.colaboradores'],
+          permissao: Permissoes.Colaboradores.Visualizar,
         },
       },
     ],

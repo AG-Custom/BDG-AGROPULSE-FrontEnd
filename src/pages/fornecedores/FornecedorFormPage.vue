@@ -18,11 +18,11 @@
           v-if="!carregandoPagina"
           ref="formularioRef"
           v-model:formulario="formulario"
-          :modo="modo"
-          :somente-leitura="fornecedorInativo"
+          :modo="modoFormulario"
+          :somente-leitura="somenteLeitura || fornecedorInativo"
         />
 
-        <div v-if="!carregandoPagina && !fornecedorInativo" class="agro-form-actions">
+        <div v-if="!carregandoPagina && modo !== 'visualizar' && !fornecedorInativo" class="agro-form-actions">
           <agro-btn
             flat
             label="Cancelar"
@@ -40,7 +40,7 @@
           />
         </div>
 
-        <div v-else-if="!carregandoPagina && fornecedorInativo" class="agro-form-actions">
+        <div v-else-if="!carregandoPagina && (modo === 'visualizar' || fornecedorInativo)" class="agro-form-actions">
           <agro-btn
             flat
             label="Voltar"
@@ -51,15 +51,24 @@
       </agro-card>
 
       <fornecedor-contatos-section
-        v-if="modo === 'editar' && fornecedorAtivo && fornecedorCarregado"
+        v-if="(modo === 'editar' || modo === 'visualizar') && (modo === 'visualizar' || fornecedorAtivo) && fornecedorCarregado"
         :fornecedor-id="fornecedorId!"
         :contatos-iniciais="fornecedorCarregado.contatos"
+        :somente-leitura="somenteLeitura"
+      />
+
+      <fornecedor-avaliacoes-section
+        v-if="(modo === 'editar' || modo === 'visualizar') && (modo === 'visualizar' || fornecedorAtivo) && fornecedorCarregado"
+        :fornecedor-id="fornecedorId!"
+        :avaliacoes-iniciais="fornecedorCarregado.avaliacoes ?? []"
+        :somente-leitura="somenteLeitura"
       />
     </section>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import FornecedorAvaliacoesSection from 'components/fornecedores/FornecedorAvaliacoesSection.vue';
 import FornecedorContatosSection from 'components/fornecedores/FornecedorContatosSection.vue';
 import FornecedorFormulario from 'components/fornecedores/FornecedorFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
@@ -87,21 +96,45 @@ const formulario = ref<FornecedorFormModel>(criarFornecedorFormVazia());
 const fornecedorCarregado = ref<FornecedorDto | null>(null);
 const carregandoPagina = ref(true);
 
-const modo = computed<'criar' | 'editar'>(() =>
-  route.name === 'fornecedor-editar' ? 'editar' : 'criar',
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'fornecedor-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'fornecedor-editar' ? 'editar' : 'criar';
+});
+
+const modoFormulario = computed<'criar' | 'editar'>(() =>
+  modo.value === 'criar' ? 'criar' : 'editar',
 );
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 
 const fornecedorId = computed(() => route.params.id as string | undefined);
 
-const tituloPagina = computed(() =>
-  modo.value === 'criar' ? 'Novo fornecedor' : 'Editar fornecedor',
-);
+const tituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Novo fornecedor';
+  }
 
-const subtituloPagina = computed(() =>
-  modo.value === 'criar'
-    ? 'Cadastre um novo fornecedor vinculado à sua empresa.'
-    : 'Atualize os dados do fornecedor selecionado.',
-);
+  if (modo.value === 'visualizar') {
+    return 'Visualizar fornecedor';
+  }
+
+  return 'Editar fornecedor';
+});
+
+const subtituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Cadastre um novo fornecedor vinculado à sua empresa.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte os dados do fornecedor selecionado.';
+  }
+
+  return 'Atualize os dados do fornecedor selecionado.';
+});
 
 const fornecedorInativo = computed(
   () => modo.value === 'editar' && fornecedorCarregado.value?.ativo === false,
@@ -128,7 +161,7 @@ async function carregarFornecedor(): Promise<void> {
 async function inicializar(): Promise<void> {
   carregandoPagina.value = true;
 
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     await carregarFornecedor();
   } else {
     formulario.value = criarFornecedorFormVazia();

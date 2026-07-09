@@ -42,6 +42,10 @@ export interface EditarUnidadePayload extends CriarUnidadePayload {
   status: UnidadeStatusValor;
 }
 
+export interface ListarUnidadesParams {
+  ativo?: boolean;
+}
+
 export interface UnidadeFormModel {
   cnpjEmpresaId: string;
   nome: string;
