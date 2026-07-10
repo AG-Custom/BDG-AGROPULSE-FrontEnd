@@ -321,3 +321,66 @@ export const CanalVendaOpcoes = [
   { label: 'Representante', value: CanalVenda.Representante },
   { label: 'Outro', value: CanalVenda.Outro },
 ];
+
+export const TipoMovimentacaoEstoque = {
+  Entrada: 'Entrada',
+  Saida: 'Saida',
+  Ajuste: 'Ajuste',
+} as const;
+
+export type TipoMovimentacaoEstoqueValor =
+  (typeof TipoMovimentacaoEstoque)[keyof typeof TipoMovimentacaoEstoque];
+
+export const TipoMovimentacaoEstoqueOpcoes = [
+  { label: 'Entrada', value: TipoMovimentacaoEstoque.Entrada },
+  { label: 'Saída', value: TipoMovimentacaoEstoque.Saida },
+  { label: 'Ajuste', value: TipoMovimentacaoEstoque.Ajuste },
+];
+
+export const OrigemMovimentacaoEstoque = {
+  Manual: 'Manual',
+  EstoqueInicial: 'EstoqueInicial',
+  Inventario: 'Inventario',
+  ReservaPedido: 'ReservaPedido',
+  DevolucaoPedido: 'DevolucaoPedido',
+  Pdv: 'Pdv',
+} as const;
+
+export type OrigemMovimentacaoEstoqueValor =
+  (typeof OrigemMovimentacaoEstoque)[keyof typeof OrigemMovimentacaoEstoque];
+
+export const OrigemMovimentacaoEstoqueOpcoes = [
+  { label: 'Manual', value: OrigemMovimentacaoEstoque.Manual },
+  { label: 'Estoque inicial', value: OrigemMovimentacaoEstoque.EstoqueInicial },
+  { label: 'Inventário', value: OrigemMovimentacaoEstoque.Inventario },
+  { label: 'Reserva de pedido', value: OrigemMovimentacaoEstoque.ReservaPedido },
+  { label: 'Devolução de pedido', value: OrigemMovimentacaoEstoque.DevolucaoPedido },
+  { label: 'PDV', value: OrigemMovimentacaoEstoque.Pdv },
+];
+
+export const InventarioStatus = {
+  Aberto: 'Aberto',
+  Concluido: 'Concluido',
+} as const;
+
+export type InventarioStatusValor = (typeof InventarioStatus)[keyof typeof InventarioStatus];
+
+export const InventarioStatusOpcoes = [
+  { label: 'Aberto', value: InventarioStatus.Aberto },
+  { label: 'Concluído', value: InventarioStatus.Concluido },
+];
+
+export const AtalhoPeriodoEstoque = {
+  Hoje: 'hoje',
+  SeteDias: '7d',
+  TrintaDias: '30d',
+} as const;
+
+export type AtalhoPeriodoEstoqueValor =
+  (typeof AtalhoPeriodoEstoque)[keyof typeof AtalhoPeriodoEstoque];
+
+export const AtalhoPeriodoEstoqueOpcoes = [
+  { label: 'Hoje', value: AtalhoPeriodoEstoque.Hoje },
+  { label: 'Últimos 7 dias', value: AtalhoPeriodoEstoque.SeteDias },
+  { label: 'Últimos 30 dias', value: AtalhoPeriodoEstoque.TrintaDias },
+];

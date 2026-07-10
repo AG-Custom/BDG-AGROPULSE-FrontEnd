@@ -79,6 +79,7 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.CategoriasProduto.Visualizar,
       Permissoes.UnidadesMedida.Visualizar,
       Permissoes.TabelasPreco.Visualizar,
+      Permissoes.Estoque.Visualizar,
     ],
   };
 }

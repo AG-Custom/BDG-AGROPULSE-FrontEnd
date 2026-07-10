@@ -32,4 +32,7 @@ export const Permissoes = {
   TabelasPreco: {
     Visualizar: 'tabelas-preco.visualizar',
   },
+  Estoque: {
+    Visualizar: 'estoque.visualizar',
+  },
 } as const;

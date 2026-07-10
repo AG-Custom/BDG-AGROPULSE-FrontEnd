@@ -143,3 +143,49 @@ export function notaAvaliacao(val: number | null | undefined): true | string {
 
   return (val >= 1 && val <= 5) || 'A nota deve estar entre 1 e 5';
 }
+
+export function quantidadePositiva(val: string): true | string {
+  if (!val || !val.trim()) {
+    return 'Campo obrigatório';
+  }
+
+  const numero = Number(val.replace(',', '.'));
+
+  if (Number.isNaN(numero)) {
+    return 'Informe um número válido';
+  }
+
+  return numero > 0 || 'A quantidade deve ser maior que zero';
+}
+
+export function quantidadeNaoNegativa(val: string): true | string {
+  if (!val || !val.trim()) {
+    return 'Campo obrigatório';
+  }
+
+  const numero = Number(val.replace(',', '.'));
+
+  if (Number.isNaN(numero)) {
+    return 'Informe um número válido';
+  }
+
+  return numero >= 0 || 'A quantidade não pode ser negativa';
+}
+
+export function justificativaAjuste(val: string): true | string {
+  if (!val || !val.trim()) {
+    return 'Campo obrigatório';
+  }
+
+  const texto = val.trim();
+
+  if (texto.length < 10) {
+    return 'A justificativa deve ter no mínimo 10 caracteres';
+  }
+
+  if (texto.length > 1000) {
+    return 'A justificativa deve ter no máximo 1000 caracteres';
+  }
+
+  return true;
+}

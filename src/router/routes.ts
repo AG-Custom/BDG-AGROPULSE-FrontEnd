@@ -380,6 +380,70 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'estoque/saldos',
+        name: 'estoque-saldos',
+        component: () => import('pages/estoque/SaldosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueSaldos',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/lotes',
+        name: 'estoque-lotes',
+        component: () => import('pages/estoque/LotesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueLotes',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/movimentacoes',
+        name: 'estoque-movimentacoes',
+        component: () => import('pages/estoque/MovimentacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueMovimentacoes',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/inicial',
+        name: 'estoque-inicial',
+        component: () => import('pages/estoque/EstoqueInicialPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueInicial',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/inventarios',
+        name: 'estoque-inventarios',
+        component: () => import('pages/estoque/InventariosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueInventarios',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/inventarios/:id',
+        name: 'estoque-inventario-detalhe',
+        component: () => import('pages/estoque/InventarioDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueInventarioDetalhe',
+          breadcrumbPais: ['navegacao.estoqueInventarios'],
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/alertas',
+        name: 'estoque-alertas',
+        component: () => import('pages/estoque/AlertasEstoquePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueAlertas',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
         path: 'usuarios',
         name: 'usuarios',
         component: () => import('pages/usuarios/UsuariosListPage.vue'),

@@ -112,6 +112,78 @@
       </q-list>
     </div>
 
+    <div v-if="podeGerenciarEstoque" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Estoque</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'estoque-saldos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="warehouse" size="20px" />
+          </q-item-section>
+          <q-item-section>Saldos</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'estoque-lotes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="qr_code_2" size="20px" />
+          </q-item-section>
+          <q-item-section>Lotes</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'estoque-movimentacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="swap_vert" size="20px" />
+          </q-item-section>
+          <q-item-section>Movimentações</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'estoque-inicial' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="start" size="20px" />
+          </q-item-section>
+          <q-item-section>Estoque inicial</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'estoque-inventarios' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="fact_check" size="20px" />
+          </q-item-section>
+          <q-item-section>Inventários</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'estoque-alertas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="notification_important" size="20px" />
+          </q-item-section>
+          <q-item-section>Alertas</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
     <div v-if="podeAcessarAdministracao" class="app-sidebar__section">
       <div class="text-overline app-sidebar__label">Administração</div>
       <q-list padding class="app-sidebar__list">
@@ -177,6 +249,10 @@ const podeGerenciarUnidadesMedida = computed(() =>
 
 const podeGerenciarTabelasPreco = computed(() =>
   possuiPermissao(Permissoes.TabelasPreco.Visualizar),
+);
+
+const podeGerenciarEstoque = computed(() =>
+  possuiPermissao(Permissoes.Estoque.Visualizar),
 );
 
 const podeAcessarProdutos = computed(

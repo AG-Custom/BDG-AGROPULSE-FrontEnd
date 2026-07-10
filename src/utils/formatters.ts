@@ -75,6 +75,31 @@ export function formatarDataHora(valor: string): string {
   }).format(data);
 }
 
+export function formatarData(valor: string | null | undefined): string {
+  if (!valor) {
+    return '—';
+  }
+
+  const data = new Date(valor.includes('T') ? valor : `${valor}T00:00:00`);
+
+  if (Number.isNaN(data.getTime())) {
+    return valor;
+  }
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(data);
+}
+
+export function formatarDecimal(valor: number, casas = 2): string {
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: casas,
+  }).format(valor);
+}
+
 export function gerarCodigoUnidade(tipo: string, nome: string): string {
   const tipoSlug = slugify(tipo);
   const nomeSlug = slugify(nome);
