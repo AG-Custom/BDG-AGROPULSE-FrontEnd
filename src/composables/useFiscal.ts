@@ -5,7 +5,9 @@ import { fiscalService } from 'services/fiscal.service';
 import type {
   ConfiguracaoFiscalDto,
   ConfiguracaoFiscalFormModel,
+  DocumentosSefazDto,
   ImportacaoXmlDto,
+  ListarDocumentosSefazParams,
   Sped0200Dto,
 } from 'types/dtos/fiscal.dto';
 import { baixarArquivo } from 'utils/download';
@@ -14,10 +16,12 @@ import { ref } from 'vue';
 export function useFiscal() {
   const configuracao = ref<ConfiguracaoFiscalDto | null>(null);
   const ultimaImportacao = ref<ImportacaoXmlDto | null>(null);
+  const documentosSefaz = ref<DocumentosSefazDto | null>(null);
   const carregando = ref(false);
   const salvando = ref(false);
   const importando = ref(false);
   const exportando = ref(false);
+  const consultandoSefaz = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -90,16 +94,37 @@ export function useFiscal() {
     }
   }
 
+  async function listarDocumentosSefaz(
+    params?: ListarDocumentosSefazParams,
+  ): Promise<DocumentosSefazDto | null> {
+    consultandoSefaz.value = true;
+
+    try {
+      documentosSefaz.value = await fiscalService.listarDocumentosSefaz(params);
+      sucesso(documentosSefaz.value.mensagem);
+      return documentosSefaz.value;
+    } catch (e) {
+      erro(mensagem(e));
+      documentosSefaz.value = null;
+      return null;
+    } finally {
+      consultandoSefaz.value = false;
+    }
+  }
+
   return {
     configuracao,
     ultimaImportacao,
+    documentosSefaz,
     carregando,
     salvando,
     importando,
     exportando,
+    consultandoSefaz,
     obterConfiguracao,
     salvarConfiguracao,
     importarXml,
     exportarSped0200,
+    listarDocumentosSefaz,
   };
 }

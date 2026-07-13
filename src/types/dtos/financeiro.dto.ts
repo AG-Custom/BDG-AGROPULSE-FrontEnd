@@ -1,4 +1,5 @@
 import type {
+  ContaPagarStatusValor,
   ContaReceberStatusValor,
   FormaPagamentoValor,
 } from 'constants/enums';
@@ -31,6 +32,26 @@ export interface ListarContasReceberParams {
   clienteId?: string;
   pedidoId?: string;
   status?: ContaReceberStatusValor;
+}
+
+export interface ContaPagarDto {
+  id: string;
+  empresaId: string;
+  unidadeId: string;
+  fornecedorId: string;
+  recebimentoCompraId: string | null;
+  notaFiscalId: string | null;
+  parcela: number;
+  valor: number;
+  vencimento: string;
+  status: ContaPagarStatusValor;
+  descricao: string | null;
+}
+
+export interface ListarContasPagarParams {
+  fornecedorId?: string;
+  recebimentoId?: string;
+  status?: ContaPagarStatusValor;
 }
 
 export interface TaxaFormaPagamentoDto {

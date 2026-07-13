@@ -16,12 +16,12 @@
           color="primary"
           unelevated
           label="Receber"
-          descricao="Registrar recebimento"
+          descricao="Abrir recebimento do pedido"
           :loading="salvando"
           @click="receber"
         />
         <agro-btn
-          v-if="pedido?.status === 'Rascunho' || pedido?.status === 'Enviado'"
+          v-if="pedido?.status === 'Rascunho' || pedido?.status === 'Enviado' || pedido?.status === 'AguardandoAprovacao'"
           color="negative"
           unelevated
           label="Cancelar"
@@ -39,7 +39,7 @@
           <div class="row q-col-gutter-md">
             <div class="col-md-3">
               <div class="text-caption">Status</div>
-              <agro-badge :label="pedido.status" variant="default" />
+              <agro-badge :label="rotuloStatus(pedido.status)" variant="default" />
             </div>
             <div class="col-md-3">
               <div class="text-caption">Fornecedor</div>
@@ -94,6 +94,7 @@ import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
+import { PedidoCompraStatusOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { PedidoCompraItemDto } from 'types/dtos/compras.dto';
 import { formatarDataHora, formatarDecimal, formatarMoeda } from 'utils/formatters';
@@ -108,7 +109,6 @@ const {
   salvando,
   obterPedido,
   enviarPedido,
-  receberPedido,
   cancelarPedido,
 } = useCompras();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
@@ -116,7 +116,7 @@ const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const id = computed(() => route.params.id as string);
 const subtitulo = computed(() =>
-  pedido.value ? `Status: ${pedido.value.status}` : 'Carregando...',
+  pedido.value ? `Status: ${rotuloStatus(pedido.value.status)}` : 'Carregando...',
 );
 
 const mapaFornecedores = computed(() => {
@@ -143,13 +143,21 @@ function rotuloFornecedor(fid: string): string {
 function rotuloProduto(pid: string): string {
   return mapaProdutos.value.get(pid) ?? pid;
 }
+function rotuloStatus(status: string): string {
+  return PedidoCompraStatusOpcoes.find((o) => o.value === status)?.label ?? status;
+}
 
 async function enviar(): Promise<void> {
   await enviarPedido(id.value);
 }
+
 async function receber(): Promise<void> {
-  await receberPedido(id.value);
+  await router.push({
+    name: 'recebimento-compra-novo',
+    query: { pedidoCompraId: id.value },
+  });
 }
+
 async function cancelar(): Promise<void> {
   await cancelarPedido(id.value);
 }

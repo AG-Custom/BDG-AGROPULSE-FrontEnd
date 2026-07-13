@@ -478,6 +478,74 @@ export const ContaReceberStatusOpcoes = [
   { label: 'Cancelada', value: ContaReceberStatus.Cancelada },
 ];
 
+export const ContaPagarStatus = {
+  Aberta: 'Aberta',
+  Paga: 'Paga',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type ContaPagarStatusValor =
+  (typeof ContaPagarStatus)[keyof typeof ContaPagarStatus];
+
+export const ContaPagarStatusOpcoes = [
+  { label: 'Aberta', value: ContaPagarStatus.Aberta },
+  { label: 'Paga', value: ContaPagarStatus.Paga },
+  { label: 'Cancelada', value: ContaPagarStatus.Cancelada },
+];
+
+export const UrgenciaCompra = {
+  Baixa: 'Baixa',
+  Normal: 'Normal',
+  Alta: 'Alta',
+  Urgente: 'Urgente',
+} as const;
+
+export type UrgenciaCompraValorEnum =
+  (typeof UrgenciaCompra)[keyof typeof UrgenciaCompra];
+
+export const UrgenciaCompraOpcoes = [
+  { label: 'Baixa', value: UrgenciaCompra.Baixa },
+  { label: 'Normal', value: UrgenciaCompra.Normal },
+  { label: 'Alta', value: UrgenciaCompra.Alta },
+  { label: 'Urgente', value: UrgenciaCompra.Urgente },
+];
+
+export const RecebimentoCompraStatus = {
+  EmConferencia: 'EmConferencia',
+  Confirmado: 'Confirmado',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type RecebimentoCompraStatusValorEnum =
+  (typeof RecebimentoCompraStatus)[keyof typeof RecebimentoCompraStatus];
+
+export const RecebimentoCompraStatusOpcoes = [
+  { label: 'Em conferência', value: RecebimentoCompraStatus.EmConferencia },
+  { label: 'Confirmado', value: RecebimentoCompraStatus.Confirmado },
+  { label: 'Cancelado', value: RecebimentoCompraStatus.Cancelado },
+];
+
+export const PedidoCompraStatus = {
+  Rascunho: 'Rascunho',
+  AguardandoAprovacao: 'AguardandoAprovacao',
+  Enviado: 'Enviado',
+  RecebidoParcial: 'RecebidoParcial',
+  Recebido: 'Recebido',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type PedidoCompraStatusValorEnum =
+  (typeof PedidoCompraStatus)[keyof typeof PedidoCompraStatus];
+
+export const PedidoCompraStatusOpcoes = [
+  { label: 'Rascunho', value: PedidoCompraStatus.Rascunho },
+  { label: 'Aguardando aprovação', value: PedidoCompraStatus.AguardandoAprovacao },
+  { label: 'Enviado', value: PedidoCompraStatus.Enviado },
+  { label: 'Recebido parcial', value: PedidoCompraStatus.RecebidoParcial },
+  { label: 'Recebido', value: PedidoCompraStatus.Recebido },
+  { label: 'Cancelado', value: PedidoCompraStatus.Cancelado },
+];
+
 export const TravaAprovacaoTipo = {
   MargemMinima: 'MargemMinima',
   LimiteCredito: 'LimiteCredito',

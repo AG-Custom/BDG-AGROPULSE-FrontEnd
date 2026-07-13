@@ -85,7 +85,56 @@
             <template #body-cell-precoUnitario="props">
               <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.precoUnitario) }}</q-td>
             </template>
+            <template #body-cell-validadeProposta="props">
+              <q-td :props="props">
+                {{ props.row.validadeProposta ? formatarData(props.row.validadeProposta) : '—' }}
+              </q-td>
+            </template>
           </q-table>
+        </agro-card>
+
+        <agro-card>
+          <h3 class="titulo">Comparativo</h3>
+          <empty-state
+            v-if="!comparativo || comparativo.itens.length === 0"
+            titulo="Sem comparativo"
+            descricao="Registre respostas para comparar propostas lado a lado."
+            icon="compare"
+          />
+          <div v-else class="comparativo-lista">
+            <div v-for="item in comparativo.itens" :key="item.itemCotacaoId" class="comparativo-item">
+              <div class="comparativo-item__titulo">
+                {{ rotuloProduto(item.produtoId) }}
+                <span class="text-metric"> — qtd {{ formatarDecimal(item.quantidade) }}</span>
+              </div>
+              <q-table
+                flat
+                bordered
+                hide-pagination
+                row-key="fornecedorId"
+                :rows="item.propostas"
+                :columns="colunasComparativo"
+                :pagination="{ rowsPerPage: 0 }"
+              >
+                <template #body-cell-fornecedorId="props">
+                  <q-td :props="props">{{ rotuloFornecedor(props.row.fornecedorId) }}</q-td>
+                </template>
+                <template #body-cell-precoUnitario="props">
+                  <q-td :props="props" class="text-metric">
+                    {{ formatarMoeda(props.row.precoUnitario) }}
+                  </q-td>
+                </template>
+                <template #body-cell-total="props">
+                  <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.total) }}</q-td>
+                </template>
+                <template #body-cell-validadeProposta="props">
+                  <q-td :props="props">
+                    {{ props.row.validadeProposta ? formatarData(props.row.validadeProposta) : '—' }}
+                  </q-td>
+                </template>
+              </q-table>
+            </div>
+          </div>
         </agro-card>
       </template>
 
@@ -124,6 +173,23 @@
           <div class="col-6">
             <q-input v-model="resposta.prazoEntregaDias" outlined label="Prazo (dias)" type="number" />
           </div>
+          <div class="col-12">
+            <q-input
+              v-model="resposta.condicoesComerciais"
+              outlined
+              label="Condições comerciais"
+              type="textarea"
+              autogrow
+            />
+          </div>
+          <div class="col-12">
+            <q-input
+              v-model="resposta.validadeProposta"
+              outlined
+              label="Validade da proposta"
+              type="date"
+            />
+          </div>
         </q-card-section>
         <q-card-actions align="right">
           <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogResposta = false" />
@@ -150,7 +216,7 @@ import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
 import type { QTableColumn } from 'quasar';
-import type { ItemCotacaoDto, RespostaCotacaoDto } from 'types/dtos/compras.dto';
+import type { ComparativoCotacaoPropostaDto, ItemCotacaoDto, RespostaCotacaoDto } from 'types/dtos/compras.dto';
 import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -159,9 +225,11 @@ const route = useRoute();
 const router = useRouter();
 const {
   cotacao,
+  comparativo,
   carregando,
   salvando,
   obterCotacao,
+  carregarComparativo,
   responderCotacao,
   encerrarCotacao,
 } = useCompras();
@@ -174,6 +242,8 @@ const resposta = reactive({
   itemCotacaoId: '',
   precoUnitario: '',
   prazoEntregaDias: '7',
+  condicoesComerciais: '',
+  validadeProposta: '',
 });
 
 const id = computed(() => route.params.id as string);
@@ -213,6 +283,16 @@ const colunasRespostas: QTableColumn<RespostaCotacaoDto>[] = [
   { name: 'fornecedorId', label: 'Fornecedor', field: 'fornecedorId', align: 'left' },
   { name: 'precoUnitario', label: 'Preço', field: 'precoUnitario', align: 'right' },
   { name: 'prazoEntregaDias', label: 'Prazo', field: 'prazoEntregaDias', align: 'right' },
+  { name: 'condicoesComerciais', label: 'Condições', field: 'condicoesComerciais', align: 'left' },
+  { name: 'validadeProposta', label: 'Validade', field: 'validadeProposta', align: 'left' },
+];
+const colunasComparativo: QTableColumn<ComparativoCotacaoPropostaDto>[] = [
+  { name: 'fornecedorId', label: 'Fornecedor', field: 'fornecedorId', align: 'left' },
+  { name: 'precoUnitario', label: 'Preço', field: 'precoUnitario', align: 'right' },
+  { name: 'total', label: 'Total', field: 'total', align: 'right' },
+  { name: 'prazoEntregaDias', label: 'Prazo', field: 'prazoEntregaDias', align: 'right' },
+  { name: 'condicoesComerciais', label: 'Condições', field: 'condicoesComerciais', align: 'left' },
+  { name: 'validadeProposta', label: 'Validade', field: 'validadeProposta', align: 'left' },
 ];
 
 function rotuloProduto(pid: string): string {
@@ -228,6 +308,8 @@ async function salvarResposta(): Promise<void> {
     itemCotacaoId: resposta.itemCotacaoId,
     precoUnitario: Number(resposta.precoUnitario),
     prazoEntregaDias: Number(resposta.prazoEntregaDias),
+    condicoesComerciais: resposta.condicoesComerciais.trim() || null,
+    validadeProposta: resposta.validadeProposta || null,
   });
   if (ok) dialogResposta.value = false;
 }
@@ -240,7 +322,11 @@ onMounted(async () => {
   void carregarProdutos();
   void carregarFornecedores();
   const ok = await obterCotacao(id.value);
-  if (!ok) await router.replace({ name: 'cotacoes-compra' });
+  if (!ok) {
+    await router.replace({ name: 'cotacoes-compra' });
+    return;
+  }
+  await carregarComparativo(id.value);
 });
 </script>
 
@@ -261,5 +347,13 @@ onMounted(async () => {
 }
 .dialog {
   min-width: min(440px, 90vw);
+}
+.comparativo-lista {
+  display: grid;
+  gap: var(--spacing-4);
+}
+.comparativo-item__titulo {
+  margin-bottom: var(--spacing-2);
+  font-weight: var(--font-weight-medium);
 }
 </style>

@@ -255,6 +255,42 @@
         <q-item
           v-if="podeGerenciarCompras"
           clickable
+          :to="{ name: 'recebimentos-compra' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="inventory_2" size="20px" />
+          </q-item-section>
+          <q-item-section>Recebimentos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras"
+          clickable
+          :to="{ name: 'historico-compras' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="history" size="20px" />
+          </q-item-section>
+          <q-item-section>Histórico</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras"
+          clickable
+          :to="{ name: 'contas-pagar' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="payments" size="20px" />
+          </q-item-section>
+          <q-item-section>Contas a pagar</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
+          clickable
           :to="{ name: 'solicitacoes-compra' }"
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
@@ -265,7 +301,7 @@
           <q-item-section>Solicitações</q-item-section>
         </q-item>
         <q-item
-          v-if="podeGerenciarCompras"
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
           clickable
           :to="{ name: 'cotacoes-compra' }"
           active-class="app-sidebar__item--active"
@@ -277,7 +313,7 @@
           <q-item-section>Cotações</q-item-section>
         </q-item>
         <q-item
-          v-if="podeGerenciarCompras"
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
           clickable
           :to="{ name: 'pedidos-compra' }"
           active-class="app-sidebar__item--active"
@@ -287,6 +323,30 @@
             <q-icon name="local_mall" size="20px" />
           </q-item-section>
           <q-item-section>Pedidos compra</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
+          clickable
+          :to="{ name: 'compras-aprovacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="verified" size="20px" />
+          </q-item-section>
+          <q-item-section>Aprovações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
+          clickable
+          :to="{ name: 'compras-alcadas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="rule" size="20px" />
+          </q-item-section>
+          <q-item-section>Alçadas / config</q-item-section>
         </q-item>
         <q-item
           v-if="podeGerenciarDevolucoes"
@@ -466,10 +526,16 @@
 
 <script setup lang="ts">
 import { useAuth } from 'composables/useAuth';
+import { useComprasConfig } from 'composables/useComprasConfig';
 import { Permissoes } from 'constants/permissoes';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 
 const { possuiPermissao } = useAuth();
+const { config, carregar: carregarComprasConfig } = useComprasConfig();
+
+const fluxoCompletoHabilitado = computed(
+  () => config.value?.fluxoCompletoHabilitado === true,
+);
 
 const podeGerenciarUsuarios = computed(() =>
   possuiPermissao(Permissoes.Usuarios.Visualizar),
@@ -562,6 +628,12 @@ const podeAcessarProdutos = computed(
 const podeAcessarAdministracao = computed(
   () => podeGerenciarUsuarios.value || podeGerenciarColaboradores.value,
 );
+
+onMounted(() => {
+  if (podeGerenciarCompras.value) {
+    void carregarComprasConfig();
+  }
+});
 </script>
 
 <style scoped>

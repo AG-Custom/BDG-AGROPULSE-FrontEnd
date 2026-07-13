@@ -53,6 +53,23 @@ export interface SalvarConfiguracaoFiscalPayload {
   focusNfeToken?: string | null;
 }
 
+export interface DocumentoSefazDto {
+  chaveAcesso: string | null;
+  numero: string | null;
+  emitente: string | null;
+  dataEmissao: string | null;
+}
+
+export interface DocumentosSefazDto {
+  documentos: DocumentoSefazDto[];
+  mensagem: string;
+}
+
+export interface ListarDocumentosSefazParams {
+  dataInicio?: string;
+  dataFim?: string;
+}
+
 export interface ConfiguracaoFiscalFormModel {
   regimeTributario: RegimeTributarioValor | '';
   focusNfeToken: string;

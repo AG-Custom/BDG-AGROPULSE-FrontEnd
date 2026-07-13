@@ -31,6 +31,10 @@
           <div class="fornecedor-avaliacoes-resumo__label">Qualidade</div>
           <div class="text-metric">{{ formatarNota(resumo.medias.qualidade) }}</div>
         </div>
+        <div class="fornecedor-avaliacoes-resumo__metric">
+          <div class="fornecedor-avaliacoes-resumo__label">Conformidade</div>
+          <div class="text-metric">{{ formatarNota(resumo.medias.conformidade) }}</div>
+        </div>
       </div>
     </template>
   </div>

@@ -3,6 +3,7 @@ import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { messageService } from 'services/message.service';
 import { comprasService } from 'services/compras.service';
 import type {
+  ComparativoCotacaoDto,
   CotacaoCompraDto,
   CriarCotacaoCompraPayload,
   CriarPedidoCompraPayload,
@@ -11,6 +12,7 @@ import type {
   ListarPedidosCompraParams,
   ListarSolicitacoesCompraParams,
   PedidoCompraDto,
+  RecebimentoCompraDto,
   ResponderCotacaoPayload,
   SolicitacaoCompraDto,
 } from 'types/dtos/compras.dto';
@@ -21,6 +23,7 @@ export function useCompras() {
   const solicitacao = ref<SolicitacaoCompraDto | null>(null);
   const cotacoes = ref<CotacaoCompraDto[]>([]);
   const cotacao = ref<CotacaoCompraDto | null>(null);
+  const comparativo = ref<ComparativoCotacaoDto | null>(null);
   const pedidos = ref<PedidoCompraDto[]>([]);
   const pedido = ref<PedidoCompraDto | null>(null);
   const carregando = ref(false);
@@ -126,6 +129,15 @@ export function useCompras() {
     }
   }
 
+  async function carregarComparativo(id: string): Promise<void> {
+    try {
+      comparativo.value = await comprasService.obterComparativoCotacao(id);
+    } catch (e) {
+      erro(mensagem(e));
+      comparativo.value = null;
+    }
+  }
+
   async function criarCotacao(
     payload: CriarCotacaoCompraPayload,
   ): Promise<CotacaoCompraDto | null> {
@@ -152,6 +164,7 @@ export function useCompras() {
     try {
       cotacao.value = await comprasService.responderCotacao(id, payload);
       sucesso('Resposta registrada.');
+      await carregarComparativo(id);
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -247,7 +260,11 @@ export function useCompras() {
 
     try {
       pedido.value = await comprasService.enviarPedido(id);
-      sucesso('Pedido enviado.');
+      sucesso(
+        pedido.value.status === 'AguardandoAprovacao'
+          ? 'Pedido enviado para aprovação.'
+          : 'Pedido enviado.',
+      );
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -257,27 +274,16 @@ export function useCompras() {
     }
   }
 
-  async function receberPedido(id: string): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
-      titulo: 'Receber pedido',
-      mensagem: 'Confirma o recebimento deste pedido de compra?',
-      textoConfirmar: 'Receber',
-      icone: 'info',
-    });
-
-    if (!confirmou) {
-      return false;
-    }
-
+  async function receberPedido(id: string): Promise<RecebimentoCompraDto | null> {
     salvando.value = true;
 
     try {
-      pedido.value = await comprasService.receberPedido(id);
-      sucesso('Pedido recebido.');
-      return true;
+      const recebimento = await comprasService.receberPedido(id);
+      sucesso('Recebimento aberto para conferência.');
+      return recebimento;
     } catch (e) {
       erro(mensagem(e));
-      return false;
+      return null;
     } finally {
       salvando.value = false;
     }
@@ -315,6 +321,7 @@ export function useCompras() {
     solicitacao,
     cotacoes,
     cotacao,
+    comparativo,
     pedidos,
     pedido,
     carregando,
@@ -325,6 +332,7 @@ export function useCompras() {
     cancelarSolicitacao,
     carregarCotacoes,
     obterCotacao,
+    carregarComparativo,
     criarCotacao,
     responderCotacao,
     encerrarCotacao,

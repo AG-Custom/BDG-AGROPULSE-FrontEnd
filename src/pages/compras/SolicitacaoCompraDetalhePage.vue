@@ -22,8 +22,16 @@
               <agro-badge :label="solicitacao.status" variant="default" />
             </div>
             <div class="col-md-4">
+              <div class="text-caption">Urgência</div>
+              <agro-badge :label="solicitacao.urgencia" variant="default" />
+            </div>
+            <div class="col-md-4">
               <div class="text-caption">Criada em</div>
               <div>{{ formatarDataHora(solicitacao.createdAt) }}</div>
+            </div>
+            <div v-if="solicitacao.justificativa" class="col-12">
+              <div class="text-caption">Justificativa</div>
+              <div>{{ solicitacao.justificativa }}</div>
             </div>
             <div v-if="solicitacao.observacao" class="col-12">
               <div class="text-caption">Observação</div>

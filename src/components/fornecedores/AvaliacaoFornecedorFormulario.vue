@@ -72,6 +72,30 @@
           <template #control />
         </q-field>
       </div>
+
+      <div class="avaliacao-fornecedor-formulario__campo">
+        <span class="avaliacao-fornecedor-formulario__label field-required">
+          Conformidade
+        </span>
+        <q-rating
+          v-model="formulario.notaConformidade"
+          :max="5"
+          size="md"
+          color="primary"
+          icon="star_border"
+          icon-selected="star"
+          aria-label="Nota de conformidade"
+          aria-required="true"
+        />
+        <q-field
+          borderless
+          dense
+          :model-value="formulario.notaConformidade"
+          :rules="[notaAvaliacaoValidator]"
+        >
+          <template #control />
+        </q-field>
+      </div>
     </div>
 
     <q-input

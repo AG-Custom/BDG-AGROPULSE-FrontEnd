@@ -129,6 +129,7 @@ export function criarAvaliacaoFormVazia(): AvaliacaoFornecedorFormModel {
     notaPreco: 0,
     notaPrazo: 0,
     notaQualidade: 0,
+    notaConformidade: 0,
     observacao: '',
   };
 }
@@ -138,6 +139,7 @@ export function avaliacaoDtoParaForm(dto: AvaliacaoFornecedorDto): AvaliacaoForn
     notaPreco: dto.notaPreco,
     notaPrazo: dto.notaPrazo,
     notaQualidade: dto.notaQualidade,
+    notaConformidade: dto.notaConformidade,
     observacao: dto.observacao ?? '',
   };
 }
@@ -149,6 +151,7 @@ export function formParaAvaliacaoPayload(
     notaPreco: form.notaPreco!,
     notaPrazo: form.notaPrazo!,
     notaQualidade: form.notaQualidade!,
+    notaConformidade: form.notaConformidade!,
     observacao: form.observacao.trim() || null,
   };
 }

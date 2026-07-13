@@ -5,7 +5,33 @@
     <section class="agro-section">
       <agro-card>
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
-          <q-input v-model="observacao" outlined label="Observação" type="textarea" autogrow class="q-mb-md" />
+          <div class="row q-col-gutter-md q-mb-md">
+            <div class="col-12 col-md-4">
+              <q-select
+                v-model="urgencia"
+                outlined
+                label="Urgência"
+                emit-value
+                map-options
+                :options="UrgenciaCompraOpcoes"
+                :rules="[obrigatorio]"
+              />
+            </div>
+            <div class="col-12 col-md-8">
+              <q-input
+                v-model="justificativa"
+                outlined
+                label="Justificativa"
+                type="textarea"
+                autogrow
+                :hint="urgencia === 'Urgente' ? 'Obrigatória para urgência Urgente' : undefined"
+                :rules="urgencia === 'Urgente' ? [obrigatorio] : []"
+              />
+            </div>
+            <div class="col-12">
+              <q-input v-model="observacao" outlined label="Observação" type="textarea" autogrow />
+            </div>
+          </div>
 
           <div class="solicitacao-form__header">
             <h3 class="solicitacao-form__titulo">Itens</h3>
@@ -56,6 +82,8 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import { useCompras } from 'composables/useCompras';
 import { useProdutos } from 'composables/useProdutos';
+import { UrgenciaCompra, UrgenciaCompraOpcoes } from 'constants/enums';
+import type { UrgenciaCompraValor } from 'types/dtos/compras.dto';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -71,6 +99,8 @@ const { salvando, criarSolicitacao } = useCompras();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const observacao = ref('');
+const urgencia = ref<UrgenciaCompraValor>(UrgenciaCompra.Normal);
+const justificativa = ref('');
 const itens = ref<ItemForm[]>([{ chave: crypto.randomUUID(), produtoId: '', quantidade: '1' }]);
 
 const produtoOpcoes = computed(() =>
@@ -84,6 +114,8 @@ function adicionar(): void {
 async function salvar(): Promise<void> {
   const criada = await criarSolicitacao({
     observacao: observacao.value.trim() || null,
+    urgencia: urgencia.value,
+    justificativa: justificativa.value.trim() || null,
     itens: itens.value.map((i) => ({
       produtoId: i.produtoId,
       quantidade: Number(i.quantidade),

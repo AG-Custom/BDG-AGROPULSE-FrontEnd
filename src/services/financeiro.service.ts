@@ -2,9 +2,11 @@ import { api } from 'services/api';
 import type {
   CondicaoPagamentoDto,
   ConfigFormaPagamentoDto,
+  ContaPagarDto,
   ContaReceberDto,
   CriarConfigFormaPagamentoPayload,
   EditarConfigFormaPagamentoPayload,
+  ListarContasPagarParams,
   ListarContasReceberParams,
   UpsertTaxaFormaPagamentoPayload,
 } from 'types/dtos/financeiro.dto';
@@ -19,6 +21,12 @@ export const financeiroService = {
   listarContasReceber(params?: ListarContasReceberParams): Promise<ContaReceberDto[]> {
     return api
       .get<ContaReceberDto[]>('/contas-receber', { params })
+      .then((r) => r.data);
+  },
+
+  listarContasPagar(params?: ListarContasPagarParams): Promise<ContaPagarDto[]> {
+    return api
+      .get<ContaPagarDto[]>('/contas-pagar', { params })
       .then((r) => r.data);
   },
 

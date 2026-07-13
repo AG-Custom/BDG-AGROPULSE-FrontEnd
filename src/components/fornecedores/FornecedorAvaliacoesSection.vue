@@ -23,7 +23,7 @@
     <empty-state
       v-if="avaliacoes.length === 0"
       titulo="Nenhuma avaliação registrada"
-      descricao="Registre avaliações de preço, prazo e qualidade deste fornecedor."
+      descricao="Registre avaliações de preço, prazo, qualidade e conformidade deste fornecedor."
       icon="star_rate"
     />
 
@@ -53,6 +53,12 @@
       <template #body-cell-notaQualidade="props">
         <q-td :props="props">
           <span class="text-metric">{{ props.row.notaQualidade }}</span>
+        </q-td>
+      </template>
+
+      <template #body-cell-notaConformidade="props">
+        <q-td :props="props">
+          <span class="text-metric">{{ props.row.notaConformidade }}</span>
         </q-td>
       </template>
 
@@ -193,6 +199,13 @@ const colunas = computed(() => {
       sortable: true,
     },
     {
+      name: 'notaConformidade',
+      label: 'Conformidade',
+      field: 'notaConformidade',
+      align: 'center',
+      sortable: true,
+    },
+    {
       name: 'media',
       label: 'Média',
       field: (row) => mediaAvaliacao(row),
@@ -219,7 +232,13 @@ watch(
 );
 
 function mediaAvaliacao(avaliacao: AvaliacaoFornecedorDto): number {
-  return (avaliacao.notaPreco + avaliacao.notaPrazo + avaliacao.notaQualidade) / 3;
+  return (
+    (avaliacao.notaPreco +
+      avaliacao.notaPrazo +
+      avaliacao.notaQualidade +
+      avaliacao.notaConformidade) /
+    4
+  );
 }
 
 function formatarMedia(avaliacao: AvaliacaoFornecedorDto): string {

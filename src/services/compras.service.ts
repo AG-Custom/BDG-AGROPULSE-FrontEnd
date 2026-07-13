@@ -1,18 +1,43 @@
 import { api } from 'services/api';
 import type {
+  AlcadaAprovacaoCompraDto,
+  AtualizarItensRecebimentoPayload,
+  ComparativoCotacaoDto,
+  ComprasConfigDto,
+  ConfirmarRecebimentoPayload,
   CotacaoCompraDto,
   CriarCotacaoCompraPayload,
   CriarPedidoCompraPayload,
+  CriarRecebimentoPayload,
   CriarSolicitacaoCompraPayload,
+  DefinirAlcadasAprovacaoPayload,
+  EvolucaoPrecoCompraDto,
+  HistoricoCompraDto,
   ListarCotacoesCompraParams,
+  ListarEvolucaoPrecoComprasParams,
+  ListarHistoricoComprasParams,
   ListarPedidosCompraParams,
+  ListarRecebimentosCompraParams,
   ListarSolicitacoesCompraParams,
   PedidoCompraDto,
+  PreviewRecebimentoXmlDto,
+  PreviewXmlRecebimentoPayload,
+  RecebimentoCompraDto,
+  RegistrarDivergenciaRecebimentoPayload,
   ResponderCotacaoPayload,
+  SalvarComprasConfigPayload,
   SolicitacaoCompraDto,
 } from 'types/dtos/compras.dto';
 
 export const comprasService = {
+  obterConfig(): Promise<ComprasConfigDto> {
+    return api.get<ComprasConfigDto>('/compras/config').then((r) => r.data);
+  },
+
+  salvarConfig(payload: SalvarComprasConfigPayload): Promise<ComprasConfigDto> {
+    return api.put<ComprasConfigDto>('/compras/config', payload).then((r) => r.data);
+  },
+
   listarSolicitacoes(
     params?: ListarSolicitacoesCompraParams,
   ): Promise<SolicitacaoCompraDto[]> {
@@ -45,6 +70,12 @@ export const comprasService = {
 
   obterCotacao(id: string): Promise<CotacaoCompraDto> {
     return api.get<CotacaoCompraDto>(`/compras/cotacoes/${id}`).then((r) => r.data);
+  },
+
+  obterComparativoCotacao(id: string): Promise<ComparativoCotacaoDto> {
+    return api
+      .get<ComparativoCotacaoDto>(`/compras/cotacoes/${id}/comparativo`)
+      .then((r) => r.data);
   },
 
   criarCotacao(payload: CriarCotacaoCompraPayload): Promise<CotacaoCompraDto> {
@@ -88,13 +119,113 @@ export const comprasService = {
       .then((r) => r.data);
   },
 
-  receberPedido(id: string): Promise<PedidoCompraDto> {
+  receberPedido(id: string): Promise<RecebimentoCompraDto> {
     return api
-      .post<PedidoCompraDto>(`/compras/pedidos/${id}/receber`)
+      .post<RecebimentoCompraDto>(`/compras/pedidos/${id}/receber`)
       .then((r) => r.data);
   },
 
   cancelarPedido(id: string): Promise<void> {
     return api.post(`/compras/pedidos/${id}/cancelar`).then(() => undefined);
+  },
+
+  aprovarPedido(id: string): Promise<PedidoCompraDto> {
+    return api
+      .post<PedidoCompraDto>(`/compras/pedidos/${id}/aprovar`)
+      .then((r) => r.data);
+  },
+
+  rejeitarPedido(id: string): Promise<PedidoCompraDto> {
+    return api
+      .post<PedidoCompraDto>(`/compras/pedidos/${id}/rejeitar`)
+      .then((r) => r.data);
+  },
+
+  listarAprovacoesPendentes(): Promise<PedidoCompraDto[]> {
+    return api.get<PedidoCompraDto[]>('/compras/aprovacoes').then((r) => r.data);
+  },
+
+  listarAlcadas(): Promise<AlcadaAprovacaoCompraDto[]> {
+    return api.get<AlcadaAprovacaoCompraDto[]>('/compras/alcadas').then((r) => r.data);
+  },
+
+  definirAlcadas(
+    payload: DefinirAlcadasAprovacaoPayload,
+  ): Promise<AlcadaAprovacaoCompraDto[]> {
+    return api
+      .put<AlcadaAprovacaoCompraDto[]>('/compras/alcadas', payload)
+      .then((r) => r.data);
+  },
+
+  previewXmlRecebimento(
+    payload: PreviewXmlRecebimentoPayload,
+  ): Promise<PreviewRecebimentoXmlDto> {
+    return api
+      .post<PreviewRecebimentoXmlDto>('/compras/recebimentos/preview-xml', payload)
+      .then((r) => r.data);
+  },
+
+  listarRecebimentos(
+    params?: ListarRecebimentosCompraParams,
+  ): Promise<RecebimentoCompraDto[]> {
+    return api
+      .get<RecebimentoCompraDto[]>('/compras/recebimentos', { params })
+      .then((r) => r.data);
+  },
+
+  obterRecebimento(id: string): Promise<RecebimentoCompraDto> {
+    return api
+      .get<RecebimentoCompraDto>(`/compras/recebimentos/${id}`)
+      .then((r) => r.data);
+  },
+
+  criarRecebimento(payload: CriarRecebimentoPayload): Promise<RecebimentoCompraDto> {
+    return api
+      .post<RecebimentoCompraDto>('/compras/recebimentos', payload)
+      .then((r) => r.data);
+  },
+
+  atualizarItensRecebimento(
+    id: string,
+    payload: AtualizarItensRecebimentoPayload,
+  ): Promise<RecebimentoCompraDto> {
+    return api
+      .put<RecebimentoCompraDto>(`/compras/recebimentos/${id}/itens`, payload)
+      .then((r) => r.data);
+  },
+
+  registrarDivergenciaRecebimento(
+    id: string,
+    payload: RegistrarDivergenciaRecebimentoPayload,
+  ): Promise<RecebimentoCompraDto> {
+    return api
+      .post<RecebimentoCompraDto>(`/compras/recebimentos/${id}/divergencias`, payload)
+      .then((r) => r.data);
+  },
+
+  confirmarRecebimento(
+    id: string,
+    payload?: ConfirmarRecebimentoPayload | null,
+  ): Promise<RecebimentoCompraDto> {
+    return api
+      .post<RecebimentoCompraDto>(
+        `/compras/recebimentos/${id}/confirmar`,
+        payload ?? {},
+      )
+      .then((r) => r.data);
+  },
+
+  listarHistorico(params?: ListarHistoricoComprasParams): Promise<HistoricoCompraDto[]> {
+    return api
+      .get<HistoricoCompraDto[]>('/compras/historico', { params })
+      .then((r) => r.data);
+  },
+
+  listarEvolucaoPreco(
+    params: ListarEvolucaoPrecoComprasParams,
+  ): Promise<EvolucaoPrecoCompraDto[]> {
+    return api
+      .get<EvolucaoPrecoCompraDto[]>('/compras/historico/preco-evolucao', { params })
+      .then((r) => r.data);
   },
 };

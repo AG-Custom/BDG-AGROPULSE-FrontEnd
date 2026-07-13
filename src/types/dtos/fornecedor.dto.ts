@@ -29,6 +29,7 @@ export interface AvaliacaoFornecedorDto {
   notaPreco: number;
   notaPrazo: number;
   notaQualidade: number;
+  notaConformidade: number;
   observacao: string | null;
   createdAt: string;
 }
@@ -37,6 +38,7 @@ export interface FornecedorAvaliacoesMediasDto {
   preco: number;
   prazo: number;
   qualidade: number;
+  conformidade: number;
   geral: number;
 }
 
@@ -46,6 +48,7 @@ export interface FornecedorAvaliacaoHistoricoDto {
   notaPreco: number;
   notaPrazo: number;
   notaQualidade: number;
+  notaConformidade: number;
   media: number;
   observacao: string | null;
 }
@@ -94,6 +97,7 @@ export interface AvaliacaoFornecedorPayload {
   notaPreco: number;
   notaPrazo: number;
   notaQualidade: number;
+  notaConformidade: number;
   observacao: string | null;
 }
 
@@ -135,5 +139,6 @@ export interface AvaliacaoFornecedorFormModel {
   notaPreco: number;
   notaPrazo: number;
   notaQualidade: number;
+  notaConformidade: number;
   observacao: string;
 }

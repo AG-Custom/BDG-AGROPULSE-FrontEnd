@@ -1,8 +1,10 @@
 import { api } from 'services/api';
 import type {
   ConfiguracaoFiscalDto,
+  DocumentosSefazDto,
   ImportacaoXmlDto,
   ImportarXmlPayload,
+  ListarDocumentosSefazParams,
   NotaFiscalDto,
   SalvarConfiguracaoFiscalPayload,
   Sped0200Dto,
@@ -43,6 +45,14 @@ export const fiscalService = {
   ): Promise<ConfiguracaoFiscalDto> {
     return api
       .put<ConfiguracaoFiscalDto>('/fiscal/configuracao', payload)
+      .then((r) => r.data);
+  },
+
+  listarDocumentosSefaz(
+    params?: ListarDocumentosSefazParams,
+  ): Promise<DocumentosSefazDto> {
+    return api
+      .get<DocumentosSefazDto>('/fiscal/sefaz/documentos-destinados', { params })
       .then((r) => r.data);
   },
 };

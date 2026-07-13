@@ -705,6 +705,71 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'compras/recebimentos',
+        name: 'recebimentos-compra',
+        component: () => import('pages/compras/RecebimentosCompraListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.recebimentosCompra',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/recebimentos/novo',
+        name: 'recebimento-compra-novo',
+        component: () => import('pages/compras/RecebimentoCompraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.recebimentoCompraNovo',
+          breadcrumbPais: ['navegacao.recebimentosCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/recebimentos/:id',
+        name: 'recebimento-compra-detalhe',
+        component: () => import('pages/compras/RecebimentoCompraDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.recebimentoCompraDetalhe',
+          breadcrumbPais: ['navegacao.recebimentosCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/historico',
+        name: 'historico-compras',
+        component: () => import('pages/compras/HistoricoComprasPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.historicoCompras',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/aprovacoes',
+        name: 'compras-aprovacoes',
+        component: () => import('pages/compras/ComprasAprovacoesPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.comprasAprovacoes',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/alcadas',
+        name: 'compras-alcadas',
+        component: () => import('pages/compras/ComprasAlcadasPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.comprasAlcadas',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/contas-pagar',
+        name: 'contas-pagar',
+        component: () => import('pages/compras/ContasPagarListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contasPagar',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
         path: 'devolucoes-venda',
         name: 'devolucoes-venda',
         component: () => import('pages/devolucoes-venda/DevolucoesVendaListPage.vue'),
