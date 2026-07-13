@@ -20,6 +20,7 @@
           v-model:formulario="formulario"
           :modo="modoFormulario"
           :somente-leitura="somenteLeitura || produtoInativo"
+          :custo-medio-ponderado="produtoCarregado?.custoMedioPonderado"
         />
 
         <div v-if="!carregandoPagina && modo !== 'visualizar' && !produtoInativo" class="agro-form-actions">

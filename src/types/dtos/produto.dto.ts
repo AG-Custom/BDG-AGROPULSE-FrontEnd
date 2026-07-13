@@ -1,4 +1,5 @@
 import type {
+  ExportacaoFormatoValor,
   MetodoCusteioValor,
   OrigemMercadoriaValor,
   TipoCodigoProdutoValor,
@@ -9,11 +10,15 @@ import type {
 export interface ProdutoResumoDto {
   id: string;
   empresaId: string;
+  unidadeId: string;
   codigo: string;
   descricao: string;
   categoriaProdutoId: string;
   tipoProduto: TipoProdutoValor;
   unidadeMedidaId: string;
+  precoVenda: number;
+  custoMedioPonderado: number | null;
+  margemMinimaPercentual: number | null;
   ativo: boolean;
 }
 
@@ -27,6 +32,8 @@ export interface ProdutoFiscalDto {
   aliquotaIcms: number | null;
   mva: number | null;
   observacoesFiscais: string | null;
+  cfopPadraoInterno: string | null;
+  cfopPadraoExterno: string | null;
 }
 
 export interface ProdutoCodigoDto {
@@ -60,12 +67,16 @@ export interface ProdutoConversaoUnidadeDto {
   fatorConversao: number;
 }
 
-export interface ProdutoDto extends ProdutoResumoDto {
+export interface ProdutoDto extends Omit<ProdutoResumoDto, 'precoVenda' | 'custoMedioPonderado'> {
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
   metodoCusteio: MetodoCusteioValor | null;
+  precoVenda: number;
+  custoMedioPonderado: number | null;
+  fatorDivisaoNfe: number;
   margemMinimaPercentual: number | null;
+  comissaoPercentual: number | null;
   fiscal: ProdutoFiscalDto | null;
   codigos: ProdutoCodigoDto[];
   documentos: ProdutoDocumentoDto[];
@@ -82,11 +93,15 @@ export interface CriarProdutoPayload {
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
+  precoVenda: number;
+  fatorDivisaoNfe?: number;
   margemMinimaPercentual?: number | null;
+  comissaoPercentual?: number | null;
 }
 
 export interface EditarProdutoPayload extends CriarProdutoPayload {
   metodoCusteio?: MetodoCusteioValor | null;
+  recalcularMargemAPartirDoPreco?: boolean;
 }
 
 export interface ProdutoFiscalPayload {
@@ -98,6 +113,8 @@ export interface ProdutoFiscalPayload {
   aliquotaIcms?: number | null;
   mva?: number | null;
   observacoesFiscais?: string | null;
+  cfopPadraoInterno?: string | null;
+  cfopPadraoExterno?: string | null;
 }
 
 export interface ProdutoCodigoPayload {
@@ -130,6 +147,7 @@ export interface ListarProdutosParams {
   ativo?: boolean;
   busca?: string;
   categoriaProdutoId?: string;
+  exportar?: ExportacaoFormatoValor;
 }
 
 export interface ProdutoFormModel {
@@ -141,8 +159,12 @@ export interface ProdutoFormModel {
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
+  precoVenda: string;
+  fatorDivisaoNfe: string;
   margemMinimaPercentual: string;
+  comissaoPercentual: string;
   metodoCusteio: MetodoCusteioValor | null;
+  recalcularMargemAPartirDoPreco: boolean;
 }
 
 export interface ProdutoFiscalFormModel {
@@ -154,6 +176,8 @@ export interface ProdutoFiscalFormModel {
   aliquotaIcms: string;
   mva: string;
   observacoesFiscais: string;
+  cfopPadraoInterno: string;
+  cfopPadraoExterno: string;
 }
 
 export interface ProdutoCodigoFormModel {

@@ -1,6 +1,8 @@
 import { useAuth } from 'composables/useAuth';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import { ExportacaoFormato } from 'constants/enums';
+import type { ExportacaoFormatoValor } from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { produtoService } from 'services/produto.service';
 import type {
@@ -9,6 +11,7 @@ import type {
   ProdutoFormModel,
   ProdutoResumoDto,
 } from 'types/dtos/produto.dto';
+import { baixarArquivo } from 'utils/download';
 import {
   conversaoDtoParaForm,
   fiscalFormTemDados,
@@ -26,6 +29,7 @@ export function useProdutos() {
   const salvando = ref(false);
   const inativando = ref(false);
   const ativando = ref(false);
+  const exportando = ref(false);
   const ultimosParams = ref<ListarProdutosParams | undefined>();
   const { unidadeId } = useAuth();
   const { sucesso, erro } = useNotificacao();
@@ -200,16 +204,38 @@ export function useProdutos() {
     return ativar(produto.id);
   }
 
+  async function exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarProdutosParams, 'exportar'>,
+  ): Promise<boolean> {
+    exportando.value = true;
+
+    try {
+      const blob = await produtoService.exportar(formato, params);
+      const extensao = formato === ExportacaoFormato.Excel ? 'xlsx' : 'pdf';
+      baixarArquivo(blob, `produtos.${extensao}`);
+      sucesso('Exportação concluída.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      exportando.value = false;
+    }
+  }
+
   return {
     produtos,
     carregando,
     salvando,
     inativando,
     ativando,
+    exportando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
     solicitarAtivacao,
+    exportar,
   };
 }

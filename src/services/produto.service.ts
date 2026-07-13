@@ -1,6 +1,6 @@
 import { api } from 'services/api';
 
-import type { TipoDocumentoProdutoValor } from 'constants/enums';
+import type { ExportacaoFormatoValor, TipoDocumentoProdutoValor } from 'constants/enums';
 import type {
   CriarProdutoPayload,
   EditarProdutoConversaoPayload,
@@ -21,6 +21,18 @@ import type {
 export const produtoService = {
   listar(params?: ListarProdutosParams): Promise<ProdutoResumoDto[]> {
     return api.get<ProdutoResumoDto[]>('/produtos', { params }).then((r) => r.data);
+  },
+
+  exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarProdutosParams, 'exportar'>,
+  ): Promise<Blob> {
+    return api
+      .get<Blob>('/produtos', {
+        params: { ...params, exportar: formato },
+        responseType: 'blob',
+      })
+      .then((r) => r.data);
   },
 
   obter(produtoId: string): Promise<ProdutoDto> {

@@ -82,6 +82,28 @@
           :readonly="somenteLeitura"
         />
       </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.cfopPadraoInterno"
+          outlined
+          label="CFOP padrão interno"
+          maxlength="4"
+          hint="4 dígitos"
+          inputmode="numeric"
+          :readonly="somenteLeitura"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.cfopPadraoExterno"
+          outlined
+          label="CFOP padrão externo"
+          maxlength="4"
+          hint="4 dígitos"
+          inputmode="numeric"
+          :readonly="somenteLeitura"
+        />
+      </div>
       <div class="col-12">
         <q-input
           v-model="formulario.observacoesFiscais"

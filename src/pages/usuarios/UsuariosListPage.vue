@@ -103,6 +103,15 @@
                 :to="{ name: 'usuario-editar', params: { id: props.row.id } }"
               />
               <agro-btn
+                flat
+                round
+                dense
+                icon="admin_panel_settings"
+                color="primary"
+                descricao="Permissões granulares"
+                :to="{ name: 'usuario-permissoes', params: { usuarioId: props.row.id } }"
+              />
+              <agro-btn
                 v-if="podeInativar(props.row.status)"
                 flat
                 round

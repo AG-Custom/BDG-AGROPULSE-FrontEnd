@@ -102,6 +102,32 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-4">
         <q-input
+          v-model="formulario.precoVenda"
+          outlined
+          label="Preço de venda"
+          class="field-required"
+          type="number"
+          min="0"
+          step="0.01"
+          aria-required="true"
+          :rules="[obrigatorio]"
+          :readonly="somenteLeitura"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.fatorDivisaoNfe"
+          outlined
+          label="Fator divisão NF-e"
+          type="number"
+          min="0.0001"
+          step="0.01"
+          hint="Unidade NF-e → estoque"
+          :readonly="somenteLeitura"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-input
           v-model="formulario.margemMinimaPercentual"
           outlined
           label="Margem mínima (%)"
@@ -109,6 +135,27 @@
           min="0"
           step="0.01"
           :readonly="somenteLeitura"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.comissaoPercentual"
+          outlined
+          label="Comissão (%)"
+          type="number"
+          min="0"
+          step="0.01"
+          hint="Vazio usa comissão padrão da empresa"
+          :readonly="somenteLeitura"
+        />
+      </div>
+      <div v-if="modo === 'editar' && custoMedioPonderado != null" class="col-12 col-md-4">
+        <q-input
+          outlined
+          label="Custo médio ponderado"
+          :model-value="formatarMoeda(custoMedioPonderado)"
+          readonly
+          class="text-metric"
         />
       </div>
       <div v-if="modo === 'editar'" class="col-12 col-md-4">
@@ -123,6 +170,12 @@
           :readonly="somenteLeitura"
         />
       </div>
+      <div v-if="modo === 'editar' && !somenteLeitura" class="col-12 col-md-4">
+        <q-toggle
+          v-model="formulario.recalcularMargemAPartirDoPreco"
+          label="Recalcular margem a partir do preço"
+        />
+      </div>
     </div>
   </fieldset>
 </q-form>
@@ -134,12 +187,14 @@ import { useUnidadesMedida } from 'composables/useUnidadesMedida';
 import { MetodoCusteioOpcoes, TipoProdutoOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { ProdutoFormModel } from 'types/dtos/produto.dto';
+import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
 defineProps<{
   modo: 'criar' | 'editar';
   somenteLeitura?: boolean;
+  custoMedioPonderado?: number | null;
 }>();
 
 const formulario = defineModel<ProdutoFormModel>('formulario', { required: true });

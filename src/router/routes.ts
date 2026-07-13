@@ -521,6 +521,402 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'orcamentos',
+        name: 'orcamentos',
+        component: () => import('pages/orcamentos/OrcamentosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.orcamentos',
+          permissao: Permissoes.Orcamentos.Visualizar,
+        },
+      },
+      {
+        path: 'orcamentos/novo',
+        name: 'orcamento-novo',
+        component: () => import('pages/orcamentos/OrcamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.orcamentoNovo',
+          breadcrumbPais: ['navegacao.orcamentos'],
+          permissao: Permissoes.Orcamentos.Visualizar,
+        },
+      },
+      {
+        path: 'orcamentos/:id/editar',
+        name: 'orcamento-editar',
+        component: () => import('pages/orcamentos/OrcamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.orcamentoEditar',
+          breadcrumbPais: ['navegacao.orcamentos'],
+          permissao: Permissoes.Orcamentos.Visualizar,
+        },
+      },
+      {
+        path: 'orcamentos/:id',
+        name: 'orcamento-detalhe',
+        component: () => import('pages/orcamentos/OrcamentoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.orcamentoDetalhe',
+          breadcrumbPais: ['navegacao.orcamentos'],
+          permissao: Permissoes.Orcamentos.Visualizar,
+        },
+      },
+      {
+        path: 'pdv',
+        name: 'pdv-vender',
+        component: () => import('pages/pdv/PdvVenderPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pdv',
+          permissao: Permissoes.Pdv.Visualizar,
+        },
+      },
+      {
+        path: 'pdv/vendas',
+        name: 'pdv-vendas',
+        component: () => import('pages/pdv/PdvVendasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pdvVendas',
+          breadcrumbPais: ['navegacao.pdv'],
+          permissao: Permissoes.Pdv.Visualizar,
+        },
+      },
+      {
+        path: 'pdv/vendas/:id',
+        name: 'pdv-venda-detalhe',
+        component: () => import('pages/pdv/PdvVendaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pdvVendaDetalhe',
+          breadcrumbPais: ['navegacao.pdvVendas'],
+          permissao: Permissoes.Pdv.Visualizar,
+        },
+      },
+      {
+        path: 'compras/solicitacoes',
+        name: 'solicitacoes-compra',
+        component: () => import('pages/compras/SolicitacoesCompraListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.solicitacoesCompra',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/solicitacoes/nova',
+        name: 'solicitacao-compra-nova',
+        component: () => import('pages/compras/SolicitacaoCompraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.solicitacaoCompraNova',
+          breadcrumbPais: ['navegacao.solicitacoesCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/solicitacoes/:id',
+        name: 'solicitacao-compra-detalhe',
+        component: () => import('pages/compras/SolicitacaoCompraDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.solicitacaoCompraDetalhe',
+          breadcrumbPais: ['navegacao.solicitacoesCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/cotacoes',
+        name: 'cotacoes-compra',
+        component: () => import('pages/compras/CotacoesCompraListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cotacoesCompra',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/cotacoes/nova',
+        name: 'cotacao-compra-nova',
+        component: () => import('pages/compras/CotacaoCompraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cotacaoCompraNova',
+          breadcrumbPais: ['navegacao.cotacoesCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/cotacoes/:id',
+        name: 'cotacao-compra-detalhe',
+        component: () => import('pages/compras/CotacaoCompraDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cotacaoCompraDetalhe',
+          breadcrumbPais: ['navegacao.cotacoesCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/pedidos',
+        name: 'pedidos-compra',
+        component: () => import('pages/compras/PedidosCompraListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidosCompra',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/pedidos/novo',
+        name: 'pedido-compra-novo',
+        component: () => import('pages/compras/PedidoCompraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidoCompraNovo',
+          breadcrumbPais: ['navegacao.pedidosCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/pedidos/:id',
+        name: 'pedido-compra-detalhe',
+        component: () => import('pages/compras/PedidoCompraDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidoCompraDetalhe',
+          breadcrumbPais: ['navegacao.pedidosCompra'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'devolucoes-venda',
+        name: 'devolucoes-venda',
+        component: () => import('pages/devolucoes-venda/DevolucoesVendaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.devolucoesVenda',
+          permissao: Permissoes.DevolucoesVenda.Visualizar,
+        },
+      },
+      {
+        path: 'devolucoes-venda/nova',
+        name: 'devolucao-venda-nova',
+        component: () => import('pages/devolucoes-venda/DevolucaoVendaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.devolucaoVendaNova',
+          breadcrumbPais: ['navegacao.devolucoesVenda'],
+          permissao: Permissoes.DevolucoesVenda.Visualizar,
+        },
+      },
+      {
+        path: 'devolucoes-venda/:id',
+        name: 'devolucao-venda-detalhe',
+        component: () => import('pages/devolucoes-venda/DevolucaoVendaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.devolucaoVendaDetalhe',
+          breadcrumbPais: ['navegacao.devolucoesVenda'],
+          permissao: Permissoes.DevolucoesVenda.Visualizar,
+        },
+      },
+      {
+        path: 'expedicao',
+        name: 'expedicao',
+        component: () => import('pages/expedicao/ExpedicaoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.expedicao',
+          permissao: Permissoes.Expedicao.Visualizar,
+        },
+      },
+      {
+        path: 'expedicao/:pedidoId/romaneio',
+        name: 'expedicao-romaneio',
+        component: () => import('pages/expedicao/ExpedicaoRomaneioPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.expedicaoRomaneio',
+          breadcrumbPais: ['navegacao.expedicao'],
+          permissao: Permissoes.Expedicao.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal',
+        name: 'fiscal-config',
+        component: () => import('pages/fiscal/FiscalConfigPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fiscal',
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'contratos',
+        name: 'contratos',
+        component: () => import('pages/contratos/ContratosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratos',
+          permissao: Permissoes.Contratos.Visualizar,
+        },
+      },
+      {
+        path: 'contratos/novo',
+        name: 'contrato-novo',
+        component: () => import('pages/contratos/ContratoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoNovo',
+          breadcrumbPais: ['navegacao.contratos'],
+          permissao: Permissoes.Contratos.Visualizar,
+        },
+      },
+      {
+        path: 'contratos/:id/editar',
+        name: 'contrato-editar',
+        component: () => import('pages/contratos/ContratoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoEditar',
+          breadcrumbPais: ['navegacao.contratos'],
+          permissao: Permissoes.Contratos.Visualizar,
+        },
+      },
+      {
+        path: 'contratos/:id',
+        name: 'contrato-detalhe',
+        component: () => import('pages/contratos/ContratoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoDetalhe',
+          breadcrumbPais: ['navegacao.contratos'],
+          permissao: Permissoes.Contratos.Visualizar,
+        },
+      },
+      {
+        path: 'producao/ordens',
+        name: 'ordens-producao',
+        component: () => import('pages/producao/OrdensProducaoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ordensProducao',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/ordens/nova',
+        name: 'ordem-producao-nova',
+        component: () => import('pages/producao/OrdemProducaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ordemProducaoNova',
+          breadcrumbPais: ['navegacao.ordensProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/ordens/:id/editar',
+        name: 'ordem-producao-editar',
+        component: () => import('pages/producao/OrdemProducaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ordemProducaoEditar',
+          breadcrumbPais: ['navegacao.ordensProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/ordens/:id',
+        name: 'ordem-producao-detalhe',
+        component: () => import('pages/producao/OrdemProducaoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ordemProducaoDetalhe',
+          breadcrumbPais: ['navegacao.ordensProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/beneficiamentos',
+        name: 'beneficiamentos',
+        component: () => import('pages/producao/BeneficiamentosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.beneficiamentos',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/beneficiamentos/novo',
+        name: 'beneficiamento-novo',
+        component: () => import('pages/producao/BeneficiamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.beneficiamentoNovo',
+          breadcrumbPais: ['navegacao.beneficiamentos'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/beneficiamentos/:id/editar',
+        name: 'beneficiamento-editar',
+        component: () => import('pages/producao/BeneficiamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.beneficiamentoEditar',
+          breadcrumbPais: ['navegacao.beneficiamentos'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/talhoes',
+        name: 'talhoes',
+        component: () => import('pages/rastreabilidade/TalhoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.talhoes',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/talhoes/novo',
+        name: 'talhao-novo',
+        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.talhaoNovo',
+          breadcrumbPais: ['navegacao.talhoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/talhoes/:id/editar',
+        name: 'talhao-editar',
+        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.talhaoEditar',
+          breadcrumbPais: ['navegacao.talhoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/aplicacoes',
+        name: 'aplicacoes',
+        component: () => import('pages/rastreabilidade/AplicacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.aplicacoes',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/aplicacoes/nova',
+        name: 'aplicacao-nova',
+        component: () => import('pages/rastreabilidade/AplicacaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.aplicacaoNova',
+          breadcrumbPais: ['navegacao.aplicacoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/aplicacoes/:id/editar',
+        name: 'aplicacao-editar',
+        component: () => import('pages/rastreabilidade/AplicacaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.aplicacaoEditar',
+          breadcrumbPais: ['navegacao.aplicacoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios',
+        name: 'relatorios',
+        component: () => import('pages/relatorios/RelatoriosPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorios',
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'usuarios/:usuarioId/permissoes',
+        name: 'usuario-permissoes',
+        component: () => import('pages/permissoes/PermissaoGranularPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.permissoesGranulares',
+          breadcrumbPais: ['navegacao.usuarios'],
+          permissao: Permissoes.PermissoesGranulares.Visualizar,
+        },
+      },
+      {
         path: 'usuarios',
         name: 'usuarios',
         component: () => import('pages/usuarios/UsuariosListPage.vue'),

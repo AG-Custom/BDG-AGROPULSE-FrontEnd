@@ -4,14 +4,32 @@
       titulo="Produtos"
       subtitulo="Gerencie o catálogo de produtos da sua empresa."
     >
-      <agro-btn
-        color="primary"
-        unelevated
-        icon="add"
-        label="Novo produto"
-        descricao="Cadastrar um novo produto"
-        :to="{ name: 'produto-novo' }"
-      />
+      <div class="produtos-list__acoes-header">
+        <agro-btn
+          flat
+          icon="table_view"
+          label="Excel"
+          descricao="Exportar listagem para Excel"
+          :loading="exportando"
+          @click="exportarLista('excel')"
+        />
+        <agro-btn
+          flat
+          icon="picture_as_pdf"
+          label="PDF"
+          descricao="Exportar listagem para PDF"
+          :loading="exportando"
+          @click="exportarLista('pdf')"
+        />
+        <agro-btn
+          color="primary"
+          unelevated
+          icon="add"
+          label="Novo produto"
+          descricao="Cadastrar um novo produto"
+          :to="{ name: 'produto-novo' }"
+        />
+      </div>
     </app-page-header>
 
     <section class="agro-section">
@@ -97,6 +115,12 @@
             </q-td>
           </template>
 
+          <template #body-cell-precoVenda="props">
+            <q-td :props="props" class="text-metric">
+              {{ formatarMoeda(props.row.precoVenda) }}
+            </q-td>
+          </template>
+
           <template #body-cell-ativo="props">
             <q-td :props="props">
               <agro-badge
@@ -164,8 +188,9 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
 import { useProdutos } from 'composables/useProdutos';
 import { TipoProdutoOpcoes } from 'constants/enums';
-import type { TipoProdutoValor } from 'constants/enums';
+import type { ExportacaoFormatoValor, TipoProdutoValor } from 'constants/enums';
 import type { ListarProdutosParams, ProdutoResumoDto } from 'types/dtos/produto.dto';
+import { formatarMoeda } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -174,9 +199,11 @@ const {
   carregando,
   inativando,
   ativando,
+  exportando,
   carregar,
   solicitarInativacao,
   solicitarAtivacao,
+  exportar,
 } = useProdutos();
 
 const {
@@ -208,6 +235,7 @@ const colunas: QTableColumn<ProdutoResumoDto>[] = [
   { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left', sortable: true },
   { name: 'tipoProduto', label: 'Tipo', field: 'tipoProduto', align: 'left', sortable: true },
   { name: 'categoriaProdutoId', label: 'Categoria', field: 'categoriaProdutoId', align: 'left' },
+  { name: 'precoVenda', label: 'Preço', field: 'precoVenda', align: 'right', sortable: true },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
@@ -262,6 +290,10 @@ async function ativarProduto(produto: ProdutoResumoDto): Promise<void> {
   await solicitarAtivacao(produto);
 }
 
+async function exportarLista(formato: ExportacaoFormatoValor): Promise<void> {
+  await exportar(formato, montarParams());
+}
+
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch([busca, filtroAtivo, filtroCategoria], () => {
@@ -278,6 +310,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.produtos-list__acoes-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
 .produtos-list__busca {
   flex: 1;
   min-width: 240px;

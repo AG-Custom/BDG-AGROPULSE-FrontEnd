@@ -195,9 +195,12 @@ export const TipoEnderecoClienteOpcoes = [
 ];
 
 export const TipoProduto = {
-  Insumo: 'Insumo',
-  Revenda: 'Revenda',
-  Produzido: 'Produzido',
+  InsumoAgricola: 'InsumoAgricola',
+  Defensivo: 'Defensivo',
+  Semente: 'Semente',
+  Fertilizante: 'Fertilizante',
+  ProdutoAcabado: 'ProdutoAcabado',
+  Colheita: 'Colheita',
   Servico: 'Servico',
   Outro: 'Outro',
 } as const;
@@ -205,9 +208,12 @@ export const TipoProduto = {
 export type TipoProdutoValor = (typeof TipoProduto)[keyof typeof TipoProduto];
 
 export const TipoProdutoOpcoes = [
-  { label: 'Insumo', value: TipoProduto.Insumo },
-  { label: 'Revenda', value: TipoProduto.Revenda },
-  { label: 'Produzido', value: TipoProduto.Produzido },
+  { label: 'Insumo agrícola', value: TipoProduto.InsumoAgricola },
+  { label: 'Defensivo', value: TipoProduto.Defensivo },
+  { label: 'Semente', value: TipoProduto.Semente },
+  { label: 'Fertilizante', value: TipoProduto.Fertilizante },
+  { label: 'Produto acabado', value: TipoProduto.ProdutoAcabado },
+  { label: 'Colheita', value: TipoProduto.Colheita },
   { label: 'Serviço', value: TipoProduto.Servico },
   { label: 'Outro', value: TipoProduto.Outro },
 ];
@@ -500,3 +506,116 @@ export type ExportacaoPedidoFormatoValor =
 
 export const ExportacaoFormato = ExportacaoPedidoFormato;
 export type ExportacaoFormatoValor = ExportacaoPedidoFormatoValor;
+
+export const OrcamentoStatus = {
+  Aberto: 'Aberto',
+  Convertido: 'Convertido',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type OrcamentoStatusValor = (typeof OrcamentoStatus)[keyof typeof OrcamentoStatus];
+
+export const OrcamentoStatusOpcoes = [
+  { label: 'Aberto', value: OrcamentoStatus.Aberto },
+  { label: 'Convertido', value: OrcamentoStatus.Convertido },
+  { label: 'Cancelado', value: OrcamentoStatus.Cancelado },
+];
+
+export const PdvVendaStatus = {
+  Concluida: 'Concluida',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type PdvVendaStatusValor = (typeof PdvVendaStatus)[keyof typeof PdvVendaStatus];
+
+export const PdvVendaStatusOpcoes = [
+  { label: 'Concluída', value: PdvVendaStatus.Concluida },
+  { label: 'Cancelada', value: PdvVendaStatus.Cancelada },
+];
+
+export const DestinoDevolucao = {
+  Reposicao: 'Reposicao',
+  Descarte: 'Descarte',
+} as const;
+
+export type DestinoDevolucaoValor = (typeof DestinoDevolucao)[keyof typeof DestinoDevolucao];
+
+export const DestinoDevolucaoOpcoes = [
+  { label: 'Reposição', value: DestinoDevolucao.Reposicao },
+  { label: 'Descarte', value: DestinoDevolucao.Descarte },
+];
+
+export const RegimeTributario = {
+  SimplesNacional: 'SimplesNacional',
+  LucroPresumido: 'LucroPresumido',
+  LucroReal: 'LucroReal',
+} as const;
+
+export type RegimeTributarioValor = (typeof RegimeTributario)[keyof typeof RegimeTributario];
+
+export const RegimeTributarioOpcoes = [
+  { label: 'Simples Nacional', value: RegimeTributario.SimplesNacional },
+  { label: 'Lucro Presumido', value: RegimeTributario.LucroPresumido },
+  { label: 'Lucro Real', value: RegimeTributario.LucroReal },
+];
+
+export const FontePreco = {
+  Manual: 'Manual',
+  Cbot: 'Cbot',
+  Esalq: 'Esalq',
+} as const;
+
+export type FontePrecoValor = (typeof FontePreco)[keyof typeof FontePreco];
+
+export const FontePrecoOpcoes = [
+  { label: 'Manual', value: FontePreco.Manual },
+  { label: 'CBOT', value: FontePreco.Cbot },
+  { label: 'ESALQ', value: FontePreco.Esalq },
+];
+
+export const ContratoStatus = {
+  Aberto: 'Aberto',
+  Liquidado: 'Liquidado',
+  Entregue: 'Entregue',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type ContratoStatusValor = (typeof ContratoStatus)[keyof typeof ContratoStatus];
+
+export const ContratoStatusOpcoes = [
+  { label: 'Aberto', value: ContratoStatus.Aberto },
+  { label: 'Liquidado', value: ContratoStatus.Liquidado },
+  { label: 'Entregue', value: ContratoStatus.Entregue },
+  { label: 'Cancelado', value: ContratoStatus.Cancelado },
+];
+
+export const TipoContrato = {
+  Cpr: 'cprs',
+  Barter: 'barter',
+  Termo: 'termo',
+} as const;
+
+export type TipoContratoValor = (typeof TipoContrato)[keyof typeof TipoContrato];
+
+export const TipoContratoOpcoes = [
+  { label: 'CPR', value: TipoContrato.Cpr },
+  { label: 'Barter', value: TipoContrato.Barter },
+  { label: 'Termo', value: TipoContrato.Termo },
+];
+
+export const OrdemProducaoStatus = {
+  Aberta: 'Aberta',
+  EmAndamento: 'EmAndamento',
+  Concluida: 'Concluida',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type OrdemProducaoStatusValor =
+  (typeof OrdemProducaoStatus)[keyof typeof OrdemProducaoStatus];
+
+export const OrdemProducaoStatusOpcoes = [
+  { label: 'Aberta', value: OrdemProducaoStatus.Aberta },
+  { label: 'Em andamento', value: OrdemProducaoStatus.EmAndamento },
+  { label: 'Concluída', value: OrdemProducaoStatus.Concluida },
+  { label: 'Cancelada', value: OrdemProducaoStatus.Cancelada },
+];

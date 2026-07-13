@@ -47,7 +47,9 @@ export function fiscalFormTemDados(form: ProdutoFiscalFormModel): boolean {
     form.cstIcms.trim().length > 0 ||
     form.aliquotaIcms.trim().length > 0 ||
     form.mva.trim().length > 0 ||
-    form.observacoesFiscais.trim().length > 0
+    form.observacoesFiscais.trim().length > 0 ||
+    apenasDigitos(form.cfopPadraoInterno).length > 0 ||
+    apenasDigitos(form.cfopPadraoExterno).length > 0
   );
 }
 
@@ -90,13 +92,17 @@ export function criarProdutoFormVazio(): ProdutoFormModel {
     codigo: '',
     descricao: '',
     categoriaProdutoId: null,
-    tipoProduto: TipoProduto.Insumo,
+    tipoProduto: TipoProduto.InsumoAgricola,
     unidadeMedidaId: null,
     exigeLote: false,
     exigeValidade: false,
     exigeFabricacao: false,
+    precoVenda: '',
+    fatorDivisaoNfe: '1',
     margemMinimaPercentual: '',
+    comissaoPercentual: '',
     metodoCusteio: null,
+    recalcularMargemAPartirDoPreco: false,
   };
 }
 
@@ -110,9 +116,13 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
     exigeLote: dto.exigeLote,
     exigeValidade: dto.exigeValidade,
     exigeFabricacao: dto.exigeFabricacao,
+    precoVenda: String(dto.precoVenda),
+    fatorDivisaoNfe: String(dto.fatorDivisaoNfe),
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
+    comissaoPercentual: dto.comissaoPercentual !== null ? String(dto.comissaoPercentual) : '',
     metodoCusteio: dto.metodoCusteio,
+    recalcularMargemAPartirDoPreco: false,
   };
 }
 
@@ -136,7 +146,10 @@ function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
     exigeLote: form.exigeLote,
     exigeValidade: form.exigeValidade,
     exigeFabricacao: form.exigeFabricacao,
+    precoVenda: Number(form.precoVenda.replace(',', '.')),
+    fatorDivisaoNfe: parseNumeroOpcional(form.fatorDivisaoNfe) ?? 1,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
+    comissaoPercentual: parseNumeroOpcional(form.comissaoPercentual),
   };
 }
 
@@ -148,6 +161,7 @@ export function formParaEditarPayload(form: ProdutoFormModel): EditarProdutoPayl
   return {
     ...montarPayloadBase(form),
     metodoCusteio: form.metodoCusteio,
+    recalcularMargemAPartirDoPreco: form.recalcularMargemAPartirDoPreco || undefined,
   };
 }
 
@@ -161,6 +175,8 @@ export function criarFiscalFormVazio(): ProdutoFiscalFormModel {
     aliquotaIcms: '',
     mva: '',
     observacoesFiscais: '',
+    cfopPadraoInterno: '',
+    cfopPadraoExterno: '',
   };
 }
 
@@ -174,6 +190,8 @@ export function fiscalDtoParaForm(dto: ProdutoFiscalDto): ProdutoFiscalFormModel
     aliquotaIcms: dto.aliquotaIcms !== null ? String(dto.aliquotaIcms) : '',
     mva: dto.mva !== null ? String(dto.mva) : '',
     observacoesFiscais: dto.observacoesFiscais ?? '',
+    cfopPadraoInterno: dto.cfopPadraoInterno ?? '',
+    cfopPadraoExterno: dto.cfopPadraoExterno ?? '',
   };
 }
 
@@ -187,6 +205,8 @@ export function formParaFiscalPayload(form: ProdutoFiscalFormModel): ProdutoFisc
     aliquotaIcms: parseNumeroOpcional(form.aliquotaIcms),
     mva: parseNumeroOpcional(form.mva),
     observacoesFiscais: form.observacoesFiscais.trim() || null,
+    cfopPadraoInterno: apenasDigitos(form.cfopPadraoInterno) || null,
+    cfopPadraoExterno: apenasDigitos(form.cfopPadraoExterno) || null,
   };
 }
 

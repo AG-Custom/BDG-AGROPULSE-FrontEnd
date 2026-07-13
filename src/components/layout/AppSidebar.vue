@@ -200,6 +200,30 @@
           <q-item-section>Pedidos</q-item-section>
         </q-item>
         <q-item
+          v-if="podeGerenciarOrcamentos"
+          clickable
+          :to="{ name: 'orcamentos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="request_quote" size="20px" />
+          </q-item-section>
+          <q-item-section>Orçamentos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarPdv"
+          clickable
+          :to="{ name: 'pdv-vender' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="point_of_sale" size="20px" />
+          </q-item-section>
+          <q-item-section>PDV</q-item-section>
+        </q-item>
+        <q-item
           v-if="podeGerenciarAprovacoes"
           clickable
           :to="{ name: 'aprovacoes' }"
@@ -210,6 +234,155 @@
             <q-icon name="rule" size="20px" />
           </q-item-section>
           <q-item-section>Aprovações</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeAcessarCompras" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Compras</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          v-if="podeGerenciarCompras"
+          clickable
+          :to="{ name: 'solicitacoes-compra' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="assignment" size="20px" />
+          </q-item-section>
+          <q-item-section>Solicitações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras"
+          clickable
+          :to="{ name: 'cotacoes-compra' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="compare" size="20px" />
+          </q-item-section>
+          <q-item-section>Cotações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras"
+          clickable
+          :to="{ name: 'pedidos-compra' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="local_mall" size="20px" />
+          </q-item-section>
+          <q-item-section>Pedidos compra</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarDevolucoes"
+          clickable
+          :to="{ name: 'devolucoes-venda' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="assignment_return" size="20px" />
+          </q-item-section>
+          <q-item-section>Devoluções</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarExpedicao"
+          clickable
+          :to="{ name: 'expedicao' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="local_shipping" size="20px" />
+          </q-item-section>
+          <q-item-section>Expedição</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeAcessarOperacoes" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Operações</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          v-if="podeGerenciarContratos"
+          clickable
+          :to="{ name: 'contratos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="handshake" size="20px" />
+          </q-item-section>
+          <q-item-section>Contratos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'ordens-producao' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="precision_manufacturing" size="20px" />
+          </q-item-section>
+          <q-item-section>Ordens produção</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'beneficiamentos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="transform" size="20px" />
+          </q-item-section>
+          <q-item-section>Beneficiamentos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarRastreabilidade"
+          clickable
+          :to="{ name: 'talhoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="grass" size="20px" />
+          </q-item-section>
+          <q-item-section>Talhões</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarRastreabilidade"
+          clickable
+          :to="{ name: 'aplicacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="science" size="20px" />
+          </q-item-section>
+          <q-item-section>Aplicações</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarFiscal" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Fiscal</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-config' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="receipt_long" size="20px" />
+          </q-item-section>
+          <q-item-section>Configuração fiscal</q-item-section>
         </q-item>
       </q-list>
     </div>
@@ -227,6 +400,23 @@
             <q-icon name="payments" size="20px" />
           </q-item-section>
           <q-item-section>Formas de pagamento</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarRelatorios" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Relatórios</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'relatorios' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="analytics" size="20px" />
+          </q-item-section>
+          <q-item-section>Relatórios</q-item-section>
         </q-item>
       </q-list>
     </div>
@@ -273,51 +463,84 @@ const { possuiPermissao } = useAuth();
 const podeGerenciarUsuarios = computed(() =>
   possuiPermissao(Permissoes.Usuarios.Visualizar),
 );
-
 const podeGerenciarColaboradores = computed(() =>
   possuiPermissao(Permissoes.Colaboradores.Visualizar),
 );
-
 const podeGerenciarClientes = computed(() =>
   possuiPermissao(Permissoes.Clientes.Visualizar),
 );
-
 const podeGerenciarProdutos = computed(() =>
   possuiPermissao(Permissoes.Produtos.Visualizar),
 );
-
 const podeGerenciarCategoriasProduto = computed(() =>
   possuiPermissao(Permissoes.CategoriasProduto.Visualizar),
 );
-
 const podeGerenciarUnidadesMedida = computed(() =>
   possuiPermissao(Permissoes.UnidadesMedida.Visualizar),
 );
-
 const podeGerenciarTabelasPreco = computed(() =>
   possuiPermissao(Permissoes.TabelasPreco.Visualizar),
 );
-
 const podeGerenciarEstoque = computed(() =>
   possuiPermissao(Permissoes.Estoque.Visualizar),
 );
-
 const podeGerenciarPedidosVenda = computed(() =>
   possuiPermissao(Permissoes.PedidosVenda.Visualizar),
 );
-
 const podeGerenciarAprovacoes = computed(() =>
   possuiPermissao(Permissoes.Aprovacoes.Visualizar),
 );
-
+const podeGerenciarOrcamentos = computed(() =>
+  possuiPermissao(Permissoes.Orcamentos.Visualizar),
+);
+const podeGerenciarPdv = computed(() => possuiPermissao(Permissoes.Pdv.Visualizar));
+const podeGerenciarCompras = computed(() =>
+  possuiPermissao(Permissoes.Compras.Visualizar),
+);
+const podeGerenciarDevolucoes = computed(() =>
+  possuiPermissao(Permissoes.DevolucoesVenda.Visualizar),
+);
+const podeGerenciarExpedicao = computed(() =>
+  possuiPermissao(Permissoes.Expedicao.Visualizar),
+);
+const podeGerenciarContratos = computed(() =>
+  possuiPermissao(Permissoes.Contratos.Visualizar),
+);
+const podeGerenciarProducao = computed(() =>
+  possuiPermissao(Permissoes.Producao.Visualizar),
+);
+const podeGerenciarRastreabilidade = computed(() =>
+  possuiPermissao(Permissoes.Rastreabilidade.Visualizar),
+);
+const podeGerenciarFiscal = computed(() =>
+  possuiPermissao(Permissoes.Fiscal.Visualizar),
+);
 const podeGerenciarFormasPagamentoConfig = computed(() =>
   possuiPermissao(Permissoes.FormasPagamentoConfig.Visualizar),
 );
-
-const podeAcessarVendas = computed(
-  () => podeGerenciarPedidosVenda.value || podeGerenciarAprovacoes.value,
+const podeGerenciarRelatorios = computed(() =>
+  possuiPermissao(Permissoes.Relatorios.Visualizar),
 );
 
+const podeAcessarVendas = computed(
+  () =>
+    podeGerenciarPedidosVenda.value ||
+    podeGerenciarAprovacoes.value ||
+    podeGerenciarOrcamentos.value ||
+    podeGerenciarPdv.value,
+);
+const podeAcessarCompras = computed(
+  () =>
+    podeGerenciarCompras.value ||
+    podeGerenciarDevolucoes.value ||
+    podeGerenciarExpedicao.value,
+);
+const podeAcessarOperacoes = computed(
+  () =>
+    podeGerenciarContratos.value ||
+    podeGerenciarProducao.value ||
+    podeGerenciarRastreabilidade.value,
+);
 const podeAcessarProdutos = computed(
   () =>
     podeGerenciarProdutos.value ||
@@ -325,7 +548,6 @@ const podeAcessarProdutos = computed(
     podeGerenciarUnidadesMedida.value ||
     podeGerenciarTabelasPreco.value,
 );
-
 const podeAcessarAdministracao = computed(
   () => podeGerenciarUsuarios.value || podeGerenciarColaboradores.value,
 );

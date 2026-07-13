@@ -47,4 +47,37 @@ export const Permissoes = {
   FormasPagamentoConfig: {
     Visualizar: 'formas-pagamento-config.visualizar',
   },
+  Orcamentos: {
+    Visualizar: 'orcamentos.visualizar',
+  },
+  Pdv: {
+    Visualizar: 'pdv.visualizar',
+  },
+  Compras: {
+    Visualizar: 'compras.visualizar',
+  },
+  DevolucoesVenda: {
+    Visualizar: 'devolucoes-venda.visualizar',
+  },
+  Expedicao: {
+    Visualizar: 'expedicao.visualizar',
+  },
+  Fiscal: {
+    Visualizar: 'fiscal.visualizar',
+  },
+  Contratos: {
+    Visualizar: 'contratos.visualizar',
+  },
+  Producao: {
+    Visualizar: 'producao.visualizar',
+  },
+  Rastreabilidade: {
+    Visualizar: 'rastreabilidade.visualizar',
+  },
+  Relatorios: {
+    Visualizar: 'relatorios.visualizar',
+  },
+  PermissoesGranulares: {
+    Visualizar: 'permissoes-granulares.visualizar',
+  },
 } as const;
