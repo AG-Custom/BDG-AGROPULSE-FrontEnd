@@ -96,6 +96,18 @@
           :disable="somenteLeitura"
         />
       </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.diasAlertaValidade"
+          outlined
+          label="Dias alerta validade"
+          type="number"
+          min="0"
+          step="1"
+          hint="Vazio usa a janela global de alertas"
+          :readonly="somenteLeitura"
+        />
+      </div>
     </div>
 
     <h3 class="produto-formulario__secao-titulo">Comercial</h3>

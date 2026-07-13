@@ -28,3 +28,18 @@ export interface CurvaAbcLucratividadeParams {
 export interface ComissoesRepasseParams {
   produtoId?: string;
 }
+
+export interface GiroEstoqueItemDto {
+  produtoId: string;
+  quantidadeSaida: number;
+  saldoAtual: number;
+  estoqueMedio: number;
+  giro: number;
+}
+
+export interface GiroEstoqueParams {
+  dataInicio?: string;
+  dataFim?: string;
+  unidadeId?: string;
+  produtoId?: string;
+}

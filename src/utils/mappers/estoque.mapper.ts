@@ -1,12 +1,16 @@
+import { OrigemMovimentacaoEstoque } from 'constants/enums';
 import type {
   AjusteEstoqueFormModel,
   AjusteEstoquePayload,
   ContagemInventarioFormModel,
+  CriarTransferenciaEstoquePayload,
   EntradaEstoqueFormModel,
   EntradaEstoquePayload,
   RegistrarContagemInventarioPayload,
   SaidaEstoqueFormModel,
   SaidaEstoquePayload,
+  TransferenciaEstoqueFormModel,
+  TransferenciaEstoqueItemFormModel,
 } from 'types/dtos/estoque.dto';
 
 function parseNumeroObrigatorio(valor: string): number {
@@ -31,6 +35,11 @@ export function criarEntradaFormVazia(): EntradaEstoqueFormModel {
     dataFabricacao: '',
     custoUnitario: '',
     quantidade: '',
+    deposito: '',
+    galpao: '',
+    corredor: '',
+    prateleira: '',
+    codigoBarras: '',
   };
 }
 
@@ -42,6 +51,10 @@ export function formParaEntradaPayload(form: EntradaEstoqueFormModel): EntradaEs
     dataFabricacao: form.dataFabricacao || null,
     custoUnitario: parseNumeroOpcional(form.custoUnitario),
     quantidade: parseNumeroObrigatorio(form.quantidade),
+    deposito: form.deposito.trim() || null,
+    galpao: form.galpao.trim() || null,
+    corredor: form.corredor.trim() || null,
+    prateleira: form.prateleira.trim() || null,
   };
 }
 
@@ -51,6 +64,9 @@ export function criarSaidaFormVazia(): SaidaEstoqueFormModel {
     loteId: '',
     quantidade: '',
     usarFefo: true,
+    motivo: OrigemMovimentacaoEstoque.Manual,
+    justificativa: '',
+    codigoBarras: '',
   };
 }
 
@@ -59,6 +75,8 @@ export function formParaSaidaPayload(form: SaidaEstoqueFormModel): SaidaEstoqueP
     produtoId: form.produtoId,
     loteId: form.usarFefo ? null : form.loteId || null,
     quantidade: parseNumeroObrigatorio(form.quantidade),
+    motivo: form.motivo || OrigemMovimentacaoEstoque.Manual,
+    justificativa: form.justificativa.trim() || null,
   };
 }
 
@@ -89,5 +107,36 @@ export function formParaContagemPayload(
 ): RegistrarContagemInventarioPayload {
   return {
     quantidadeContada: parseNumeroObrigatorio(form.quantidadeContada),
+  };
+}
+
+export function criarItemTransferenciaForm(): TransferenciaEstoqueItemFormModel {
+  return {
+    chave: crypto.randomUUID(),
+    produtoId: '',
+    loteId: '',
+    quantidade: '',
+  };
+}
+
+export function criarTransferenciaFormVazia(): TransferenciaEstoqueFormModel {
+  return {
+    unidadeDestinoId: '',
+    justificativa: '',
+    itens: [criarItemTransferenciaForm()],
+  };
+}
+
+export function formParaTransferenciaPayload(
+  form: TransferenciaEstoqueFormModel,
+): CriarTransferenciaEstoquePayload {
+  return {
+    unidadeDestinoId: form.unidadeDestinoId,
+    justificativa: form.justificativa.trim() || null,
+    itens: form.itens.map((item) => ({
+      produtoId: item.produtoId,
+      loteId: item.loteId || null,
+      quantidade: parseNumeroObrigatorio(item.quantidade),
+    })),
   };
 }

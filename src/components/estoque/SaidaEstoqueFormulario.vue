@@ -1,5 +1,25 @@
 <template>
   <q-form ref="formRef" class="saida-estoque-formulario" greedy>
+    <q-input
+      v-model="formulario.codigoBarras"
+      outlined
+      label="Código de barras"
+      hint="Leia o código ou digite e pressione Enter"
+      @keyup.enter.prevent="buscarPorCodigo"
+    >
+      <template #append>
+        <q-btn
+          flat
+          dense
+          round
+          icon="qr_code_scanner"
+          aria-label="Buscar produto por código"
+          :loading="buscandoCodigo"
+          @click="buscarPorCodigo"
+        />
+      </template>
+    </q-input>
+
     <q-select
       v-model="formulario.produtoId"
       outlined
@@ -12,6 +32,18 @@
       :loading="carregandoProdutos"
       :rules="[obrigatorio]"
       @update:model-value="onProdutoAlterado"
+    />
+
+    <q-select
+      v-model="formulario.motivo"
+      outlined
+      label="Motivo da saída"
+      class="field-required"
+      emit-value
+      map-options
+      aria-required="true"
+      :options="MotivoSaidaEstoqueOpcoes"
+      :rules="[obrigatorio]"
     />
 
     <q-toggle
@@ -43,13 +75,39 @@
       step="0.01"
       aria-required="true"
       :rules="[quantidadePositivaValidator]"
+    >
+      <template #append>
+        <q-btn
+          flat
+          dense
+          round
+          icon="scale"
+          aria-label="Ler peso da balança"
+          :loading="lendoPeso"
+          @click="lerPeso"
+        />
+      </template>
+    </q-input>
+
+    <q-input
+      v-if="exigeJustificativa"
+      v-model="formulario.justificativa"
+      outlined
+      label="Justificativa"
+      class="field-required"
+      type="textarea"
+      autogrow
+      aria-required="true"
+      :rules="[obrigatorio, justificativaMinima]"
     />
   </q-form>
 </template>
 
 <script setup lang="ts">
+import { useEstoqueDispositivos } from 'composables/useEstoqueDispositivos';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
+import { MotivoSaidaEstoqueOpcoes, OrigemMovimentacaoEstoque } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { SaidaEstoqueFormModel } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
@@ -60,9 +118,15 @@ const formulario = defineModel<SaidaEstoqueFormModel>('formulario', { required: 
 
 const formRef = ref<QForm | null>(null);
 const quantidadePositivaValidator = quantidadePositiva;
+const { buscandoCodigo, lendoPeso, buscarProdutoPorCodigo, lerPesoBalanca } =
+  useEstoqueDispositivos();
 
 const { produtoOpcoes, carregando: carregandoProdutos } = useProdutoOpcoesEstoque();
 const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
+
+const exigeJustificativa = computed(
+  () => formulario.value.motivo === OrigemMovimentacaoEstoque.Descarte,
+);
 
 const loteOpcoes = computed(() =>
   lotes.value.map((lote) => ({
@@ -73,6 +137,10 @@ const loteOpcoes = computed(() =>
   })),
 );
 
+function justificativaMinima(valor: string): true | string {
+  return valor.trim().length >= 10 || 'Informe ao menos 10 caracteres.';
+}
+
 async function onProdutoAlterado(produtoId: string | null): Promise<void> {
   formulario.value.loteId = '';
 
@@ -81,6 +149,23 @@ async function onProdutoAlterado(produtoId: string | null): Promise<void> {
   }
 
   await carregarLotes({ produtoId, apenasComSaldo: true });
+}
+
+async function buscarPorCodigo(): Promise<void> {
+  const produto = await buscarProdutoPorCodigo(formulario.value.codigoBarras);
+  if (!produto) {
+    return;
+  }
+
+  formulario.value.produtoId = produto.id;
+  await onProdutoAlterado(produto.id);
+}
+
+async function lerPeso(): Promise<void> {
+  const leitura = await lerPesoBalanca();
+  if (leitura) {
+    formulario.value.quantidade = String(leitura.peso);
+  }
 }
 
 watch(

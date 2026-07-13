@@ -2,7 +2,11 @@ import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { messageService } from 'services/message.service';
 import { estoqueService } from 'services/estoque.service';
-import type { ContagemInventarioFormModel, InventarioDto } from 'types/dtos/estoque.dto';
+import type {
+  ContagemInventarioFormModel,
+  IniciarInventarioPayload,
+  InventarioDto,
+} from 'types/dtos/estoque.dto';
 import { formParaContagemPayload } from 'utils/mappers/estoque.mapper';
 import { ref } from 'vue';
 
@@ -40,11 +44,11 @@ export function useEstoqueInventarios() {
     }
   }
 
-  async function iniciar(): Promise<InventarioDto | null> {
+  async function iniciar(payload?: IniciarInventarioPayload): Promise<InventarioDto | null> {
     salvando.value = true;
 
     try {
-      const criado = await estoqueService.iniciarInventario();
+      const criado = await estoqueService.iniciarInventario(payload);
       sucesso('Inventário iniciado com sucesso.');
       await carregar();
       return criado;

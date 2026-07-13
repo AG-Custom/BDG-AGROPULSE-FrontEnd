@@ -78,6 +78,18 @@
             </q-td>
           </template>
 
+          <template #body-cell-localizacao="props">
+            <q-td :props="props">
+              {{ formatarLocalizacao(props.row) }}
+            </q-td>
+          </template>
+
+          <template #body-cell-notaFiscalOrigemId="props">
+            <q-td :props="props">
+              {{ props.row.notaFiscalOrigemId ? props.row.notaFiscalOrigemId.slice(0, 8) + '…' : '—' }}
+            </q-td>
+          </template>
+
           <template #body-cell-ativo="props">
             <q-td :props="props">
               <agro-badge
@@ -139,6 +151,18 @@ const colunas: QTableColumn<LoteDto>[] = [
     align: 'left',
     sortable: true,
   },
+  {
+    name: 'localizacao',
+    label: 'Localização',
+    field: 'deposito',
+    align: 'left',
+  },
+  {
+    name: 'notaFiscalOrigemId',
+    label: 'NF origem',
+    field: 'notaFiscalOrigemId',
+    align: 'left',
+  },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
 ];
 
@@ -147,6 +171,13 @@ const descricaoVazia = computed(() =>
     ? 'Nenhum lote corresponde aos filtros aplicados.'
     : 'Ainda não há lotes cadastrados nesta unidade.',
 );
+
+function formatarLocalizacao(lote: LoteDto): string {
+  const partes = [lote.galpao, lote.deposito, lote.corredor, lote.prateleira].filter(
+    (parte) => !!parte?.trim(),
+  );
+  return partes.length > 0 ? partes.join(' / ') : '—';
+}
 
 async function recarregar(): Promise<void> {
   await carregar({

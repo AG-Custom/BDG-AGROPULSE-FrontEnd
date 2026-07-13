@@ -15,6 +15,11 @@ export interface LoteDto {
   dataFabricacao: string | null;
   custoUnitario: number;
   quantidade: number;
+  deposito: string | null;
+  galpao: string | null;
+  corredor: string | null;
+  prateleira: string | null;
+  notaFiscalOrigemId: string | null;
   ativo: boolean;
 }
 
@@ -63,6 +68,11 @@ export interface InventarioDto {
   status: InventarioStatusValor;
   iniciadoEm: string;
   concluidoEm: string | null;
+  categoriaProdutoId: string | null;
+  deposito: string | null;
+  galpao: string | null;
+  corredor: string | null;
+  prateleira: string | null;
   itens: InventarioItemDto[];
 }
 
@@ -70,6 +80,44 @@ export interface AlertaEstoqueMinimoDto {
   produtoId: string;
   saldo: number;
   estoqueMinimo: number;
+}
+
+export interface AlertaEstoqueZeradoDto {
+  produtoId: string;
+  saldo: number;
+}
+
+export interface TransferenciaEstoqueItemDto {
+  id: string;
+  transferenciaId: string;
+  produtoId: string;
+  loteOrigemId: string | null;
+  numeroLote: string | null;
+  quantidade: number;
+  custoUnitario: number;
+}
+
+export interface TransferenciaEstoqueDto {
+  id: string;
+  empresaId: string;
+  unidadeOrigemId: string;
+  unidadeDestinoId: string;
+  status: string;
+  justificativa: string | null;
+  notaFiscalId: string | null;
+  itens: TransferenciaEstoqueItemDto[];
+}
+
+export interface ProdutoPorCodigoDto {
+  id: string;
+  codigo: string;
+  descricao: string;
+}
+
+export interface LeituraPesoDto {
+  peso: number;
+  unidade: string;
+  dispositivoId: string | null;
 }
 
 export interface ReservaStatusDto {
@@ -86,12 +134,62 @@ export interface EntradaEstoquePayload {
   dataFabricacao?: string | null;
   custoUnitario?: number | null;
   quantidade: number;
+  deposito?: string | null;
+  galpao?: string | null;
+  corredor?: string | null;
+  prateleira?: string | null;
+  notaFiscalOrigemId?: string | null;
 }
 
 export interface SaidaEstoquePayload {
   produtoId: string;
   loteId?: string | null;
   quantidade: number;
+  motivo?: OrigemMovimentacaoEstoqueValor | null;
+  justificativa?: string | null;
+}
+
+export interface IniciarInventarioPayload {
+  categoriaProdutoId?: string | null;
+  deposito?: string | null;
+  galpao?: string | null;
+  corredor?: string | null;
+  prateleira?: string | null;
+}
+
+export interface CriarTransferenciaEstoquePayload {
+  unidadeDestinoId: string;
+  justificativa?: string | null;
+  itens: Array<{
+    produtoId: string;
+    quantidade: number;
+    loteId?: string | null;
+    numeroLote?: string | null;
+    dataValidade?: string | null;
+    dataFabricacao?: string | null;
+    custoUnitario?: number | null;
+    deposito?: string | null;
+    galpao?: string | null;
+    corredor?: string | null;
+    prateleira?: string | null;
+  }>;
+}
+
+export interface ConfirmarTransferenciaEstoquePayload {
+  emitirNotaFiscal?: boolean;
+}
+
+export interface TransferenciaEstoqueItemFormModel {
+  chave: string;
+  produtoId: string;
+  loteId: string;
+  quantidade: string;
+}
+
+export interface TransferenciaEstoqueFormModel {
+  unidadeDestinoId: string;
+  justificativa: string;
+  itens: TransferenciaEstoqueItemFormModel[];
 }
 
 export interface AjusteEstoquePayload {
@@ -146,6 +244,11 @@ export interface EntradaEstoqueFormModel {
   dataFabricacao: string;
   custoUnitario: string;
   quantidade: string;
+  deposito: string;
+  galpao: string;
+  corredor: string;
+  prateleira: string;
+  codigoBarras: string;
 }
 
 export interface SaidaEstoqueFormModel {
@@ -153,6 +256,9 @@ export interface SaidaEstoqueFormModel {
   loteId: string;
   quantidade: string;
   usarFefo: boolean;
+  motivo: OrigemMovimentacaoEstoqueValor;
+  justificativa: string;
+  codigoBarras: string;
 }
 
 export interface AjusteEstoqueFormModel {

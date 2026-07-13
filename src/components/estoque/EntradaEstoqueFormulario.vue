@@ -1,5 +1,25 @@
 <template>
   <q-form ref="formRef" class="entrada-estoque-formulario" greedy>
+    <q-input
+      v-model="formulario.codigoBarras"
+      outlined
+      label="Código de barras"
+      hint="Leia o código ou digite e pressione Enter"
+      @keyup.enter.prevent="buscarPorCodigo"
+    >
+      <template #append>
+        <q-btn
+          flat
+          dense
+          round
+          icon="qr_code_scanner"
+          aria-label="Buscar produto por código"
+          :loading="buscandoCodigo"
+          @click="buscarPorCodigo"
+        />
+      </template>
+    </q-input>
+
     <q-select
       v-model="formulario.produtoId"
       outlined
@@ -24,7 +44,19 @@
       step="0.01"
       aria-required="true"
       :rules="[quantidadePositivaValidator]"
-    />
+    >
+      <template #append>
+        <q-btn
+          flat
+          dense
+          round
+          icon="scale"
+          aria-label="Ler peso da balança"
+          :loading="lendoPeso"
+          @click="lerPeso"
+        />
+      </template>
+    </q-input>
 
     <q-input
       v-if="exigeLote"
@@ -65,10 +97,18 @@
       step="0.01"
       hint="Opcional"
     />
+
+    <div class="entrada-estoque-formulario__localizacao">
+      <q-input v-model="formulario.deposito" outlined label="Depósito" maxlength="50" />
+      <q-input v-model="formulario.galpao" outlined label="Galpão" maxlength="50" />
+      <q-input v-model="formulario.corredor" outlined label="Corredor" maxlength="50" />
+      <q-input v-model="formulario.prateleira" outlined label="Prateleira" maxlength="50" />
+    </div>
   </q-form>
 </template>
 
 <script setup lang="ts">
+import { useEstoqueDispositivos } from 'composables/useEstoqueDispositivos';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import type { QForm } from 'quasar';
 import type { EntradaEstoqueFormModel } from 'types/dtos/estoque.dto';
@@ -79,6 +119,8 @@ const formulario = defineModel<EntradaEstoqueFormModel>('formulario', { required
 
 const formRef = ref<QForm | null>(null);
 const quantidadePositivaValidator = quantidadePositiva;
+const { buscandoCodigo, lendoPeso, buscarProdutoPorCodigo, lerPesoBalanca } =
+  useEstoqueDispositivos();
 
 const {
   produtoOpcoes,
@@ -102,6 +144,23 @@ async function onProdutoAlterado(produtoId: string | null): Promise<void> {
   await carregarDetalhe(produtoId);
 }
 
+async function buscarPorCodigo(): Promise<void> {
+  const produto = await buscarProdutoPorCodigo(formulario.value.codigoBarras);
+  if (!produto) {
+    return;
+  }
+
+  formulario.value.produtoId = produto.id;
+  await carregarDetalhe(produto.id);
+}
+
+async function lerPeso(): Promise<void> {
+  const leitura = await lerPesoBalanca();
+  if (leitura) {
+    formulario.value.quantidade = String(leitura.peso);
+  }
+}
+
 watch(
   () => formulario.value.produtoId,
   (produtoId) => {
@@ -123,5 +182,17 @@ defineExpose({ validar });
 .entrada-estoque-formulario {
   display: grid;
   gap: var(--spacing-4);
+}
+
+.entrada-estoque-formulario__localizacao {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 600px) {
+  .entrada-estoque-formulario__localizacao {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

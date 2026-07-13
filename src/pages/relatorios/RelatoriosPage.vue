@@ -1,12 +1,22 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header titulo="Relatórios" subtitulo="Curva ABC de lucratividade e comissões." />
+    <app-page-header
+      titulo="Relatórios"
+      subtitulo="Curva ABC, comissões e giro de estoque."
+    />
 
     <section class="agro-section">
       <agro-card>
-        <q-tabs v-model="aba" dense class="text-primary" active-color="primary" indicator-color="primary">
+        <q-tabs
+          v-model="aba"
+          dense
+          class="text-primary"
+          active-color="primary"
+          indicator-color="primary"
+        >
           <q-tab name="abc" label="Curva ABC" />
           <q-tab name="comissoes" label="Comissões" />
+          <q-tab name="giro" label="Giro de estoque" />
         </q-tabs>
         <q-separator />
 
@@ -54,7 +64,7 @@
           </q-table>
         </div>
 
-        <div v-else class="painel">
+        <div v-else-if="aba === 'comissoes'" class="painel">
           <div class="agro-filter-bar">
             <agro-btn
               color="primary"
@@ -91,6 +101,63 @@
             </template>
           </q-table>
         </div>
+
+        <div v-else class="painel">
+          <div class="agro-filter-bar">
+            <q-input v-model="dataInicio" outlined dense type="date" label="Data início" class="filtro" />
+            <q-input v-model="dataFim" outlined dense type="date" label="Data fim" class="filtro" />
+            <agro-btn
+              color="primary"
+              unelevated
+              label="Atualizar"
+              descricao="Carregar giro de estoque"
+              :loading="carregando"
+              @click="carregarGiro"
+            />
+          </div>
+
+          <agro-table-skeleton v-if="carregando && giroEstoque.length === 0" :colunas="5" />
+          <empty-state
+            v-else-if="!carregando && giroEstoque.length === 0"
+            titulo="Sem giro no período"
+            descricao="Não há saídas de estoque no intervalo informado."
+            icon="sync_alt"
+          />
+          <q-table
+            v-else
+            flat
+            bordered
+            row-key="produtoId"
+            :rows="giroEstoque"
+            :columns="colunasGiro"
+            :loading="carregando"
+            :rows-per-page-options="[10, 25, 50]"
+          >
+            <template #body-cell-produtoId="props">
+              <q-td :props="props">{{ rotuloProduto(props.row.produtoId) }}</q-td>
+            </template>
+            <template #body-cell-quantidadeSaida="props">
+              <q-td :props="props" class="text-metric">
+                {{ formatarDecimal(props.row.quantidadeSaida) }}
+              </q-td>
+            </template>
+            <template #body-cell-saldoAtual="props">
+              <q-td :props="props" class="text-metric">
+                {{ formatarDecimal(props.row.saldoAtual) }}
+              </q-td>
+            </template>
+            <template #body-cell-estoqueMedio="props">
+              <q-td :props="props" class="text-metric">
+                {{ formatarDecimal(props.row.estoqueMedio) }}
+              </q-td>
+            </template>
+            <template #body-cell-giro="props">
+              <q-td :props="props" class="text-metric">
+                {{ formatarDecimal(props.row.giro) }}
+              </q-td>
+            </template>
+          </q-table>
+        </div>
       </agro-card>
     </section>
   </q-page>
@@ -100,19 +167,32 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import { useRelatorios } from 'composables/useRelatorios';
 import type { QTableColumn } from 'quasar';
 import type {
   ComissaoRepasseItemDto,
   CurvaAbcLucratividadeItemDto,
+  GiroEstoqueItemDto,
 } from 'types/dtos/relatorio.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { onMounted, ref, watch } from 'vue';
 
-const { curvaAbc, comissoes, carregando, carregarCurvaAbc, carregarComissoes } = useRelatorios();
+const {
+  curvaAbc,
+  comissoes,
+  giroEstoque,
+  carregando,
+  carregarCurvaAbc,
+  carregarComissoes,
+  carregarGiroEstoque,
+} = useRelatorios();
+const { rotuloProduto } = useProdutoOpcoesEstoque();
 
-const aba = ref<'abc' | 'comissoes'>('abc');
+const aba = ref<'abc' | 'comissoes' | 'giro'>('abc');
 const dias = ref('30');
+const dataInicio = ref(dataIsoOffset(-30));
+const dataFim = ref(dataIsoOffset(0));
 
 const colunasAbc: QTableColumn<CurvaAbcLucratividadeItemDto>[] = [
   { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
@@ -136,6 +216,20 @@ const colunasCom: QTableColumn<ComissaoRepasseItemDto>[] = [
   { name: 'valorComissao', label: 'Comissão', field: 'valorComissao', align: 'right' },
 ];
 
+const colunasGiro: QTableColumn<GiroEstoqueItemDto>[] = [
+  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
+  { name: 'quantidadeSaida', label: 'Saídas', field: 'quantidadeSaida', align: 'right' },
+  { name: 'saldoAtual', label: 'Saldo atual', field: 'saldoAtual', align: 'right' },
+  { name: 'estoqueMedio', label: 'Estoque médio', field: 'estoqueMedio', align: 'right' },
+  { name: 'giro', label: 'Giro', field: 'giro', align: 'right' },
+];
+
+function dataIsoOffset(diasOffset: number): string {
+  const data = new Date();
+  data.setDate(data.getDate() + diasOffset);
+  return data.toISOString().slice(0, 10);
+}
+
 async function carregarAbc(): Promise<void> {
   await carregarCurvaAbc({ dias: Number(dias.value) || undefined });
 }
@@ -144,9 +238,17 @@ async function carregarCom(): Promise<void> {
   await carregarComissoes();
 }
 
+async function carregarGiro(): Promise<void> {
+  await carregarGiroEstoque({
+    dataInicio: dataInicio.value || undefined,
+    dataFim: dataFim.value || undefined,
+  });
+}
+
 watch(aba, (nova) => {
   if (nova === 'abc') void carregarAbc();
-  else void carregarCom();
+  else if (nova === 'comissoes') void carregarCom();
+  else void carregarGiro();
 });
 
 onMounted(() => {
@@ -158,7 +260,8 @@ onMounted(() => {
 .painel {
   padding-top: var(--spacing-4);
 }
+
 .filtro {
-  min-width: 120px;
+  min-width: 140px;
 }
 </style>

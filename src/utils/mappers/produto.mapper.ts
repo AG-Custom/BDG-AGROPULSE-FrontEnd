@@ -97,6 +97,7 @@ export function criarProdutoFormVazio(): ProdutoFormModel {
     exigeLote: false,
     exigeValidade: false,
     exigeFabricacao: false,
+    diasAlertaValidade: '',
     precoVenda: '',
     fatorDivisaoNfe: '1',
     margemMinimaPercentual: '',
@@ -116,6 +117,10 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
     exigeLote: dto.exigeLote,
     exigeValidade: dto.exigeValidade,
     exigeFabricacao: dto.exigeFabricacao,
+    diasAlertaValidade:
+      dto.diasAlertaValidade !== null && dto.diasAlertaValidade !== undefined
+        ? String(dto.diasAlertaValidade)
+        : '',
     precoVenda: String(dto.precoVenda),
     fatorDivisaoNfe: String(dto.fatorDivisaoNfe),
     margemMinimaPercentual:
@@ -146,6 +151,7 @@ function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
     exigeLote: form.exigeLote,
     exigeValidade: form.exigeValidade,
     exigeFabricacao: form.exigeFabricacao,
+    diasAlertaValidade: parseNumeroOpcional(form.diasAlertaValidade),
     precoVenda: Number(form.precoVenda.replace(',', '.')),
     fatorDivisaoNfe: parseNumeroOpcional(form.fatorDivisaoNfe) ?? 1,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),

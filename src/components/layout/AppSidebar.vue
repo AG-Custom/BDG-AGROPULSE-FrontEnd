@@ -172,6 +172,17 @@
         </q-item>
         <q-item
           clickable
+          :to="{ name: 'estoque-transferencias' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="swap_horiz" size="20px" />
+          </q-item-section>
+          <q-item-section>Transferências</q-item-section>
+        </q-item>
+        <q-item
+          clickable
           :to="{ name: 'estoque-alertas' }"
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"

@@ -4,6 +4,8 @@ import type {
   ComissoesRepasseParams,
   CurvaAbcLucratividadeItemDto,
   CurvaAbcLucratividadeParams,
+  GiroEstoqueItemDto,
+  GiroEstoqueParams,
 } from 'types/dtos/relatorio.dto';
 
 export const relatorioService = {
@@ -20,6 +22,12 @@ export const relatorioService = {
   comissoesRepasse(params?: ComissoesRepasseParams): Promise<ComissaoRepasseItemDto[]> {
     return api
       .get<ComissaoRepasseItemDto[]>('/relatorios/comissoes-repasse', { params })
+      .then((r) => r.data);
+  },
+
+  giroEstoque(params?: GiroEstoqueParams): Promise<GiroEstoqueItemDto[]> {
+    return api
+      .get<GiroEstoqueItemDto[]>('/relatorios/giro-estoque', { params })
       .then((r) => r.data);
   },
 };

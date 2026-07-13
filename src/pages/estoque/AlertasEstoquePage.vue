@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Alertas de estoque"
-      subtitulo="Monitore produtos abaixo do mínimo e lotes próximos do vencimento."
+      subtitulo="Monitore estoque mínimo, saldo zerado e lotes próximos do vencimento."
     />
 
     <section class="agro-section estoque-alertas">
@@ -52,6 +52,44 @@
 
       <agro-card>
         <template #header>
+          <h3 class="estoque-alertas__titulo">Estoque zerado</h3>
+        </template>
+
+        <agro-table-skeleton v-if="carregandoZerado && alertasZerado.length === 0" :colunas="2" />
+
+        <empty-state
+          v-else-if="!carregandoZerado && alertasZerado.length === 0"
+          titulo="Nenhum produto zerado"
+          descricao="Não há produtos com saldo zero nesta unidade."
+          icon="inventory_2"
+        />
+
+        <q-table
+          v-else
+          flat
+          bordered
+          row-key="produtoId"
+          :rows="alertasZerado"
+          :columns="colunasZerado"
+          :loading="carregandoZerado"
+          :rows-per-page-options="[10, 25, 50]"
+        >
+          <template #body-cell-produtoId="props">
+            <q-td :props="props">
+              {{ rotuloProduto(props.row.produtoId) }}
+            </q-td>
+          </template>
+
+          <template #body-cell-saldo="props">
+            <q-td :props="props">
+              <span class="text-metric">{{ formatarDecimal(props.row.saldo) }}</span>
+            </q-td>
+          </template>
+        </q-table>
+      </agro-card>
+
+      <agro-card>
+        <template #header>
           <div class="estoque-alertas__header">
             <h3 class="estoque-alertas__titulo">Validade</h3>
             <q-input
@@ -60,7 +98,8 @@
               dense
               type="number"
               min="1"
-              label="Janela (dias)"
+              label="Janela global (dias)"
+              hint="Produtos com threshold próprio usam o valor do cadastro"
               class="estoque-alertas__dias"
             />
           </div>
@@ -118,16 +157,23 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { useEstoqueAlertas } from 'composables/useEstoqueAlertas';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import type { QTableColumn } from 'quasar';
-import type { AlertaEstoqueMinimoDto, LoteDto } from 'types/dtos/estoque.dto';
+import type {
+  AlertaEstoqueMinimoDto,
+  AlertaEstoqueZeradoDto,
+  LoteDto,
+} from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
 import { onMounted, ref, watch } from 'vue';
 
 const {
   alertasMinimo,
+  alertasZerado,
   alertasValidade,
   carregandoMinimo,
+  carregandoZerado,
   carregandoValidade,
   carregarMinimo,
+  carregarZerado,
   carregarValidade,
 } = useEstoqueAlertas();
 const { rotuloProduto } = useProdutoOpcoesEstoque();
@@ -144,6 +190,11 @@ const colunasMinimo: QTableColumn<AlertaEstoqueMinimoDto>[] = [
     align: 'right',
     sortable: true,
   },
+];
+
+const colunasZerado: QTableColumn<AlertaEstoqueZeradoDto>[] = [
+  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
+  { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right', sortable: true },
 ];
 
 const colunasValidade: QTableColumn<LoteDto>[] = [
@@ -173,6 +224,7 @@ watch(diasValidade, (dias) => {
 
 onMounted(() => {
   void carregarMinimo();
+  void carregarZerado();
   void carregarValidade({ dias: diasValidade.value });
 });
 </script>
@@ -198,6 +250,6 @@ onMounted(() => {
 }
 
 .estoque-alertas__dias {
-  max-width: 140px;
+  max-width: 220px;
 }
 </style>

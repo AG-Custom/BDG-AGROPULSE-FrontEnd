@@ -71,6 +71,7 @@ export interface ProdutoDto extends Omit<ProdutoResumoDto, 'precoVenda' | 'custo
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
+  diasAlertaValidade: number | null;
   metodoCusteio: MetodoCusteioValor | null;
   precoVenda: number;
   custoMedioPonderado: number | null;
@@ -93,6 +94,7 @@ export interface CriarProdutoPayload {
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
+  diasAlertaValidade?: number | null;
   precoVenda: number;
   fatorDivisaoNfe?: number;
   margemMinimaPercentual?: number | null;
@@ -159,6 +161,7 @@ export interface ProdutoFormModel {
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
+  diasAlertaValidade: string;
   precoVenda: string;
   fatorDivisaoNfe: string;
   margemMinimaPercentual: string;

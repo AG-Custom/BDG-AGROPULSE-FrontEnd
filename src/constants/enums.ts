@@ -350,6 +350,11 @@ export const OrigemMovimentacaoEstoque = {
   ReservaPedido: 'ReservaPedido',
   DevolucaoPedido: 'DevolucaoPedido',
   Pdv: 'Pdv',
+  Producao: 'Producao',
+  RequisicaoInterna: 'RequisicaoInterna',
+  Descarte: 'Descarte',
+  Transferencia: 'Transferencia',
+  NfeEntrada: 'NfeEntrada',
 } as const;
 
 export type OrigemMovimentacaoEstoqueValor =
@@ -362,6 +367,32 @@ export const OrigemMovimentacaoEstoqueOpcoes = [
   { label: 'Reserva de pedido', value: OrigemMovimentacaoEstoque.ReservaPedido },
   { label: 'Devolução de pedido', value: OrigemMovimentacaoEstoque.DevolucaoPedido },
   { label: 'PDV', value: OrigemMovimentacaoEstoque.Pdv },
+  { label: 'Produção', value: OrigemMovimentacaoEstoque.Producao },
+  { label: 'Requisição interna', value: OrigemMovimentacaoEstoque.RequisicaoInterna },
+  { label: 'Descarte', value: OrigemMovimentacaoEstoque.Descarte },
+  { label: 'Transferência', value: OrigemMovimentacaoEstoque.Transferencia },
+  { label: 'NF-e entrada', value: OrigemMovimentacaoEstoque.NfeEntrada },
+];
+
+export const MotivoSaidaEstoqueOpcoes = [
+  { label: 'Manual', value: OrigemMovimentacaoEstoque.Manual },
+  { label: 'Requisição interna', value: OrigemMovimentacaoEstoque.RequisicaoInterna },
+  { label: 'Descarte', value: OrigemMovimentacaoEstoque.Descarte },
+];
+
+export const TransferenciaEstoqueStatus = {
+  Pendente: 'Pendente',
+  Concluida: 'Concluida',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type TransferenciaEstoqueStatusValor =
+  (typeof TransferenciaEstoqueStatus)[keyof typeof TransferenciaEstoqueStatus];
+
+export const TransferenciaEstoqueStatusOpcoes = [
+  { label: 'Pendente', value: TransferenciaEstoqueStatus.Pendente },
+  { label: 'Concluída', value: TransferenciaEstoqueStatus.Concluida },
+  { label: 'Cancelada', value: TransferenciaEstoqueStatus.Cancelada },
 ];
 
 export const InventarioStatus = {

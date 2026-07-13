@@ -3,21 +3,28 @@ import { api } from 'services/api';
 import type {
   AjusteEstoquePayload,
   AlertaEstoqueMinimoDto,
+  AlertaEstoqueZeradoDto,
+  ConfirmarTransferenciaEstoquePayload,
+  CriarTransferenciaEstoquePayload,
   EntradaEstoquePayload,
   EstoqueInicialStatusDto,
+  IniciarInventarioPayload,
   InventarioDto,
   LancarEstoqueInicialPayload,
+  LeituraPesoDto,
   ListarAlertasValidadeParams,
   ListarLotesParams,
   ListarMovimentacoesParams,
   ListarSaldosParams,
   LoteDto,
   MovimentacaoEstoqueDto,
+  ProdutoPorCodigoDto,
   RegistrarContagemInventarioPayload,
   ReservaStatusDto,
   ReservarEstoquePedidoPayload,
   SaidaEstoquePayload,
   SaldoProdutoDto,
+  TransferenciaEstoqueDto,
 } from 'types/dtos/estoque.dto';
 
 export const estoqueService = {
@@ -75,8 +82,10 @@ export const estoqueService = {
     return api.get<InventarioDto[]>('/estoque/inventarios').then((r) => r.data);
   },
 
-  iniciarInventario(): Promise<InventarioDto> {
-    return api.post<InventarioDto>('/estoque/inventarios/iniciar').then((r) => r.data);
+  iniciarInventario(payload?: IniciarInventarioPayload): Promise<InventarioDto> {
+    return api
+      .post<InventarioDto>('/estoque/inventarios/iniciar', payload ?? {})
+      .then((r) => r.data);
   },
 
   obterInventario(inventarioId: string): Promise<InventarioDto> {
@@ -121,7 +130,56 @@ export const estoqueService = {
       .then((r) => r.data);
   },
 
+  listarAlertasZerado(): Promise<AlertaEstoqueZeradoDto[]> {
+    return api
+      .get<AlertaEstoqueZeradoDto[]>('/estoque/alertas/zerado')
+      .then((r) => r.data);
+  },
+
   listarAlertasValidade(params?: ListarAlertasValidadeParams): Promise<LoteDto[]> {
     return api.get<LoteDto[]>('/estoque/alertas/validade', { params }).then((r) => r.data);
+  },
+
+  listarTransferencias(): Promise<TransferenciaEstoqueDto[]> {
+    return api.get<TransferenciaEstoqueDto[]>('/estoque/transferencias').then((r) => r.data);
+  },
+
+  obterTransferencia(id: string): Promise<TransferenciaEstoqueDto> {
+    return api.get<TransferenciaEstoqueDto>(`/estoque/transferencias/${id}`).then((r) => r.data);
+  },
+
+  criarTransferencia(
+    payload: CriarTransferenciaEstoquePayload,
+  ): Promise<TransferenciaEstoqueDto> {
+    return api
+      .post<TransferenciaEstoqueDto>('/estoque/transferencias', payload)
+      .then((r) => r.data);
+  },
+
+  confirmarTransferencia(
+    id: string,
+    payload?: ConfirmarTransferenciaEstoquePayload,
+  ): Promise<TransferenciaEstoqueDto> {
+    return api
+      .post<TransferenciaEstoqueDto>(`/estoque/transferencias/${id}/confirmar`, payload ?? {})
+      .then((r) => r.data);
+  },
+
+  cancelarTransferencia(id: string): Promise<TransferenciaEstoqueDto> {
+    return api
+      .post<TransferenciaEstoqueDto>(`/estoque/transferencias/${id}/cancelar`)
+      .then((r) => r.data);
+  },
+
+  obterProdutoPorCodigo(valor: string): Promise<ProdutoPorCodigoDto> {
+    return api
+      .get<ProdutoPorCodigoDto>('/estoque/produtos/por-codigo', { params: { valor } })
+      .then((r) => r.data);
+  },
+
+  lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto> {
+    return api
+      .post<LeituraPesoDto>('/estoque/dispositivos/leitura-peso', { dispositivoId })
+      .then((r) => r.data);
   },
 };

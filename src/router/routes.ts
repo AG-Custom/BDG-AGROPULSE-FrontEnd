@@ -444,6 +444,35 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'estoque/transferencias',
+        name: 'estoque-transferencias',
+        component: () => import('pages/estoque/TransferenciasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueTransferencias',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/transferencias/nova',
+        name: 'estoque-transferencia-nova',
+        component: () => import('pages/estoque/TransferenciaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueTransferenciaNova',
+          breadcrumbPais: ['navegacao.estoqueTransferencias'],
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
+        path: 'estoque/transferencias/:id',
+        name: 'estoque-transferencia-detalhe',
+        component: () => import('pages/estoque/TransferenciaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueTransferenciaDetalhe',
+          breadcrumbPais: ['navegacao.estoqueTransferencias'],
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
         path: 'pedidos-venda',
         name: 'pedidos-venda',
         component: () => import('pages/pedidos-venda/PedidosVendaListPage.vue'),

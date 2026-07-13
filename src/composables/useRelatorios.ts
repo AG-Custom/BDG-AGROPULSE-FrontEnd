@@ -6,12 +6,15 @@ import type {
   ComissoesRepasseParams,
   CurvaAbcLucratividadeItemDto,
   CurvaAbcLucratividadeParams,
+  GiroEstoqueItemDto,
+  GiroEstoqueParams,
 } from 'types/dtos/relatorio.dto';
 import { ref } from 'vue';
 
 export function useRelatorios() {
   const curvaAbc = ref<CurvaAbcLucratividadeItemDto[]>([]);
   const comissoes = ref<ComissaoRepasseItemDto[]>([]);
+  const giroEstoque = ref<GiroEstoqueItemDto[]>([]);
   const carregando = ref(false);
   const { erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
@@ -40,11 +43,25 @@ export function useRelatorios() {
     }
   }
 
+  async function carregarGiroEstoque(params?: GiroEstoqueParams): Promise<void> {
+    carregando.value = true;
+
+    try {
+      giroEstoque.value = await relatorioService.giroEstoque(params);
+    } catch (e) {
+      erro(mensagem(e));
+    } finally {
+      carregando.value = false;
+    }
+  }
+
   return {
     curvaAbc,
     comissoes,
+    giroEstoque,
     carregando,
     carregarCurvaAbc,
     carregarComissoes,
+    carregarGiroEstoque,
   };
 }
