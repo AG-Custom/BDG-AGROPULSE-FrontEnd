@@ -13,6 +13,7 @@
         <agro-logo size="sm" :show-text="false" class="main-layout__logo-mobile" />
         <q-space />
         <div class="main-layout__actions">
+          <notificacoes-menu v-if="podeVerNotificacoes" />
           <empresa-header-link />
           <agro-btn
             outline
@@ -49,18 +50,22 @@
 <script setup lang="ts">
 import AppSidebar from 'components/layout/AppSidebar.vue';
 import EmpresaHeaderLink from 'components/layout/EmpresaHeaderLink.vue';
+import NotificacoesMenu from 'components/layout/NotificacoesMenu.vue';
 import UnidadeSwitcher from 'components/layout/UnidadeSwitcher.vue';
 import AgroLogo from 'components/shared/AgroLogo.vue';
 import { useAuth } from 'composables/useAuth';
+import { Permissoes } from 'constants/permissoes';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const drawer = ref(true);
 const router = useRouter();
-const { sair: sairAuth, usuario, unidadeId } = useAuth();
+const { sair: sairAuth, usuario, unidadeId, possuiPermissao } = useAuth();
 
 const nomeUsuario = computed(() => usuario.value?.nome ?? '');
-
+const podeVerNotificacoes = computed(() =>
+  possuiPermissao(Permissoes.Notificacoes.Visualizar),
+);
 async function sair(): Promise<void> {
   await sairAuth();
   await router.push({ name: 'login' });

@@ -189,3 +189,17 @@ export function justificativaAjuste(val: string): true | string {
 
   return true;
 }
+
+export function percentualZeroACem(val: string): true | string {
+  if (!val || !val.trim()) {
+    return true;
+  }
+
+  const numero = Number(val.replace(',', '.'));
+
+  if (Number.isNaN(numero)) {
+    return 'Informe um número válido';
+  }
+
+  return (numero >= 0 && numero <= 100) || 'O percentual deve estar entre 0 e 100';
+}

@@ -1,4 +1,5 @@
 import type {
+  ExportacaoFormatoValor,
   GrupoComercialValor,
   TipoClienteValor,
   TipoEnderecoClienteValor,
@@ -90,6 +91,7 @@ export interface ListarClientesParams {
   ativo?: boolean;
   busca?: string;
   vendedorId?: string;
+  exportar?: ExportacaoFormatoValor;
 }
 
 export interface ClienteFormModel {

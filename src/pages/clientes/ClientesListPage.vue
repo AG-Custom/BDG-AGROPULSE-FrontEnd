@@ -4,14 +4,32 @@
       titulo="Clientes"
       subtitulo="Gerencie os clientes cadastrados na sua empresa."
     >
-      <agro-btn
-        color="primary"
-        unelevated
-        icon="add"
-        label="Novo cliente"
-        descricao="Cadastrar um novo cliente"
-        :to="{ name: 'cliente-novo' }"
-      />
+      <div class="clientes-list__acoes-header">
+        <agro-btn
+          flat
+          icon="table_view"
+          label="Excel"
+          descricao="Exportar listagem para Excel"
+          :loading="exportando"
+          @click="exportarLista('excel')"
+        />
+        <agro-btn
+          flat
+          icon="picture_as_pdf"
+          label="PDF"
+          descricao="Exportar listagem para PDF"
+          :loading="exportando"
+          @click="exportarLista('pdf')"
+        />
+        <agro-btn
+          color="primary"
+          unelevated
+          icon="add"
+          label="Novo cliente"
+          descricao="Cadastrar um novo cliente"
+          :to="{ name: 'cliente-novo' }"
+        />
+      </div>
     </app-page-header>
 
     <section class="agro-section">
@@ -40,6 +58,20 @@
             map-options
             class="clientes-list__status"
             :options="opcoesStatus"
+          />
+
+          <q-select
+            v-if="!ehVendedor"
+            v-model="filtroVendedor"
+            outlined
+            dense
+            label="Vendedor"
+            emit-value
+            map-options
+            clearable
+            class="clientes-list__vendedor"
+            :options="vendedorOpcoes"
+            :loading="carregandoUsuarios"
           />
         </div>
 
@@ -160,9 +192,18 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { GrupoComercialOpcoes, TipoClienteOpcoes } from 'constants/enums';
-import type { GrupoComercialValor, TipoClienteValor } from 'constants/enums';
 import { useClientes } from 'composables/useClientes';
+import { usePerfilAtual } from 'composables/usePerfilAtual';
+import { useUsuarios } from 'composables/useUsuarios';
+import {
+  GrupoComercialOpcoes,
+  PerfilUsuario,
+  TipoClienteOpcoes,
+  UsuarioStatus,
+  type ExportacaoFormatoValor,
+  type GrupoComercialValor,
+  type TipoClienteValor,
+} from 'constants/enums';
 import type { ClienteResumoDto, ListarClientesParams } from 'types/dtos/cliente.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -172,20 +213,46 @@ const {
   carregando,
   inativando,
   ativando,
+  exportando,
   carregar,
   solicitarInativacao,
   solicitarAtivacao,
+  exportar,
   rotuloDocumento,
 } = useClientes();
 
+const { ehVendedor } = usePerfilAtual();
+const {
+  usuarios,
+  carregando: carregandoUsuarios,
+  carregar: carregarUsuarios,
+  nomeCompleto,
+} = useUsuarios();
+
 const busca = ref('');
 const filtroAtivo = ref<'todos' | 'ativos' | 'inativos'>('ativos');
+const filtroVendedor = ref<string | null>(null);
 
 const opcoesStatus = [
   { label: 'Ativos', value: 'ativos' },
   { label: 'Inativos', value: 'inativos' },
   { label: 'Todos', value: 'todos' },
 ];
+
+const vendedorOpcoes = computed(() =>
+  usuarios.value
+    .filter(
+      (usuario) =>
+        usuario.status === UsuarioStatus.Ativo &&
+        (usuario.perfil === PerfilUsuario.Vendedor ||
+          usuario.perfil === PerfilUsuario.Gerente ||
+          usuario.perfil === PerfilUsuario.Diretor),
+    )
+    .map((usuario) => ({
+      label: nomeCompleto(usuario),
+      value: usuario.id,
+    })),
+);
 
 const colunas: QTableColumn<ClienteResumoDto>[] = [
   { name: 'documento', label: 'Documento', field: 'documento', align: 'left', sortable: true },
@@ -219,6 +286,10 @@ function montarParams(): ListarClientesParams {
     params.busca = termo;
   }
 
+  if (!ehVendedor.value && filtroVendedor.value) {
+    params.vendedorId = filtroVendedor.value;
+  }
+
   return params;
 }
 
@@ -232,6 +303,10 @@ function rotuloGrupoComercial(grupo: GrupoComercialValor): string {
 
 async function recarregar(): Promise<void> {
   await carregar(montarParams());
+}
+
+async function exportarLista(formato: ExportacaoFormatoValor): Promise<void> {
+  await exportar(formato, montarParams());
 }
 
 async function inativarCliente(cliente: ClienteResumoDto): Promise<void> {
@@ -252,7 +327,7 @@ async function ativarCliente(cliente: ClienteResumoDto): Promise<void> {
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-watch([busca, filtroAtivo], () => {
+watch([busca, filtroAtivo, filtroVendedor], () => {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     void recarregar();
@@ -260,17 +335,28 @@ watch([busca, filtroAtivo], () => {
 });
 
 onMounted(() => {
+  if (!ehVendedor.value) {
+    void carregarUsuarios();
+  }
+
   void recarregar();
 });
 </script>
 
 <style scoped>
+.clientes-list__acoes-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
 .clientes-list__busca {
   flex: 1;
   min-width: 240px;
 }
 
-.clientes-list__status {
+.clientes-list__status,
+.clientes-list__vendedor {
   min-width: 160px;
 }
 

@@ -5,12 +5,15 @@ import { fornecedorService } from 'services/fornecedor.service';
 import type {
   AvaliacaoFornecedorDto,
   AvaliacaoFornecedorFormModel,
+  FornecedorAvaliacoesResumoDto,
 } from 'types/dtos/fornecedor.dto';
 import { formParaAvaliacaoPayload } from 'utils/mappers/fornecedor.mapper';
 import { ref } from 'vue';
 
 export function useFornecedorAvaliacoes(fornecedorId: () => string) {
   const avaliacoes = ref<AvaliacaoFornecedorDto[]>([]);
+  const resumo = ref<FornecedorAvaliacoesResumoDto | null>(null);
+  const carregandoResumo = ref(false);
   const salvando = ref(false);
   const removendo = ref(false);
   const { sucesso, erro } = useNotificacao();
@@ -20,8 +23,22 @@ export function useFornecedorAvaliacoes(fornecedorId: () => string) {
     avaliacoes.value = lista;
   }
 
+  async function carregarResumo(): Promise<void> {
+    carregandoResumo.value = true;
+
+    try {
+      resumo.value = await fornecedorService.obterResumoAvaliacoes(fornecedorId());
+    } catch (e) {
+      erro(mensagem(e));
+      resumo.value = null;
+    } finally {
+      carregandoResumo.value = false;
+    }
+  }
+
   async function recarregar(): Promise<void> {
     avaliacoes.value = await fornecedorService.listarAvaliacoes(fornecedorId());
+    await carregarResumo();
   }
 
   async function adicionar(form: AvaliacaoFornecedorFormModel): Promise<boolean> {
@@ -71,7 +88,7 @@ export function useFornecedorAvaliacoes(fornecedorId: () => string) {
 
     try {
       await fornecedorService.removerAvaliacao(fornecedorId(), avaliacaoId);
-      avaliacoes.value = avaliacoes.value.filter((item) => item.id !== avaliacaoId);
+      await recarregar();
       sucesso('Avaliação removida com sucesso.');
       return true;
     } catch (e) {
@@ -99,9 +116,12 @@ export function useFornecedorAvaliacoes(fornecedorId: () => string) {
 
   return {
     avaliacoes,
+    resumo,
+    carregandoResumo,
     salvando,
     removendo,
     definirAvaliacoes,
+    carregarResumo,
     adicionar,
     editar,
     solicitarRemocao,

@@ -4,14 +4,32 @@
       titulo="Fornecedores"
       subtitulo="Gerencie os fornecedores cadastrados na sua empresa."
     >
-      <agro-btn
-        color="primary"
-        unelevated
-        icon="add"
-        label="Novo fornecedor"
-        descricao="Cadastrar um novo fornecedor"
-        :to="{ name: 'fornecedor-novo' }"
-      />
+      <div class="fornecedores-list__acoes-header">
+        <agro-btn
+          flat
+          icon="table_view"
+          label="Excel"
+          descricao="Exportar listagem para Excel"
+          :loading="exportando"
+          @click="exportarLista('excel')"
+        />
+        <agro-btn
+          flat
+          icon="picture_as_pdf"
+          label="PDF"
+          descricao="Exportar listagem para PDF"
+          :loading="exportando"
+          @click="exportarLista('pdf')"
+        />
+        <agro-btn
+          color="primary"
+          unelevated
+          icon="add"
+          label="Novo fornecedor"
+          descricao="Cadastrar um novo fornecedor"
+          :to="{ name: 'fornecedor-novo' }"
+        />
+      </div>
     </app-page-header>
 
     <section class="agro-section">
@@ -143,15 +161,26 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { TipoPessoaFornecedorOpcoes } from 'constants/enums';
+import {
+  TipoPessoaFornecedorOpcoes,
+  type ExportacaoFormatoValor,
+  type TipoPessoaFornecedorValor,
+} from 'constants/enums';
 import { useFornecedores } from 'composables/useFornecedores';
 import type { FornecedorResumoDto, ListarFornecedoresParams } from 'types/dtos/fornecedor.dto';
-import type { TipoPessoaFornecedorValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
 
-const { fornecedores, carregando, inativando, carregar, solicitarInativacao, rotuloDocumento } =
-  useFornecedores();
+const {
+  fornecedores,
+  carregando,
+  inativando,
+  exportando,
+  carregar,
+  solicitarInativacao,
+  exportar,
+  rotuloDocumento,
+} = useFornecedores();
 
 const busca = ref('');
 const filtroAtivo = ref<'todos' | 'ativos' | 'inativos'>('ativos');
@@ -212,6 +241,10 @@ async function inativarFornecedor(fornecedor: FornecedorResumoDto): Promise<void
   }
 }
 
+async function exportarLista(formato: ExportacaoFormatoValor): Promise<void> {
+  await exportar(formato, montarParams());
+}
+
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch([busca, filtroAtivo], () => {
@@ -227,6 +260,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.fornecedores-list__acoes-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
 .fornecedores-list__busca {
   flex: 1;
   min-width: 240px;

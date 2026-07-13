@@ -7,7 +7,12 @@ import type {
   FornecedorResumoDto,
   ListarFornecedoresParams,
 } from 'types/dtos/fornecedor.dto';
+import {
+  ExportacaoFormato,
+  type ExportacaoFormatoValor,
+} from 'constants/enums';
 import { formParaCriarPayload, formParaEditarPayload } from 'utils/mappers/fornecedor.mapper';
+import { baixarArquivo } from 'utils/download';
 import { formatarDocumento } from 'utils/formatters';
 import { ref } from 'vue';
 
@@ -16,6 +21,7 @@ export function useFornecedores() {
   const carregando = ref(false);
   const salvando = ref(false);
   const inativando = ref(false);
+  const exportando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -92,6 +98,26 @@ export function useFornecedores() {
     return sucessoInativacao;
   }
 
+  async function exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarFornecedoresParams, 'exportar'>,
+  ): Promise<boolean> {
+    exportando.value = true;
+
+    try {
+      const blob = await fornecedorService.exportar(formato, params);
+      const extensao = formato === ExportacaoFormato.Excel ? 'xlsx' : 'pdf';
+      baixarArquivo(blob, `fornecedores.${extensao}`);
+      sucesso('Exportação concluída.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      exportando.value = false;
+    }
+  }
+
   function rotuloDocumento(fornecedor: FornecedorResumoDto): string {
     return formatarDocumento(fornecedor.tipoPessoa, fornecedor.documento);
   }
@@ -101,10 +127,12 @@ export function useFornecedores() {
     carregando,
     salvando,
     inativando,
+    exportando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
+    exportar,
     rotuloDocumento,
   };
 }

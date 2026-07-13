@@ -1,5 +1,5 @@
 import { api } from 'services/api';
-
+import type { ExportacaoFormatoValor } from 'constants/enums';
 import type {
   ClienteContatoDto,
   ClienteContatoPayload,
@@ -15,6 +15,18 @@ import type {
 export const clienteService = {
   listar(params?: ListarClientesParams): Promise<ClienteResumoDto[]> {
     return api.get<ClienteResumoDto[]>('/clientes', { params }).then((r) => r.data);
+  },
+
+  exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarClientesParams, 'exportar'>,
+  ): Promise<Blob> {
+    return api
+      .get<Blob>('/clientes', {
+        params: { ...params, exportar: formato },
+        responseType: 'blob',
+      })
+      .then((r) => r.data);
   },
 
   obter(clienteId: string): Promise<ClienteDto> {

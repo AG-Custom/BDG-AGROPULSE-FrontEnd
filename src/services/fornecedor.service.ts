@@ -1,5 +1,5 @@
 import { api } from 'services/api';
-
+import type { ExportacaoFormatoValor } from 'constants/enums';
 import type {
   AvaliacaoFornecedorDto,
   AvaliacaoFornecedorPayload,
@@ -7,6 +7,7 @@ import type {
   ContatoFornecedorPayload,
   CriarFornecedorPayload,
   EditarFornecedorPayload,
+  FornecedorAvaliacoesResumoDto,
   FornecedorDto,
   FornecedorResumoDto,
   ListarFornecedoresParams,
@@ -19,8 +20,26 @@ export const fornecedorService = {
       .then((r) => r.data);
   },
 
+  exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarFornecedoresParams, 'exportar'>,
+  ): Promise<Blob> {
+    return api
+      .get<Blob>('/fornecedores', {
+        params: { ...params, exportar: formato },
+        responseType: 'blob',
+      })
+      .then((r) => r.data);
+  },
+
   obter(fornecedorId: string): Promise<FornecedorDto> {
     return api.get<FornecedorDto>(`/fornecedores/${fornecedorId}`).then((r) => r.data);
+  },
+
+  obterResumoAvaliacoes(fornecedorId: string): Promise<FornecedorAvaliacoesResumoDto> {
+    return api
+      .get<FornecedorAvaliacoesResumoDto>(`/fornecedores/${fornecedorId}/resumo`)
+      .then((r) => r.data);
   },
 
   criar(payload: CriarFornecedorPayload): Promise<FornecedorDto> {

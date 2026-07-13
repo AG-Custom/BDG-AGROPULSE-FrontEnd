@@ -384,3 +384,119 @@ export const AtalhoPeriodoEstoqueOpcoes = [
   { label: 'Últimos 7 dias', value: AtalhoPeriodoEstoque.SeteDias },
   { label: 'Últimos 30 dias', value: AtalhoPeriodoEstoque.TrintaDias },
 ];
+
+export const FormaPagamento = {
+  Dinheiro: 'Dinheiro',
+  Pix: 'Pix',
+  Boleto: 'Boleto',
+  Cartao: 'Cartao',
+  Transferencia: 'Transferencia',
+  Outros: 'Outros',
+} as const;
+
+export type FormaPagamentoValor = (typeof FormaPagamento)[keyof typeof FormaPagamento];
+
+export const FormaPagamentoOpcoes = [
+  { label: 'Dinheiro', value: FormaPagamento.Dinheiro },
+  { label: 'PIX', value: FormaPagamento.Pix },
+  { label: 'Boleto', value: FormaPagamento.Boleto },
+  { label: 'Cartão', value: FormaPagamento.Cartao },
+  { label: 'Transferência', value: FormaPagamento.Transferencia },
+  { label: 'Outros', value: FormaPagamento.Outros },
+];
+
+export const PedidoVendaStatus = {
+  Orcamento: 'Orcamento',
+  Aguardando: 'Aguardando',
+  Aprovado: 'Aprovado',
+  Faturado: 'Faturado',
+  Recusado: 'Recusado',
+  Expirado: 'Expirado',
+} as const;
+
+export type PedidoVendaStatusValor =
+  (typeof PedidoVendaStatus)[keyof typeof PedidoVendaStatus];
+
+export const PedidoVendaStatusOpcoes = [
+  { label: 'Orçamento', value: PedidoVendaStatus.Orcamento },
+  { label: 'Aguardando', value: PedidoVendaStatus.Aguardando },
+  { label: 'Aprovado', value: PedidoVendaStatus.Aprovado },
+  { label: 'Faturado', value: PedidoVendaStatus.Faturado },
+  { label: 'Recusado', value: PedidoVendaStatus.Recusado },
+  { label: 'Expirado', value: PedidoVendaStatus.Expirado },
+];
+
+export const ContaReceberStatus = {
+  Aberta: 'Aberta',
+  Paga: 'Paga',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type ContaReceberStatusValor =
+  (typeof ContaReceberStatus)[keyof typeof ContaReceberStatus];
+
+export const ContaReceberStatusOpcoes = [
+  { label: 'Aberta', value: ContaReceberStatus.Aberta },
+  { label: 'Paga', value: ContaReceberStatus.Paga },
+  { label: 'Cancelada', value: ContaReceberStatus.Cancelada },
+];
+
+export const TravaAprovacaoTipo = {
+  MargemMinima: 'MargemMinima',
+  LimiteCredito: 'LimiteCredito',
+  EstoqueInsuficiente: 'EstoqueInsuficiente',
+  AtrasoCliente: 'AtrasoCliente',
+} as const;
+
+export type TravaAprovacaoTipoValor =
+  (typeof TravaAprovacaoTipo)[keyof typeof TravaAprovacaoTipo];
+
+export const TravaAprovacaoTipoOpcoes = [
+  { label: 'Margem mínima', value: TravaAprovacaoTipo.MargemMinima },
+  { label: 'Limite de crédito', value: TravaAprovacaoTipo.LimiteCredito },
+  { label: 'Estoque insuficiente', value: TravaAprovacaoTipo.EstoqueInsuficiente },
+  { label: 'Atraso do cliente', value: TravaAprovacaoTipo.AtrasoCliente },
+];
+
+export const NotificacaoTipo = {
+  PedidoRetido: 'PedidoRetido',
+  PedidoAprovado: 'PedidoAprovado',
+  PedidoRecusado: 'PedidoRecusado',
+  PedidoExpirado: 'PedidoExpirado',
+} as const;
+
+export type NotificacaoTipoValor =
+  (typeof NotificacaoTipo)[keyof typeof NotificacaoTipo];
+
+export const NotificacaoTipoOpcoes = [
+  { label: 'Pedido retido', value: NotificacaoTipo.PedidoRetido },
+  { label: 'Pedido aprovado', value: NotificacaoTipo.PedidoAprovado },
+  { label: 'Pedido recusado', value: NotificacaoTipo.PedidoRecusado },
+  { label: 'Pedido expirado', value: NotificacaoTipo.PedidoExpirado },
+];
+
+export const NotificacaoPrioridade = {
+  Baixa: 'Baixa',
+  Media: 'Media',
+  Alta: 'Alta',
+} as const;
+
+export type NotificacaoPrioridadeValor =
+  (typeof NotificacaoPrioridade)[keyof typeof NotificacaoPrioridade];
+
+export const NotificacaoPrioridadeOpcoes = [
+  { label: 'Baixa', value: NotificacaoPrioridade.Baixa },
+  { label: 'Média', value: NotificacaoPrioridade.Media },
+  { label: 'Alta', value: NotificacaoPrioridade.Alta },
+];
+
+export const ExportacaoPedidoFormato = {
+  Excel: 'excel',
+  Pdf: 'pdf',
+} as const;
+
+export type ExportacaoPedidoFormatoValor =
+  (typeof ExportacaoPedidoFormato)[keyof typeof ExportacaoPedidoFormato];
+
+export const ExportacaoFormato = ExportacaoPedidoFormato;
+export type ExportacaoFormatoValor = ExportacaoPedidoFormatoValor;

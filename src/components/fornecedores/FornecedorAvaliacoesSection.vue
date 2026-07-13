@@ -15,6 +15,11 @@
       </div>
     </template>
 
+    <fornecedor-avaliacoes-resumo-card
+      :resumo="resumo"
+      :carregando="carregandoResumo"
+    />
+
     <empty-state
       v-if="avaliacoes.length === 0"
       titulo="Nenhuma avaliação registrada"
@@ -137,6 +142,7 @@
 
 <script setup lang="ts">
 import AvaliacaoFornecedorFormulario from 'components/fornecedores/AvaliacaoFornecedorFormulario.vue';
+import FornecedorAvaliacoesResumoCard from 'components/fornecedores/FornecedorAvaliacoesResumoCard.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFornecedorAvaliacoes } from 'composables/useFornecedorAvaliacoes';
@@ -147,7 +153,7 @@ import {
   avaliacaoDtoParaForm,
   criarAvaliacaoFormVazia,
 } from 'utils/mappers/fornecedor.mapper';
-import { computed, ref, toRef, watch } from 'vue';
+import { computed, onMounted, ref, toRef, watch } from 'vue';
 
 const props = defineProps<{
   fornecedorId: string;
@@ -157,9 +163,12 @@ const props = defineProps<{
 
 const {
   avaliacoes,
+  resumo,
+  carregandoResumo,
   salvando,
   removendo,
   definirAvaliacoes,
+  carregarResumo,
   adicionar,
   editar,
   solicitarRemocao,
@@ -251,6 +260,10 @@ async function salvarAvaliacao(): Promise<void> {
     fecharDialog();
   }
 }
+
+onMounted(() => {
+  void carregarResumo();
+});
 </script>
 
 <style scoped>

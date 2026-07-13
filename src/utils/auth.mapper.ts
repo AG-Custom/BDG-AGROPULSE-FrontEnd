@@ -67,6 +67,7 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
+    perfil: usuario.perfil ?? null,
     permissoes: [
       Permissoes.Dashboard.Visualizar,
       Permissoes.Unidades.Visualizar,
@@ -80,6 +81,10 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.UnidadesMedida.Visualizar,
       Permissoes.TabelasPreco.Visualizar,
       Permissoes.Estoque.Visualizar,
+      Permissoes.PedidosVenda.Visualizar,
+      Permissoes.Aprovacoes.Visualizar,
+      Permissoes.Notificacoes.Visualizar,
+      Permissoes.FormasPagamentoConfig.Visualizar,
     ],
   };
 }

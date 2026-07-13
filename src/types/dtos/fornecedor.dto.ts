@@ -1,4 +1,7 @@
-import type { TipoPessoaFornecedorValor } from 'constants/enums';
+import type {
+  ExportacaoFormatoValor,
+  TipoPessoaFornecedorValor,
+} from 'constants/enums';
 
 import type { EnderecoDto } from 'types/dtos/unidade.dto';
 
@@ -28,6 +31,29 @@ export interface AvaliacaoFornecedorDto {
   notaQualidade: number;
   observacao: string | null;
   createdAt: string;
+}
+
+export interface FornecedorAvaliacoesMediasDto {
+  preco: number;
+  prazo: number;
+  qualidade: number;
+  geral: number;
+}
+
+export interface FornecedorAvaliacaoHistoricoDto {
+  id: string;
+  createdAt: string;
+  notaPreco: number;
+  notaPrazo: number;
+  notaQualidade: number;
+  media: number;
+  observacao: string | null;
+}
+
+export interface FornecedorAvaliacoesResumoDto {
+  totalAvaliacoes: number;
+  medias: FornecedorAvaliacoesMediasDto;
+  historico: FornecedorAvaliacaoHistoricoDto[];
 }
 
 export interface FornecedorDto extends FornecedorResumoDto {
@@ -74,6 +100,7 @@ export interface AvaliacaoFornecedorPayload {
 export interface ListarFornecedoresParams {
   ativo?: boolean;
   busca?: string;
+  exportar?: ExportacaoFormatoValor;
 }
 
 export interface FornecedorFormModel {

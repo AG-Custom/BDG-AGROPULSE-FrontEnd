@@ -164,10 +164,11 @@
           label="Vendedor"
           emit-value
           map-options
-          clearable
-          :options="usuarioOpcoes"
+          :clearable="!ehVendedor && !somenteLeitura"
+          :options="vendedorOpcoes"
           :loading="carregandoUsuarios"
-          :readonly="somenteLeitura"
+          :readonly="somenteLeitura || ehVendedor"
+          :hint="ehVendedor ? 'Carteira vinculada ao seu usuário' : undefined"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -189,9 +190,11 @@
 </template>
 
 <script setup lang="ts">
+import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   GrupoComercialOpcoes,
+  PerfilUsuario,
   TipoClienteOpcoes,
   TipoPessoaCliente,
   TipoPessoaClienteOpcoes,
@@ -212,6 +215,7 @@ const props = defineProps<{
 const formulario = defineModel<ClienteFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+const { ehVendedor, usuario } = usePerfilAtual();
 const {
   usuarios,
   carregando: carregandoUsuarios,
@@ -261,12 +265,45 @@ const documentoExibicao = computed({
 
 const usuarioOpcoes = computed(() =>
   usuarios.value
-    .filter((usuario) => usuario.status === UsuarioStatus.Ativo)
-    .map((usuario) => ({
-      label: nomeCompleto(usuario),
-      value: usuario.id,
+    .filter((item) => item.status === UsuarioStatus.Ativo)
+    .map((item) => ({
+      label: nomeCompleto(item),
+      value: item.id,
     })),
 );
+
+const vendedorOpcoes = computed(() => {
+  if (ehVendedor.value && usuario.value) {
+    return [
+      {
+        label: usuario.value.nome,
+        value: usuario.value.id,
+      },
+    ];
+  }
+
+  return usuarios.value
+    .filter(
+      (item) =>
+        item.status === UsuarioStatus.Ativo &&
+        (item.perfil === PerfilUsuario.Vendedor ||
+          item.perfil === PerfilUsuario.Gerente ||
+          item.perfil === PerfilUsuario.Diretor ||
+          item.id === formulario.value.vendedorUsuarioId),
+    )
+    .map((item) => ({
+      label: nomeCompleto(item),
+      value: item.id,
+    }));
+});
+
+function aplicarCarteiraVendedor(): void {
+  if (!ehVendedor.value || !usuario.value || props.somenteLeitura) {
+    return;
+  }
+
+  formulario.value.vendedorUsuarioId = usuario.value.id;
+}
 
 watch(
   () => formulario.value.tipoPessoa,
@@ -280,12 +317,18 @@ watch(
   },
 );
 
+watch(ehVendedor, () => {
+  aplicarCarteiraVendedor();
+});
+
 async function validar(): Promise<boolean> {
+  aplicarCarteiraVendedor();
   return (await formRef.value?.validate()) ?? false;
 }
 
 onMounted(() => {
   void carregarUsuarios();
+  aplicarCarteiraVendedor();
 });
 
 defineExpose({ validar });

@@ -184,6 +184,53 @@
       </q-list>
     </div>
 
+    <div v-if="podeAcessarVendas" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Vendas</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          v-if="podeGerenciarPedidosVenda"
+          clickable
+          :to="{ name: 'pedidos-venda' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="shopping_cart" size="20px" />
+          </q-item-section>
+          <q-item-section>Pedidos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarAprovacoes"
+          clickable
+          :to="{ name: 'aprovacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="rule" size="20px" />
+          </q-item-section>
+          <q-item-section>Aprovações</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarFormasPagamentoConfig" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Financeiro</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'formas-pagamento-config' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="payments" size="20px" />
+          </q-item-section>
+          <q-item-section>Formas de pagamento</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
     <div v-if="podeAcessarAdministracao" class="app-sidebar__section">
       <div class="text-overline app-sidebar__label">Administração</div>
       <q-list padding class="app-sidebar__list">
@@ -253,6 +300,22 @@ const podeGerenciarTabelasPreco = computed(() =>
 
 const podeGerenciarEstoque = computed(() =>
   possuiPermissao(Permissoes.Estoque.Visualizar),
+);
+
+const podeGerenciarPedidosVenda = computed(() =>
+  possuiPermissao(Permissoes.PedidosVenda.Visualizar),
+);
+
+const podeGerenciarAprovacoes = computed(() =>
+  possuiPermissao(Permissoes.Aprovacoes.Visualizar),
+);
+
+const podeGerenciarFormasPagamentoConfig = computed(() =>
+  possuiPermissao(Permissoes.FormasPagamentoConfig.Visualizar),
+);
+
+const podeAcessarVendas = computed(
+  () => podeGerenciarPedidosVenda.value || podeGerenciarAprovacoes.value,
 );
 
 const podeAcessarProdutos = computed(

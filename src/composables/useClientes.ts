@@ -1,5 +1,9 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import {
+  ExportacaoFormato,
+  type ExportacaoFormatoValor,
+} from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { clienteService } from 'services/cliente.service';
 import type {
@@ -7,6 +11,7 @@ import type {
   ClienteResumoDto,
   ListarClientesParams,
 } from 'types/dtos/cliente.dto';
+import { baixarArquivo } from 'utils/download';
 import { formParaCriarPayload, formParaEditarPayload } from 'utils/mappers/cliente.mapper';
 import { formatarDocumento } from 'utils/formatters';
 import { ref } from 'vue';
@@ -17,6 +22,7 @@ export function useClientes() {
   const salvando = ref(false);
   const inativando = ref(false);
   const ativando = ref(false);
+  const exportando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -122,6 +128,26 @@ export function useClientes() {
     return ativar(cliente.id);
   }
 
+  async function exportar(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<ListarClientesParams, 'exportar'>,
+  ): Promise<boolean> {
+    exportando.value = true;
+
+    try {
+      const blob = await clienteService.exportar(formato, params);
+      const extensao = formato === ExportacaoFormato.Excel ? 'xlsx' : 'pdf';
+      baixarArquivo(blob, `clientes.${extensao}`);
+      sucesso('Exportação concluída.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      exportando.value = false;
+    }
+  }
+
   function rotuloDocumento(cliente: ClienteResumoDto): string {
     return formatarDocumento(cliente.tipoPessoa, cliente.documento);
   }
@@ -132,11 +158,13 @@ export function useClientes() {
     salvando,
     inativando,
     ativando,
+    exportando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
     solicitarAtivacao,
+    exportar,
     rotuloDocumento,
   };
 }

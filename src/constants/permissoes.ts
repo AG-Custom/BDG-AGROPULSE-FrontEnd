@@ -35,4 +35,16 @@ export const Permissoes = {
   Estoque: {
     Visualizar: 'estoque.visualizar',
   },
+  PedidosVenda: {
+    Visualizar: 'pedidos-venda.visualizar',
+  },
+  Aprovacoes: {
+    Visualizar: 'aprovacoes.visualizar',
+  },
+  Notificacoes: {
+    Visualizar: 'notificacoes.visualizar',
+  },
+  FormasPagamentoConfig: {
+    Visualizar: 'formas-pagamento-config.visualizar',
+  },
 } as const;

@@ -100,6 +100,13 @@ export function formatarDecimal(valor: number, casas = 2): string {
   }).format(valor);
 }
 
+export function formatarMoeda(valor: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(valor);
+}
+
 export function gerarCodigoUnidade(tipo: string, nome: string): string {
   const tipoSlug = slugify(tipo);
   const nomeSlug = slugify(nome);

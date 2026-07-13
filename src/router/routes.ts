@@ -444,6 +444,83 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'pedidos-venda',
+        name: 'pedidos-venda',
+        component: () => import('pages/pedidos-venda/PedidosVendaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidosVenda',
+          permissao: Permissoes.PedidosVenda.Visualizar,
+        },
+      },
+      {
+        path: 'pedidos-venda/novo',
+        name: 'pedido-venda-novo',
+        component: () => import('pages/pedidos-venda/PedidoVendaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidoVendaNovo',
+          breadcrumbPais: ['navegacao.pedidosVenda'],
+          permissao: Permissoes.PedidosVenda.Visualizar,
+        },
+      },
+      {
+        path: 'pedidos-venda/:id/editar',
+        name: 'pedido-venda-editar',
+        component: () => import('pages/pedidos-venda/PedidoVendaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidoVendaEditar',
+          breadcrumbPais: ['navegacao.pedidosVenda'],
+          permissao: Permissoes.PedidosVenda.Visualizar,
+        },
+      },
+      {
+        path: 'pedidos-venda/:id',
+        name: 'pedido-venda-detalhe',
+        component: () => import('pages/pedidos-venda/PedidoVendaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.pedidoVendaDetalhe',
+          breadcrumbPais: ['navegacao.pedidosVenda'],
+          permissao: Permissoes.PedidosVenda.Visualizar,
+        },
+      },
+      {
+        path: 'aprovacoes',
+        name: 'aprovacoes',
+        component: () => import('pages/aprovacoes/AprovacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.aprovacoes',
+          permissao: Permissoes.Aprovacoes.Visualizar,
+        },
+      },
+      {
+        path: 'formas-pagamento-config',
+        name: 'formas-pagamento-config',
+        component: () => import('pages/financeiro/FormasPagamentoConfigListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.formasPagamentoConfig',
+          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+        },
+      },
+      {
+        path: 'formas-pagamento-config/novo',
+        name: 'forma-pagamento-config-nova',
+        component: () => import('pages/financeiro/FormaPagamentoConfigFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.formaPagamentoConfigNova',
+          breadcrumbPais: ['navegacao.formasPagamentoConfig'],
+          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+        },
+      },
+      {
+        path: 'formas-pagamento-config/:id/editar',
+        name: 'forma-pagamento-config-editar',
+        component: () => import('pages/financeiro/FormaPagamentoConfigFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.formaPagamentoConfigEditar',
+          breadcrumbPais: ['navegacao.formasPagamentoConfig'],
+          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+        },
+      },
+      {
         path: 'usuarios',
         name: 'usuarios',
         component: () => import('pages/usuarios/UsuariosListPage.vue'),

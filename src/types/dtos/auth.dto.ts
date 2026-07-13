@@ -1,3 +1,5 @@
+import type { PerfilUsuarioValor } from 'constants/enums';
+
 export interface LoginPayload {
   email: string;
   senha: string;
@@ -25,6 +27,7 @@ export interface AuthUsuarioDto {
   id: string;
   nome: string;
   email: string;
+  perfil?: PerfilUsuarioValor | null;
 }
 
 export interface UnidadeDisponivelDto {
