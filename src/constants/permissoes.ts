@@ -47,6 +47,9 @@ export const Permissoes = {
   FormasPagamentoConfig: {
     Visualizar: 'formas-pagamento-config.visualizar',
   },
+  Financeiro: {
+    Visualizar: 'financeiro.visualizar',
+  },
   Orcamentos: {
     Visualizar: 'orcamentos.visualizar',
   },
@@ -76,6 +79,12 @@ export const Permissoes = {
   },
   Relatorios: {
     Visualizar: 'relatorios.visualizar',
+  },
+  MetasVendedor: {
+    Visualizar: 'metas-vendedor.visualizar',
+  },
+  Representantes: {
+    Visualizar: 'representantes.visualizar',
   },
   PermissoesGranulares: {
     Visualizar: 'permissoes-granulares.visualizar',

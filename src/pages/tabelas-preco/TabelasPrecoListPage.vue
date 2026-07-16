@@ -80,10 +80,17 @@
 
           <template #body-cell-ativo="props">
             <q-td :props="props">
-              <agro-badge
-                :label="props.row.ativo ? 'Ativo' : 'Inativo'"
-                :variant="props.row.ativo ? 'success' : 'default'"
-              />
+              <div class="tabelas-preco-list__status-badges">
+                <agro-badge
+                  :label="props.row.ativo ? 'Ativo' : 'Inativo'"
+                  :variant="props.row.ativo ? 'success' : 'default'"
+                />
+                <agro-badge
+                  v-if="props.row.ehPadrao"
+                  label="Padrão"
+                  variant="accent"
+                />
+              </div>
             </q-td>
           </template>
 
@@ -106,6 +113,17 @@
                 color="primary"
                 descricao="Editar tabela de preço"
                 :to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
+              />
+              <agro-btn
+                v-if="props.row.ativo && !props.row.ehPadrao"
+                flat
+                round
+                dense
+                icon="star"
+                color="primary"
+                descricao="Definir como tabela padrão"
+                :loading="salvando"
+                @click="definirComoPadrao(props.row)"
               />
               <agro-btn
                 v-if="props.row.ativo"
@@ -150,11 +168,13 @@ import { computed, onMounted, ref, watch } from 'vue';
 const {
   tabelas,
   carregando,
+  salvando,
   inativando,
   ativando,
   carregar,
   solicitarInativacao,
   solicitarAtivacao,
+  definirPadrao,
 } = useTabelasPreco();
 
 const busca = ref('');
@@ -219,6 +239,10 @@ async function ativarTabela(tabela: TabelaPrecoResumoDto): Promise<void> {
   await solicitarAtivacao(tabela);
 }
 
+async function definirComoPadrao(tabela: TabelaPrecoResumoDto): Promise<void> {
+  await definirPadrao(tabela.id);
+}
+
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch([busca, filtroAtivo], () => {
@@ -245,5 +269,11 @@ onMounted(() => {
 
 .tabelas-preco-list__acoes {
   white-space: nowrap;
+}
+
+.tabelas-preco-list__status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
 }
 </style>

@@ -15,6 +15,7 @@ export interface OrcamentoResumoDto {
   valorTotal: number;
   status: OrcamentoStatusValor;
   pedidoVendaId: string | null;
+  tabelaPrecoId?: string | null;
   createdAt: string;
 }
 
@@ -27,12 +28,13 @@ export interface OrcamentoDto extends OrcamentoResumoDto {
 export interface OrcamentoItemPayload {
   produtoId: string;
   quantidade: number;
-  precoUnitario: number;
+  precoUnitario?: number | null;
 }
 
 export interface CriarOrcamentoPayload {
   clienteId: string;
   vendedorUsuarioId?: string | null;
+  tabelaPrecoId?: string | null;
   itens: OrcamentoItemPayload[];
   observacao?: string | null;
 }
@@ -59,6 +61,7 @@ export interface OrcamentoItemFormModel {
 export interface OrcamentoFormModel {
   clienteId: string;
   vendedorUsuarioId: string;
+  tabelaPrecoId: string;
   observacao: string;
   itens: OrcamentoItemFormModel[];
 }

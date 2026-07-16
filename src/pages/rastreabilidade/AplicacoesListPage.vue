@@ -13,7 +13,56 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && aplicacoes.length === 0" :colunas="5" />
+        <div class="agro-filter-bar">
+          <q-select
+            v-model="filtros.talhaoId"
+            outlined
+            dense
+            clearable
+            emit-value
+            map-options
+            label="Talhão"
+            class="filtro"
+            :options="talhaoOpcoes"
+          />
+          <q-select
+            v-model="filtros.safraId"
+            outlined
+            dense
+            clearable
+            emit-value
+            map-options
+            label="Safra"
+            class="filtro"
+            :options="safraOpcoes"
+          />
+          <q-input
+            v-model="filtros.dataInicio"
+            outlined
+            dense
+            label="Data início"
+            type="date"
+            class="filtro"
+          />
+          <q-input
+            v-model="filtros.dataFim"
+            outlined
+            dense
+            label="Data fim"
+            type="date"
+            class="filtro"
+          />
+          <agro-btn
+            color="primary"
+            unelevated
+            label="Filtrar"
+            descricao="Aplicar filtros"
+            :loading="carregando"
+            @click="aplicarFiltros"
+          />
+        </div>
+
+        <agro-table-skeleton v-if="carregando && aplicacoes.length === 0" :colunas="6" />
         <empty-state
           v-else-if="!carregando && aplicacoes.length === 0"
           titulo="Nenhuma aplicação"
@@ -52,6 +101,9 @@
               {{ formatarDecimal(props.row.quantidade) }} {{ props.row.unidadeMedida }}
             </q-td>
           </template>
+          <template #body-cell-numeroLote="props">
+            <q-td :props="props">{{ props.row.numeroLote ?? '—' }}</q-td>
+          </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
               <agro-btn
@@ -87,10 +139,11 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useProdutos } from 'composables/useProdutos';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
+import { useSafras } from 'composables/useSafras';
 import type { QTableColumn } from 'quasar';
 import type { AplicacaoInsumoDto } from 'types/dtos/rastreabilidade.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 const {
   aplicacoes,
@@ -102,6 +155,18 @@ const {
   removerAplicacao,
 } = useRastreabilidade();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { safraOpcoes, carregar: carregarSafras } = useSafras();
+
+const filtros = reactive({
+  talhaoId: '' as string | null,
+  safraId: '' as string | null,
+  dataInicio: '',
+  dataFim: '',
+});
+
+const talhaoOpcoes = computed(() =>
+  talhoes.value.map((t) => ({ label: t.nome, value: t.id })),
+);
 
 const mapaTalhoes = computed(() => {
   const m = new Map<string, string>();
@@ -118,6 +183,7 @@ const colunas: QTableColumn<AplicacaoInsumoDto>[] = [
   { name: 'dataAplicacao', label: 'Data', field: 'dataAplicacao', align: 'left', sortable: true },
   { name: 'talhaoId', label: 'Talhão', field: 'talhaoId', align: 'left' },
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
+  { name: 'numeroLote', label: 'Lote', field: 'numeroLote', align: 'left' },
   { name: 'quantidade', label: 'Qtd', field: 'quantidade', align: 'right' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
@@ -129,19 +195,33 @@ function rotuloProduto(id: string): string {
   return mapaProdutos.value.get(id) ?? id;
 }
 
+function aplicarFiltros(): void {
+  void carregarAplicacoes({
+    talhaoId: filtros.talhaoId || undefined,
+    safraId: filtros.safraId || undefined,
+    dataInicio: filtros.dataInicio || undefined,
+    dataFim: filtros.dataFim || undefined,
+  });
+}
+
 async function onRemover(id: string): Promise<void> {
   const ok = await removerAplicacao(id);
-  if (ok) await carregarAplicacoes();
+  if (ok) aplicarFiltros();
 }
 
 onMounted(() => {
   void carregarTalhoes();
   void carregarProdutos();
+  void carregarSafras();
   void carregarAplicacoes();
 });
 </script>
 
 <style scoped>
+.filtro {
+  min-width: 140px;
+  max-width: 200px;
+}
 .acoes {
   white-space: nowrap;
 }

@@ -20,6 +20,17 @@ function parseNumeroOpcional(valor: string): number {
   return Number(texto.replace(',', '.'));
 }
 
+function parsePrecoOpcional(valor: string): number | undefined {
+  const texto = valor.trim();
+
+  if (!texto) {
+    return undefined;
+  }
+
+  const numero = Number(texto.replace(',', '.'));
+  return Number.isFinite(numero) && numero > 0 ? numero : undefined;
+}
+
 let chaveSequencia = 0;
 
 export function criarChaveItem(): string {
@@ -44,6 +55,7 @@ export function criarPedidoVendaFormVazio(): PedidoVendaFormModel {
     condicaoPagamentoId: '',
     formaPagamento: '',
     observacao: '',
+    tabelaPrecoId: '',
     itens: [],
   };
 }
@@ -55,6 +67,7 @@ export function pedidoDtoParaForm(dto: PedidoVendaDto): PedidoVendaFormModel {
     condicaoPagamentoId: dto.condicaoPagamentoId,
     formaPagamento: dto.formaPagamento,
     observacao: dto.observacao ?? '',
+    tabelaPrecoId: dto.tabelaPrecoId ?? '',
     itens: dto.itens.map((item) => ({
       chave: item.id,
       produtoId: item.produtoId,
@@ -72,10 +85,11 @@ export function formParaCriarPayload(form: PedidoVendaFormModel): CriarPedidoVen
     condicaoPagamentoId: form.condicaoPagamentoId,
     formaPagamento: form.formaPagamento as CriarPedidoVendaPayload['formaPagamento'],
     observacao: form.observacao.trim() || null,
+    tabelaPrecoId: form.tabelaPrecoId || null,
     itens: form.itens.map((item) => ({
       produtoId: item.produtoId,
       quantidade: parseNumeroObrigatorio(item.quantidade),
-      precoUnitario: parseNumeroObrigatorio(item.precoUnitario),
+      precoUnitario: parsePrecoOpcional(item.precoUnitario) ?? null,
       descontoPercentual: parseNumeroOpcional(item.descontoPercentual),
     })),
   };

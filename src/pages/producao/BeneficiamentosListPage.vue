@@ -49,6 +49,11 @@
               {{ formatarDecimal(props.row.rendimentoPercentual) }}%
             </q-td>
           </template>
+          <template #body-cell-status="props">
+            <q-td :props="props">
+              <agro-badge :label="props.row.status ?? 'Rascunho'" variant="default" />
+            </q-td>
+          </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
               <agro-btn
@@ -61,6 +66,7 @@
                 :to="{ name: 'beneficiamento-editar', params: { id: props.row.id } }"
               />
               <agro-btn
+                v-if="props.row.status !== BeneficiamentoLoteStatus.Confirmado"
                 flat
                 round
                 dense
@@ -79,11 +85,13 @@
 </template>
 
 <script setup lang="ts">
+import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
+import { BeneficiamentoLoteStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { BeneficiamentoLoteDto } from 'types/dtos/producao.dto';
 import { formatarDecimal } from 'utils/formatters';
@@ -108,6 +116,7 @@ const colunas: QTableColumn<BeneficiamentoLoteDto>[] = [
   { name: 'produtoEntradaId', label: 'Entrada', field: 'produtoEntradaId', align: 'left' },
   { name: 'produtoSaidaId', label: 'Saída', field: 'produtoSaidaId', align: 'left' },
   { name: 'rendimentoPercentual', label: 'Rendimento', field: 'rendimentoPercentual', align: 'right' },
+  { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 

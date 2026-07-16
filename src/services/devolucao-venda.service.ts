@@ -1,8 +1,10 @@
 import { api } from 'services/api';
 import type {
+  BuscarOrigemDevolucaoParams,
   CriarDevolucaoVendaPayload,
   DevolucaoVendaDto,
   ListarDevolucoesVendaParams,
+  OrigemDevolucaoDto,
 } from 'types/dtos/devolucao-venda.dto';
 
 export const devolucaoVendaService = {
@@ -14,6 +16,12 @@ export const devolucaoVendaService = {
 
   obter(id: string): Promise<DevolucaoVendaDto> {
     return api.get<DevolucaoVendaDto>(`/devolucoes-venda/${id}`).then((r) => r.data);
+  },
+
+  buscarOrigem(params: BuscarOrigemDevolucaoParams): Promise<OrigemDevolucaoDto> {
+    return api
+      .get<OrigemDevolucaoDto>('/devolucoes-venda/origem', { params })
+      .then((r) => r.data);
   },
 
   criar(payload: CriarDevolucaoVendaPayload): Promise<DevolucaoVendaDto> {

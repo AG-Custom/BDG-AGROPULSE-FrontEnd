@@ -11,15 +11,25 @@ import type {
 } from 'types/dtos/orcamento.dto';
 import { ref } from 'vue';
 
+function parsePrecoOpcional(valor: string): number | null {
+  const texto = valor.trim();
+  if (!texto) {
+    return null;
+  }
+  const numero = Number(texto.replace(',', '.'));
+  return Number.isFinite(numero) && numero > 0 ? numero : null;
+}
+
 function formParaPayload(form: OrcamentoFormModel): CriarOrcamentoPayload {
   return {
     clienteId: form.clienteId,
     vendedorUsuarioId: form.vendedorUsuarioId || null,
+    tabelaPrecoId: form.tabelaPrecoId || null,
     observacao: form.observacao.trim() || null,
     itens: form.itens.map((item) => ({
       produtoId: item.produtoId,
       quantidade: Number(item.quantidade),
-      precoUnitario: Number(item.precoUnitario),
+      precoUnitario: parsePrecoOpcional(item.precoUnitario),
     })),
   };
 }

@@ -235,6 +235,30 @@
           <q-item-section>PDV</q-item-section>
         </q-item>
         <q-item
+          v-if="podeGerenciarMetasVendedor"
+          clickable
+          :to="{ name: 'metas-vendedor' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="flag" size="20px" />
+          </q-item-section>
+          <q-item-section>Metas</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarRepresentantes"
+          clickable
+          :to="{ name: 'representantes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="handshake" size="20px" />
+          </q-item-section>
+          <q-item-section>Representantes</q-item-section>
+        </q-item>
+        <q-item
           v-if="podeGerenciarAprovacoes"
           clickable
           :to="{ name: 'aprovacoes' }"
@@ -275,18 +299,6 @@
             <q-icon name="history" size="20px" />
           </q-item-section>
           <q-item-section>Histórico</q-item-section>
-        </q-item>
-        <q-item
-          v-if="podeGerenciarCompras"
-          clickable
-          :to="{ name: 'contas-pagar' }"
-          active-class="app-sidebar__item--active"
-          class="app-sidebar__item"
-        >
-          <q-item-section avatar>
-            <q-icon name="payments" size="20px" />
-          </q-item-section>
-          <q-item-section>Contas a pagar</q-item-section>
         </q-item>
         <q-item
           v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
@@ -405,6 +417,18 @@
         <q-item
           v-if="podeGerenciarProducao"
           clickable
+          :to="{ name: 'receitas-producao' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="menu_book" size="20px" />
+          </q-item-section>
+          <q-item-section>Receitas / BOM</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
           :to="{ name: 'beneficiamentos' }"
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
@@ -415,7 +439,82 @@
           <q-item-section>Beneficiamentos</q-item-section>
         </q-item>
         <q-item
-          v-if="podeGerenciarRastreabilidade"
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'laudos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="biotech" size="20px" />
+          </q-item-section>
+          <q-item-section>Laudos qualidade</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'fichas-tecnicas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="description" size="20px" />
+          </q-item-section>
+          <q-item-section>Fichas técnicas</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'paradas-linha' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="pause_circle" size="20px" />
+          </q-item-section>
+          <q-item-section>Paradas de linha</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarProducao"
+          clickable
+          :to="{ name: 'oee' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="speed" size="20px" />
+          </q-item-section>
+          <q-item-section>OEE</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarRastreabilidade" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Safras</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'safras-fazendas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="agriculture" size="20px" />
+          </q-item-section>
+          <q-item-section>Fazendas</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'safras-glebas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="map" size="20px" />
+          </q-item-section>
+          <q-item-section>Glebas</q-item-section>
+        </q-item>
+        <q-item
           clickable
           :to="{ name: 'talhoes' }"
           active-class="app-sidebar__item--active"
@@ -427,7 +526,6 @@
           <q-item-section>Talhões</q-item-section>
         </q-item>
         <q-item
-          v-if="podeGerenciarRastreabilidade"
           clickable
           :to="{ name: 'aplicacoes' }"
           active-class="app-sidebar__item--active"
@@ -438,12 +536,227 @@
           </q-item-section>
           <q-item-section>Aplicações</q-item-section>
         </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'safras-diario-campo' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="menu_book" size="20px" />
+          </q-item-section>
+          <q-item-section>Diário de campo</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'safras-historico-aplicacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="timeline" size="20px" />
+          </q-item-section>
+          <q-item-section>Histórico aplicações</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'safras-historico-produtividade' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="insights" size="20px" />
+          </q-item-section>
+          <q-item-section>Histórico produtividade</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'safras-geo' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="public" size="20px" />
+          </q-item-section>
+          <q-item-section>Importação geo</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensRevenda"
+          clickable
+          :to="{ name: 'safras-visitas-tecnicas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="support_agent" size="20px" />
+          </q-item-section>
+          <q-item-section>Visitas técnicas</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensRevenda"
+          clickable
+          :to="{ name: 'safras-recomendacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="recommend" size="20px" />
+          </q-item-section>
+          <q-item-section>Recomendações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensIndustria"
+          clickable
+          :to="{ name: 'safras-planejamento' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="calendar_month" size="20px" />
+          </q-item-section>
+          <q-item-section>Planejamento de safras</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensIndustria"
+          clickable
+          :to="{ name: 'safras-ordens-servico' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="assignment" size="20px" />
+          </q-item-section>
+          <q-item-section>OS agrícola</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensIndustria"
+          clickable
+          :to="{ name: 'safras-custeio' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="payments" size="20px" />
+          </q-item-section>
+          <q-item-section>Custeio</q-item-section>
+        </q-item>
+        <q-item
+          v-if="mostrarItensIndustria"
+          clickable
+          :to="{ name: 'safras-oee-campo' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="speed" size="20px" />
+          </q-item-section>
+          <q-item-section>OEE campo</q-item-section>
+        </q-item>
       </q-list>
     </div>
 
     <div v-if="podeGerenciarFiscal" class="app-sidebar__section">
       <div class="text-overline app-sidebar__label">Fiscal</div>
       <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-notas-fiscais' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="description" size="20px" />
+          </q-item-section>
+          <q-item-section>Notas fiscais</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-contingencia' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="cloud_off" size="20px" />
+          </q-item-section>
+          <q-item-section>Contingência</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-inutilizacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="block" size="20px" />
+          </q-item-section>
+          <q-item-section>Inutilizações</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-ncm-pis-cofins' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="percent" size="20px" />
+          </q-item-section>
+          <q-item-section>PIS/COFINS NCM</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-mva-ncm-uf' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="swap_horiz" size="20px" />
+          </q-item-section>
+          <q-item-section>MVA NCM/UF</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-gnre' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance" size="20px" />
+          </q-item-section>
+          <q-item-section>GNRE</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-funrural' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="agriculture" size="20px" />
+          </q-item-section>
+          <q-item-section>Funrural</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-regimes-cnpj' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="business" size="20px" />
+          </q-item-section>
+          <q-item-section>Regimes por CNPJ</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'fiscal-sped' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="folder_zip" size="20px" />
+          </q-item-section>
+          <q-item-section>SPED</q-item-section>
+        </q-item>
         <q-item
           clickable
           :to="{ name: 'fiscal-config' }"
@@ -458,19 +771,227 @@
       </q-list>
     </div>
 
-    <div v-if="podeGerenciarFormasPagamentoConfig" class="app-sidebar__section">
+    <div
+      v-if="podeGerenciarFinanceiro || podeGerenciarFormasPagamentoConfig"
+      class="app-sidebar__section"
+    >
       <div class="text-overline app-sidebar__label">Financeiro</div>
       <q-list padding class="app-sidebar__list">
         <q-item
+          v-if="podeGerenciarFinanceiro"
           clickable
-          :to="{ name: 'formas-pagamento-config' }"
+          :to="{ name: 'contas-receber' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="request_quote" size="20px" />
+          </q-item-section>
+          <q-item-section>Contas a receber</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'contas-pagar' }"
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
           <q-item-section avatar>
             <q-icon name="payments" size="20px" />
           </q-item-section>
+          <q-item-section>Contas a pagar</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'condicoes-pagamento' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="event_repeat" size="20px" />
+          </q-item-section>
+          <q-item-section>Condições de pagamento</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFormasPagamentoConfig"
+          clickable
+          :to="{ name: 'formas-pagamento-config' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="credit_card" size="20px" />
+          </q-item-section>
           <q-item-section>Formas de pagamento</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'contas-bancarias' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance" size="20px" />
+          </q-item-section>
+          <q-item-section>Contas bancárias</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'caixas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="point_of_sale" size="20px" />
+          </q-item-section>
+          <q-item-section>Caixas</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'centros-custo' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_tree" size="20px" />
+          </q-item-section>
+          <q-item-section>Centros de custo</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'transferencias-financeiras' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="swap_horiz" size="20px" />
+          </q-item-section>
+          <q-item-section>Transferências</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'cheques' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="money" size="20px" />
+          </q-item-section>
+          <q-item-section>Cheques</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'fluxo-caixa' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="waterfall_chart" size="20px" />
+          </q-item-section>
+          <q-item-section>Fluxo de caixa</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'tesouraria' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="savings" size="20px" />
+          </q-item-section>
+          <q-item-section>Tesouraria</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'conciliacao-bancaria' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="sync_alt" size="20px" />
+          </q-item-section>
+          <q-item-section>Conciliação</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'boletos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="receipt" size="20px" />
+          </q-item-section>
+          <q-item-section>Boletos</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'regua-cobranca' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="campaign" size="20px" />
+          </q-item-section>
+          <q-item-section>Régua de cobrança</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'renegociacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="handshake" size="20px" />
+          </q-item-section>
+          <q-item-section>Renegociações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'antecipacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance_wallet" size="20px" />
+          </q-item-section>
+          <q-item-section>Antecipações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'orcamento-financeiro' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="pie_chart" size="20px" />
+          </q-item-section>
+          <q-item-section>Orçamento financeiro</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          :to="{ name: 'cotacoes-moeda' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="currency_exchange" size="20px" />
+          </q-item-section>
+          <q-item-section>Cotações / multi-moeda</q-item-section>
         </q-item>
       </q-list>
     </div>
@@ -527,15 +1048,20 @@
 <script setup lang="ts">
 import { useAuth } from 'composables/useAuth';
 import { useComprasConfig } from 'composables/useComprasConfig';
+import { usePerfilSafras } from 'composables/usePerfilSafras';
 import { Permissoes } from 'constants/permissoes';
 import { computed, onMounted } from 'vue';
 
 const { possuiPermissao } = useAuth();
 const { config, carregar: carregarComprasConfig } = useComprasConfig();
+const { isRevenda, isIndustria, carregarPerfil } = usePerfilSafras();
 
 const fluxoCompletoHabilitado = computed(
   () => config.value?.fluxoCompletoHabilitado === true,
 );
+
+const mostrarItensRevenda = computed(() => isRevenda.value);
+const mostrarItensIndustria = computed(() => isIndustria.value);
 
 const podeGerenciarUsuarios = computed(() =>
   possuiPermissao(Permissoes.Usuarios.Visualizar),
@@ -571,6 +1097,12 @@ const podeGerenciarOrcamentos = computed(() =>
   possuiPermissao(Permissoes.Orcamentos.Visualizar),
 );
 const podeGerenciarPdv = computed(() => possuiPermissao(Permissoes.Pdv.Visualizar));
+const podeGerenciarMetasVendedor = computed(() =>
+  possuiPermissao(Permissoes.MetasVendedor.Visualizar),
+);
+const podeGerenciarRepresentantes = computed(() =>
+  possuiPermissao(Permissoes.Representantes.Visualizar),
+);
 const podeGerenciarCompras = computed(() =>
   possuiPermissao(Permissoes.Compras.Visualizar),
 );
@@ -595,6 +1127,9 @@ const podeGerenciarFiscal = computed(() =>
 const podeGerenciarFormasPagamentoConfig = computed(() =>
   possuiPermissao(Permissoes.FormasPagamentoConfig.Visualizar),
 );
+const podeGerenciarFinanceiro = computed(() =>
+  possuiPermissao(Permissoes.Financeiro.Visualizar),
+);
 const podeGerenciarRelatorios = computed(() =>
   possuiPermissao(Permissoes.Relatorios.Visualizar),
 );
@@ -604,7 +1139,9 @@ const podeAcessarVendas = computed(
     podeGerenciarPedidosVenda.value ||
     podeGerenciarAprovacoes.value ||
     podeGerenciarOrcamentos.value ||
-    podeGerenciarPdv.value,
+    podeGerenciarPdv.value ||
+    podeGerenciarMetasVendedor.value ||
+    podeGerenciarRepresentantes.value,
 );
 const podeAcessarCompras = computed(
   () =>
@@ -613,10 +1150,7 @@ const podeAcessarCompras = computed(
     podeGerenciarExpedicao.value,
 );
 const podeAcessarOperacoes = computed(
-  () =>
-    podeGerenciarContratos.value ||
-    podeGerenciarProducao.value ||
-    podeGerenciarRastreabilidade.value,
+  () => podeGerenciarContratos.value || podeGerenciarProducao.value,
 );
 const podeAcessarProdutos = computed(
   () =>
@@ -632,6 +1166,9 @@ const podeAcessarAdministracao = computed(
 onMounted(() => {
   if (podeGerenciarCompras.value) {
     void carregarComprasConfig();
+  }
+  if (podeGerenciarRastreabilidade.value) {
+    void carregarPerfil();
   }
 });
 </script>

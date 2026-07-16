@@ -69,34 +69,49 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QTableColumn } from 'quasar';
 import type { PedidoVendaItemDto } from 'types/dtos/pedido-venda.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { computed } from 'vue';
 
 defineProps<{
   itens: PedidoVendaItemDto[];
   rotuloProduto: (produtoId: string) => string;
 }>();
 
-const colunas: QTableColumn<PedidoVendaItemDto>[] = [
-  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
-  { name: 'quantidade', label: 'Qtd.', field: 'quantidade', align: 'right' },
-  { name: 'precoUnitario', label: 'Preço unit.', field: 'precoUnitario', align: 'right' },
-  {
-    name: 'descontoPercentual',
-    label: 'Desc. %',
-    field: 'descontoPercentual',
-    align: 'right',
-  },
-  {
-    name: 'comissaoPercentual',
-    label: 'Comissão %',
-    field: 'comissaoPercentual',
-    align: 'right',
-  },
-  { name: 'valorComissao', label: 'Comissão R$', field: 'valorComissao', align: 'right' },
-  { name: 'subtotal', label: 'Subtotal', field: 'subtotal', align: 'right' },
-];
+const { verCustos } = useVerCustos();
+
+const colunas = computed(() => {
+  const base: QTableColumn<PedidoVendaItemDto>[] = [
+    { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
+    { name: 'quantidade', label: 'Qtd.', field: 'quantidade', align: 'right' },
+    { name: 'precoUnitario', label: 'Preço unit.', field: 'precoUnitario', align: 'right' },
+    {
+      name: 'descontoPercentual',
+      label: 'Desc. %',
+      field: 'descontoPercentual',
+      align: 'right',
+    },
+    {
+      name: 'comissaoPercentual',
+      label: 'Comissão %',
+      field: 'comissaoPercentual',
+      align: 'right',
+    },
+    { name: 'valorComissao', label: 'Comissão R$', field: 'valorComissao', align: 'right' },
+    { name: 'subtotal', label: 'Subtotal', field: 'subtotal', align: 'right' },
+  ];
+
+  if (verCustos.value) {
+    return base;
+  }
+
+  return base.filter(
+    (coluna) =>
+      coluna.name !== 'comissaoPercentual' && coluna.name !== 'valorComissao',
+  );
+});
 </script>
 
 <style scoped>

@@ -98,15 +98,81 @@
               />
             </q-td>
           </template>
+
+          <template #body-cell-acoes="props">
+            <q-td :props="props">
+              <agro-btn
+                flat
+                round
+                dense
+                icon="account_tree"
+                color="primary"
+                descricao="Genealogia do lote"
+                @click="abrirGenealogia(props.row)"
+              />
+            </q-td>
+          </template>
         </q-table>
       </agro-card>
     </section>
+
+    <q-dialog v-model="dialogGenealogia">
+      <q-card class="dialog-genealogia">
+        <q-card-section>
+          <h4 class="titulo">Genealogia — {{ loteSelecionado?.numeroLote }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <agro-form-skeleton v-if="carregandoGenealogia" :campos="3" />
+          <template v-else-if="genealogia">
+            <h5 class="subtitulo">Lotes pai (origem)</h5>
+            <empty-state
+              v-if="genealogia.pais.length === 0"
+              titulo="Sem origem"
+              descricao="Nenhum vínculo de matéria-prima."
+              icon="account_tree"
+            />
+            <q-list v-else bordered separator>
+              <q-item v-for="v in genealogia.pais" :key="v.id">
+                <q-item-section>
+                  <q-item-label>{{ v.lotePaiId.slice(0, 8) }}…</q-item-label>
+                  <q-item-label caption>
+                    {{ v.origem }} · qtd {{ formatarDecimal(v.quantidade) }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+
+            <h5 class="subtitulo">Lotes filhos (derivados)</h5>
+            <empty-state
+              v-if="genealogia.filhos.length === 0"
+              titulo="Sem derivados"
+              descricao="Nenhum lote gerado a partir deste."
+              icon="account_tree"
+            />
+            <q-list v-else bordered separator>
+              <q-item v-for="v in genealogia.filhos" :key="v.id">
+                <q-item-section>
+                  <q-item-label>{{ v.loteFilhoId.slice(0, 8) }}…</q-item-label>
+                  <q-item-label caption>
+                    {{ v.origem }} · qtd {{ formatarDecimal(v.quantidade) }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </template>
+        </q-card-section>
+        <q-card-actions align="right">
+          <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogGenealogia = false" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
@@ -116,7 +182,8 @@ import type { LoteDto } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
 
-const { lotes, carregando, carregar } = useEstoqueLotes();
+const { lotes, genealogia, carregando, carregandoGenealogia, carregar, obterGenealogia } =
+  useEstoqueLotes();
 const {
   produtoOpcoes,
   carregando: carregandoProdutos,
@@ -125,6 +192,8 @@ const {
 
 const filtroProduto = ref<string | null>(null);
 const apenasComSaldo = ref(true);
+const dialogGenealogia = ref(false);
+const loteSelecionado = ref<LoteDto | null>(null);
 
 const colunas: QTableColumn<LoteDto>[] = [
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
@@ -164,6 +233,7 @@ const colunas: QTableColumn<LoteDto>[] = [
     align: 'left',
   },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
 const descricaoVazia = computed(() =>
@@ -177,6 +247,12 @@ function formatarLocalizacao(lote: LoteDto): string {
     (parte) => !!parte?.trim(),
   );
   return partes.length > 0 ? partes.join(' / ') : '—';
+}
+
+async function abrirGenealogia(lote: LoteDto): Promise<void> {
+  loteSelecionado.value = lote;
+  dialogGenealogia.value = true;
+  await obterGenealogia(lote.id);
 }
 
 async function recarregar(): Promise<void> {
@@ -198,5 +274,17 @@ onMounted(() => {
 <style scoped>
 .estoque-lotes__produto {
   min-width: min(320px, 100%);
+}
+.dialog-genealogia {
+  min-width: min(440px, 92vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+}
+.subtitulo {
+  margin: var(--spacing-4) 0 var(--spacing-2);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
 }
 </style>

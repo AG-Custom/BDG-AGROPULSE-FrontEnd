@@ -169,6 +169,7 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import { useRelatorios } from 'composables/useRelatorios';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QTableColumn } from 'quasar';
 import type {
   ComissaoRepasseItemDto,
@@ -176,7 +177,7 @@ import type {
   GiroEstoqueItemDto,
 } from 'types/dtos/relatorio.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const {
   curvaAbc,
@@ -188,33 +189,50 @@ const {
   carregarGiroEstoque,
 } = useRelatorios();
 const { rotuloProduto } = useProdutoOpcoesEstoque();
+const { verCustos } = useVerCustos();
 
 const aba = ref<'abc' | 'comissoes' | 'giro'>('abc');
 const dias = ref('30');
 const dataInicio = ref(dataIsoOffset(-30));
 const dataFim = ref(dataIsoOffset(0));
 
-const colunasAbc: QTableColumn<CurvaAbcLucratividadeItemDto>[] = [
-  { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
-  { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
-  { name: 'classeAbc', label: 'Classe', field: 'classeAbc', align: 'left' },
-  { name: 'receita', label: 'Receita', field: 'receita', align: 'right' },
-  { name: 'lucro', label: 'Lucro', field: 'lucro', align: 'right' },
-  {
-    name: 'participacaoReceitaPercentual',
-    label: 'Part. %',
-    field: 'participacaoReceitaPercentual',
-    align: 'right',
-  },
-];
+const colunasAbc = computed(() => {
+  const base: QTableColumn<CurvaAbcLucratividadeItemDto>[] = [
+    { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
+    { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
+    { name: 'classeAbc', label: 'Classe', field: 'classeAbc', align: 'left' },
+    { name: 'receita', label: 'Receita', field: 'receita', align: 'right' },
+    { name: 'lucro', label: 'Lucro', field: 'lucro', align: 'right' },
+    {
+      name: 'participacaoReceitaPercentual',
+      label: 'Part. %',
+      field: 'participacaoReceitaPercentual',
+      align: 'right',
+    },
+  ];
 
-const colunasCom: QTableColumn<ComissaoRepasseItemDto>[] = [
-  { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
-  { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
-  { name: 'vendedorUsuarioId', label: 'Vendedor', field: 'vendedorUsuarioId', align: 'left' },
-  { name: 'valorVendido', label: 'Vendido', field: 'valorVendido', align: 'right' },
-  { name: 'valorComissao', label: 'Comissão', field: 'valorComissao', align: 'right' },
-];
+  if (verCustos.value) {
+    return base;
+  }
+
+  return base.filter((coluna) => coluna.name !== 'lucro');
+});
+
+const colunasCom = computed(() => {
+  const base: QTableColumn<ComissaoRepasseItemDto>[] = [
+    { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
+    { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
+    { name: 'vendedorUsuarioId', label: 'Vendedor', field: 'vendedorUsuarioId', align: 'left' },
+    { name: 'valorVendido', label: 'Vendido', field: 'valorVendido', align: 'right' },
+    { name: 'valorComissao', label: 'Comissão', field: 'valorComissao', align: 'right' },
+  ];
+
+  if (verCustos.value) {
+    return base;
+  }
+
+  return base.filter((coluna) => coluna.name !== 'valorComissao');
+});
 
 const colunasGiro: QTableColumn<GiroEstoqueItemDto>[] = [
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },

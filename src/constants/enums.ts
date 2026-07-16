@@ -429,6 +429,9 @@ export const FormaPagamento = {
   Cartao: 'Cartao',
   Transferencia: 'Transferencia',
   Outros: 'Outros',
+  Debito: 'Debito',
+  Credito: 'Credito',
+  Cheque: 'Cheque',
 } as const;
 
 export type FormaPagamentoValor = (typeof FormaPagamento)[keyof typeof FormaPagamento];
@@ -438,6 +441,19 @@ export const FormaPagamentoOpcoes = [
   { label: 'PIX', value: FormaPagamento.Pix },
   { label: 'Boleto', value: FormaPagamento.Boleto },
   { label: 'Cartão', value: FormaPagamento.Cartao },
+  { label: 'Cartão débito', value: FormaPagamento.Debito },
+  { label: 'Cartão crédito', value: FormaPagamento.Credito },
+  { label: 'Cheque', value: FormaPagamento.Cheque },
+  { label: 'Transferência', value: FormaPagamento.Transferencia },
+  { label: 'Outros', value: FormaPagamento.Outros },
+];
+
+export const FormaPagamentoPdvOpcoes = [
+  { label: 'Dinheiro', value: FormaPagamento.Dinheiro },
+  { label: 'PIX', value: FormaPagamento.Pix },
+  { label: 'Cartão débito', value: FormaPagamento.Debito },
+  { label: 'Cartão crédito', value: FormaPagamento.Credito },
+  { label: 'Cheque', value: FormaPagamento.Cheque },
   { label: 'Transferência', value: FormaPagamento.Transferencia },
   { label: 'Outros', value: FormaPagamento.Outros },
 ];
@@ -445,6 +461,7 @@ export const FormaPagamentoOpcoes = [
 export const PedidoVendaStatus = {
   Orcamento: 'Orcamento',
   Aguardando: 'Aguardando',
+  PendenteEstoque: 'PendenteEstoque',
   Aprovado: 'Aprovado',
   Faturado: 'Faturado',
   Recusado: 'Recusado',
@@ -456,7 +473,8 @@ export type PedidoVendaStatusValor =
 
 export const PedidoVendaStatusOpcoes = [
   { label: 'Orçamento', value: PedidoVendaStatus.Orcamento },
-  { label: 'Aguardando', value: PedidoVendaStatus.Aguardando },
+  { label: 'Aguardando aprovação', value: PedidoVendaStatus.Aguardando },
+  { label: 'Pendente de estoque', value: PedidoVendaStatus.PendenteEstoque },
   { label: 'Aprovado', value: PedidoVendaStatus.Aprovado },
   { label: 'Faturado', value: PedidoVendaStatus.Faturado },
   { label: 'Recusado', value: PedidoVendaStatus.Recusado },
@@ -465,6 +483,7 @@ export const PedidoVendaStatusOpcoes = [
 
 export const ContaReceberStatus = {
   Aberta: 'Aberta',
+  ParcialmentePaga: 'ParcialmentePaga',
   Paga: 'Paga',
   Cancelada: 'Cancelada',
 } as const;
@@ -474,12 +493,14 @@ export type ContaReceberStatusValor =
 
 export const ContaReceberStatusOpcoes = [
   { label: 'Aberta', value: ContaReceberStatus.Aberta },
+  { label: 'Parcialmente paga', value: ContaReceberStatus.ParcialmentePaga },
   { label: 'Paga', value: ContaReceberStatus.Paga },
   { label: 'Cancelada', value: ContaReceberStatus.Cancelada },
 ];
 
 export const ContaPagarStatus = {
   Aberta: 'Aberta',
+  ParcialmentePaga: 'ParcialmentePaga',
   Paga: 'Paga',
   Cancelada: 'Cancelada',
 } as const;
@@ -489,8 +510,197 @@ export type ContaPagarStatusValor =
 
 export const ContaPagarStatusOpcoes = [
   { label: 'Aberta', value: ContaPagarStatus.Aberta },
+  { label: 'Parcialmente paga', value: ContaPagarStatus.ParcialmentePaga },
   { label: 'Paga', value: ContaPagarStatus.Paga },
   { label: 'Cancelada', value: ContaPagarStatus.Cancelada },
+];
+
+export const EscopoFinanceiro = {
+  Unidade: 'Unidade',
+  Cnpj: 'Cnpj',
+  Grupo: 'Grupo',
+} as const;
+
+export type EscopoFinanceiroValor =
+  (typeof EscopoFinanceiro)[keyof typeof EscopoFinanceiro];
+
+export const EscopoFinanceiroOpcoes = [
+  { label: 'Unidade', value: EscopoFinanceiro.Unidade },
+  { label: 'CNPJ', value: EscopoFinanceiro.Cnpj },
+  { label: 'Grupo', value: EscopoFinanceiro.Grupo },
+];
+
+export const TipoContaBancaria = {
+  Corrente: 'Corrente',
+  Poupanca: 'Poupanca',
+  Pagamento: 'Pagamento',
+  Investimento: 'Investimento',
+} as const;
+
+export type TipoContaBancariaValor =
+  (typeof TipoContaBancaria)[keyof typeof TipoContaBancaria];
+
+export const TipoContaBancariaOpcoes = [
+  { label: 'Corrente', value: TipoContaBancaria.Corrente },
+  { label: 'Poupança', value: TipoContaBancaria.Poupanca },
+  { label: 'Pagamento', value: TipoContaBancaria.Pagamento },
+  { label: 'Investimento', value: TipoContaBancaria.Investimento },
+];
+
+export const StatusTransferencia = {
+  Pendente: 'Pendente',
+  Confirmada: 'Confirmada',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type StatusTransferenciaValor =
+  (typeof StatusTransferencia)[keyof typeof StatusTransferencia];
+
+export const StatusTransferenciaOpcoes = [
+  { label: 'Pendente', value: StatusTransferencia.Pendente },
+  { label: 'Confirmada', value: StatusTransferencia.Confirmada },
+  { label: 'Cancelada', value: StatusTransferencia.Cancelada },
+];
+
+export const StatusCheque = {
+  EmCarteira: 'EmCarteira',
+  Depositado: 'Depositado',
+  Compensado: 'Compensado',
+  Devolvido: 'Devolvido',
+} as const;
+
+export type StatusChequeValor = (typeof StatusCheque)[keyof typeof StatusCheque];
+
+export const StatusChequeOpcoes = [
+  { label: 'Em carteira', value: StatusCheque.EmCarteira },
+  { label: 'Depositado', value: StatusCheque.Depositado },
+  { label: 'Compensado', value: StatusCheque.Compensado },
+  { label: 'Devolvido', value: StatusCheque.Devolvido },
+];
+
+export const TipoCheque = {
+  Recebido: 'Recebido',
+  Emitido: 'Emitido',
+} as const;
+
+export type TipoChequeValor = (typeof TipoCheque)[keyof typeof TipoCheque];
+
+export const TipoChequeOpcoes = [
+  { label: 'Recebido', value: TipoCheque.Recebido },
+  { label: 'Emitido', value: TipoCheque.Emitido },
+];
+
+export const TipoAplicacao = {
+  CDB: 'CDB',
+  LCI: 'LCI',
+  LCA: 'LCA',
+  Fundo: 'Fundo',
+  Tesouro: 'Tesouro',
+  Outros: 'Outros',
+} as const;
+
+export type TipoAplicacaoValor = (typeof TipoAplicacao)[keyof typeof TipoAplicacao];
+
+export const TipoAplicacaoOpcoes = [
+  { label: 'CDB', value: TipoAplicacao.CDB },
+  { label: 'LCI', value: TipoAplicacao.LCI },
+  { label: 'LCA', value: TipoAplicacao.LCA },
+  { label: 'Fundo', value: TipoAplicacao.Fundo },
+  { label: 'Tesouro', value: TipoAplicacao.Tesouro },
+  { label: 'Outros', value: TipoAplicacao.Outros },
+];
+
+export const StatusBoleto = {
+  Pendente: 'Pendente',
+  Emitido: 'Emitido',
+  Registrado: 'Registrado',
+  Pago: 'Pago',
+  Cancelado: 'Cancelado',
+  Vencido: 'Vencido',
+} as const;
+
+export type StatusBoletoValor = (typeof StatusBoleto)[keyof typeof StatusBoleto];
+
+export const StatusBoletoOpcoes = [
+  { label: 'Pendente', value: StatusBoleto.Pendente },
+  { label: 'Emitido', value: StatusBoleto.Emitido },
+  { label: 'Registrado', value: StatusBoleto.Registrado },
+  { label: 'Pago', value: StatusBoleto.Pago },
+  { label: 'Cancelado', value: StatusBoleto.Cancelado },
+  { label: 'Vencido', value: StatusBoleto.Vencido },
+];
+
+export const PeriodoFluxoCaixa = {
+  Diario: 'Diario',
+  Semanal: 'Semanal',
+  Projetado: 'Projetado',
+} as const;
+
+export type PeriodoFluxoCaixaValor =
+  (typeof PeriodoFluxoCaixa)[keyof typeof PeriodoFluxoCaixa];
+
+export const PeriodoFluxoCaixaOpcoes = [
+  { label: 'Diário', value: PeriodoFluxoCaixa.Diario },
+  { label: 'Semanal', value: PeriodoFluxoCaixa.Semanal },
+  { label: 'Projetado', value: PeriodoFluxoCaixa.Projetado },
+];
+
+export const VersaoOrcamentoFinanceiro = {
+  R0: 'R0',
+  R1: 'R1',
+  R2: 'R2',
+} as const;
+
+export type VersaoOrcamentoFinanceiroValor =
+  (typeof VersaoOrcamentoFinanceiro)[keyof typeof VersaoOrcamentoFinanceiro];
+
+export const VersaoOrcamentoFinanceiroOpcoes = [
+  { label: 'R0', value: VersaoOrcamentoFinanceiro.R0 },
+  { label: 'R1', value: VersaoOrcamentoFinanceiro.R1 },
+  { label: 'R2', value: VersaoOrcamentoFinanceiro.R2 },
+];
+
+export const StatusRenegociacao = {
+  Pendente: 'Pendente',
+  Aprovada: 'Aprovada',
+  Rejeitada: 'Rejeitada',
+} as const;
+
+export type StatusRenegociacaoValor =
+  (typeof StatusRenegociacao)[keyof typeof StatusRenegociacao];
+
+export const StatusRenegociacaoOpcoes = [
+  { label: 'Pendente', value: StatusRenegociacao.Pendente },
+  { label: 'Aprovada', value: StatusRenegociacao.Aprovada },
+  { label: 'Rejeitada', value: StatusRenegociacao.Rejeitada },
+];
+
+export const StatusAntecipacao = {
+  Simulada: 'Simulada',
+  Cedida: 'Cedida',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type StatusAntecipacaoValor =
+  (typeof StatusAntecipacao)[keyof typeof StatusAntecipacao];
+
+export const StatusAntecipacaoOpcoes = [
+  { label: 'Simulada', value: StatusAntecipacao.Simulada },
+  { label: 'Cedida', value: StatusAntecipacao.Cedida },
+  { label: 'Cancelada', value: StatusAntecipacao.Cancelada },
+];
+
+export const StatusAplicacao = {
+  Ativa: 'Ativa',
+  Resgatada: 'Resgatada',
+} as const;
+
+export type StatusAplicacaoValor =
+  (typeof StatusAplicacao)[keyof typeof StatusAplicacao];
+
+export const StatusAplicacaoOpcoes = [
+  { label: 'Ativa', value: StatusAplicacao.Ativa },
+  { label: 'Resgatada', value: StatusAplicacao.Resgatada },
 ];
 
 export const UrgenciaCompra = {
@@ -644,10 +854,35 @@ export const DestinoDevolucaoOpcoes = [
   { label: 'Descarte', value: DestinoDevolucao.Descarte },
 ];
 
+export const DestinoCreditoDevolucao = {
+  AbatimentoProximaCompra: 'AbatimentoProximaCompra',
+  DevolucaoDinheiro: 'DevolucaoDinheiro',
+  EstornoCartao: 'EstornoCartao',
+} as const;
+
+export type DestinoCreditoDevolucaoValor =
+  (typeof DestinoCreditoDevolucao)[keyof typeof DestinoCreditoDevolucao];
+
+export const DestinoCreditoDevolucaoOpcoes = [
+  {
+    label: 'Abatimento na próxima compra',
+    value: DestinoCreditoDevolucao.AbatimentoProximaCompra,
+  },
+  {
+    label: 'Devolução dinheiro/PIX',
+    value: DestinoCreditoDevolucao.DevolucaoDinheiro,
+  },
+  {
+    label: 'Estorno de cartão',
+    value: DestinoCreditoDevolucao.EstornoCartao,
+  },
+];
+
 export const RegimeTributario = {
   SimplesNacional: 'SimplesNacional',
   LucroPresumido: 'LucroPresumido',
   LucroReal: 'LucroReal',
+  ProdutorRural: 'ProdutorRural',
 } as const;
 
 export type RegimeTributarioValor = (typeof RegimeTributario)[keyof typeof RegimeTributario];
@@ -656,6 +891,118 @@ export const RegimeTributarioOpcoes = [
   { label: 'Simples Nacional', value: RegimeTributario.SimplesNacional },
   { label: 'Lucro Presumido', value: RegimeTributario.LucroPresumido },
   { label: 'Lucro Real', value: RegimeTributario.LucroReal },
+  { label: 'Produtor Rural', value: RegimeTributario.ProdutorRural },
+];
+
+export const StatusNotaFiscal = {
+  Rascunho: 'Rascunho',
+  Emitida: 'Emitida',
+  Cancelada: 'Cancelada',
+  Erro: 'Erro',
+  Contingencia: 'Contingencia',
+  Inutilizada: 'Inutilizada',
+} as const;
+
+export type StatusNotaFiscalValor = (typeof StatusNotaFiscal)[keyof typeof StatusNotaFiscal];
+
+export const StatusNotaFiscalOpcoes = [
+  { label: 'Rascunho', value: StatusNotaFiscal.Rascunho },
+  { label: 'Emitida', value: StatusNotaFiscal.Emitida },
+  { label: 'Cancelada', value: StatusNotaFiscal.Cancelada },
+  { label: 'Erro', value: StatusNotaFiscal.Erro },
+  { label: 'Contingência', value: StatusNotaFiscal.Contingencia },
+  { label: 'Inutilizada', value: StatusNotaFiscal.Inutilizada },
+];
+
+export const ModeloDocumentoFiscal = {
+  NFe: 'NFe',
+  NFCe: 'NFCe',
+  CTe: 'CTe',
+  MDFe: 'MDFe',
+  NFPR: 'NFPR',
+  Complementar: 'Complementar',
+  Devolucao: 'Devolucao',
+} as const;
+
+export type ModeloDocumentoFiscalValor =
+  (typeof ModeloDocumentoFiscal)[keyof typeof ModeloDocumentoFiscal];
+
+export const ModeloDocumentoFiscalOpcoes = [
+  { label: 'NF-e', value: ModeloDocumentoFiscal.NFe },
+  { label: 'NFC-e', value: ModeloDocumentoFiscal.NFCe },
+  { label: 'CT-e', value: ModeloDocumentoFiscal.CTe },
+  { label: 'MDF-e', value: ModeloDocumentoFiscal.MDFe },
+  { label: 'NFPR', value: ModeloDocumentoFiscal.NFPR },
+  { label: 'Complementar', value: ModeloDocumentoFiscal.Complementar },
+  { label: 'Devolução', value: ModeloDocumentoFiscal.Devolucao },
+];
+
+export const TipoDestinatarioFiscal = {
+  Contribuinte: 'Contribuinte',
+  NaoContribuinte: 'NaoContribuinte',
+  ProdutorRural: 'ProdutorRural',
+  Exterior: 'Exterior',
+} as const;
+
+export type TipoDestinatarioFiscalValor =
+  (typeof TipoDestinatarioFiscal)[keyof typeof TipoDestinatarioFiscal];
+
+export const TipoDestinatarioFiscalOpcoes = [
+  { label: 'Contribuinte', value: TipoDestinatarioFiscal.Contribuinte },
+  { label: 'Não contribuinte', value: TipoDestinatarioFiscal.NaoContribuinte },
+  { label: 'Produtor rural', value: TipoDestinatarioFiscal.ProdutorRural },
+  { label: 'Exterior', value: TipoDestinatarioFiscal.Exterior },
+];
+
+export const ModoContingenciaFiscal = {
+  Normal: 'Normal',
+  Offline: 'Offline',
+  SVC: 'SVC',
+} as const;
+
+export type ModoContingenciaFiscalValor =
+  (typeof ModoContingenciaFiscal)[keyof typeof ModoContingenciaFiscal];
+
+export const ModoContingenciaFiscalOpcoes = [
+  { label: 'Normal', value: ModoContingenciaFiscal.Normal },
+  { label: 'Offline', value: ModoContingenciaFiscal.Offline },
+  { label: 'SVC', value: ModoContingenciaFiscal.SVC },
+];
+
+export const ModoContingenciaAtivarOpcoes = [
+  { label: 'Offline', value: ModoContingenciaFiscal.Offline },
+  { label: 'SVC', value: ModoContingenciaFiscal.SVC },
+];
+
+export const TipoManifestacaoSefaz = {
+  Ciencia: 'Ciencia',
+  Confirmacao: 'Confirmacao',
+  Desconhecimento: 'Desconhecimento',
+  NaoRealizada: 'NaoRealizada',
+} as const;
+
+export type TipoManifestacaoSefazValor =
+  (typeof TipoManifestacaoSefaz)[keyof typeof TipoManifestacaoSefaz];
+
+export const TipoManifestacaoSefazOpcoes = [
+  { label: 'Ciência', value: TipoManifestacaoSefaz.Ciencia },
+  { label: 'Confirmação', value: TipoManifestacaoSefaz.Confirmacao },
+  { label: 'Desconhecimento', value: TipoManifestacaoSefaz.Desconhecimento },
+  { label: 'Não realizada', value: TipoManifestacaoSefaz.NaoRealizada },
+];
+
+export const TipoSpedFiscal = {
+  EfdIcmsIpi: 'EfdIcmsIpi',
+  EfdContribuicoes: 'EfdContribuicoes',
+  Contabil: 'Contabil',
+} as const;
+
+export type TipoSpedFiscalValor = (typeof TipoSpedFiscal)[keyof typeof TipoSpedFiscal];
+
+export const TipoSpedFiscalOpcoes = [
+  { label: 'EFD ICMS/IPI', value: TipoSpedFiscal.EfdIcmsIpi },
+  { label: 'EFD Contribuições', value: TipoSpedFiscal.EfdContribuicoes },
+  { label: 'SPED Contábil', value: TipoSpedFiscal.Contabil },
 ];
 
 export const FontePreco = {
@@ -717,4 +1064,210 @@ export const OrdemProducaoStatusOpcoes = [
   { label: 'Em andamento', value: OrdemProducaoStatus.EmAndamento },
   { label: 'Concluída', value: OrdemProducaoStatus.Concluida },
   { label: 'Cancelada', value: OrdemProducaoStatus.Cancelada },
+];
+
+export const BeneficiamentoLoteStatus = {
+  Rascunho: 'Rascunho',
+  Confirmado: 'Confirmado',
+} as const;
+
+export type BeneficiamentoLoteStatusValor =
+  (typeof BeneficiamentoLoteStatus)[keyof typeof BeneficiamentoLoteStatus];
+
+export const BeneficiamentoLoteStatusOpcoes = [
+  { label: 'Rascunho', value: BeneficiamentoLoteStatus.Rascunho },
+  { label: 'Confirmado', value: BeneficiamentoLoteStatus.Confirmado },
+];
+
+export const TipoSaidaBeneficiamento = {
+  Principal: 'Principal',
+  Subproduto: 'Subproduto',
+  Perda: 'Perda',
+} as const;
+
+export type TipoSaidaBeneficiamentoValor =
+  (typeof TipoSaidaBeneficiamento)[keyof typeof TipoSaidaBeneficiamento];
+
+export const TipoSaidaBeneficiamentoOpcoes = [
+  { label: 'Principal', value: TipoSaidaBeneficiamento.Principal },
+  { label: 'Subproduto', value: TipoSaidaBeneficiamento.Subproduto },
+  { label: 'Perda', value: TipoSaidaBeneficiamento.Perda },
+];
+
+export const LaudoQualidadeStatus = {
+  Pendente: 'Pendente',
+  Aprovado: 'Aprovado',
+  Reprovado: 'Reprovado',
+} as const;
+
+export type LaudoQualidadeStatusValor =
+  (typeof LaudoQualidadeStatus)[keyof typeof LaudoQualidadeStatus];
+
+export const LaudoQualidadeStatusOpcoes = [
+  { label: 'Pendente', value: LaudoQualidadeStatus.Pendente },
+  { label: 'Aprovado', value: LaudoQualidadeStatus.Aprovado },
+  { label: 'Reprovado', value: LaudoQualidadeStatus.Reprovado },
+];
+
+export const OrigemGenealogiaLote = {
+  OP: 'OP',
+  Beneficiamento: 'Beneficiamento',
+} as const;
+
+export type OrigemGenealogiaLoteValor =
+  (typeof OrigemGenealogiaLote)[keyof typeof OrigemGenealogiaLote];
+
+export const TipoOperacaoSafras = {
+  Revenda: 'Revenda',
+  Industria: 'Industria',
+} as const;
+
+export type TipoOperacaoSafrasValor =
+  (typeof TipoOperacaoSafras)[keyof typeof TipoOperacaoSafras];
+
+export const StatusSafra = {
+  Planejada: 'Planejada',
+  EmAndamento: 'EmAndamento',
+  Encerrada: 'Encerrada',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type StatusSafraValor = (typeof StatusSafra)[keyof typeof StatusSafra];
+
+export const StatusSafraOpcoes = [
+  { label: 'Planejada', value: StatusSafra.Planejada },
+  { label: 'Em andamento', value: StatusSafra.EmAndamento },
+  { label: 'Encerrada', value: StatusSafra.Encerrada },
+  { label: 'Cancelada', value: StatusSafra.Cancelada },
+];
+
+export const TipoOrdemServicoAgricola = {
+  Plantio: 'Plantio',
+  TratosCulturais: 'TratosCulturais',
+  Irrigacao: 'Irrigacao',
+  Aplicacao: 'Aplicacao',
+  Colheita: 'Colheita',
+  Outro: 'Outro',
+} as const;
+
+export type TipoOrdemServicoAgricolaValor =
+  (typeof TipoOrdemServicoAgricola)[keyof typeof TipoOrdemServicoAgricola];
+
+export const TipoOrdemServicoAgricolaOpcoes = [
+  { label: 'Plantio', value: TipoOrdemServicoAgricola.Plantio },
+  { label: 'Tratos culturais', value: TipoOrdemServicoAgricola.TratosCulturais },
+  { label: 'Irrigação', value: TipoOrdemServicoAgricola.Irrigacao },
+  { label: 'Aplicação', value: TipoOrdemServicoAgricola.Aplicacao },
+  { label: 'Colheita', value: TipoOrdemServicoAgricola.Colheita },
+  { label: 'Outro', value: TipoOrdemServicoAgricola.Outro },
+];
+
+export const StatusOrdemServicoAgricola = {
+  Aberta: 'Aberta',
+  EmAndamento: 'EmAndamento',
+  Concluida: 'Concluida',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type StatusOrdemServicoAgricolaValor =
+  (typeof StatusOrdemServicoAgricola)[keyof typeof StatusOrdemServicoAgricola];
+
+export const StatusOrdemServicoAgricolaOpcoes = [
+  { label: 'Aberta', value: StatusOrdemServicoAgricola.Aberta },
+  { label: 'Em andamento', value: StatusOrdemServicoAgricola.EmAndamento },
+  { label: 'Concluída', value: StatusOrdemServicoAgricola.Concluida },
+  { label: 'Cancelada', value: StatusOrdemServicoAgricola.Cancelada },
+];
+
+export const TipoVisitaTecnica = {
+  Presencial: 'Presencial',
+  Telefone: 'Telefone',
+  WhatsApp: 'WhatsApp',
+  Remota: 'Remota',
+  Outro: 'Outro',
+} as const;
+
+export type TipoVisitaTecnicaValor =
+  (typeof TipoVisitaTecnica)[keyof typeof TipoVisitaTecnica];
+
+export const TipoVisitaTecnicaOpcoes = [
+  { label: 'Presencial', value: TipoVisitaTecnica.Presencial },
+  { label: 'Telefone', value: TipoVisitaTecnica.Telefone },
+  { label: 'WhatsApp', value: TipoVisitaTecnica.WhatsApp },
+  { label: 'Remota', value: TipoVisitaTecnica.Remota },
+  { label: 'Outro', value: TipoVisitaTecnica.Outro },
+];
+
+export const StatusRecomendacao = {
+  Pendente: 'Pendente',
+  Aplicada: 'Aplicada',
+  Cancelada: 'Cancelada',
+} as const;
+
+export type StatusRecomendacaoValor =
+  (typeof StatusRecomendacao)[keyof typeof StatusRecomendacao];
+
+export const StatusRecomendacaoOpcoes = [
+  { label: 'Pendente', value: StatusRecomendacao.Pendente },
+  { label: 'Aplicada', value: StatusRecomendacao.Aplicada },
+  { label: 'Cancelada', value: StatusRecomendacao.Cancelada },
+];
+
+export const CategoriaCusteioSafra = {
+  Insumos: 'Insumos',
+  MaoDeObra: 'MaoDeObra',
+  Servicos: 'Servicos',
+  Maquinario: 'Maquinario',
+  Outros: 'Outros',
+} as const;
+
+export type CategoriaCusteioSafraValor =
+  (typeof CategoriaCusteioSafra)[keyof typeof CategoriaCusteioSafra];
+
+export const CategoriaCusteioSafraOpcoes = [
+  { label: 'Insumos', value: CategoriaCusteioSafra.Insumos },
+  { label: 'Mão de obra', value: CategoriaCusteioSafra.MaoDeObra },
+  { label: 'Serviços', value: CategoriaCusteioSafra.Servicos },
+  { label: 'Maquinário', value: CategoriaCusteioSafra.Maquinario },
+  { label: 'Outros', value: CategoriaCusteioSafra.Outros },
+];
+
+export const TipoAtividadeDiarioCampo = {
+  VisitaTecnica: 'VisitaTecnica',
+  Recomendacao: 'Recomendacao',
+  Aplicacao: 'Aplicacao',
+  Avaliacao: 'Avaliacao',
+  Plantio: 'Plantio',
+  Colheita: 'Colheita',
+  TratosCulturais: 'TratosCulturais',
+  Outro: 'Outro',
+} as const;
+
+export type TipoAtividadeDiarioCampoValor =
+  (typeof TipoAtividadeDiarioCampo)[keyof typeof TipoAtividadeDiarioCampo];
+
+export const TipoAtividadeDiarioCampoOpcoes = [
+  { label: 'Visita técnica', value: TipoAtividadeDiarioCampo.VisitaTecnica },
+  { label: 'Recomendação', value: TipoAtividadeDiarioCampo.Recomendacao },
+  { label: 'Aplicação', value: TipoAtividadeDiarioCampo.Aplicacao },
+  { label: 'Avaliação', value: TipoAtividadeDiarioCampo.Avaliacao },
+  { label: 'Plantio', value: TipoAtividadeDiarioCampo.Plantio },
+  { label: 'Colheita', value: TipoAtividadeDiarioCampo.Colheita },
+  { label: 'Tratos culturais', value: TipoAtividadeDiarioCampo.TratosCulturais },
+  { label: 'Outro', value: TipoAtividadeDiarioCampo.Outro },
+];
+
+export const TipoGeoImportacao = {
+  Kml: 'Kml',
+  Shapefile: 'Shapefile',
+  GeoJson: 'GeoJson',
+} as const;
+
+export type TipoGeoImportacaoValor =
+  (typeof TipoGeoImportacao)[keyof typeof TipoGeoImportacao];
+
+export const TipoGeoImportacaoOpcoes = [
+  { label: 'KML', value: TipoGeoImportacao.Kml },
+  { label: 'Shapefile', value: TipoGeoImportacao.Shapefile },
+  { label: 'GeoJSON', value: TipoGeoImportacao.GeoJson },
 ];

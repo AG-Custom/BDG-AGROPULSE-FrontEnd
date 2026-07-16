@@ -1,0 +1,195 @@
+<template>
+  <q-page class="agro-page">
+    <app-page-header titulo="Fazendas" subtitulo="Cadastro de propriedades rurais.">
+      <agro-btn
+        color="primary"
+        unelevated
+        icon="add"
+        label="Nova fazenda"
+        descricao="Cadastrar fazenda"
+        @click="abrirDialog()"
+      />
+    </app-page-header>
+
+    <section class="agro-section">
+      <agro-card>
+        <agro-table-skeleton v-if="carregando && fazendas.length === 0" :colunas="5" />
+        <empty-state
+          v-else-if="!carregando && fazendas.length === 0"
+          titulo="Nenhuma fazenda"
+          descricao="Cadastre a primeira fazenda."
+          icon="agriculture"
+        />
+        <q-table
+          v-else
+          flat
+          bordered
+          row-key="id"
+          :rows="fazendas"
+          :columns="colunas"
+          :loading="carregando"
+          :rows-per-page-options="[10, 25, 50]"
+        >
+          <template #body-cell-areaTotalHa="props">
+            <q-td :props="props" class="text-metric">
+              {{ props.row.areaTotalHa != null ? formatarDecimal(props.row.areaTotalHa) : '—' }}
+            </q-td>
+          </template>
+          <template #body-cell-ativo="props">
+            <q-td :props="props">
+              <agro-badge
+                :label="props.row.ativo ? 'Ativo' : 'Inativo'"
+                :variant="props.row.ativo ? 'success' : 'default'"
+              />
+            </q-td>
+          </template>
+          <template #body-cell-acoes="props">
+            <q-td :props="props" class="acoes">
+              <agro-btn
+                flat
+                round
+                dense
+                icon="edit"
+                color="primary"
+                descricao="Editar"
+                @click="abrirDialog(props.row)"
+              />
+              <agro-btn
+                v-if="props.row.ativo"
+                flat
+                round
+                dense
+                icon="block"
+                color="negative"
+                descricao="Inativar"
+                :loading="salvando"
+                @click="inativar(props.row.id)"
+              />
+            </q-td>
+          </template>
+        </q-table>
+      </agro-card>
+    </section>
+
+    <q-dialog v-model="dialog" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">{{ editandoId ? 'Editar fazenda' : 'Nova fazenda' }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-input
+                  v-model="formulario.nome"
+                  outlined
+                  label="Nome"
+                  class="field-required"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input v-model="formulario.municipio" outlined label="Município" />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input v-model="formulario.uf" outlined label="UF" maxlength="2" />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input
+                  v-model="formulario.areaTotalHa"
+                  outlined
+                  label="Área total (ha)"
+                  type="number"
+                  step="0.01"
+                />
+              </div>
+              <div class="col-12">
+                <q-input v-model="formulario.clienteId" outlined label="Cliente ID (opcional)" />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+              <agro-btn
+                color="primary"
+                unelevated
+                label="Salvar"
+                type="submit"
+                :loading="salvando"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  </q-page>
+</template>
+
+<script setup lang="ts">
+import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroCard from 'components/ui/AgroCard.vue';
+import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
+import EmptyState from 'components/ui/EmptyState.vue';
+import { useFazendas } from 'composables/useFazendas';
+import type { QTableColumn } from 'quasar';
+import type { FazendaDto, FazendaFormModel } from 'types/dtos/safras.dto';
+import { formatarDecimal } from 'utils/formatters';
+import { obrigatorio } from 'utils/validators';
+import { onMounted, ref } from 'vue';
+
+const { fazendas, carregando, salvando, carregar, criar, editar, inativar } = useFazendas();
+const dialog = ref(false);
+const editandoId = ref<string | null>(null);
+const formulario = ref<FazendaFormModel>({
+  nome: '',
+  clienteId: '',
+  municipio: '',
+  uf: '',
+  areaTotalHa: '',
+});
+
+const colunas: QTableColumn<FazendaDto>[] = [
+  { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
+  { name: 'municipio', label: 'Município', field: 'municipio', align: 'left' },
+  { name: 'uf', label: 'UF', field: 'uf', align: 'left' },
+  { name: 'areaTotalHa', label: 'Área (ha)', field: 'areaTotalHa', align: 'right' },
+  { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+];
+
+function abrirDialog(item?: FazendaDto): void {
+  editandoId.value = item?.id ?? null;
+  formulario.value = {
+    nome: item?.nome ?? '',
+    clienteId: item?.clienteId ?? '',
+    municipio: item?.municipio ?? '',
+    uf: item?.uf ?? '',
+    areaTotalHa: item?.areaTotalHa != null ? String(item.areaTotalHa) : '',
+  };
+  dialog.value = true;
+}
+
+async function salvar(): Promise<void> {
+  const ok = editandoId.value
+    ? await editar(editandoId.value, formulario.value)
+    : await criar(formulario.value);
+  if (ok) dialog.value = false;
+}
+
+onMounted(() => {
+  void carregar();
+});
+</script>
+
+<style scoped>
+.dialog {
+  min-width: min(520px, 94vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+}
+.acoes {
+  white-space: nowrap;
+}
+</style>

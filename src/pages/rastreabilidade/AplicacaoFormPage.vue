@@ -4,7 +4,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
+        <agro-form-skeleton v-if="carregandoPagina" :campos="12" />
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
@@ -29,31 +29,127 @@
                 map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @update:model-value="onProdutoChange"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.quantidade" outlined label="Quantidade" type="number" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.quantidade"
+                outlined
+                label="Quantidade"
+                type="number"
+                class="field-required"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.unidadeMedida" outlined label="Unidade" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.unidadeMedida"
+                outlined
+                label="Unidade"
+                class="field-required"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataAplicacao" outlined label="Data" type="date" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.dataAplicacao"
+                outlined
+                label="Data"
+                type="date"
+                class="field-required"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.loteId" outlined label="ID do lote" />
+              <q-select
+                v-model="formulario.loteId"
+                outlined
+                label="Lote"
+                clearable
+                emit-value
+                map-options
+                :options="loteOpcoes"
+                :loading="carregandoLotes"
+                :disable="!formulario.produtoId"
+              />
             </div>
-            <div class="col-6 col-md-3">
-              <q-input v-model="formulario.safra" outlined label="Safra" />
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="formulario.safraId"
+                outlined
+                label="Safra"
+                clearable
+                emit-value
+                map-options
+                :options="safraOpcoes"
+              />
             </div>
             <div class="col-6 col-md-3">
               <q-input v-model="formulario.cultura" outlined label="Cultura" />
+            </div>
+            <div class="col-6 col-md-3">
+              <q-input
+                v-model="formulario.doseHa"
+                outlined
+                label="Dose / ha"
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="col-6 col-md-3">
+              <q-input
+                v-model="formulario.areaAplicadaHa"
+                outlined
+                label="Área aplicada (ha)"
+                type="number"
+                step="0.01"
+              />
+            </div>
+            <div class="col-6 col-md-3">
+              <q-input v-model="formulario.equipamento" outlined label="Equipamento" />
+            </div>
+            <div class="col-6 col-md-3">
+              <q-input v-model="formulario.operadorNome" outlined label="Operador" />
+            </div>
+            <div class="col-4 col-md-2">
+              <q-input
+                v-model="formulario.temperaturaC"
+                outlined
+                label="Temp. (°C)"
+                type="number"
+              />
+            </div>
+            <div class="col-4 col-md-2">
+              <q-input
+                v-model="formulario.umidadePct"
+                outlined
+                label="Umidade (%)"
+                type="number"
+              />
+            </div>
+            <div class="col-4 col-md-2">
+              <q-input
+                v-model="formulario.ventoKmh"
+                outlined
+                label="Vento (km/h)"
+                type="number"
+              />
             </div>
             <div class="col-6 col-md-3">
               <q-input v-model="formulario.numeroReceita" outlined label="Nº receita" />
             </div>
             <div class="col-6 col-md-3">
               <q-input v-model="formulario.crea" outlined label="CREA" />
+            </div>
+            <div class="col-12">
+              <q-input
+                v-model="formulario.observacoes"
+                outlined
+                label="Observações"
+                type="textarea"
+                autogrow
+              />
             </div>
           </div>
 
@@ -77,8 +173,10 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutos } from 'composables/useProdutos';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
+import { useSafras } from 'composables/useSafras';
 import type { AplicacaoInsumoFormModel } from 'types/dtos/rastreabilidade.dto';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
@@ -96,6 +194,12 @@ const {
   carregarTalhoes,
 } = useRastreabilidade();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { safraOpcoes, carregar: carregarSafras } = useSafras();
+const {
+  lotes,
+  carregando: carregandoLotes,
+  carregar: carregarLotes,
+} = useEstoqueLotes();
 
 const modo = computed(() => (route.name === 'aplicacao-editar' ? 'editar' : 'criar'));
 const aplicacaoId = computed(() => route.params.id as string | undefined);
@@ -111,10 +215,19 @@ const formulario = ref<AplicacaoInsumoFormModel>({
   quantidade: '',
   unidadeMedida: '',
   dataAplicacao: '',
+  safraId: '',
   safra: '',
   cultura: '',
   numeroReceita: '',
   crea: '',
+  doseHa: '',
+  areaAplicadaHa: '',
+  equipamento: '',
+  operadorNome: '',
+  temperaturaC: '',
+  umidadePct: '',
+  ventoKmh: '',
+  observacoes: '',
 });
 
 const talhaoOpcoes = computed(() =>
@@ -123,6 +236,23 @@ const talhaoOpcoes = computed(() =>
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
 );
+const loteOpcoes = computed(() =>
+  lotes.value
+    .filter((l) => l.ativo)
+    .map((l) => ({
+      label: `${l.numeroLote}${l.quantidade != null ? ` (${l.quantidade})` : ''}`,
+      value: l.id,
+    })),
+);
+
+async function onProdutoChange(produtoId: string | null): Promise<void> {
+  formulario.value.loteId = '';
+  if (!produtoId) {
+    lotes.value = [];
+    return;
+  }
+  await carregarLotes({ produtoId, apenasComSaldo: true });
+}
 
 async function salvar(): Promise<void> {
   if (modo.value === 'criar') {
@@ -138,6 +268,7 @@ async function salvar(): Promise<void> {
 onMounted(async () => {
   void carregarTalhoes();
   void carregarProdutos();
+  void carregarSafras();
 
   if (modo.value === 'editar' && aplicacaoId.value) {
     carregandoPagina.value = true;
@@ -153,11 +284,28 @@ onMounted(async () => {
       quantidade: String(aplicacao.value.quantidade),
       unidadeMedida: aplicacao.value.unidadeMedida,
       dataAplicacao: aplicacao.value.dataAplicacao.slice(0, 10),
+      safraId: aplicacao.value.safraId ?? '',
       safra: aplicacao.value.safra ?? '',
       cultura: aplicacao.value.cultura ?? '',
       numeroReceita: aplicacao.value.numeroReceita ?? '',
       crea: aplicacao.value.crea ?? '',
+      doseHa: aplicacao.value.doseHa != null ? String(aplicacao.value.doseHa) : '',
+      areaAplicadaHa:
+        aplicacao.value.areaAplicadaHa != null
+          ? String(aplicacao.value.areaAplicadaHa)
+          : '',
+      equipamento: aplicacao.value.equipamento ?? '',
+      operadorNome: aplicacao.value.operadorNome ?? '',
+      temperaturaC:
+        aplicacao.value.temperaturaC != null ? String(aplicacao.value.temperaturaC) : '',
+      umidadePct:
+        aplicacao.value.umidadePct != null ? String(aplicacao.value.umidadePct) : '',
+      ventoKmh: aplicacao.value.ventoKmh != null ? String(aplicacao.value.ventoKmh) : '',
+      observacoes: aplicacao.value.observacoes ?? '',
     };
+    if (aplicacao.value.produtoId) {
+      await carregarLotes({ produtoId: aplicacao.value.produtoId, apenasComSaldo: false });
+    }
     carregandoPagina.value = false;
   }
 });

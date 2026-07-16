@@ -5,11 +5,15 @@ import { producaoService } from 'services/producao.service';
 import type {
   BeneficiamentoLoteDto,
   BeneficiamentoLoteFormModel,
+  ConcluirOrdemProducaoPayload,
+  CriarApontamentoConsumoPayload,
+  CriarApontamentoProducaoPayload,
   CriarBeneficiamentoLotePayload,
   CriarOrdemProducaoPayload,
   OrdemProducaoDto,
   OrdemProducaoFormModel,
 } from 'types/dtos/producao.dto';
+import { TipoSaidaBeneficiamento } from 'constants/enums';
 import { ref } from 'vue';
 
 function ordemFormParaPayload(form: OrdemProducaoFormModel): CriarOrdemProducaoPayload {
@@ -18,6 +22,7 @@ function ordemFormParaPayload(form: OrdemProducaoFormModel): CriarOrdemProducaoP
     quantidadePlanejada: Number(form.quantidadePlanejada),
     dataPrevista: form.dataPrevista || null,
     observacao: form.observacao.trim() || null,
+    receitaId: form.receitaId || null,
     itens: form.itens.map((item) => ({
       produtoInsumoId: item.produtoInsumoId,
       quantidade: Number(item.quantidade),
@@ -28,12 +33,28 @@ function ordemFormParaPayload(form: OrdemProducaoFormModel): CriarOrdemProducaoP
 function beneficiamentoFormParaPayload(
   form: BeneficiamentoLoteFormModel,
 ): CriarBeneficiamentoLotePayload {
+  const saidas = form.saidas.map((s) => ({
+    produtoId: s.produtoId,
+    quantidade: Number(s.quantidade),
+    tipo: s.tipo,
+    numeroLote: s.numeroLote.trim() || null,
+    destinoPerda: s.destinoPerda.trim() || null,
+  }));
+
+  const principal = saidas.find((s) => s.tipo === TipoSaidaBeneficiamento.Principal);
+  const produtoSaidaId = form.produtoSaidaId || principal?.produtoId || '';
+  const quantidadeSaida = form.quantidadeSaida
+    ? Number(form.quantidadeSaida)
+    : (principal?.quantidade ?? 0);
+
   return {
     produtoEntradaId: form.produtoEntradaId,
-    produtoSaidaId: form.produtoSaidaId,
+    produtoSaidaId,
     quantidadeEntrada: Number(form.quantidadeEntrada),
-    quantidadeSaida: Number(form.quantidadeSaida),
+    quantidadeSaida,
+    loteEntradaId: form.loteEntradaId || null,
     observacao: form.observacao.trim() || null,
+    saidas,
   };
 }
 
@@ -49,7 +70,6 @@ export function useProducao() {
 
   async function carregarOrdens(): Promise<void> {
     carregando.value = true;
-
     try {
       ordens.value = await producaoService.listarOrdens();
     } catch (e) {
@@ -61,7 +81,6 @@ export function useProducao() {
 
   async function obterOrdem(id: string): Promise<boolean> {
     carregando.value = true;
-
     try {
       ordem.value = await producaoService.obterOrdem(id);
       return true;
@@ -75,7 +94,6 @@ export function useProducao() {
 
   async function criarOrdem(form: OrdemProducaoFormModel): Promise<OrdemProducaoDto | null> {
     salvando.value = true;
-
     try {
       const criada = await producaoService.criarOrdem(ordemFormParaPayload(form));
       sucesso('Ordem de produção criada.');
@@ -93,7 +111,6 @@ export function useProducao() {
     form: OrdemProducaoFormModel,
   ): Promise<OrdemProducaoDto | null> {
     salvando.value = true;
-
     try {
       const atualizada = await producaoService.editarOrdem(id, ordemFormParaPayload(form));
       sucesso('Ordem de produção atualizada.');
@@ -113,13 +130,9 @@ export function useProducao() {
       textoConfirmar: 'Iniciar',
       icone: 'info',
     });
-
-    if (!confirmou) {
-      return false;
-    }
+    if (!confirmou) return false;
 
     salvando.value = true;
-
     try {
       ordem.value = await producaoService.iniciarOrdem(id);
       sucesso('Ordem iniciada.');
@@ -132,11 +145,13 @@ export function useProducao() {
     }
   }
 
-  async function concluirOrdem(id: string, quantidadeProduzida: number): Promise<boolean> {
+  async function concluirOrdem(
+    id: string,
+    payload: ConcluirOrdemProducaoPayload,
+  ): Promise<boolean> {
     salvando.value = true;
-
     try {
-      ordem.value = await producaoService.concluirOrdem(id, { quantidadeProduzida });
+      ordem.value = await producaoService.concluirOrdem(id, payload);
       sucesso('Ordem concluída.');
       return true;
     } catch (e) {
@@ -154,13 +169,9 @@ export function useProducao() {
       textoConfirmar: 'Cancelar',
       icone: 'warning',
     });
-
-    if (!confirmou) {
-      return false;
-    }
+    if (!confirmou) return false;
 
     salvando.value = true;
-
     try {
       await producaoService.cancelarOrdem(id);
       sucesso('Ordem cancelada.');
@@ -174,9 +185,44 @@ export function useProducao() {
     }
   }
 
+  async function apontarConsumo(
+    ordemId: string,
+    payload: CriarApontamentoConsumoPayload,
+  ): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await producaoService.criarApontamentoConsumo(ordemId, payload);
+      sucesso('Consumo apontado.');
+      ordem.value = await producaoService.obterOrdem(ordemId);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function apontarProducao(
+    ordemId: string,
+    payload: CriarApontamentoProducaoPayload,
+  ): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await producaoService.criarApontamentoProducao(ordemId, payload);
+      sucesso('Produção apontada.');
+      ordem.value = await producaoService.obterOrdem(ordemId);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   async function carregarBeneficiamentos(): Promise<void> {
     carregando.value = true;
-
     try {
       beneficiamentos.value = await producaoService.listarBeneficiamentos();
     } catch (e) {
@@ -188,7 +234,6 @@ export function useProducao() {
 
   async function obterBeneficiamento(id: string): Promise<boolean> {
     carregando.value = true;
-
     try {
       beneficiamento.value = await producaoService.obterBeneficiamento(id);
       return true;
@@ -204,7 +249,6 @@ export function useProducao() {
     form: BeneficiamentoLoteFormModel,
   ): Promise<BeneficiamentoLoteDto | null> {
     salvando.value = true;
-
     try {
       const criado = await producaoService.criarBeneficiamento(
         beneficiamentoFormParaPayload(form),
@@ -224,7 +268,6 @@ export function useProducao() {
     form: BeneficiamentoLoteFormModel,
   ): Promise<BeneficiamentoLoteDto | null> {
     salvando.value = true;
-
     try {
       const atualizado = await producaoService.editarBeneficiamento(
         id,
@@ -240,6 +283,28 @@ export function useProducao() {
     }
   }
 
+  async function confirmarBeneficiamento(id: string): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Confirmar beneficiamento',
+      mensagem: 'Confirma a movimentação de estoque deste beneficiamento?',
+      textoConfirmar: 'Confirmar',
+      icone: 'info',
+    });
+    if (!confirmou) return false;
+
+    salvando.value = true;
+    try {
+      beneficiamento.value = await producaoService.confirmarBeneficiamento(id);
+      sucesso('Beneficiamento confirmado.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   async function removerBeneficiamento(id: string): Promise<boolean> {
     const confirmou = await messageService.confirmar({
       titulo: 'Remover beneficiamento',
@@ -247,13 +312,9 @@ export function useProducao() {
       textoConfirmar: 'Remover',
       icone: 'warning',
     });
-
-    if (!confirmou) {
-      return false;
-    }
+    if (!confirmou) return false;
 
     salvando.value = true;
-
     try {
       await producaoService.removerBeneficiamento(id);
       sucesso('Beneficiamento removido.');
@@ -280,10 +341,13 @@ export function useProducao() {
     iniciarOrdem,
     concluirOrdem,
     cancelarOrdem,
+    apontarConsumo,
+    apontarProducao,
     carregarBeneficiamentos,
     obterBeneficiamento,
     criarBeneficiamento,
     editarBeneficiamento,
+    confirmarBeneficiamento,
     removerBeneficiamento,
   };
 }

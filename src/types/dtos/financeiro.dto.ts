@@ -1,6 +1,7 @@
 import type {
   ContaPagarStatusValor,
   ContaReceberStatusValor,
+  EscopoFinanceiroValor,
   FormaPagamentoValor,
 } from 'constants/enums';
 
@@ -15,43 +16,129 @@ export interface CondicaoPagamentoDto {
   ativo: boolean;
 }
 
+export interface CriarCondicaoPagamentoPayload {
+  codigo: string;
+  nome: string;
+  numeroParcelas: number;
+  intervaloDias: number;
+}
+
+export interface EditarCondicaoPagamentoPayload {
+  codigo: string;
+  nome: string;
+  numeroParcelas: number;
+  intervaloDias: number;
+}
+
+export interface CondicaoPagamentoFormModel {
+  codigo: string;
+  nome: string;
+  numeroParcelas: string;
+  intervaloDias: string;
+}
+
+export interface FiltroEscopoFinanceiro {
+  escopo?: EscopoFinanceiroValor;
+  cnpjId?: string;
+  unidadeId?: string;
+  centroCustoId?: string;
+}
+
 export interface ContaReceberDto {
   id: string;
   empresaId: string;
   unidadeId: string;
+  cnpjId?: string | null;
   clienteId: string;
-  pedidoVendaId: string;
+  pedidoVendaId: string | null;
   parcela: number;
   valor: number;
+  valorPago?: number | null;
   vencimento: string;
   status: ContaReceberStatusValor;
   formaPagamento: FormaPagamentoValor;
+  centroCustoId?: string | null;
 }
 
-export interface ListarContasReceberParams {
+export interface ListarContasReceberParams extends FiltroEscopoFinanceiro {
   clienteId?: string;
   pedidoId?: string;
   status?: ContaReceberStatusValor;
+}
+
+export interface FormaBaixaReceberPayload {
+  formaPagamento: FormaPagamentoValor;
+  valor: number;
+  contaBancariaId?: string | null;
+}
+
+export interface BaixarContaReceberPayload {
+  valor?: number;
+  formas?: FormaBaixaReceberPayload[];
+  contaBancariaId?: string | null;
+  dataPagamento?: string | null;
+  juros?: number | null;
+  multa?: number | null;
+  observacao?: string | null;
 }
 
 export interface ContaPagarDto {
   id: string;
   empresaId: string;
   unidadeId: string;
+  cnpjId?: string | null;
   fornecedorId: string;
   recebimentoCompraId: string | null;
   notaFiscalId: string | null;
   parcela: number;
   valor: number;
+  valorPago?: number | null;
   vencimento: string;
   status: ContaPagarStatusValor;
   descricao: string | null;
+  formaPagamento?: FormaPagamentoValor | null;
+  centroCustoId?: string | null;
 }
 
-export interface ListarContasPagarParams {
+export interface ListarContasPagarParams extends FiltroEscopoFinanceiro {
   fornecedorId?: string;
   recebimentoId?: string;
   status?: ContaPagarStatusValor;
+}
+
+export interface BaixarContaPagarPayload {
+  valor?: number;
+  formaPagamento?: FormaPagamentoValor | null;
+  contaBancariaId?: string | null;
+  dataPagamento?: string | null;
+  juros?: number | null;
+  multa?: number | null;
+  observacao?: string | null;
+}
+
+export interface BaixaContaPagarFormModel {
+  valor: string;
+  formaPagamento: FormaPagamentoValor | '';
+  contaBancariaId: string;
+  dataPagamento: string;
+  juros: string;
+  multa: string;
+  observacao: string;
+}
+
+export interface FormaBaixaReceberFormModel {
+  formaPagamento: FormaPagamentoValor | '';
+  valor: string;
+  contaBancariaId: string;
+}
+
+export interface BaixaContaReceberFormModel {
+  valor: string;
+  dataPagamento: string;
+  juros: string;
+  multa: string;
+  observacao: string;
+  formas: FormaBaixaReceberFormModel[];
 }
 
 export interface TaxaFormaPagamentoDto {

@@ -1,5 +1,6 @@
 import { api } from 'services/api';
 import type {
+  EmitirNfcePdvDto,
   ListarPdvVendasParams,
   PdvVendaDto,
   PdvVendaResumoDto,
@@ -23,5 +24,9 @@ export const pdvService = {
 
   cancelar(id: string): Promise<PdvVendaDto> {
     return api.post<PdvVendaDto>(`/pdv/${id}/cancelar`).then((r) => r.data);
+  },
+
+  emitirNfce(id: string): Promise<EmitirNfcePdvDto> {
+    return api.post<EmitirNfcePdvDto>(`/pdv/${id}/emitir-nfce`).then((r) => r.data);
   },
 };

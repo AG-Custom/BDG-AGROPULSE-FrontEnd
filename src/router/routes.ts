@@ -550,6 +550,179 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'financeiro/contas-receber',
+        name: 'contas-receber',
+        component: () => import('pages/financeiro/ContasReceberListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contasReceber',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/contas-pagar',
+        name: 'contas-pagar',
+        component: () => import('pages/financeiro/ContasPagarListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contasPagar',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/condicoes-pagamento',
+        name: 'condicoes-pagamento',
+        component: () => import('pages/financeiro/CondicoesPagamentoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.condicoesPagamento',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/condicoes-pagamento/nova',
+        name: 'condicao-pagamento-nova',
+        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.condicaoPagamentoNova',
+          breadcrumbPais: ['navegacao.condicoesPagamento'],
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/condicoes-pagamento/:id/editar',
+        name: 'condicao-pagamento-editar',
+        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.condicaoPagamentoEditar',
+          breadcrumbPais: ['navegacao.condicoesPagamento'],
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/contas-bancarias',
+        name: 'contas-bancarias',
+        component: () => import('pages/financeiro/ContasBancariasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contasBancarias',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/caixas',
+        name: 'caixas',
+        component: () => import('pages/financeiro/CaixasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.caixas',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/centros-custo',
+        name: 'centros-custo',
+        component: () => import('pages/financeiro/CentrosCustoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.centrosCusto',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/transferencias',
+        name: 'transferencias-financeiras',
+        component: () => import('pages/financeiro/TransferenciasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.transferenciasFinanceiras',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/cheques',
+        name: 'cheques',
+        component: () => import('pages/financeiro/ChequesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cheques',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/fluxo-caixa',
+        name: 'fluxo-caixa',
+        component: () => import('pages/financeiro/FluxoCaixaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fluxoCaixa',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/tesouraria',
+        name: 'tesouraria',
+        component: () => import('pages/financeiro/TesourariaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.tesouraria',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/conciliacao-bancaria',
+        name: 'conciliacao-bancaria',
+        component: () => import('pages/financeiro/ConciliacaoBancariaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.conciliacaoBancaria',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/boletos',
+        name: 'boletos',
+        component: () => import('pages/financeiro/BoletosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.boletos',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/regua-cobranca',
+        name: 'regua-cobranca',
+        component: () => import('pages/financeiro/ReguaCobrancaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.reguaCobranca',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/renegociacoes',
+        name: 'renegociacoes',
+        component: () => import('pages/financeiro/RenegociacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.renegociacoes',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/antecipacoes',
+        name: 'antecipacoes',
+        component: () => import('pages/financeiro/AntecipacoesPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.antecipacoes',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/orcamento',
+        name: 'orcamento-financeiro',
+        component: () => import('pages/financeiro/OrcamentoFinanceiroPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.orcamentoFinanceiro',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/cotacoes-moeda',
+        name: 'cotacoes-moeda',
+        component: () => import('pages/financeiro/CotacoesMoedaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cotacoesMoeda',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
         path: 'orcamentos',
         name: 'orcamentos',
         component: () => import('pages/orcamentos/OrcamentosListPage.vue'),
@@ -762,12 +935,7 @@ export const routes: RouteRecordRaw[] = [
       },
       {
         path: 'compras/contas-pagar',
-        name: 'contas-pagar',
-        component: () => import('pages/compras/ContasPagarListPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.contasPagar',
-          permissao: Permissoes.Compras.Visualizar,
-        },
+        redirect: { name: 'contas-pagar' },
       },
       {
         path: 'devolucoes-venda',
@@ -823,6 +991,106 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/fiscal/FiscalConfigPage.vue'),
         meta: {
           breadcrumb: 'navegacao.fiscal',
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/notas-fiscais',
+        name: 'fiscal-notas-fiscais',
+        component: () => import('pages/fiscal/NotasFiscaisListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.notasFiscais',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/contingencia',
+        name: 'fiscal-contingencia',
+        component: () => import('pages/fiscal/ContingenciaFiscalPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contingenciaFiscal',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/inutilizacoes',
+        name: 'fiscal-inutilizacoes',
+        component: () => import('pages/fiscal/InutilizacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.inutilizacoesFiscais',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/ncm-pis-cofins',
+        name: 'fiscal-ncm-pis-cofins',
+        component: () => import('pages/fiscal/NcmPisCofinsListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ncmPisCofins',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/mva-ncm-uf',
+        name: 'fiscal-mva-ncm-uf',
+        component: () => import('pages/fiscal/MvaNcmUfListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.mvaNcmUf',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/gnre',
+        name: 'fiscal-gnre',
+        component: () => import('pages/fiscal/GnreListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.gnre',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/funrural',
+        name: 'fiscal-funrural',
+        component: () => import('pages/fiscal/FunruralPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.funrural',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/regimes-cnpj',
+        name: 'fiscal-regimes-cnpj',
+        component: () => import('pages/fiscal/RegimesCnpjListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.regimesCnpj',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/sped',
+        name: 'fiscal-sped',
+        component: () => import('pages/fiscal/SpedFiscalPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.spedFiscal',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/calculo-impostos',
+        name: 'fiscal-calculo-impostos',
+        component: () => import('pages/fiscal/CalculoImpostosPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.calculoImpostos',
+          breadcrumbPais: ['navegacao.fiscal'],
           permissao: Permissoes.Fiscal.Visualizar,
         },
       },
@@ -934,6 +1202,111 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'producao/receitas',
+        name: 'receitas-producao',
+        component: () => import('pages/producao/ReceitasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.receitasProducao',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/receitas/nova',
+        name: 'receita-producao-nova',
+        component: () => import('pages/producao/ReceitaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.receitaProducaoNova',
+          breadcrumbPais: ['navegacao.receitasProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/receitas/:id/editar',
+        name: 'receita-producao-editar',
+        component: () => import('pages/producao/ReceitaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.receitaProducaoEditar',
+          breadcrumbPais: ['navegacao.receitasProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/laudos',
+        name: 'laudos',
+        component: () => import('pages/producao/LaudosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.laudos',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/laudos/novo',
+        name: 'laudo-novo',
+        component: () => import('pages/producao/LaudoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.laudoNovo',
+          breadcrumbPais: ['navegacao.laudos'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/laudos/:id',
+        name: 'laudo-detalhe',
+        component: () => import('pages/producao/LaudoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.laudoDetalhe',
+          breadcrumbPais: ['navegacao.laudos'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/fichas-tecnicas',
+        name: 'fichas-tecnicas',
+        component: () => import('pages/producao/FichasTecnicasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fichasTecnicas',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/fichas-tecnicas/nova',
+        name: 'ficha-tecnica-nova',
+        component: () => import('pages/producao/FichaTecnicaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fichaTecnicaNova',
+          breadcrumbPais: ['navegacao.fichasTecnicas'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/fichas-tecnicas/:id/editar',
+        name: 'ficha-tecnica-editar',
+        component: () => import('pages/producao/FichaTecnicaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fichaTecnicaEditar',
+          breadcrumbPais: ['navegacao.fichasTecnicas'],
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/paradas',
+        name: 'paradas-linha',
+        component: () => import('pages/producao/ParadasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.paradasLinha',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
+        path: 'producao/oee',
+        name: 'oee',
+        component: () => import('pages/producao/OeePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.oee',
+          permissao: Permissoes.Producao.Visualizar,
+        },
+      },
+      {
         path: 'rastreabilidade/talhoes',
         name: 'talhoes',
         component: () => import('pages/rastreabilidade/TalhoesListPage.vue'),
@@ -992,12 +1365,158 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'safras/fazendas',
+        name: 'safras-fazendas',
+        component: () => import('pages/safras/FazendasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fazendas',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/glebas',
+        name: 'safras-glebas',
+        component: () => import('pages/safras/GlebasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.glebas',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/diario-campo',
+        name: 'safras-diario-campo',
+        component: () => import('pages/safras/DiarioCampoPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.diarioCampo',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/historico-aplicacoes',
+        name: 'safras-historico-aplicacoes',
+        component: () => import('pages/safras/HistoricoAplicacoesPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.historicoAplicacoes',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/historico-produtividade',
+        name: 'safras-historico-produtividade',
+        component: () => import('pages/safras/HistoricoProdutividadePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.historicoProdutividade',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/geo',
+        name: 'safras-geo',
+        component: () => import('pages/safras/GeoImportPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.geoImport',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/visitas-tecnicas',
+        name: 'safras-visitas-tecnicas',
+        component: () => import('pages/safras/VisitasTecnicasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.visitasTecnicas',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/recomendacoes',
+        name: 'safras-recomendacoes',
+        component: () => import('pages/safras/RecomendacoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.recomendacoes',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/planejamento',
+        name: 'safras-planejamento',
+        component: () => import('pages/safras/SafrasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.planejamentoSafras',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/planejamento/nova',
+        name: 'safra-nova',
+        component: () => import('pages/safras/SafraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.safraNova',
+          breadcrumbPais: ['navegacao.planejamentoSafras'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/planejamento/:id/editar',
+        name: 'safra-editar',
+        component: () => import('pages/safras/SafraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.safraEditar',
+          breadcrumbPais: ['navegacao.planejamentoSafras'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/ordens-servico',
+        name: 'safras-ordens-servico',
+        component: () => import('pages/safras/OrdensServicoAgricolaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.ordensServicoAgricola',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/custeio',
+        name: 'safras-custeio',
+        component: () => import('pages/safras/CusteioSafraPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.custeioSafra',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'safras/oee-campo',
+        name: 'safras-oee-campo',
+        component: () => import('pages/safras/OeeCampoPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.oeeCampo',
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
         path: 'relatorios',
         name: 'relatorios',
         component: () => import('pages/relatorios/RelatoriosPage.vue'),
         meta: {
           breadcrumb: 'navegacao.relatorios',
           permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'metas-vendedor',
+        name: 'metas-vendedor',
+        component: () => import('pages/metas-vendedor/MetasVendedorListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.metasVendedor',
+          permissao: Permissoes.MetasVendedor.Visualizar,
+        },
+      },
+      {
+        path: 'representantes',
+        name: 'representantes',
+        component: () => import('pages/representantes/RepresentantesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.representantes',
+          permissao: Permissoes.Representantes.Visualizar,
         },
       },
       {

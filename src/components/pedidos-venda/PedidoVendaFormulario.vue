@@ -21,6 +21,7 @@
             :loading="carregandoClientes"
             :rules="[obrigatorio]"
             :readonly="somenteLeitura"
+            @update:model-value="onClienteChange"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -34,6 +35,20 @@
             clearable
             :options="vendedorOpcoes"
             :loading="carregandoUsuarios"
+            :readonly="somenteLeitura"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <q-select
+            v-model="formulario.tabelaPrecoId"
+            outlined
+            label="Tabela de preço"
+            hint="Opcional — resolve preço automático nos itens"
+            emit-value
+            map-options
+            clearable
+            :options="tabelaOpcoes"
+            :loading="carregandoTabelas"
             :readonly="somenteLeitura"
           />
         </div>
@@ -86,6 +101,7 @@
 <script setup lang="ts">
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
+import { usePrecificacao } from 'composables/usePrecificacao';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   FormaPagamentoOpcoes,
@@ -95,7 +111,7 @@ import {
 import type { QForm } from 'quasar';
 import type { PedidoVendaFormModel } from 'types/dtos/pedido-venda.dto';
 import { obrigatorio } from 'utils/validators';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 defineProps<{
   somenteLeitura?: boolean;
@@ -124,6 +140,13 @@ const {
   carregar: carregarCondicoes,
 } = useCondicoesPagamento();
 
+const {
+  tabelaOpcoes,
+  tabelaPadraoId,
+  carregandoTabelas,
+  carregarTabelasPermitidas,
+} = usePrecificacao();
+
 const clienteOpcoes = computed(() =>
   clientes.value
     .filter((cliente) => cliente.ativo || cliente.id === formulario.value.clienteId)
@@ -149,14 +172,33 @@ const vendedorOpcoes = computed(() =>
     })),
 );
 
+async function onClienteChange(clienteId: string): Promise<void> {
+  await carregarTabelasPermitidas({ clienteId: clienteId || null });
+  if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
+    formulario.value.tabelaPrecoId = tabelaPadraoId.value;
+  }
+}
+
 async function validar(): Promise<boolean> {
   return (await formRef.value?.validate()) ?? false;
 }
+
+watch(
+  () => formulario.value.clienteId,
+  (clienteId) => {
+    if (clienteId) {
+      void carregarTabelasPermitidas({ clienteId });
+    }
+  },
+);
 
 onMounted(() => {
   void carregarClientes({ ativo: true });
   void carregarUsuarios();
   void carregarCondicoes();
+  void carregarTabelasPermitidas({
+    clienteId: formulario.value.clienteId || null,
+  });
 });
 
 defineExpose({ validar });

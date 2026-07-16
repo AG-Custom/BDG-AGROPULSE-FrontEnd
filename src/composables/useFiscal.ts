@@ -1,7 +1,15 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import type { RegimeTributarioValor } from 'constants/enums';
+import { fiscalGestaoService } from 'services/fiscal-gestao.service';
 import { fiscalService } from 'services/fiscal.service';
+import type {
+  CfopOverridePayload,
+  ManifestacaoDestinatarioDto,
+  ManifestarDestinatarioPayload,
+  SugerirCompletoParams,
+  SugestaoTributacaoCompletaDto,
+} from 'types/dtos/fiscal-gestao.dto';
 import type {
   ConfiguracaoFiscalDto,
   ConfiguracaoFiscalFormModel,
@@ -17,6 +25,8 @@ export function useFiscal() {
   const configuracao = ref<ConfiguracaoFiscalDto | null>(null);
   const ultimaImportacao = ref<ImportacaoXmlDto | null>(null);
   const documentosSefaz = ref<DocumentosSefazDto | null>(null);
+  const sugestaoCompleta = ref<SugestaoTributacaoCompletaDto | null>(null);
+  const ultimaManifestacao = ref<ManifestacaoDestinatarioDto | null>(null);
   const carregando = ref(false);
   const salvando = ref(false);
   const importando = ref(false);
@@ -112,10 +122,57 @@ export function useFiscal() {
     }
   }
 
+  async function sugerirCompleto(
+    produtoId: string,
+    params?: SugerirCompletoParams,
+  ): Promise<SugestaoTributacaoCompletaDto | null> {
+    try {
+      sugestaoCompleta.value = await fiscalGestaoService.sugerirCompleto(produtoId, params);
+      return sugestaoCompleta.value;
+    } catch (e) {
+      erro(mensagem(e));
+      sugestaoCompleta.value = null;
+      return null;
+    }
+  }
+
+  async function cfopOverride(payload: CfopOverridePayload): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await fiscalGestaoService.cfopOverride(payload);
+      sucesso('Override de CFOP registrado.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function manifestar(
+    payload: ManifestarDestinatarioPayload,
+  ): Promise<ManifestacaoDestinatarioDto | null> {
+    salvando.value = true;
+    try {
+      ultimaManifestacao.value = await fiscalGestaoService.manifestar(payload);
+      sucesso('Manifestação SEFAZ registrada.');
+      return ultimaManifestacao.value;
+    } catch (e) {
+      erro(mensagem(e));
+      ultimaManifestacao.value = null;
+      return null;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   return {
     configuracao,
     ultimaImportacao,
     documentosSefaz,
+    sugestaoCompleta,
+    ultimaManifestacao,
     carregando,
     salvando,
     importando,
@@ -126,5 +183,8 @@ export function useFiscal() {
     importarXml,
     exportarSped0200,
     listarDocumentosSefaz,
+    sugerirCompleto,
+    cfopOverride,
+    manifestar,
   };
 }

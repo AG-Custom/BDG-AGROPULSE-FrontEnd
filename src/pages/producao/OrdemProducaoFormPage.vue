@@ -1,6 +1,6 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header :titulo="titulo" subtitulo="Defina produto de saída e insumos." />
+    <app-page-header :titulo="titulo" subtitulo="Selecione receita (BOM) ou informe insumos." />
 
     <section class="agro-section">
       <agro-card>
@@ -17,6 +17,19 @@
                 map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @update:model-value="onProdutoSaida"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="formulario.receitaId"
+                outlined
+                label="Receita / BOM"
+                emit-value
+                map-options
+                clearable
+                :options="receitaOpcoes"
+                @update:model-value="onReceita"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -93,6 +106,7 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
+import { useReceitasProducao } from 'composables/useReceitasProducao';
 import type {
   ItemOrdemProducaoFormModel,
   OrdemProducaoFormModel,
@@ -109,6 +123,7 @@ const route = useRoute();
 const router = useRouter();
 const { ordem, salvando, obterOrdem, criarOrdem, editarOrdem } = useProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { receitas, carregar: carregarReceitas } = useReceitasProducao();
 
 const modo = computed(() => (route.name === 'ordem-producao-editar' ? 'editar' : 'criar'));
 const ordemId = computed(() => route.params.id as string | undefined);
@@ -119,6 +134,7 @@ const titulo = computed(() =>
 const carregandoPagina = ref(false);
 const formulario = ref<OrdemProducaoFormModel>({
   produtoSaidaId: '',
+  receitaId: '',
   quantidadePlanejada: '',
   dataPrevista: '',
   observacao: '',
@@ -129,8 +145,49 @@ const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
 );
 
+const receitaOpcoes = computed(() =>
+  receitas.value
+    .filter(
+      (r) =>
+        r.ativa &&
+        (!formulario.value.produtoSaidaId || r.produtoSaidaId === formulario.value.produtoSaidaId),
+    )
+    .map((r) => ({
+      label: `v${r.versao}${r.observacao ? ` — ${r.observacao}` : ''}`,
+      value: r.id,
+    })),
+);
+
 function adicionar(): void {
   formulario.value.itens.push(novoItem());
+}
+
+function aplicarReceita(receitaId: string): void {
+  const receita = receitas.value.find((r) => r.id === receitaId);
+  if (!receita) return;
+  formulario.value.produtoSaidaId = receita.produtoSaidaId;
+  formulario.value.itens = receita.itens.map((i) => ({
+    chave: crypto.randomUUID(),
+    produtoInsumoId: i.produtoInsumoId,
+    quantidade: String(i.quantidade),
+  }));
+}
+
+function onReceita(receitaId: string | null): void {
+  if (receitaId) aplicarReceita(receitaId);
+}
+
+function onProdutoSaida(): void {
+  if (
+    formulario.value.receitaId &&
+    !receitas.value.some(
+      (r) =>
+        r.id === formulario.value.receitaId &&
+        r.produtoSaidaId === formulario.value.produtoSaidaId,
+    )
+  ) {
+    formulario.value.receitaId = '';
+  }
 }
 
 async function salvar(): Promise<void> {
@@ -148,6 +205,7 @@ async function salvar(): Promise<void> {
 
 onMounted(async () => {
   void carregarProdutos();
+  void carregarReceitas();
   if (modo.value === 'editar' && ordemId.value) {
     carregandoPagina.value = true;
     const ok = await obterOrdem(ordemId.value);
@@ -157,6 +215,7 @@ onMounted(async () => {
     }
     formulario.value = {
       produtoSaidaId: ordem.value.produtoSaidaId,
+      receitaId: ordem.value.receitaId ?? '',
       quantidadePlanejada: String(ordem.value.quantidadePlanejada),
       dataPrevista: ordem.value.dataPrevista?.slice(0, 10) ?? '',
       observacao: ordem.value.observacao ?? '',

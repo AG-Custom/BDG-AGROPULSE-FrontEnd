@@ -29,10 +29,10 @@ export function useEstoqueDispositivos() {
     }
   }
 
-  async function lerPesoBalanca(): Promise<LeituraPesoDto | null> {
+  async function lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto | null> {
     lendoPeso.value = true;
     try {
-      const leitura = await estoqueService.lerPesoBalanca();
+      const leitura = await estoqueService.lerPesoBalanca(dispositivoId);
       sucesso('Peso lido da balança.');
       return leitura;
     } catch (e) {

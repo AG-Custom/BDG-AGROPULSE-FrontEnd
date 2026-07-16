@@ -8,6 +8,7 @@ export interface TabelaPrecoResumoDto {
   vigenciaInicio: string;
   vigenciaFim: string | null;
   ativo: boolean;
+  ehPadrao?: boolean;
 }
 
 export interface TabelaPrecoItemDto {

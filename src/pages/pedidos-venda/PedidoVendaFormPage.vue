@@ -17,6 +17,8 @@
       <pedido-venda-itens-section
         v-if="!carregandoPagina"
         v-model:itens="formulario.itens"
+        :cliente-id="formulario.clienteId"
+        :tabela-preco-id="formulario.tabelaPrecoId"
       />
 
       <div v-if="!carregandoPagina" class="agro-form-actions">

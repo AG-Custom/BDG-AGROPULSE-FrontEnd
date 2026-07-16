@@ -1,5 +1,6 @@
 import { api } from 'services/api';
 import type { ExportacaoFormatoValor } from 'constants/enums';
+import type { HistoricoComercialDto } from 'types/dtos/comercial-extras.dto';
 import type {
   ClienteContatoDto,
   ClienteContatoPayload,
@@ -31,6 +32,12 @@ export const clienteService = {
 
   obter(clienteId: string): Promise<ClienteDto> {
     return api.get<ClienteDto>(`/clientes/${clienteId}`).then((r) => r.data);
+  },
+
+  obterHistoricoComercial(clienteId: string): Promise<HistoricoComercialDto> {
+    return api
+      .get<HistoricoComercialDto>(`/clientes/${clienteId}/historico-comercial`)
+      .then((r) => r.data);
   },
 
   criar(payload: CriarClientePayload): Promise<ClienteDto> {

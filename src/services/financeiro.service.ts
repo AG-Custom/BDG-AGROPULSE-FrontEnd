@@ -1,10 +1,14 @@
 import { api } from 'services/api';
 import type {
+  BaixarContaPagarPayload,
+  BaixarContaReceberPayload,
   CondicaoPagamentoDto,
   ConfigFormaPagamentoDto,
   ContaPagarDto,
   ContaReceberDto,
+  CriarCondicaoPagamentoPayload,
   CriarConfigFormaPagamentoPayload,
+  EditarCondicaoPagamentoPayload,
   EditarConfigFormaPagamentoPayload,
   ListarContasPagarParams,
   ListarContasReceberParams,
@@ -18,15 +22,69 @@ export const financeiroService = {
       .then((r) => r.data);
   },
 
+  obterCondicaoPagamento(id: string): Promise<CondicaoPagamentoDto> {
+    return api
+      .get<CondicaoPagamentoDto>(`/condicoes-pagamento/${id}`)
+      .then((r) => r.data);
+  },
+
+  criarCondicaoPagamento(
+    payload: CriarCondicaoPagamentoPayload,
+  ): Promise<CondicaoPagamentoDto> {
+    return api
+      .post<CondicaoPagamentoDto>('/condicoes-pagamento', payload)
+      .then((r) => r.data);
+  },
+
+  editarCondicaoPagamento(
+    id: string,
+    payload: EditarCondicaoPagamentoPayload,
+  ): Promise<CondicaoPagamentoDto> {
+    return api
+      .put<CondicaoPagamentoDto>(`/condicoes-pagamento/${id}`, payload)
+      .then((r) => r.data);
+  },
+
+  inativarCondicaoPagamento(id: string): Promise<void> {
+    return api.patch(`/condicoes-pagamento/${id}/inativar`).then(() => undefined);
+  },
+
   listarContasReceber(params?: ListarContasReceberParams): Promise<ContaReceberDto[]> {
     return api
       .get<ContaReceberDto[]>('/contas-receber', { params })
       .then((r) => r.data);
   },
 
+  baixarContaReceber(
+    id: string,
+    payload: BaixarContaReceberPayload,
+  ): Promise<ContaReceberDto> {
+    return api
+      .post<ContaReceberDto>(`/contas-receber/${id}/baixar`, payload)
+      .then((r) => r.data);
+  },
+
+  cancelarContaReceber(id: string): Promise<ContaReceberDto> {
+    return api
+      .post<ContaReceberDto>(`/contas-receber/${id}/cancelar`)
+      .then((r) => r.data);
+  },
+
   listarContasPagar(params?: ListarContasPagarParams): Promise<ContaPagarDto[]> {
     return api
       .get<ContaPagarDto[]>('/contas-pagar', { params })
+      .then((r) => r.data);
+  },
+
+  baixarContaPagar(id: string, payload: BaixarContaPagarPayload): Promise<ContaPagarDto> {
+    return api
+      .post<ContaPagarDto>(`/contas-pagar/${id}/baixar`, payload)
+      .then((r) => r.data);
+  },
+
+  cancelarContaPagar(id: string): Promise<ContaPagarDto> {
+    return api
+      .post<ContaPagarDto>(`/contas-pagar/${id}/cancelar`)
       .then((r) => r.data);
   },
 

@@ -5,6 +5,7 @@ import type {
   CriarTalhaoPayload,
   EditarAplicacaoInsumoPayload,
   EditarTalhaoPayload,
+  ListarAplicacoesParams,
   TalhaoDto,
 } from 'types/dtos/rastreabilidade.dto';
 
@@ -39,9 +40,9 @@ export const rastreabilidadeService = {
       .then(() => undefined);
   },
 
-  listarAplicacoes(): Promise<AplicacaoInsumoDto[]> {
+  listarAplicacoes(params?: ListarAplicacoesParams): Promise<AplicacaoInsumoDto[]> {
     return api
-      .get<AplicacaoInsumoDto[]>('/rastreabilidade/aplicacoes')
+      .get<AplicacaoInsumoDto[]>('/rastreabilidade/aplicacoes', { params })
       .then((r) => r.data);
   },
 

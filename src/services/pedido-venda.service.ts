@@ -1,4 +1,5 @@
 import { api } from 'services/api';
+import type { TravaAprovacaoDto } from 'types/dtos/aprovacao.dto';
 import type {
   CriarPedidoVendaPayload,
   EditarPedidoVendaPayload,
@@ -30,6 +31,12 @@ export const pedidoVendaService = {
 
   obter(id: string): Promise<PedidoVendaDto> {
     return api.get<PedidoVendaDto>(`/pedidos-venda/${id}`).then((r) => r.data);
+  },
+
+  obterTravas(id: string): Promise<TravaAprovacaoDto[]> {
+    return api
+      .get<TravaAprovacaoDto[]>(`/pedidos-venda/${id}/travas`)
+      .then((r) => r.data);
   },
 
   criar(payload: CriarPedidoVendaPayload): Promise<PedidoVendaDto> {

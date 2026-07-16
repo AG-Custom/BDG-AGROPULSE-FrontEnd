@@ -61,11 +61,26 @@
       <agro-form-skeleton v-if="carregando && !pedido" :campos="8" />
 
       <template v-else-if="pedido">
+        <q-banner
+          v-if="ehPendenteEstoque"
+          rounded
+          class="pedido-venda-detalhe__aviso"
+        >
+          Pedido pendente de estoque. Será liberado automaticamente quando houver
+          saldo suficiente.
+        </q-banner>
+
         <pedido-venda-resumo-card
           :pedido="pedido"
           :rotulo-cliente="rotuloCliente(pedido.clienteId)"
           :rotulo-vendedor="rotuloVendedor(pedido.vendedorUsuarioId)"
           :rotulo-condicao="rotuloCondicao(pedido.condicaoPagamentoId)"
+        />
+
+        <pedido-venda-travas-card
+          v-if="ehAguardando || ehPendenteEstoque || travas.length > 0"
+          :travas="travas"
+          :carregando="carregandoTravas"
         />
 
         <pedido-venda-itens-detalhe
@@ -103,6 +118,7 @@ import PedidoVendaItensDetalhe from 'components/pedidos-venda/PedidoVendaItensDe
 import PedidoVendaParcelasSection from 'components/pedidos-venda/PedidoVendaParcelasSection.vue';
 import PedidoVendaRecusarDialog from 'components/pedidos-venda/PedidoVendaRecusarDialog.vue';
 import PedidoVendaResumoCard from 'components/pedidos-venda/PedidoVendaResumoCard.vue';
+import PedidoVendaTravasCard from 'components/pedidos-venda/PedidoVendaTravasCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
@@ -120,7 +136,9 @@ const router = useRouter();
 
 const {
   pedido,
+  travas,
   carregando,
+  carregandoTravas,
   salvando,
   obter,
   enviarAprovacao,
@@ -150,6 +168,9 @@ const ehOrcamento = computed(
 );
 const ehAguardando = computed(
   () => pedido.value?.status === PedidoVendaStatus.Aguardando,
+);
+const ehPendenteEstoque = computed(
+  () => pedido.value?.status === PedidoVendaStatus.PendenteEstoque,
 );
 const ehAprovado = computed(
   () => pedido.value?.status === PedidoVendaStatus.Aprovado,
@@ -267,5 +288,10 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-2);
+}
+
+.pedido-venda-detalhe__aviso {
+  background: var(--color-warning-50, var(--color-surface-muted));
+  color: var(--color-text-primary);
 }
 </style>

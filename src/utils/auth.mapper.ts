@@ -85,6 +85,7 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.Aprovacoes.Visualizar,
       Permissoes.Notificacoes.Visualizar,
       Permissoes.FormasPagamentoConfig.Visualizar,
+      Permissoes.Financeiro.Visualizar,
       Permissoes.Orcamentos.Visualizar,
       Permissoes.Pdv.Visualizar,
       Permissoes.Compras.Visualizar,
@@ -95,6 +96,8 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.Producao.Visualizar,
       Permissoes.Rastreabilidade.Visualizar,
       Permissoes.Relatorios.Visualizar,
+      Permissoes.MetasVendedor.Visualizar,
+      Permissoes.Representantes.Visualizar,
       Permissoes.PermissoesGranulares.Visualizar,
     ],
   };

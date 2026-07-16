@@ -7,15 +7,25 @@ import type {
   AplicacaoInsumoFormModel,
   CriarAplicacaoInsumoPayload,
   CriarTalhaoPayload,
+  ListarAplicacoesParams,
   TalhaoDto,
   TalhaoFormModel,
 } from 'types/dtos/rastreabilidade.dto';
 import { ref } from 'vue';
 
+function parseOpcionalNumero(valor: string): number | null {
+  const trimmed = valor.trim();
+  if (!trimmed) return null;
+  return Number(trimmed);
+}
+
 function talhaoFormParaPayload(form: TalhaoFormModel): CriarTalhaoPayload {
   return {
     nome: form.nome.trim(),
-    areaHectares: form.areaHectares ? Number(form.areaHectares) : null,
+    areaHectares: parseOpcionalNumero(form.areaHectares),
+    glebaId: form.glebaId.trim() || null,
+    coordenadas: form.coordenadas.trim() || null,
+    culturaAtual: form.culturaAtual.trim() || null,
   };
 }
 
@@ -27,10 +37,19 @@ function aplicacaoFormParaPayload(form: AplicacaoInsumoFormModel): CriarAplicaca
     quantidade: Number(form.quantidade),
     unidadeMedida: form.unidadeMedida.trim(),
     dataAplicacao: form.dataAplicacao,
+    safraId: form.safraId.trim() || null,
     safra: form.safra.trim() || null,
     cultura: form.cultura.trim() || null,
     numeroReceita: form.numeroReceita.trim() || null,
     crea: form.crea.trim() || null,
+    doseHa: parseOpcionalNumero(form.doseHa),
+    areaAplicadaHa: parseOpcionalNumero(form.areaAplicadaHa),
+    equipamento: form.equipamento.trim() || null,
+    operadorNome: form.operadorNome.trim() || null,
+    temperaturaC: parseOpcionalNumero(form.temperaturaC),
+    umidadePct: parseOpcionalNumero(form.umidadePct),
+    ventoKmh: parseOpcionalNumero(form.ventoKmh),
+    observacoes: form.observacoes.trim() || null,
   };
 }
 
@@ -46,7 +65,6 @@ export function useRastreabilidade() {
 
   async function carregarTalhoes(): Promise<void> {
     carregando.value = true;
-
     try {
       talhoes.value = await rastreabilidadeService.listarTalhoes();
     } catch (e) {
@@ -58,7 +76,6 @@ export function useRastreabilidade() {
 
   async function obterTalhao(id: string): Promise<boolean> {
     carregando.value = true;
-
     try {
       talhao.value = await rastreabilidadeService.obterTalhao(id);
       return true;
@@ -72,7 +89,6 @@ export function useRastreabilidade() {
 
   async function criarTalhao(form: TalhaoFormModel): Promise<TalhaoDto | null> {
     salvando.value = true;
-
     try {
       const criado = await rastreabilidadeService.criarTalhao(talhaoFormParaPayload(form));
       sucesso('Talhão cadastrado.');
@@ -87,7 +103,6 @@ export function useRastreabilidade() {
 
   async function editarTalhao(id: string, form: TalhaoFormModel): Promise<TalhaoDto | null> {
     salvando.value = true;
-
     try {
       const atualizado = await rastreabilidadeService.editarTalhao(
         id,
@@ -110,13 +125,9 @@ export function useRastreabilidade() {
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
-
-    if (!confirmou) {
-      return false;
-    }
+    if (!confirmou) return false;
 
     salvando.value = true;
-
     try {
       await rastreabilidadeService.inativarTalhao(id);
       sucesso('Talhão inativado.');
@@ -129,11 +140,10 @@ export function useRastreabilidade() {
     }
   }
 
-  async function carregarAplicacoes(): Promise<void> {
+  async function carregarAplicacoes(params?: ListarAplicacoesParams): Promise<void> {
     carregando.value = true;
-
     try {
-      aplicacoes.value = await rastreabilidadeService.listarAplicacoes();
+      aplicacoes.value = await rastreabilidadeService.listarAplicacoes(params);
     } catch (e) {
       erro(mensagem(e));
     } finally {
@@ -143,7 +153,6 @@ export function useRastreabilidade() {
 
   async function obterAplicacao(id: string): Promise<boolean> {
     carregando.value = true;
-
     try {
       aplicacao.value = await rastreabilidadeService.obterAplicacao(id);
       return true;
@@ -159,7 +168,6 @@ export function useRastreabilidade() {
     form: AplicacaoInsumoFormModel,
   ): Promise<AplicacaoInsumoDto | null> {
     salvando.value = true;
-
     try {
       const criada = await rastreabilidadeService.criarAplicacao(
         aplicacaoFormParaPayload(form),
@@ -179,7 +187,6 @@ export function useRastreabilidade() {
     form: AplicacaoInsumoFormModel,
   ): Promise<AplicacaoInsumoDto | null> {
     salvando.value = true;
-
     try {
       const atualizada = await rastreabilidadeService.editarAplicacao(
         id,
@@ -202,13 +209,9 @@ export function useRastreabilidade() {
       textoConfirmar: 'Remover',
       icone: 'warning',
     });
-
-    if (!confirmou) {
-      return false;
-    }
+    if (!confirmou) return false;
 
     salvando.value = true;
-
     try {
       await rastreabilidadeService.removerAplicacao(id);
       sucesso('Aplicação removida.');

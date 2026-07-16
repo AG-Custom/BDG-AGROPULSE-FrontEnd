@@ -35,6 +35,12 @@ export const tabelaPrecoService = {
     return api.patch(`/tabelas-preco/${tabelaPrecoId}/ativar`);
   },
 
+  definirPadrao(tabelaPrecoId: string): Promise<TabelaPrecoDto> {
+    return api
+      .put<TabelaPrecoDto>(`/tabelas-preco/${tabelaPrecoId}/definir-padrao`)
+      .then((r) => r.data);
+  },
+
   listarItens(tabelaPrecoId: string): Promise<TabelaPrecoItemDto[]> {
     return api
       .get<TabelaPrecoItemDto[]>(`/tabelas-preco/${tabelaPrecoId}/itens`)

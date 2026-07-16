@@ -96,6 +96,7 @@ const { talhoes, carregando, salvando, carregarTalhoes, inativarTalhao } = useRa
 
 const colunas: QTableColumn<TalhaoDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
+  { name: 'culturaAtual', label: 'Cultura', field: 'culturaAtual', align: 'left' },
   { name: 'areaHectares', label: 'Área (ha)', field: 'areaHectares', align: 'right' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },

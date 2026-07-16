@@ -125,6 +125,33 @@ export function useTabelasPreco() {
     return ativar(tabela.id);
   }
 
+  async function definirPadrao(tabelaId: string): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Definir tabela padrão',
+      mensagem: 'Esta tabela passará a ser a padrão da unidade. Continuar?',
+      textoConfirmar: 'Definir padrão',
+      icone: 'info',
+    });
+
+    if (!confirmou) {
+      return false;
+    }
+
+    salvando.value = true;
+
+    try {
+      await tabelaPrecoService.definirPadrao(tabelaId);
+      sucesso('Tabela definida como padrão.');
+      await carregar(ultimosParams.value);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   return {
     tabelas,
     carregando,
@@ -136,5 +163,6 @@ export function useTabelasPreco() {
     editar,
     solicitarInativacao,
     solicitarAtivacao,
+    definirPadrao,
   };
 }

@@ -1,4 +1,5 @@
 import type { FormaPagamentoValor, PedidoVendaStatusValor, ExportacaoPedidoFormatoValor } from 'constants/enums';
+import type { TravaAprovacaoDto } from 'types/dtos/aprovacao.dto';
 
 export interface PedidoVendaItemDto {
   id: string;
@@ -26,6 +27,7 @@ export interface PedidoVendaResumoDto {
   dataExpiracao: string | null;
   estoqueBaixado: boolean;
   observacao: string | null;
+  tabelaPrecoId?: string | null;
   createdAt: string;
 }
 
@@ -36,12 +38,13 @@ export interface PedidoVendaDto extends PedidoVendaResumoDto {
   expiradoEm: string | null;
   faturadoEm: string | null;
   itens: PedidoVendaItemDto[];
+  travas?: TravaAprovacaoDto[];
 }
 
 export interface PedidoVendaItemPayload {
   produtoId: string;
   quantidade: number;
-  precoUnitario: number;
+  precoUnitario?: number | null;
   descontoPercentual?: number;
 }
 
@@ -51,6 +54,7 @@ export interface CriarPedidoVendaPayload {
   condicaoPagamentoId: string;
   formaPagamento: FormaPagamentoValor;
   observacao?: string | null;
+  tabelaPrecoId?: string | null;
   itens: PedidoVendaItemPayload[];
 }
 
@@ -74,6 +78,7 @@ export interface PedidoVendaFormModel {
   condicaoPagamentoId: string;
   formaPagamento: FormaPagamentoValor | '';
   observacao: string;
+  tabelaPrecoId: string;
   itens: PedidoVendaItemFormModel[];
 }
 

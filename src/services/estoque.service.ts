@@ -26,6 +26,7 @@ import type {
   SaldoProdutoDto,
   TransferenciaEstoqueDto,
 } from 'types/dtos/estoque.dto';
+import type { GenealogiaLoteDto } from 'types/dtos/producao.dto';
 
 export const estoqueService = {
   listarLotes(params?: ListarLotesParams): Promise<LoteDto[]> {
@@ -34,6 +35,12 @@ export const estoqueService = {
 
   obterLote(loteId: string): Promise<LoteDto> {
     return api.get<LoteDto>(`/estoque/lotes/${loteId}`).then((r) => r.data);
+  },
+
+  obterGenealogiaLote(loteId: string): Promise<GenealogiaLoteDto> {
+    return api
+      .get<GenealogiaLoteDto>(`/estoque/lotes/${loteId}/genealogia`)
+      .then((r) => r.data);
   },
 
   listarSaldos(params?: ListarSaldosParams): Promise<SaldoProdutoDto[]> {

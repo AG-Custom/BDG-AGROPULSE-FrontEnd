@@ -8,13 +8,24 @@ import type {
   PdvVendaFormModel,
   PdvVendaResumoDto,
 } from 'types/dtos/pdv.dto';
+import type { FormaPagamentoValor } from 'constants/enums';
 import { ref } from 'vue';
+
+function parsePrecoOpcional(valor: string): number | null {
+  const texto = valor.trim();
+  if (!texto) {
+    return null;
+  }
+  const numero = Number(texto.replace(',', '.'));
+  return Number.isFinite(numero) && numero > 0 ? numero : null;
+}
 
 export function usePdv() {
   const vendas = ref<PdvVendaResumoDto[]>([]);
   const venda = ref<PdvVendaDto | null>(null);
   const carregando = ref(false);
   const salvando = ref(false);
+  const emitindoNfce = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -50,13 +61,25 @@ export function usePdv() {
     try {
       const criada = await pdvService.vender({
         clienteId: form.clienteId || null,
+        clienteNomeAvulso: form.clienteNomeAvulso.trim() || null,
+        clienteDocumentoAvulso: form.clienteDocumentoAvulso.trim() || null,
+        tabelaPrecoId: form.tabelaPrecoId || null,
+        aPrazo: form.aPrazo,
         itens: form.itens.map((item) => ({
           produtoId: item.produtoId,
           quantidade: Number(item.quantidade),
-          precoUnitario: Number(item.precoUnitario),
+          precoUnitario: parsePrecoOpcional(item.precoUnitario),
           numeroLote: item.numeroLote.trim() || null,
           loteId: item.loteId.trim() || null,
         })),
+        pagamentos: form.aPrazo
+          ? undefined
+          : form.pagamentos
+              .filter((pagamento) => pagamento.formaPagamento && pagamento.valor.trim())
+              .map((pagamento) => ({
+                formaPagamento: pagamento.formaPagamento as FormaPagamentoValor,
+                valor: Number(pagamento.valor.replace(',', '.')),
+              })),
       });
       sucesso('Venda PDV registrada com sucesso.');
       return criada;
@@ -94,14 +117,32 @@ export function usePdv() {
     }
   }
 
+  async function emitirNfce(vendaId: string): Promise<boolean> {
+    emitindoNfce.value = true;
+
+    try {
+      const resultado = await pdvService.emitirNfce(vendaId);
+      sucesso(resultado.mensagem ?? `NFC-e: ${resultado.status}`);
+      await obterVenda(vendaId);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      emitindoNfce.value = false;
+    }
+  }
+
   return {
     vendas,
     venda,
     carregando,
     salvando,
+    emitindoNfce,
     carregarVendas,
     obterVenda,
     vender,
     cancelar,
+    emitirNfce,
   };
 }

@@ -19,6 +19,7 @@
                 :options="clienteOpcoes"
                 :rules="[obrigatorio]"
                 :loading="carregandoClientes"
+                @update:model-value="onClienteChange"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -31,6 +32,18 @@
                 clearable
                 :options="vendedorOpcoes"
                 :loading="carregandoUsuarios"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="formulario.tabelaPrecoId"
+                outlined
+                label="Tabela de preço"
+                emit-value
+                map-options
+                clearable
+                :options="tabelaOpcoes"
+                :loading="carregandoTabelas"
               />
             </div>
             <div class="col-12">
@@ -70,6 +83,7 @@
                 map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @update:model-value="(id: string) => void onProdutoItem(index, id)"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -90,6 +104,7 @@
                 label="Preço unitário"
                 type="number"
                 step="0.01"
+                :loading="resolvendoPreco"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -135,6 +150,7 @@ import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useClientes } from 'composables/useClientes';
 import { useOrcamento } from 'composables/useOrcamento';
 import { useOrcamentos } from 'composables/useOrcamentos';
+import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useUsuarios } from 'composables/useUsuarios';
 import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
@@ -160,10 +176,19 @@ const { clientes, carregando: carregandoClientes, carregar: carregarClientes } =
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { usuarios, carregando: carregandoUsuarios, carregar: carregarUsuarios, nomeCompleto } =
   useUsuarios();
+const {
+  tabelaOpcoes,
+  tabelaPadraoId,
+  carregandoTabelas,
+  resolvendoPreco,
+  carregarTabelasPermitidas,
+  resolverPreco,
+} = usePrecificacao();
 
 const formulario = ref<OrcamentoFormModel>({
   clienteId: '',
   vendedorUsuarioId: '',
+  tabelaPrecoId: '',
   observacao: '',
   itens: [novoItem()],
 });
@@ -175,7 +200,9 @@ const tituloPagina = computed(() =>
   modo.value === 'criar' ? 'Novo orçamento' : 'Editar orçamento',
 );
 const subtituloPagina = computed(() =>
-  modo.value === 'criar' ? 'Informe cliente e itens.' : 'Atualize os dados do orçamento.',
+  modo.value === 'criar'
+    ? 'Informe cliente, tabela e itens.'
+    : 'Atualize os dados do orçamento.',
 );
 
 const clienteOpcoes = computed(() =>
@@ -195,6 +222,38 @@ const vendedorOpcoes = computed(() =>
     )
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),
 );
+
+async function onClienteChange(clienteId: string): Promise<void> {
+  await carregarTabelasPermitidas({ clienteId: clienteId || null });
+  if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
+    formulario.value.tabelaPrecoId = tabelaPadraoId.value;
+  }
+}
+
+async function onProdutoItem(index: number, produtoId: string): Promise<void> {
+  if (!produtoId) {
+    return;
+  }
+
+  const resolvido = await resolverPreco(
+    {
+      produtoId,
+      clienteId: formulario.value.clienteId || null,
+      tabelaPrecoId: formulario.value.tabelaPrecoId || null,
+    },
+    true,
+  );
+
+  if (resolvido) {
+    formulario.value.itens[index].precoUnitario = String(resolvido.preco);
+    return;
+  }
+
+  const produto = produtos.value.find((item) => item.id === produtoId);
+  if (produto) {
+    formulario.value.itens[index].precoUnitario = String(produto.precoVenda);
+  }
+}
 
 function adicionarItem(): void {
   formulario.value.itens.push(novoItem());
@@ -224,6 +283,7 @@ onMounted(async () => {
   void carregarClientes();
   void carregarProdutos();
   void carregarUsuarios();
+  await carregarTabelasPermitidas();
 
   if (modo.value === 'editar' && orcamentoId.value) {
     carregandoPagina.value = true;
@@ -236,6 +296,7 @@ onMounted(async () => {
     formulario.value = {
       clienteId: orcamento.value.clienteId,
       vendedorUsuarioId: orcamento.value.vendedorUsuarioId,
+      tabelaPrecoId: orcamento.value.tabelaPrecoId ?? '',
       observacao: orcamento.value.observacao ?? '',
       itens: orcamento.value.itens.map((item) => ({
         chave: item.id,
@@ -244,7 +305,10 @@ onMounted(async () => {
         precoUnitario: String(item.precoUnitario),
       })),
     };
+    await carregarTabelasPermitidas({ clienteId: orcamento.value.clienteId });
     carregandoPagina.value = false;
+  } else if (tabelaPadraoId.value) {
+    formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }
 });
 </script>

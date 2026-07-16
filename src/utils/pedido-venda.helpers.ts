@@ -29,6 +29,8 @@ export function variantePedidoVendaStatus(
       return 'default';
     case PedidoVendaStatus.Aguardando:
       return 'warning';
+    case PedidoVendaStatus.PendenteEstoque:
+      return 'accent';
     case PedidoVendaStatus.Aprovado:
       return 'info';
     case PedidoVendaStatus.Faturado:
