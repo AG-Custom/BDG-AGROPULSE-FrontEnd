@@ -67,3 +67,16 @@ Aplicar manualmente:
 
 - NF automática de transferência e balança/leitor são **stubs** (sem Focus NFe / hardware real).
 - Cadastro hierárquico formal de locais por unidade continua fora de escopo (localização livre em texto no lote).
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração | NF de transferência real (Focus/SEFAZ) — hoje stub |
+| Integração | Balança / leitor de código de barras real — hoje stub de dispositivo |
+| Domínio (opcional) | Cadastro hierárquico formal de locais por unidade (galpão → depósito → corredor → prateleira) |
+| Fora de escopo | — |
+
+**Status:** domínio operacional coberto; falta maturidade de integração/hardware.

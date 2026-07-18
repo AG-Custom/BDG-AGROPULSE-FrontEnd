@@ -16,7 +16,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && visitas.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && visitas.length === 0" :colunas="6" />
         <empty-state
           v-else-if="!carregando && visitas.length === 0"
           titulo="Nenhuma visita"
@@ -39,11 +39,37 @@
           <template #body-cell-tipo="props">
             <q-td :props="props">{{ rotuloTipo(props.row.tipo) }}</q-td>
           </template>
+          <template #body-cell-status="props">
+            <q-td :props="props">{{ rotuloStatus(props.row.status) }}</q-td>
+          </template>
           <template #body-cell-fazendaId="props">
             <q-td :props="props">{{ rotuloFazenda(props.row.fazendaId) }}</q-td>
           </template>
+          <template #body-cell-checkinEm="props">
+            <q-td :props="props">
+              {{ props.row.checkinEm ? formatarDataHora(props.row.checkinEm) : '—' }}
+            </q-td>
+          </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
+              <agro-btn
+                flat
+                round
+                dense
+                icon="my_location"
+                color="primary"
+                descricao="Check-in"
+                @click="abrirCheckIn(props.row)"
+              />
+              <agro-btn
+                flat
+                round
+                dense
+                icon="photo_camera"
+                color="primary"
+                descricao="Adicionar foto"
+                @click="abrirFoto(props.row)"
+              />
               <agro-btn
                 flat
                 round
@@ -101,6 +127,24 @@
               </div>
               <div class="col-12 col-md-6">
                 <q-select
+                  v-model="formulario.status"
+                  outlined
+                  label="Status"
+                  emit-value
+                  map-options
+                  :options="StatusVisitaTecnicaOpcoes"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="formulario.duracaoMin"
+                  outlined
+                  label="Duração (min)"
+                  type="number"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-select
                   v-model="formulario.fazendaId"
                   outlined
                   label="Fazenda"
@@ -151,6 +195,88 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="dialogCheckIn" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">Check-in</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form greedy @submit.prevent="salvarCheckIn">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="formCheckIn.latitude"
+                  outlined
+                  label="Latitude"
+                  type="number"
+                  step="any"
+                  class="field-required"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="formCheckIn.longitude"
+                  outlined
+                  label="Longitude"
+                  type="number"
+                  step="any"
+                  class="field-required"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn
+                flat
+                label="Usar GPS"
+                descricao="Obter localização"
+                @click="usarGps"
+              />
+              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCheckIn = false" />
+              <agro-btn
+                color="primary"
+                unelevated
+                label="Confirmar"
+                type="submit"
+                :loading="salvando"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="dialogFoto" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">Adicionar foto</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form greedy @submit.prevent="salvarFoto">
+            <q-input
+              v-model="formFoto.url"
+              outlined
+              label="URL da foto"
+              class="field-required q-mb-md"
+              :rules="[obrigatorio]"
+            />
+            <q-input v-model="formFoto.descricao" outlined label="Descrição" />
+            <div class="agro-form-actions">
+              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogFoto = false" />
+              <agro-btn
+                color="primary"
+                unelevated
+                label="Salvar"
+                type="submit"
+                :loading="salvando"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -159,31 +285,44 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFazendas } from 'composables/useFazendas';
+import { useNotificacao } from 'composables/useNotificacao';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
-import { useVisitasTecnicas } from 'composables/useVisitasTecnicas';
-import { TipoVisitaTecnicaOpcoes } from 'constants/enums';
+import { useVisitasTecnicas, visitaVazia } from 'composables/useVisitasTecnicas';
+import { StatusVisitaTecnicaOpcoes, TipoVisitaTecnicaOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
-import type { VisitaTecnicaDto, VisitaTecnicaFormModel } from 'types/dtos/safras.dto';
-import { formatarData } from 'utils/formatters';
+import type {
+  AdicionarFotoVisitaFormModel,
+  CheckInVisitaTecnicaFormModel,
+  VisitaTecnicaDto,
+  VisitaTecnicaFormModel,
+} from 'types/dtos/safras.dto';
+import { formatarData, formatarDataHora } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
-const { visitas, carregando, salvando, carregar, criar, editar, remover } =
-  useVisitasTecnicas();
+const {
+  visitas,
+  carregando,
+  salvando,
+  carregar,
+  criar,
+  editar,
+  remover,
+  checkIn,
+  adicionarFoto,
+} = useVisitasTecnicas();
 const { fazendas, fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
+const { erro: notificarErro } = useNotificacao();
 
 const dialog = ref(false);
+const dialogCheckIn = ref(false);
+const dialogFoto = ref(false);
 const editandoId = ref<string | null>(null);
-const formulario = ref<VisitaTecnicaFormModel>({
-  clienteId: '',
-  fazendaId: '',
-  talhaoId: '',
-  dataVisita: '',
-  tipo: '',
-  tecnicoNome: '',
-  observacoes: '',
-});
+const visitaAcaoId = ref<string | null>(null);
+const formulario = ref<VisitaTecnicaFormModel>(visitaVazia());
+const formCheckIn = ref<CheckInVisitaTecnicaFormModel>({ latitude: '', longitude: '' });
+const formFoto = ref<AdicionarFotoVisitaFormModel>({ url: '', descricao: '' });
 
 const talhaoOpcoes = computed(() =>
   talhoes.value.filter((t) => t.ativo).map((t) => ({ label: t.nome, value: t.id })),
@@ -201,11 +340,19 @@ const mapaTipos = computed(() => {
   return m;
 });
 
+const mapaStatus = computed(() => {
+  const m = new Map<string, string>();
+  for (const o of StatusVisitaTecnicaOpcoes) m.set(o.value, o.label);
+  return m;
+});
+
 const colunas: QTableColumn<VisitaTecnicaDto>[] = [
   { name: 'dataVisita', label: 'Data', field: 'dataVisita', align: 'left', sortable: true },
   { name: 'tipo', label: 'Tipo', field: 'tipo', align: 'left' },
+  { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'tecnicoNome', label: 'Técnico', field: 'tecnicoNome', align: 'left' },
   { name: 'fazendaId', label: 'Fazenda', field: 'fazendaId', align: 'left' },
+  { name: 'checkinEm', label: 'Check-in', field: 'checkinEm', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
@@ -218,18 +365,57 @@ function rotuloTipo(tipo: string): string {
   return mapaTipos.value.get(tipo) ?? tipo;
 }
 
+function rotuloStatus(status: string): string {
+  return mapaStatus.value.get(status) ?? status;
+}
+
 function abrirDialog(item?: VisitaTecnicaDto): void {
   editandoId.value = item?.id ?? null;
-  formulario.value = {
-    clienteId: item?.clienteId ?? '',
-    fazendaId: item?.fazendaId ?? '',
-    talhaoId: item?.talhaoId ?? '',
-    dataVisita: item?.dataVisita?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
-    tipo: item?.tipo ?? '',
-    tecnicoNome: item?.tecnicoNome ?? '',
-    observacoes: item?.observacoes ?? '',
-  };
+  formulario.value = item
+    ? {
+        clienteId: item.clienteId ?? '',
+        fazendaId: item.fazendaId ?? '',
+        talhaoId: item.talhaoId ?? '',
+        dataVisita: item.dataVisita?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+        tipo: item.tipo ?? '',
+        status: item.status,
+        tecnicoNome: item.tecnicoNome ?? '',
+        observacoes: item.observacoes ?? '',
+        duracaoMin: item.duracaoMin != null ? String(item.duracaoMin) : '',
+      }
+    : visitaVazia();
   dialog.value = true;
+}
+
+function abrirCheckIn(item: VisitaTecnicaDto): void {
+  visitaAcaoId.value = item.id;
+  formCheckIn.value = {
+    latitude: item.checkinLat != null ? String(item.checkinLat) : '',
+    longitude: item.checkinLng != null ? String(item.checkinLng) : '',
+  };
+  dialogCheckIn.value = true;
+}
+
+function abrirFoto(item: VisitaTecnicaDto): void {
+  visitaAcaoId.value = item.id;
+  formFoto.value = { url: '', descricao: '' };
+  dialogFoto.value = true;
+}
+
+function usarGps(): void {
+  if (!navigator.geolocation) {
+    notificarErro('Geolocalização não disponível neste dispositivo.');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      formCheckIn.value.latitude = String(pos.coords.latitude);
+      formCheckIn.value.longitude = String(pos.coords.longitude);
+    },
+    () => {
+      notificarErro('Não foi possível obter a localização. Informe manualmente.');
+    },
+  );
 }
 
 async function salvar(): Promise<void> {
@@ -237,6 +423,18 @@ async function salvar(): Promise<void> {
     ? await editar(editandoId.value, formulario.value)
     : await criar(formulario.value);
   if (ok) dialog.value = false;
+}
+
+async function salvarCheckIn(): Promise<void> {
+  if (!visitaAcaoId.value) return;
+  const ok = await checkIn(visitaAcaoId.value, formCheckIn.value);
+  if (ok) dialogCheckIn.value = false;
+}
+
+async function salvarFoto(): Promise<void> {
+  if (!visitaAcaoId.value) return;
+  const ok = await adicionarFoto(visitaAcaoId.value, formFoto.value);
+  if (ok) dialogFoto.value = false;
 }
 
 onMounted(() => {

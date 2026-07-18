@@ -1,5 +1,7 @@
 import { api } from 'services/api';
 import type {
+  AdicionarFotoVisitaPayload,
+  CheckInVisitaTecnicaPayload,
   CriarCusteioSafraPayload,
   CriarDiarioCampoPayload,
   CriarFazendaPayload,
@@ -116,6 +118,21 @@ export const safrasService = {
 
   removerVisita(id: string): Promise<void> {
     return api.delete(`/safras/visitas-tecnicas/${id}`).then(() => undefined);
+  },
+
+  checkInVisita(id: string, payload: CheckInVisitaTecnicaPayload): Promise<VisitaTecnicaDto> {
+    return api
+      .patch<VisitaTecnicaDto>(`/safras/visitas-tecnicas/${id}/check-in`, payload)
+      .then((r) => r.data);
+  },
+
+  adicionarFotoVisita(
+    id: string,
+    payload: AdicionarFotoVisitaPayload,
+  ): Promise<VisitaTecnicaDto> {
+    return api
+      .post<VisitaTecnicaDto>(`/safras/visitas-tecnicas/${id}/fotos`, payload)
+      .then((r) => r.data);
   },
 
   listarRecomendacoes(): Promise<RecomendacaoDto[]> {

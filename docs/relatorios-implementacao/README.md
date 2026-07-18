@@ -1,20 +1,89 @@
 # Relatórios de implementação
 
-Gap analysis entre a documentação funcional de cada módulo e o que já existe no **frontend** e no **backend**.
+Gap analysis entre a especificação funcional de cada módulo e o que existe no **frontend** (`new_agropulse_frontend`) e no **backend** (`new_agropulse_backend`).
 
-Cada arquivo lista o que está pronto, o que falta e um mapa rápido Backend × Frontend.
+Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Frontend.
 
-| Módulo | Arquivo |
+**Atualizado:** 2026-07-17
+
+---
+
+## Escopo
+
+| Decisão | Detalhe |
 |--------|---------|
-| Gestão de Estoque | [gestao-estoque.md](./gestao-estoque.md) |
-| Compras e Fornecedores | [compras-fornecedores.md](./compras-fornecedores.md) |
-| Vendas e Pedidos | [vendas-pedidos.md](./vendas-pedidos.md) |
-| Produção e Beneficiamento | [producao-beneficiamento.md](./producao-beneficiamento.md) |
-| Financeiro | [financeiro-OK.md](./financeiro-OK.md) |
-| Fiscal e Tributário | [fiscal-tributario-OK.md](./fiscal-tributario-OK.md) |
-| Gestão de Safras | [gestao-safras-OK.md](./gestao-safras-OK.md) |
-| Manutenção e Ativos | [manutencao-ativos.md](./manutencao-ativos.md) |
-| CRM Agrícola | [crm-agricola.md](./crm-agricola.md) |
-| Relatórios via Dashboards | [relatorios-dashboards.md](./relatorios-dashboards.md) |
-| Cobrança e Crédito Rural | [cobranca-credito-rural.md](./cobranca-credito-rural.md) |
-| Contratos Agrícolas | [contratos-agricolas.md](./contratos-agricolas.md) |
+| Meta | Cobrir a spec comercial dos módulos listados abaixo no stack novo (Vue + .NET) |
+| RH e Folha | **Fora de escopo.** Não haverá módulo nem relatório. Cadastro de colaboradores permanece só como apoio a OS, responsável, etc. |
+| Legado | `AGROPULSE2026` (React) é referência de telas/fluxos/endpoints — não copiar código; portar comportamento via `api-contract` |
+
+### Legenda de status
+
+| Status | Significado |
+|--------|-------------|
+| Domínio OK | Fluxos e API internos cobertos; ver seção **Pendente** do arquivo (stubs de integração / gaps pontuais) |
+| Greenfield | Módulo ainda não existe no stack novo (ou só fragmento tangencial) |
+| Fora de escopo | Explicitamente excluído do produto |
+
+---
+
+## Índice
+
+| Módulo | Arquivo | Status |
+|--------|---------|--------|
+| Gestão de Estoque | [gestao-estoque-OK.md](./gestao-estoque-OK.md) | Domínio OK |
+| Compras e Fornecedores | [compras-fornecedores-OK.md](./compras-fornecedores-OK.md) | Domínio OK |
+| Vendas e Pedidos | [vendas-pedidos-OK.md](./vendas-pedidos-OK.md) | Domínio OK |
+| Produção e Beneficiamento | [producao-beneficiamento-OK.md](./producao-beneficiamento-OK.md) | Domínio OK |
+| Financeiro | [financeiro-OK.md](./financeiro-OK.md) | Domínio OK |
+| Fiscal e Tributário | [fiscal-tributario-OK.md](./fiscal-tributario-OK.md) | Domínio OK |
+| Gestão de Safras | [gestao-safras-OK.md](./gestao-safras-OK.md) | Domínio OK |
+| **Logística e Transporte** | [logistica-transporte.md](./logistica-transporte.md) | **Greenfield** |
+| Manutenção e Ativos | [manutencao-ativos-OK.md](./manutencao-ativos-OK.md) | Domínio OK |
+| CRM Agrícola | [crm-agricola-OK.md](./crm-agricola-OK.md) | Domínio OK |
+| Relatórios / Dashboards | [relatorios-dashboards-OK.md](./relatorios-dashboards-OK.md) | Domínio OK |
+| Cobrança e Crédito Rural | [cobranca-credito-rural-OK.md](./cobranca-credito-rural-OK.md) | Domínio OK |
+| Contratos Agrícolas | [contratos-agricolas-OK.md](./contratos-agricolas-OK.md) | Domínio OK |
+| RH e Folha | — | **Fora de escopo** |
+
+---
+
+## Backlog priorizado (o que ainda precisa ser feito)
+
+### 1. Greenfield
+
+1. **Logística e Transporte** — módulo completo (frota, cargas, romaneio operacional, transportadoras, abastecimento, relatórios). Ver [logistica-transporte.md](./logistica-transporte.md). Hoje só existe expedição/romaneio FEFO pós-pedido.
+
+### 2. Integrações externas (stubs → real) — impacto alto
+
+| Prioridade | Módulo | Pendência |
+|------------|--------|-----------|
+| Alta | Fiscal | Focus/SEFAZ real; contingência; cancelamento com reversão estoque/CR/CP; SPED além de blocos stub |
+| Alta | Financeiro | Boletos registrados; OFX/API bancária; PTAX Bacen |
+| Alta | Vendas | NF-e devolução; contingência PDV; bloqueio hard sem preço de tabela |
+| Média | Compras | SEFAZ documentos destinados; envio de cotação; contratos de fornecimento |
+| Média | Contratos | Estoque + NF-e reais na liquidação/barter; cotação CBOT/ESALQ |
+| Média | Cobrança | Serasa/SPC; revisão automática de limite; crédito bancário |
+| Baixa | CRM | WhatsApp / e-mail |
+| Baixa | Relatórios | Power BI embed |
+| Baixa | Estoque / Produção / Manutenção / Safras | Hardware IoT, geo real, offline PWA, telemetria |
+
+### 3. Domínio interno ainda aberto (sem provider externo)
+
+- Vendas: comissões por canal/faixa de desconto; alinhar trava de preço por safra com Contratos
+- Compras: contratos de fornecimento + alerta de vencimento
+- Estoque (opcional): cadastro hierárquico formal de locais
+
+### 4. Explicitamente fora de escopo
+
+- **RH e Folha** (eSocial, ponto, folha, FGTS, EPI, NR-31 como módulo)
+- Bonificação / fidelidade por volume (Vendas)
+- App mobile vendedor/consultor (Vendas)
+
+---
+
+## Como usar estes arquivos
+
+1. Abrir o `*-OK.md` ou `logistica-transporte.md` do módulo.
+2. Conferir o mapa rápido e a seção **Pendente para fechar o módulo**.
+3. Antes de implementar: atualizar `new_agropulse_backend/api-contract/` e só então BE + FE no padrão AgroPulse.
+4. Referência de UX/legado: `C:\Users\Guilherme\Documents\AGROPULSE2026\AGROPULSE2026` (páginas React por módulo).

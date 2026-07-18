@@ -3,6 +3,7 @@ import type {
   StatusOrdemServicoAgricolaValor,
   StatusRecomendacaoValor,
   StatusSafraValor,
+  StatusVisitaTecnicaValor,
   TipoAtividadeDiarioCampoValor,
   TipoGeoImportacaoValor,
   TipoOperacaoSafrasValor,
@@ -119,6 +120,13 @@ export interface SafraFormModel {
   observacoes: string;
 }
 
+export interface VisitaTecnicaFotoDto {
+  id: string;
+  url: string;
+  descricao: string | null;
+  criadoEm: string;
+}
+
 export interface VisitaTecnicaDto {
   id: string;
   empresaId: string;
@@ -127,8 +135,14 @@ export interface VisitaTecnicaDto {
   talhaoId: string | null;
   dataVisita: string;
   tipo: TipoVisitaTecnicaValor;
+  status: StatusVisitaTecnicaValor;
   tecnicoNome: string | null;
   observacoes: string | null;
+  duracaoMin: number | null;
+  checkinLat: number | null;
+  checkinLng: number | null;
+  checkinEm: string | null;
+  fotos: VisitaTecnicaFotoDto[];
 }
 
 export interface CriarVisitaTecnicaPayload {
@@ -137,8 +151,10 @@ export interface CriarVisitaTecnicaPayload {
   talhaoId?: string | null;
   dataVisita: string;
   tipo: TipoVisitaTecnicaValor;
+  status?: StatusVisitaTecnicaValor;
   tecnicoNome?: string | null;
   observacoes?: string | null;
+  duracaoMin?: number | null;
 }
 
 export type EditarVisitaTecnicaPayload = CriarVisitaTecnicaPayload;
@@ -149,8 +165,31 @@ export interface VisitaTecnicaFormModel {
   talhaoId: string;
   dataVisita: string;
   tipo: TipoVisitaTecnicaValor | '';
+  status: StatusVisitaTecnicaValor;
   tecnicoNome: string;
   observacoes: string;
+  duracaoMin: string;
+}
+
+export interface CheckInVisitaTecnicaPayload {
+  latitude: number;
+  longitude: number;
+  checkinEm?: string | null;
+}
+
+export interface CheckInVisitaTecnicaFormModel {
+  latitude: string;
+  longitude: string;
+}
+
+export interface AdicionarFotoVisitaPayload {
+  url: string;
+  descricao?: string | null;
+}
+
+export interface AdicionarFotoVisitaFormModel {
+  url: string;
+  descricao: string;
 }
 
 export interface RecomendacaoDto {

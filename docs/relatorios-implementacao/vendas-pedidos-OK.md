@@ -168,3 +168,20 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 | App mobile | ❌ | ❌ (fora) |
 
 **Legenda:** ✅ pronto · ⚠️ parcial / depende BE paralelo · ❌ ausente / fora de escopo
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Domínio | Bloqueio hard se produto não estiver em tabela de preço (hoje fallback `precoVenda`) |
+| Domínio | Comissões por canal de venda e faixa de desconto |
+| Domínio | Trava de preço por safra no pedido — alinhar com módulo Contratos (`ContratoId` / painel safra) |
+| Integração | Contingência SEFAZ no PDV |
+| Integração | NF-e / NFC-e automática real (hoje stub) |
+| Integração | NF-e de devolução + efeitos fiscais (ICMS / PIS/COFINS) |
+| Fora de escopo | Bonificação / fidelidade por volume |
+| Fora de escopo | App mobile vendedor / consultor |
+
+**Status:** orçamento, pedido, PDV, travas e devolução parcial cobertos em domínio/UI; faltam fiscal real e regras avançadas de comissão/precificação.

@@ -64,7 +64,7 @@
         :somente-leitura="somenteLeitura"
       />
 
-      <cliente-historico-comercial-section
+      <cliente-perfil360-section
         v-if="(modo === 'editar' || modo === 'visualizar') && clienteCarregado"
         :cliente-id="clienteId!"
       />
@@ -76,7 +76,7 @@
 import ClienteContatosSection from 'components/clientes/ClienteContatosSection.vue';
 import ClienteEnderecosSection from 'components/clientes/ClienteEnderecosSection.vue';
 import ClienteFormulario from 'components/clientes/ClienteFormulario.vue';
-import ClienteHistoricoComercialSection from 'components/clientes/ClienteHistoricoComercialSection.vue';
+import ClientePerfil360Section from 'components/crm/ClientePerfil360Section.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useClientes } from 'composables/useClientes';

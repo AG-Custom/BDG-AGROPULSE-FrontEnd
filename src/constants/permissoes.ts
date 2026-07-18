@@ -80,6 +80,15 @@ export const Permissoes = {
   Relatorios: {
     Visualizar: 'relatorios.visualizar',
   },
+  Manutencao: {
+    Visualizar: 'manutencao.visualizar',
+  },
+  Crm: {
+    Visualizar: 'crm.visualizar',
+  },
+  CobrancaCredito: {
+    Visualizar: 'cobranca-credito.visualizar',
+  },
   MetasVendedor: {
     Visualizar: 'metas-vendedor.visualizar',
   },

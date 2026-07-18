@@ -1,10 +1,22 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import { StatusVisitaTecnica } from 'constants/enums';
 import type { TipoVisitaTecnicaValor } from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { safrasService } from 'services/safras.service';
-import type { VisitaTecnicaDto, VisitaTecnicaFormModel } from 'types/dtos/safras.dto';
+import type {
+  AdicionarFotoVisitaFormModel,
+  CheckInVisitaTecnicaFormModel,
+  VisitaTecnicaDto,
+  VisitaTecnicaFormModel,
+} from 'types/dtos/safras.dto';
 import { ref } from 'vue';
+
+function numOuNulo(valor: string): number | null {
+  if (!valor.trim()) return null;
+  const n = Number(valor);
+  return Number.isFinite(n) ? n : null;
+}
 
 function formParaPayload(form: VisitaTecnicaFormModel) {
   return {
@@ -13,8 +25,24 @@ function formParaPayload(form: VisitaTecnicaFormModel) {
     talhaoId: form.talhaoId.trim() || null,
     dataVisita: form.dataVisita,
     tipo: form.tipo as TipoVisitaTecnicaValor,
+    status: form.status,
     tecnicoNome: form.tecnicoNome.trim() || null,
     observacoes: form.observacoes.trim() || null,
+    duracaoMin: numOuNulo(form.duracaoMin),
+  };
+}
+
+export function visitaVazia(): VisitaTecnicaFormModel {
+  return {
+    clienteId: '',
+    fazendaId: '',
+    talhaoId: '',
+    dataVisita: new Date().toISOString().slice(0, 10),
+    tipo: '',
+    status: StatusVisitaTecnica.Agendada,
+    tecnicoNome: '',
+    observacoes: '',
+    duracaoMin: '',
   };
 }
 
@@ -90,5 +118,57 @@ export function useVisitasTecnicas() {
     }
   }
 
-  return { visitas, carregando, salvando, carregar, criar, editar, remover };
+  async function checkIn(
+    id: string,
+    form: CheckInVisitaTecnicaFormModel,
+  ): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await safrasService.checkInVisita(id, {
+        latitude: Number(form.latitude),
+        longitude: Number(form.longitude),
+      });
+      sucesso('Check-in registrado.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function adicionarFoto(
+    id: string,
+    form: AdicionarFotoVisitaFormModel,
+  ): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await safrasService.adicionarFotoVisita(id, {
+        url: form.url.trim(),
+        descricao: form.descricao.trim() || null,
+      });
+      sucesso('Foto adicionada.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  return {
+    visitas,
+    carregando,
+    salvando,
+    carregar,
+    criar,
+    editar,
+    remover,
+    checkIn,
+    adicionarFoto,
+  };
 }

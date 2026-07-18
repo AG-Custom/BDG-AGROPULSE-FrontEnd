@@ -489,6 +489,219 @@
       </q-list>
     </div>
 
+    <div v-if="podeGerenciarManutencao" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Manutenção</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-dashboard' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="dashboard" size="20px" />
+          </q-item-section>
+          <q-item-section>Dashboard</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-ativos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="agriculture" size="20px" />
+          </q-item-section>
+          <q-item-section>Ativos</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-planos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="event_repeat" size="20px" />
+          </q-item-section>
+          <q-item-section>Planos preventivos</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-ordens' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="handyman" size="20px" />
+          </q-item-section>
+          <q-item-section>Ordens de serviço</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-checklists' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="checklist" size="20px" />
+          </q-item-section>
+          <q-item-section>Checklists</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'manutencao-custos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="payments" size="20px" />
+          </q-item-section>
+          <q-item-section>Custos</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarCrm" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">CRM Agrícola</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'crm-dashboard' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="dashboard" size="20px" />
+          </q-item-section>
+          <q-item-section>Dashboard</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'crm-carteira' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="agriculture" size="20px" />
+          </q-item-section>
+          <q-item-section>Carteira</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'crm-oportunidades' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="trending_up" size="20px" />
+          </q-item-section>
+          <q-item-section>Oportunidades</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'crm-amostras' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="science" size="20px" />
+          </q-item-section>
+          <q-item-section>Amostras</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'crm-campanhas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="campaign" size="20px" />
+          </q-item-section>
+          <q-item-section>Campanhas</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'crm-credito' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance" size="20px" />
+          </q-item-section>
+          <q-item-section>Crédito</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarCobrancaCredito" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Cobrança e Crédito</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'cobranca-credito' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance_wallet" size="20px" />
+          </q-item-section>
+          <q-item-section>Painel crédito</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          dense
+          :to="{ name: 'contas-receber' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item app-sidebar__item--atalho"
+        >
+          <q-item-section avatar>
+            <q-icon name="receipt_long" size="18px" />
+          </q-item-section>
+          <q-item-section>Contas a receber</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          dense
+          :to="{ name: 'regua-cobranca' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item app-sidebar__item--atalho"
+        >
+          <q-item-section avatar>
+            <q-icon name="campaign" size="18px" />
+          </q-item-section>
+          <q-item-section>Régua de cobrança</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarFinanceiro"
+          clickable
+          dense
+          :to="{ name: 'renegociacoes' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item app-sidebar__item--atalho"
+        >
+          <q-item-section avatar>
+            <q-icon name="handshake" size="18px" />
+          </q-item-section>
+          <q-item-section>Renegociações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCrm"
+          clickable
+          dense
+          :to="{ name: 'crm-credito' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item app-sidebar__item--atalho"
+        >
+          <q-item-section avatar>
+            <q-icon name="account_balance" size="18px" />
+          </q-item-section>
+          <q-item-section>CRM Crédito</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
     <div v-if="podeGerenciarRastreabilidade" class="app-sidebar__section">
       <div class="text-overline app-sidebar__label">Safras</div>
       <q-list padding class="app-sidebar__list">
@@ -1117,6 +1330,13 @@ const podeGerenciarContratos = computed(() =>
 );
 const podeGerenciarProducao = computed(() =>
   possuiPermissao(Permissoes.Producao.Visualizar),
+);
+const podeGerenciarManutencao = computed(() =>
+  possuiPermissao(Permissoes.Manutencao.Visualizar),
+);
+const podeGerenciarCrm = computed(() => possuiPermissao(Permissoes.Crm.Visualizar));
+const podeGerenciarCobrancaCredito = computed(() =>
+  possuiPermissao(Permissoes.CobrancaCredito.Visualizar),
 );
 const podeGerenciarRastreabilidade = computed(() =>
   possuiPermissao(Permissoes.Rastreabilidade.Visualizar),

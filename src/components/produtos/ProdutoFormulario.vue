@@ -132,8 +132,8 @@
           outlined
           label="Fator divisão NF-e"
           type="number"
-          min="0.0001"
-          step="0.01"
+          min="0"
+          step="any"
           hint="Unidade NF-e → estoque"
           :readonly="somenteLeitura"
         />

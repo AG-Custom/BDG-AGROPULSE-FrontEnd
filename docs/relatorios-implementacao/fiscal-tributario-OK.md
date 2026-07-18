@@ -148,3 +148,20 @@ Contrato API: `new_agropulse_backend/api-contract/fiscal.md`
 - Reversão de estoque/CR/CP no cancelamento é flag/observação stub — não integra estoque real.
 - Permissão FE: `fiscal.visualizar`.
 - Rotas FE: `fiscal/notas-fiscais`, `contingencia`, `inutilizacoes`, `ncm-pis-cofins`, `mva-ncm-uf`, `gnre`, `funrural`, `regimes-cnpj`, `sped`, `calculo-impostos` (+ config).
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração | Emissão Focus/SEFAZ real (NF-e, NFC-e, CT-e, MDF-e, NFPR) |
+| Integração | Contingência offline + SVC reais (hoje stub de fila) |
+| Domínio + integração | Cancelamento com reversão real de estoque, CR/CP e comissões |
+| Integração | GNRE com protocolo real |
+| Integração | SPED Fiscal / Contribuições / Contábil além de blocos stub |
+| Integração | Envio automático ao escritório contábil |
+| Domínio | DANFE customizável avançado (hoje HTML stub com campos agronômicos) |
+| Fora de escopo | — |
+
+**Status:** UI e regras tributárias (CFOP, Funrural, MVA, regimes) cobertas; prioridade #1 de integração do produto.

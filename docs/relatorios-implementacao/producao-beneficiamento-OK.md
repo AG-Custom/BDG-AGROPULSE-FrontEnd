@@ -92,3 +92,14 @@ Aplicar manualmente:
 
 - IoT/balança real permanece stub (sem hardware).
 - Upload PDF de ficha no produto continua disponível em paralelo à ficha estruturada de processo.
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração | Balanças de processo / sensores de linha reais (hoje stub `leitura-peso`) |
+| Fora de escopo | — |
+
+**Status:** BOM, OP, genealogia, laudos, paradas e OEE cobertos; falta só IoT real.

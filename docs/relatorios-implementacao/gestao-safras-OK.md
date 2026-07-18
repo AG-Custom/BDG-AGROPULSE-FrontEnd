@@ -127,3 +127,16 @@ Contrato API: `new_agropulse_backend/api-contract/safras.md` (+ `rastreabilidade
 - Geo real (polígono/mapa) e offline tablet permanecem stub.
 - OEE de campo é heurística a partir de OS (não confundir com OEE industrial em `/producao/oee`).
 - Permissão FE: `rastreabilidade.visualizar`.
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração / UX | Georreferenciamento real (shapefile/KML → polígono/mapa) — hoje stub de importação |
+| Integração / UX | Diário de campo offline real (PWA/tablet) — hoje sync stub por `clientSyncId` |
+| Domínio (opcional) | OEE de campo além da heurística atual |
+| Fora de escopo | — |
+
+**Status:** Revenda (visitas/recomendações) e Indústria (planejamento, OS, custeio) cobertos; faltam geo e offline reais.

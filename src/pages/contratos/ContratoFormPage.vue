@@ -1,18 +1,18 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header :titulo="titulo" subtitulo="Informe cliente, produto e condições." />
+    <app-page-header :titulo="titulo" :subtitulo="subtitulo" />
 
     <section class="agro-section">
-      <agro-card v-if="cotacao" class="q-mb-md">
-        <div class="text-caption">Cotação de mercado</div>
-        <div>
-          {{ cotacao.produto }} · {{ cotacao.fonte }} ·
-          <span class="text-metric">{{ formatarMoeda(cotacao.preco) }}</span>
-        </div>
-      </agro-card>
+      <cotacao-mercado-card
+        class="q-mb-md"
+        :cotacao="cotacao"
+        mostrar-aplicar
+        @atualizar="carregarCotacaoMercado()"
+        @aplicar="aplicarCotacao"
+      />
 
       <agro-card>
-        <agro-form-skeleton v-if="carregandoPagina" :campos="6" />
+        <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
@@ -40,10 +40,23 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.quantidade" outlined label="Quantidade" type="number" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.quantidade"
+                outlined
+                label="Quantidade"
+                type="number"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.preco" outlined label="Preço" type="number" step="0.01" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.preco"
+                outlined
+                label="Preço"
+                type="number"
+                step="0.01"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-12 col-md-3">
               <q-select
@@ -57,18 +70,176 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataInicio" outlined label="Início" type="date" :rules="[obrigatorio]" />
+              <q-input
+                v-model="formulario.dataInicio"
+                outlined
+                label="Início"
+                type="date"
+                :rules="[obrigatorio]"
+              />
             </div>
             <div class="col-6 col-md-3">
               <q-input v-model="formulario.dataFim" outlined label="Fim" type="date" />
             </div>
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="formulario.safraId"
+                outlined
+                clearable
+                emit-value
+                map-options
+                label="Safra"
+                :options="safraOpcoes"
+              />
+            </div>
+
+            <template v-if="tipo === TipoContrato.Cpr">
+              <div class="col-12"><div class="text-subtitle2">Dados da CPR</div></div>
+              <div class="col-12 col-md-4">
+                <q-input v-model="formulario.numeroCpr" outlined label="Número da CPR" />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input v-model="formulario.localEntrega" outlined label="Local de entrega" />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.dataEntregaPrevista"
+                  outlined
+                  label="Data entrega prevista"
+                  type="date"
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  v-model="formulario.qualidadeMinima"
+                  outlined
+                  label="Qualidade mínima"
+                  type="textarea"
+                  autogrow
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input v-model="formulario.partes" outlined label="Partes" type="textarea" autogrow />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="formulario.garantias"
+                  outlined
+                  label="Garantias"
+                  type="textarea"
+                  autogrow
+                />
+              </div>
+            </template>
+
+            <template v-else-if="tipo === TipoContrato.Barter">
+              <div class="col-12"><div class="text-subtitle2">Barter — insumos × grãos</div></div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.valorInsumos"
+                  outlined
+                  label="Valor dos insumos (R$)"
+                  type="number"
+                  step="0.01"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-select
+                  v-model="formulario.produtoGraoId"
+                  outlined
+                  clearable
+                  emit-value
+                  map-options
+                  label="Produto grão a receber"
+                  :options="produtoOpcoes"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-select
+                  v-model="formulario.unidadeGrao"
+                  outlined
+                  clearable
+                  emit-value
+                  map-options
+                  label="Unidade do grão"
+                  :options="UnidadeGraoOpcoes"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.precoReferencia"
+                  outlined
+                  label="Preço de referência"
+                  type="number"
+                  step="0.0001"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.quantidadeGraos"
+                  outlined
+                  label="Quantidade de grãos"
+                  type="number"
+                  step="0.001"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.quantidadeEquivalente"
+                  outlined
+                  label="Qtd. equivalente"
+                  type="number"
+                  step="0.001"
+                  readonly
+                />
+              </div>
+              <div class="col-12">
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  icon="calculate"
+                  label="Calcular equivalente"
+                  descricao="Calcular grãos equivalentes"
+                  :loading="calculando"
+                  @click="calcular"
+                />
+              </div>
+            </template>
+
+            <template v-else-if="tipo === TipoContrato.Termo">
+              <div class="col-12"><div class="text-subtitle2">Contrato a termo</div></div>
+              <div class="col-12 col-md-4">
+                <q-select
+                  v-model="formulario.tipoOperacao"
+                  outlined
+                  emit-value
+                  map-options
+                  label="Tipo de operação"
+                  class="field-required"
+                  :options="TipoOperacaoTermoOpcoes"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+            </template>
+
             <div class="col-12">
-              <q-input v-model="formulario.observacao" outlined label="Observação" type="textarea" autogrow />
+              <q-input
+                v-model="formulario.observacao"
+                outlined
+                label="Observação"
+                type="textarea"
+                autogrow
+              />
             </div>
           </div>
 
           <div class="agro-form-actions">
-            <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'contratos', query: { tipo } }" />
+            <agro-btn
+              flat
+              label="Cancelar"
+              descricao="Voltar"
+              :to="{ name: 'contratos', query: { tipo } }"
+            />
             <agro-btn
               color="primary"
               unelevated
@@ -85,18 +256,26 @@
 </template>
 
 <script setup lang="ts">
+import CotacaoMercadoCard from 'components/contratos/CotacaoMercadoCard.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useClientes } from 'composables/useClientes';
-import { useContratos } from 'composables/useContratos';
+import {
+  contratoParaForm,
+  formVazioContrato,
+  useContratos,
+} from 'composables/useContratos';
 import { useProdutos } from 'composables/useProdutos';
+import { useSafras } from 'composables/useSafras';
 import {
   FontePrecoOpcoes,
   TipoContrato,
+  TipoOperacaoTermoOpcoes,
+  UnidadeGraoOpcoes,
+  type FontePrecoValor,
   type TipoContratoValor,
 } from 'constants/enums';
-import type { ContratoFormModel } from 'types/dtos/contrato.dto';
-import { formatarMoeda } from 'utils/formatters';
+import type { CotacaoMercadoDto } from 'types/dtos/contrato.dto';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -112,23 +291,29 @@ const contratoId = computed(() => route.params.id as string | undefined);
 const titulo = computed(() =>
   modo.value === 'criar' ? 'Novo contrato' : 'Editar contrato',
 );
+const subtitulo = computed(() => {
+  if (tipo.value === TipoContrato.Cpr) return 'CPR — número, qualidade, local e garantias.';
+  if (tipo.value === TipoContrato.Barter) return 'Barter — insumos, grãos e equivalente.';
+  return 'Termo — compra ou venda futura com preço travado.';
+});
 
-const { contrato, salvando, obter, criar, editar, cotacao, carregarCotacaoMercado } =
-  useContratos(tipo);
+const {
+  contrato,
+  salvando,
+  obter,
+  criar,
+  editar,
+  cotacao,
+  carregarCotacaoMercado,
+  calcularEquivalente,
+} = useContratos(tipo);
 const { clientes, carregar: carregarClientes } = useClientes();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { safraOpcoes, carregar: carregarSafras } = useSafras();
 
 const carregandoPagina = ref(false);
-const formulario = ref<ContratoFormModel>({
-  clienteId: '',
-  produtoId: '',
-  quantidade: '',
-  preco: '',
-  fontePreco: '',
-  dataInicio: '',
-  dataFim: '',
-  observacao: '',
-});
+const calculando = ref(false);
+const formulario = ref(formVazioContrato());
 
 const clienteOpcoes = computed(() =>
   clientes.value.map((c) => ({ label: c.nomeRazao, value: c.id })),
@@ -136,6 +321,33 @@ const clienteOpcoes = computed(() =>
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
 );
+
+function aplicarCotacao(c: CotacaoMercadoDto): void {
+  formulario.value.preco = String(c.preco);
+  formulario.value.fontePreco = c.fonte;
+  if (tipo.value === TipoContrato.Barter) {
+    formulario.value.precoReferencia = String(c.preco);
+  }
+}
+
+async function calcular(): Promise<void> {
+  const valor = Number(formulario.value.valorInsumos);
+  const precoRef = Number(formulario.value.precoReferencia);
+  if (!Number.isFinite(valor) || !Number.isFinite(precoRef) || precoRef <= 0) return;
+  calculando.value = true;
+  const eq = await calcularEquivalente(
+    valor,
+    precoRef,
+    formulario.value.unidadeGrao || null,
+  );
+  calculando.value = false;
+  if (eq != null) {
+    formulario.value.quantidadeEquivalente = String(eq);
+    if (!formulario.value.quantidadeGraos) {
+      formulario.value.quantidadeGraos = String(eq);
+    }
+  }
+}
 
 async function salvar(): Promise<void> {
   if (modo.value === 'criar') {
@@ -164,7 +376,15 @@ async function salvar(): Promise<void> {
 onMounted(async () => {
   void carregarClientes();
   void carregarProdutos();
+  void carregarSafras();
   void carregarCotacaoMercado();
+
+  if (modo.value === 'criar') {
+    const precoQuery = route.query.preco as string | undefined;
+    const fonteQuery = route.query.fonte as FontePrecoValor | undefined;
+    if (precoQuery) formulario.value.preco = precoQuery;
+    if (fonteQuery) formulario.value.fontePreco = fonteQuery;
+  }
 
   if (modo.value === 'editar' && contratoId.value) {
     carregandoPagina.value = true;
@@ -173,16 +393,7 @@ onMounted(async () => {
       await router.replace({ name: 'contratos', query: { tipo: tipo.value } });
       return;
     }
-    formulario.value = {
-      clienteId: contrato.value.clienteId,
-      produtoId: contrato.value.produtoId,
-      quantidade: String(contrato.value.quantidade),
-      preco: String(contrato.value.preco),
-      fontePreco: contrato.value.fontePreco,
-      dataInicio: contrato.value.dataInicio.slice(0, 10),
-      dataFim: contrato.value.dataFim?.slice(0, 10) ?? '',
-      observacao: contrato.value.observacao ?? '',
-    };
+    formulario.value = contratoParaForm(contrato.value);
     carregandoPagina.value = false;
   }
 });

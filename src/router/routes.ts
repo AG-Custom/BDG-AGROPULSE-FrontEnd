@@ -1307,6 +1307,254 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'manutencao',
+        name: 'manutencao-dashboard',
+        component: () => import('pages/manutencao/ManutencaoDashboardPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoDashboard',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ativos',
+        name: 'manutencao-ativos',
+        component: () => import('pages/manutencao/AtivosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoAtivos',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ativos/novo',
+        name: 'manutencao-ativo-novo',
+        component: () => import('pages/manutencao/AtivoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoAtivoNovo',
+          breadcrumbPais: ['navegacao.manutencaoAtivos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ativos/:id/editar',
+        name: 'manutencao-ativo-editar',
+        component: () => import('pages/manutencao/AtivoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoAtivoEditar',
+          breadcrumbPais: ['navegacao.manutencaoAtivos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ativos/:id',
+        name: 'manutencao-ativo-detalhe',
+        component: () => import('pages/manutencao/AtivoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoAtivoDetalhe',
+          breadcrumbPais: ['navegacao.manutencaoAtivos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/planos',
+        name: 'manutencao-planos',
+        component: () => import('pages/manutencao/PlanosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoPlanos',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/planos/novo',
+        name: 'manutencao-plano-novo',
+        component: () => import('pages/manutencao/PlanoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoPlanoNovo',
+          breadcrumbPais: ['navegacao.manutencaoPlanos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/planos/:id/editar',
+        name: 'manutencao-plano-editar',
+        component: () => import('pages/manutencao/PlanoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoPlanoEditar',
+          breadcrumbPais: ['navegacao.manutencaoPlanos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ordens',
+        name: 'manutencao-ordens',
+        component: () => import('pages/manutencao/OrdensServicoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoOrdens',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ordens/nova',
+        name: 'manutencao-ordem-nova',
+        component: () => import('pages/manutencao/OrdemServicoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoOrdemNova',
+          breadcrumbPais: ['navegacao.manutencaoOrdens'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/ordens/:id',
+        name: 'manutencao-ordem-detalhe',
+        component: () => import('pages/manutencao/OrdemServicoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoOrdemDetalhe',
+          breadcrumbPais: ['navegacao.manutencaoOrdens'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/checklists',
+        name: 'manutencao-checklists',
+        component: () => import('pages/manutencao/ChecklistsListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoChecklists',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/checklists/novo',
+        name: 'manutencao-checklist-novo',
+        component: () => import('pages/manutencao/ChecklistFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoChecklistNovo',
+          breadcrumbPais: ['navegacao.manutencaoChecklists'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'manutencao/custos',
+        name: 'manutencao-custos',
+        component: () => import('pages/manutencao/CustosManutencaoPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoCustos',
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
+        path: 'crm',
+        name: 'crm-dashboard',
+        component: () => import('pages/crm/CrmDashboardPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmDashboard',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/carteira',
+        name: 'crm-carteira',
+        component: () => import('pages/crm/CarteiraAgronomicaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmCarteira',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/oportunidades',
+        name: 'crm-oportunidades',
+        component: () => import('pages/crm/OportunidadesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmOportunidades',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/oportunidades/novo',
+        name: 'crm-oportunidade-nova',
+        component: () => import('pages/crm/OportunidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmOportunidadeNova',
+          breadcrumbPais: ['navegacao.crmOportunidades'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/oportunidades/:id/editar',
+        name: 'crm-oportunidade-editar',
+        component: () => import('pages/crm/OportunidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmOportunidadeEditar',
+          breadcrumbPais: ['navegacao.crmOportunidades'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/amostras',
+        name: 'crm-amostras',
+        component: () => import('pages/crm/AmostrasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmAmostras',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/amostras/novo',
+        name: 'crm-amostra-nova',
+        component: () => import('pages/crm/AmostraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmAmostraNova',
+          breadcrumbPais: ['navegacao.crmAmostras'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/amostras/:id/editar',
+        name: 'crm-amostra-editar',
+        component: () => import('pages/crm/AmostraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmAmostraEditar',
+          breadcrumbPais: ['navegacao.crmAmostras'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/campanhas',
+        name: 'crm-campanhas',
+        component: () => import('pages/crm/CampanhasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmCampanhas',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/campanhas/:id',
+        name: 'crm-campanha-detalhe',
+        component: () => import('pages/crm/CampanhaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmCampanhaDetalhe',
+          breadcrumbPais: ['navegacao.crmCampanhas'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/credito',
+        name: 'crm-credito',
+        component: () => import('pages/crm/AnalisesCreditoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmCredito',
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/credito/:id',
+        name: 'crm-credito-detalhe',
+        component: () => import('pages/crm/AnaliseCreditoDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmCreditoDetalhe',
+          breadcrumbPais: ['navegacao.crmCredito'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
         path: 'rastreabilidade/talhoes',
         name: 'talhoes',
         component: () => import('pages/rastreabilidade/TalhoesListPage.vue'),
@@ -1490,6 +1738,15 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.oeeCampo',
           permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'cobranca-credito',
+        name: 'cobranca-credito',
+        component: () => import('pages/cobranca-credito/CobrancaCreditoPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cobrancaCredito',
+          permissao: Permissoes.CobrancaCredito.Visualizar,
         },
       },
       {

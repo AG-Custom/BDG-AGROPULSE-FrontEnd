@@ -157,3 +157,17 @@ Contrato API: `new_agropulse_backend/api-contract/financeiro.md`
 - Geração automática de CAP/CR (compras/vendas) foi reutilizada — não duplicada.
 - Permissão FE: `financeiro.visualizar` (+ `formas-pagamento-config.visualizar` para formas).
 - Rota legado `compras/contas-pagar` redireciona para `financeiro/contas-pagar`.
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração | Boletos bancários registrados (CNAB / registradora) — hoje stub |
+| Integração | Conciliação OFX / API bancária real + proposta de lançamentos |
+| Integração | Saldo intraday real (hoje stub) |
+| Integração | PTAX Banco Central real (hoje stub/manual) |
+| Fora de escopo | — |
+
+**Status:** CAP/CR, fluxo, régua interna, renegociação, antecipação e orçamento/DRE cobertos; falta banking/FX reais.

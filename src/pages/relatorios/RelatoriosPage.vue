@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Relatórios"
-      subtitulo="Curva ABC, comissões e giro de estoque."
+      subtitulo="Análises gerenciais, margem, DRE, rentabilidade e exportações."
     />
 
     <section class="agro-section">
@@ -10,276 +10,121 @@
         <q-tabs
           v-model="aba"
           dense
-          class="text-primary"
+          outside-arrows
+          mobile-arrows
+          class="text-primary relatorios-tabs"
           active-color="primary"
           indicator-color="primary"
         >
-          <q-tab name="abc" label="Curva ABC" />
-          <q-tab name="comissoes" label="Comissões" />
-          <q-tab name="giro" label="Giro de estoque" />
+          <q-tab v-for="item in abasVisiveis" :key="item.name" :name="item.name" :label="item.label" />
         </q-tabs>
         <q-separator />
 
-        <div v-if="aba === 'abc'" class="painel">
-          <div class="agro-filter-bar">
-            <q-input v-model="dias" outlined dense label="Dias" type="number" class="filtro" />
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Atualizar"
-              descricao="Carregar curva ABC"
-              :loading="carregando"
-              @click="carregarAbc"
-            />
-          </div>
-
-          <agro-table-skeleton v-if="carregando && curvaAbc.length === 0" :colunas="6" />
-          <empty-state
-            v-else-if="!carregando && curvaAbc.length === 0"
-            titulo="Sem dados"
-            descricao="Não há vendas no período informado."
-            icon="analytics"
-          />
-          <q-table
-            v-else
-            flat
-            bordered
-            row-key="produtoId"
-            :rows="curvaAbc"
-            :columns="colunasAbc"
-            :loading="carregando"
-            :rows-per-page-options="[10, 25, 50]"
-          >
-            <template #body-cell-receita="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.receita) }}</q-td>
-            </template>
-            <template #body-cell-lucro="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.lucro) }}</q-td>
-            </template>
-            <template #body-cell-participacaoReceitaPercentual="props">
-              <q-td :props="props" class="text-metric">
-                {{ formatarDecimal(props.row.participacaoReceitaPercentual) }}%
-              </q-td>
-            </template>
-          </q-table>
-        </div>
-
-        <div v-else-if="aba === 'comissoes'" class="painel">
-          <div class="agro-filter-bar">
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Atualizar"
-              descricao="Carregar comissões"
-              :loading="carregando"
-              @click="carregarCom"
-            />
-          </div>
-
-          <agro-table-skeleton v-if="carregando && comissoes.length === 0" :colunas="5" />
-          <empty-state
-            v-else-if="!carregando && comissoes.length === 0"
-            titulo="Sem comissões"
-            descricao="Não há dados de comissão/repasse."
-            icon="payments"
-          />
-          <q-table
-            v-else
-            flat
-            bordered
-            row-key="produtoId"
-            :rows="comissoes"
-            :columns="colunasCom"
-            :loading="carregando"
-            :rows-per-page-options="[10, 25, 50]"
-          >
-            <template #body-cell-valorVendido="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.valorVendido) }}</q-td>
-            </template>
-            <template #body-cell-valorComissao="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.valorComissao) }}</q-td>
-            </template>
-          </q-table>
-        </div>
-
-        <div v-else class="painel">
-          <div class="agro-filter-bar">
-            <q-input v-model="dataInicio" outlined dense type="date" label="Data início" class="filtro" />
-            <q-input v-model="dataFim" outlined dense type="date" label="Data fim" class="filtro" />
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Atualizar"
-              descricao="Carregar giro de estoque"
-              :loading="carregando"
-              @click="carregarGiro"
-            />
-          </div>
-
-          <agro-table-skeleton v-if="carregando && giroEstoque.length === 0" :colunas="5" />
-          <empty-state
-            v-else-if="!carregando && giroEstoque.length === 0"
-            titulo="Sem giro no período"
-            descricao="Não há saídas de estoque no intervalo informado."
-            icon="sync_alt"
-          />
-          <q-table
-            v-else
-            flat
-            bordered
-            row-key="produtoId"
-            :rows="giroEstoque"
-            :columns="colunasGiro"
-            :loading="carregando"
-            :rows-per-page-options="[10, 25, 50]"
-          >
-            <template #body-cell-produtoId="props">
-              <q-td :props="props">{{ rotuloProduto(props.row.produtoId) }}</q-td>
-            </template>
-            <template #body-cell-quantidadeSaida="props">
-              <q-td :props="props" class="text-metric">
-                {{ formatarDecimal(props.row.quantidadeSaida) }}
-              </q-td>
-            </template>
-            <template #body-cell-saldoAtual="props">
-              <q-td :props="props" class="text-metric">
-                {{ formatarDecimal(props.row.saldoAtual) }}
-              </q-td>
-            </template>
-            <template #body-cell-estoqueMedio="props">
-              <q-td :props="props" class="text-metric">
-                {{ formatarDecimal(props.row.estoqueMedio) }}
-              </q-td>
-            </template>
-            <template #body-cell-giro="props">
-              <q-td :props="props" class="text-metric">
-                {{ formatarDecimal(props.row.giro) }}
-              </q-td>
-            </template>
-          </q-table>
-        </div>
+        <curva-abc-tab v-if="aba === 'abc'" />
+        <comissoes-tab v-else-if="aba === 'comissoes'" />
+        <giro-estoque-tab v-else-if="aba === 'giro'" />
+        <margem-por-lote-tab v-else-if="aba === 'margem'" />
+        <dre-tab v-else-if="aba === 'dre'" />
+        <rentabilidade-tab v-else-if="aba === 'rentabilidade'" />
+        <inadimplencia-tab v-else-if="aba === 'inadimplencia'" />
+        <desempenho-equipe-tab v-else-if="aba === 'desempenho'" />
+        <alertas-tab v-else-if="aba === 'alertas'" />
+        <power-bi-tab v-else-if="aba === 'powerbi'" />
       </agro-card>
     </section>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AlertasTab from 'components/relatorios/AlertasTab.vue';
+import ComissoesTab from 'components/relatorios/ComissoesTab.vue';
+import CurvaAbcTab from 'components/relatorios/CurvaAbcTab.vue';
+import DesempenhoEquipeTab from 'components/relatorios/DesempenhoEquipeTab.vue';
+import DreTab from 'components/relatorios/DreTab.vue';
+import GiroEstoqueTab from 'components/relatorios/GiroEstoqueTab.vue';
+import InadimplenciaTab from 'components/relatorios/InadimplenciaTab.vue';
+import MargemPorLoteTab from 'components/relatorios/MargemPorLoteTab.vue';
+import PowerBiTab from 'components/relatorios/PowerBiTab.vue';
+import RentabilidadeTab from 'components/relatorios/RentabilidadeTab.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
-import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
-import EmptyState from 'components/ui/EmptyState.vue';
-import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
-import { useRelatorios } from 'composables/useRelatorios';
-import { useVerCustos } from 'composables/useVerCustos';
-import type { QTableColumn } from 'quasar';
-import type {
-  ComissaoRepasseItemDto,
-  CurvaAbcLucratividadeItemDto,
-  GiroEstoqueItemDto,
-} from 'types/dtos/relatorio.dto';
-import { formatarDecimal, formatarMoeda } from 'utils/formatters';
-import { computed, onMounted, ref, watch } from 'vue';
+import { useAuth } from 'composables/useAuth';
+import { PerfilUsuario } from 'constants/enums';
+import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
-const {
-  curvaAbc,
-  comissoes,
-  giroEstoque,
-  carregando,
-  carregarCurvaAbc,
-  carregarComissoes,
-  carregarGiroEstoque,
-} = useRelatorios();
-const { rotuloProduto } = useProdutoOpcoesEstoque();
-const { verCustos } = useVerCustos();
+type AbaRelatorio =
+  | 'abc'
+  | 'comissoes'
+  | 'giro'
+  | 'margem'
+  | 'dre'
+  | 'rentabilidade'
+  | 'inadimplencia'
+  | 'desempenho'
+  | 'alertas'
+  | 'powerbi';
 
-const aba = ref<'abc' | 'comissoes' | 'giro'>('abc');
-const dias = ref('30');
-const dataInicio = ref(dataIsoOffset(-30));
-const dataFim = ref(dataIsoOffset(0));
-
-const colunasAbc = computed(() => {
-  const base: QTableColumn<CurvaAbcLucratividadeItemDto>[] = [
-    { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
-    { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
-    { name: 'classeAbc', label: 'Classe', field: 'classeAbc', align: 'left' },
-    { name: 'receita', label: 'Receita', field: 'receita', align: 'right' },
-    { name: 'lucro', label: 'Lucro', field: 'lucro', align: 'right' },
-    {
-      name: 'participacaoReceitaPercentual',
-      label: 'Part. %',
-      field: 'participacaoReceitaPercentual',
-      align: 'right',
-    },
-  ];
-
-  if (verCustos.value) {
-    return base;
-  }
-
-  return base.filter((coluna) => coluna.name !== 'lucro');
-});
-
-const colunasCom = computed(() => {
-  const base: QTableColumn<ComissaoRepasseItemDto>[] = [
-    { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
-    { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
-    { name: 'vendedorUsuarioId', label: 'Vendedor', field: 'vendedorUsuarioId', align: 'left' },
-    { name: 'valorVendido', label: 'Vendido', field: 'valorVendido', align: 'right' },
-    { name: 'valorComissao', label: 'Comissão', field: 'valorComissao', align: 'right' },
-  ];
-
-  if (verCustos.value) {
-    return base;
-  }
-
-  return base.filter((coluna) => coluna.name !== 'valorComissao');
-});
-
-const colunasGiro: QTableColumn<GiroEstoqueItemDto>[] = [
-  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
-  { name: 'quantidadeSaida', label: 'Saídas', field: 'quantidadeSaida', align: 'right' },
-  { name: 'saldoAtual', label: 'Saldo atual', field: 'saldoAtual', align: 'right' },
-  { name: 'estoqueMedio', label: 'Estoque médio', field: 'estoqueMedio', align: 'right' },
-  { name: 'giro', label: 'Giro', field: 'giro', align: 'right' },
+const ABAS_VALIDAS: AbaRelatorio[] = [
+  'abc',
+  'comissoes',
+  'giro',
+  'margem',
+  'dre',
+  'rentabilidade',
+  'inadimplencia',
+  'desempenho',
+  'alertas',
+  'powerbi',
 ];
 
-function dataIsoOffset(diasOffset: number): string {
-  const data = new Date();
-  data.setDate(data.getDate() + diasOffset);
-  return data.toISOString().slice(0, 10);
-}
+const route = useRoute();
+const { usuario } = useAuth();
 
-async function carregarAbc(): Promise<void> {
-  await carregarCurvaAbc({ dias: Number(dias.value) || undefined });
-}
-
-async function carregarCom(): Promise<void> {
-  await carregarComissoes();
-}
-
-async function carregarGiro(): Promise<void> {
-  await carregarGiroEstoque({
-    dataInicio: dataInicio.value || undefined,
-    dataFim: dataFim.value || undefined,
-  });
-}
-
-watch(aba, (nova) => {
-  if (nova === 'abc') void carregarAbc();
-  else if (nova === 'comissoes') void carregarCom();
-  else void carregarGiro();
+const perfilOperacional = computed(() => {
+  const perfil = usuario.value?.perfil;
+  return perfil === PerfilUsuario.Operacional || perfil === PerfilUsuario.Rh;
 });
 
-onMounted(() => {
-  void carregarAbc();
+const abasVisiveis = computed(() => {
+  const todas: { name: AbaRelatorio; label: string; sensivel?: boolean }[] = [
+    { name: 'abc', label: 'Curva ABC' },
+    { name: 'comissoes', label: 'Comissões' },
+    { name: 'giro', label: 'Giro' },
+    { name: 'margem', label: 'Margem por lote', sensivel: true },
+    { name: 'dre', label: 'DRE', sensivel: true },
+    { name: 'rentabilidade', label: 'Rentabilidade' },
+    { name: 'inadimplencia', label: 'Inadimplência' },
+    { name: 'desempenho', label: 'Desempenho' },
+    { name: 'alertas', label: 'Alertas' },
+    { name: 'powerbi', label: 'Power BI' },
+  ];
+
+  return todas.filter((abaItem) => !(abaItem.sensivel && perfilOperacional.value));
 });
+
+function abaInicial(): AbaRelatorio {
+  const query = route.query.aba;
+  if (typeof query === 'string' && ABAS_VALIDAS.includes(query as AbaRelatorio)) {
+    return query as AbaRelatorio;
+  }
+  return 'abc';
+}
+
+const aba = ref<AbaRelatorio>(abaInicial());
+
+watch(
+  abasVisiveis,
+  (lista) => {
+    if (!lista.some((item) => item.name === aba.value)) {
+      aba.value = lista[0]?.name ?? 'abc';
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>
-.painel {
-  padding-top: var(--spacing-4);
-}
-
-.filtro {
-  min-width: 140px;
+.relatorios-tabs {
+  overflow-x: auto;
 }
 </style>

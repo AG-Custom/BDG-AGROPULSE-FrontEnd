@@ -62,4 +62,17 @@ Aplicar manualmente:
 ### Observações
 
 - SEFAZ é stub (sem Focus NFe real nesta fase).
-- Envio de cotação por e-mail/portal permanece fora de escopo.
+- Envio de cotação por e-mail/portal permanece fora de escopo (agora no backlog pendente abaixo).
+
+---
+
+## Pendente para fechar o módulo
+
+| Tipo | Item |
+|------|------|
+| Integração | SEFAZ documentos destinados real (hoje stub) |
+| Domínio | Envio de cotação a fornecedores (e-mail/portal) |
+| Domínio | Contratos de fornecimento + alerta de vencimento (spec comercial; ausente no `api-contract`) |
+| Fora de escopo | — |
+
+**Status:** fluxo essencial (NF-e → estoque + CAP) e opcionais SC/cotação/alçada/OC cobertos; faltam integração SEFAZ e contratos de fornecimento.
