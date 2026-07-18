@@ -1,0 +1,175 @@
+<template>
+  <q-page class="agro-page">
+    <app-page-header :titulo="tituloPagina" :subtitulo="subtituloPagina" />
+
+    <section class="agro-section">
+      <agro-card>
+        <agro-form-skeleton v-if="carregandoPagina" :campos="4" />
+
+        <q-form v-else ref="formRef" greedy class="agro-formulario">
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
+              <q-select
+                v-model="formulario.canal"
+                outlined
+                label="Canal de venda"
+                hint="Vazio = aplica a todos os canais"
+                emit-value
+                map-options
+                clearable
+                :options="CanalVendaOpcoes"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="formulario.percentual"
+                outlined
+                label="Comissão %"
+                class="field-required"
+                type="number"
+                min="0"
+                step="0.01"
+                aria-required="true"
+                :rules="[obrigatorio, percentualZeroACem]"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="formulario.descontoDe"
+                outlined
+                label="Desconto de %"
+                class="field-required"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                aria-required="true"
+                :rules="[obrigatorio, percentualZeroACem]"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <q-input
+                v-model="formulario.descontoAte"
+                outlined
+                label="Desconto até %"
+                class="field-required"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                aria-required="true"
+                :rules="[obrigatorio, percentualZeroACem]"
+              />
+            </div>
+          </div>
+
+          <div class="agro-form-actions">
+            <agro-btn
+              flat
+              label="Cancelar"
+              descricao="Voltar sem salvar"
+              :disable="salvando"
+              @click="voltar"
+            />
+            <agro-btn
+              color="primary"
+              unelevated
+              :label="modo === 'criar' ? 'Cadastrar' : 'Salvar'"
+              :descricao="
+                modo === 'criar' ? 'Cadastrar regra de comissão' : 'Salvar alterações'
+              "
+              :loading="salvando"
+              @click="salvar"
+            />
+          </div>
+        </q-form>
+      </agro-card>
+    </section>
+  </q-page>
+</template>
+
+<script setup lang="ts">
+import AgroCard from 'components/ui/AgroCard.vue';
+import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import {
+  formVazioRegraComissao,
+  regraComissaoParaForm,
+  useRegrasComissao,
+} from 'composables/useRegrasComissao';
+import { CanalVendaOpcoes } from 'constants/enums';
+import type { QForm } from 'quasar';
+import type { RegraComissaoFormModel } from 'types/dtos/regra-comissao.dto';
+import { obrigatorio, percentualZeroACem } from 'utils/validators';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+const { regra, salvando, obter, criar, editar } = useRegrasComissao();
+
+const formRef = ref<QForm | null>(null);
+const formulario = ref<RegraComissaoFormModel>(formVazioRegraComissao());
+const carregandoPagina = ref(true);
+
+const modo = computed<'criar' | 'editar'>(() =>
+  route.name === 'regra-comissao-editar' ? 'editar' : 'criar',
+);
+
+const regraId = computed(() => route.params.id as string | undefined);
+
+const tituloPagina = computed(() =>
+  modo.value === 'criar' ? 'Nova regra de comissão' : 'Editar regra de comissão',
+);
+
+const subtituloPagina = computed(() =>
+  modo.value === 'criar'
+    ? 'Defina canal, faixa de desconto e percentual de comissão.'
+    : 'Atualize a regra de comissão selecionada.',
+);
+
+function voltar(): void {
+  void router.push({ name: 'regras-comissao' });
+}
+
+async function salvar(): Promise<void> {
+  const valido = (await formRef.value?.validate()) ?? false;
+  if (!valido) {
+    return;
+  }
+
+  if (modo.value === 'criar') {
+    const criado = await criar(formulario.value);
+    if (criado) {
+      await router.push({ name: 'regras-comissao' });
+    }
+    return;
+  }
+
+  if (!regraId.value) {
+    return;
+  }
+
+  const atualizado = await editar(regraId.value, formulario.value);
+  if (atualizado) {
+    await router.push({ name: 'regras-comissao' });
+  }
+}
+
+onMounted(async () => {
+  carregandoPagina.value = true;
+
+  if (modo.value === 'editar' && regraId.value) {
+    const ok = await obter(regraId.value);
+    if (!ok || !regra.value) {
+      await router.replace({ name: 'regras-comissao' });
+      return;
+    }
+
+    formulario.value = regraComissaoParaForm(regra.value);
+  } else {
+    formulario.value = formVazioRegraComissao();
+  }
+
+  carregandoPagina.value = false;
+});
+</script>

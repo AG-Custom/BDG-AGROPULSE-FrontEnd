@@ -1,10 +1,12 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
-import type {
-  FontePrecoValor,
-  TipoContratoValor,
-  TipoOperacaoTermoValor,
-  UnidadeGraoValor,
+import {
+  ContratoStatus,
+  TipoContrato,
+  type FontePrecoValor,
+  type TipoContratoValor,
+  type TipoOperacaoTermoValor,
+  type UnidadeGraoValor,
 } from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { contratoService } from 'services/contrato.service';
@@ -144,6 +146,34 @@ export function diasVencimentoContrato(c: ContratoDto): number | null {
   const hoje = new Date();
   hoje.setHours(12, 0, 0, 0);
   return Math.round((fim.getTime() - hoje.getTime()) / 86_400_000);
+}
+
+export type ContratoComTipo = ContratoDto & { tipoRotulo: string };
+
+export async function listarContratosAbertosPorCliente(
+  clienteId: string,
+): Promise<ContratoComTipo[]> {
+  if (!clienteId) {
+    return [];
+  }
+
+  const [cprs, barters, termos] = await Promise.all([
+    contratoService.listar(TipoContrato.Cpr, { status: ContratoStatus.Aberto }),
+    contratoService.listar(TipoContrato.Barter, { status: ContratoStatus.Aberto }),
+    contratoService.listar(TipoContrato.Termo, { status: ContratoStatus.Aberto }),
+  ]);
+
+  return [
+    ...cprs
+      .filter((c) => c.clienteId === clienteId)
+      .map((c) => ({ ...c, tipoRotulo: 'CPR' })),
+    ...barters
+      .filter((c) => c.clienteId === clienteId)
+      .map((c) => ({ ...c, tipoRotulo: 'Barter' })),
+    ...termos
+      .filter((c) => c.clienteId === clienteId)
+      .map((c) => ({ ...c, tipoRotulo: 'Termo' })),
+  ];
 }
 
 export function useContratos(tipo: TipoContratoValor | Ref<TipoContratoValor>) {

@@ -15,7 +15,7 @@ Dois fluxos: venda consultiva (orçamento → pedido → NF-e) e venda de balcã
 | Pedidos de venda (ciclo completo) | Orçamento → aprovação → faturamento; reserva FEFO; contas a receber |
 | Orçamentos dedicados + conversão 1 clique | CRUD + `POST /orcamentos/{id}/converter` e UI |
 | Tabelas de preço com escopos | Cliente, grupo comercial, canal, região, vigência — CRUD BE/FE |
-| Motor de resolução de preço (domínio) | Prioridade cliente → grupo → canal/região → geral → `precoVenda` |
+| Motor de resolução de preço (domínio) | Prioridade cliente → grupo → canal/região → geral (sem fallback `precoVenda` em vendas) |
 | Margem mínima produto/categoria/item de tabela | Cadastro + trava `MargemMinima` |
 | Fila de aprovações com travas | Margem, limite crédito, estoque insuficiente, atraso cliente |
 | Notificações pós-decisão | Pedido retido / aprovado / recusado / expirado |
@@ -45,8 +45,8 @@ Dois fluxos: venda consultiva (orçamento → pedido → NF-e) e venda de balcã
 #### 3. Seleção manual de tabela pelo operador — ✅ FE
 - `tabelaPrecoId` em pedido/orçamento/PDV; `GET /tabelas-preco/permitidas`.
 
-#### 4. Bloqueio se produto não estiver em tabela — ⚠️ parcial
-- FE tenta resolver preço; fallback local para `precoVenda` se endpoint falhar. Bloqueio hard depende do BE.
+#### 4. Bloqueio se produto não estiver em tabela — ✅
+- BE e FE sem fallback `precoVenda`; `GET /precificacao/resolver` e domínio de pedido/orçamento/PDV em hard mode.
 
 ---
 
@@ -113,9 +113,11 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 #### 20. Representantes/consultores com carteira e metas — ✅ FE tipado
 - Rotas `/metas-vendedor` e `/representantes` (listagens; graceful se BE ainda não expuser).
 
-#### 21. Comissões por canal e faixa de desconto — ❌
+#### 21. Comissões por canal e faixa de desconto — ✅
+- BE aplica regras com canal da tabela de preço do pedido; FE CRUD `/regras-comissao`.
 
-#### 22. Contratos com trava de preço por safra — ❌
+#### 22. Contratos com trava de preço por safra — ✅
+- `contratoId` no pedido trava preço do produto do contrato (CPR/Barter/Termo); FE select opcional no formulário.
 
 #### 23. Bonificação / fidelidade por volume — ❌ fora de escopo
 
@@ -135,7 +137,7 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 | Tabelas exclusivas (cliente/grupo/canal/período) | ✅ | ✅ |
 | Aplicação automática pelo perfil | ⚠️ resolver domínio + API | ✅ resolver + preço auto |
 | Seleção manual de tabela | ⚠️ `tabelaPrecoId` | ✅ |
-| Bloqueio item sem preço de tabela | ⚠️ | ⚠️ fallback `precoVenda` |
+| Bloqueio item sem preço de tabela | ✅ hard mode | ✅ sem fallback `precoVenda` |
 | **Desconto / margem** | | |
 | Margem mínima produto/categoria | ✅ | ✅ cadastro |
 | Vendedor não vê custo/margem/lucro | ✅ `verCustos` | ✅ telas venda/relatório |
@@ -163,6 +165,8 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 | Orçamento + tabela automática | ⚠️ | ✅ |
 | Orçamento → pedido 1 clique | ✅ | ✅ |
 | Representante + carteira + metas | ⚠️ | ✅ listagens tipadas |
+| Comissões por canal + faixa desconto | ✅ canal da tabela | ✅ CRUD `/regras-comissao` |
+| Trava preço contrato/safra no pedido | ✅ `contratoId` | ✅ select + DTO |
 | Histórico pedidos/negociações por cliente | ⚠️ | ✅ aba/seção no cliente |
 | Bonificação / fidelidade | ❌ | ❌ (fora) |
 | App mobile | ❌ | ❌ (fora) |
@@ -175,13 +179,12 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 
 | Tipo | Item |
 |------|------|
-| Domínio | Bloqueio hard se produto não estiver em tabela de preço (hoje fallback `precoVenda`) |
-| Domínio | Comissões por canal de venda e faixa de desconto |
-| Domínio | Trava de preço por safra no pedido — alinhar com módulo Contratos (`ContratoId` / painel safra) |
 | Integração | Contingência SEFAZ no PDV |
 | Integração | NF-e / NFC-e automática real (hoje stub) |
 | Integração | NF-e de devolução + efeitos fiscais (ICMS / PIS/COFINS) |
 | Fora de escopo | Bonificação / fidelidade por volume |
 | Fora de escopo | App mobile vendedor / consultor |
 
-**Status:** orçamento, pedido, PDV, travas e devolução parcial cobertos em domínio/UI; faltam fiscal real e regras avançadas de comissão/precificação.
+**Domínio fechado (2026-07-17):** bloqueio hard sem preço de tabela; comissões por canal/faixa; trava de preço por `contratoId`.
+
+**Status:** domínio de precificação, comissão e trava por contrato fechados; restam integrações fiscais (SEFAZ / NF-e).

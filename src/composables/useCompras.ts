@@ -8,6 +8,7 @@ import type {
   CriarCotacaoCompraPayload,
   CriarPedidoCompraPayload,
   CriarSolicitacaoCompraPayload,
+  EnviarCotacaoPayload,
   ListarCotacoesCompraParams,
   ListarPedidosCompraParams,
   ListarSolicitacoesCompraParams,
@@ -201,6 +202,36 @@ export function useCompras() {
     }
   }
 
+  async function enviarCotacao(
+    id: string,
+    payload: EnviarCotacaoPayload,
+  ): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Enviar cotação',
+      mensagem:
+        'Registrar envio interno desta cotação aos fornecedores selecionados? (sem e-mail real)',
+      textoConfirmar: 'Enviar',
+      icone: 'info',
+    });
+
+    if (!confirmou) {
+      return false;
+    }
+
+    salvando.value = true;
+
+    try {
+      cotacao.value = await comprasService.enviarCotacao(id, payload);
+      sucesso('Cotação marcada como enviada.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   async function carregarPedidos(params?: ListarPedidosCompraParams): Promise<void> {
     carregando.value = true;
 
@@ -336,6 +367,7 @@ export function useCompras() {
     criarCotacao,
     responderCotacao,
     encerrarCotacao,
+    enviarCotacao,
     carregarPedidos,
     obterPedido,
     criarPedido,

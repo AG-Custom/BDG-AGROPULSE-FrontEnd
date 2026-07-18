@@ -3,6 +3,14 @@
     <app-page-header titulo="Cotação de compra" :subtitulo="subtitulo">
       <div class="acoes">
         <agro-btn
+          v-if="podeEnviar"
+          color="primary"
+          unelevated
+          label="Enviar cotação"
+          descricao="Registrar envio interno aos fornecedores"
+          @click="abrirEnvio"
+        />
+        <agro-btn
           v-if="podeResponder"
           color="primary"
           unelevated
@@ -34,11 +42,35 @@
               <div class="text-caption">Data limite</div>
               <div>{{ formatarData(cotacao.dataLimite) }}</div>
             </div>
+            <div v-if="cotacao.enviadoEm" class="col-md-4">
+              <div class="text-caption">Enviado em</div>
+              <div>{{ formatarData(cotacao.enviadoEm) }}</div>
+            </div>
             <div v-if="cotacao.observacao" class="col-12">
               <div class="text-caption">Observação</div>
               <div>{{ cotacao.observacao }}</div>
             </div>
           </div>
+        </agro-card>
+
+        <agro-card v-if="(cotacao.envios ?? []).length > 0">
+          <h3 class="titulo">Envios</h3>
+          <q-table
+            flat
+            bordered
+            row-key="id"
+            hide-pagination
+            :rows="cotacao.envios ?? []"
+            :columns="colunasEnvios"
+            :pagination="{ rowsPerPage: 0 }"
+          >
+            <template #body-cell-fornecedorId="props">
+              <q-td :props="props">{{ rotuloFornecedor(props.row.fornecedorId) }}</q-td>
+            </template>
+            <template #body-cell-enviadoEm="props">
+              <q-td :props="props">{{ formatarData(props.row.enviadoEm) }}</q-td>
+            </template>
+          </q-table>
         </agro-card>
 
         <agro-card>
@@ -143,6 +175,39 @@
       </div>
     </section>
 
+    <q-dialog v-model="dialogEnvio" persistent>
+      <q-card class="dialog">
+        <q-card-section><h4 class="titulo">Enviar cotação</h4></q-card-section>
+        <q-card-section>
+          <q-select
+            v-model="fornecedoresEnvio"
+            outlined
+            label="Fornecedores"
+            multiple
+            emit-value
+            map-options
+            use-chips
+            :options="fornecedorOpcoes"
+          />
+          <div class="text-caption q-mt-sm">
+            Registra fila interna de envio (sem e-mail real / SendGrid).
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogEnvio = false" />
+          <agro-btn
+            color="primary"
+            unelevated
+            label="Enviar"
+            descricao="Confirmar envio"
+            :loading="salvando"
+            :disable="fornecedoresEnvio.length === 0"
+            @click="enviar"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-dialog v-model="dialogResposta" persistent>
       <q-card class="dialog">
         <q-card-section><h4 class="titulo">Responder cotação</h4></q-card-section>
@@ -216,7 +281,12 @@ import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
 import type { QTableColumn } from 'quasar';
-import type { ComparativoCotacaoPropostaDto, ItemCotacaoDto, RespostaCotacaoDto } from 'types/dtos/compras.dto';
+import type {
+  ComparativoCotacaoPropostaDto,
+  EnvioCotacaoDto,
+  ItemCotacaoDto,
+  RespostaCotacaoDto,
+} from 'types/dtos/compras.dto';
 import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -232,11 +302,14 @@ const {
   carregarComparativo,
   responderCotacao,
   encerrarCotacao,
+  enviarCotacao,
 } = useCompras();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
 
 const dialogResposta = ref(false);
+const dialogEnvio = ref(false);
+const fornecedoresEnvio = ref<string[]>([]);
 const resposta = reactive({
   fornecedorId: '',
   itemCotacaoId: '',
@@ -247,8 +320,14 @@ const resposta = reactive({
 });
 
 const id = computed(() => route.params.id as string);
+const podeEnviar = computed(
+  () => cotacao.value?.status === 'Aberta' || cotacao.value?.status === 'Enviada',
+);
 const podeResponder = computed(
-  () => cotacao.value?.status === 'Aberta' || cotacao.value?.status === 'EmResposta',
+  () =>
+    cotacao.value?.status === 'Aberta' ||
+    cotacao.value?.status === 'Enviada' ||
+    cotacao.value?.status === 'EmResposta',
 );
 const podeEncerrar = computed(() => podeResponder.value);
 const subtitulo = computed(() =>
@@ -278,6 +357,11 @@ const itemOpcoes = computed(() =>
 const colunasItens: QTableColumn<ItemCotacaoDto>[] = [
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
   { name: 'quantidade', label: 'Qtd', field: 'quantidade', align: 'right' },
+];
+const colunasEnvios: QTableColumn<EnvioCotacaoDto>[] = [
+  { name: 'fornecedorId', label: 'Fornecedor', field: 'fornecedorId', align: 'left' },
+  { name: 'email', label: 'E-mail', field: 'email', align: 'left' },
+  { name: 'enviadoEm', label: 'Enviado em', field: 'enviadoEm', align: 'left' },
 ];
 const colunasRespostas: QTableColumn<RespostaCotacaoDto>[] = [
   { name: 'fornecedorId', label: 'Fornecedor', field: 'fornecedorId', align: 'left' },
@@ -316,6 +400,16 @@ async function salvarResposta(): Promise<void> {
 
 async function encerrar(): Promise<void> {
   await encerrarCotacao(id.value);
+}
+
+function abrirEnvio(): void {
+  fornecedoresEnvio.value = (cotacao.value?.envios ?? []).map((e) => e.fornecedorId);
+  dialogEnvio.value = true;
+}
+
+async function enviar(): Promise<void> {
+  const ok = await enviarCotacao(id.value, { fornecedorIds: fornecedoresEnvio.value });
+  if (ok) dialogEnvio.value = false;
 }
 
 onMounted(async () => {

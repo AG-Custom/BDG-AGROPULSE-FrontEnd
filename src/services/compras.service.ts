@@ -6,13 +6,19 @@ import type {
   ComprasConfigDto,
   ConfirmarRecebimentoPayload,
   CotacaoCompraDto,
+  AtualizarContratoFornecimentoPayload,
+  ContratoFornecimentoAlertaDto,
+  ContratoFornecimentoDto,
+  CriarContratoFornecimentoPayload,
   CriarCotacaoCompraPayload,
   CriarPedidoCompraPayload,
   CriarRecebimentoPayload,
   CriarSolicitacaoCompraPayload,
   DefinirAlcadasAprovacaoPayload,
+  EnviarCotacaoPayload,
   EvolucaoPrecoCompraDto,
   HistoricoCompraDto,
+  ListarContratosFornecimentoParams,
   ListarCotacoesCompraParams,
   ListarEvolucaoPrecoComprasParams,
   ListarHistoricoComprasParams,
@@ -95,6 +101,57 @@ export const comprasService = {
 
   encerrarCotacao(id: string): Promise<void> {
     return api.post(`/compras/cotacoes/${id}/encerrar`).then(() => undefined);
+  },
+
+  enviarCotacao(id: string, payload: EnviarCotacaoPayload): Promise<CotacaoCompraDto> {
+    return api
+      .post<CotacaoCompraDto>(`/compras/cotacoes/${id}/enviar`, payload)
+      .then((r) => r.data);
+  },
+
+  listarContratosFornecimento(
+    params?: ListarContratosFornecimentoParams,
+  ): Promise<ContratoFornecimentoDto[]> {
+    return api
+      .get<ContratoFornecimentoDto[]>('/compras/contratos-fornecimento', { params })
+      .then((r) => r.data);
+  },
+
+  obterContratoFornecimento(id: string): Promise<ContratoFornecimentoDto> {
+    return api
+      .get<ContratoFornecimentoDto>(`/compras/contratos-fornecimento/${id}`)
+      .then((r) => r.data);
+  },
+
+  criarContratoFornecimento(
+    payload: CriarContratoFornecimentoPayload,
+  ): Promise<ContratoFornecimentoDto> {
+    return api
+      .post<ContratoFornecimentoDto>('/compras/contratos-fornecimento', payload)
+      .then((r) => r.data);
+  },
+
+  atualizarContratoFornecimento(
+    id: string,
+    payload: AtualizarContratoFornecimentoPayload,
+  ): Promise<ContratoFornecimentoDto> {
+    return api
+      .put<ContratoFornecimentoDto>(`/compras/contratos-fornecimento/${id}`, payload)
+      .then((r) => r.data);
+  },
+
+  cancelarContratoFornecimento(id: string): Promise<void> {
+    return api
+      .post(`/compras/contratos-fornecimento/${id}/cancelar`)
+      .then(() => undefined);
+  },
+
+  alertasContratosFornecimento(dias = 30): Promise<ContratoFornecimentoAlertaDto[]> {
+    return api
+      .get<ContratoFornecimentoAlertaDto[]>('/compras/contratos-fornecimento/alertas', {
+        params: { dias },
+      })
+      .then((r) => r.data);
   },
 
   listarPedidos(params?: ListarPedidosCompraParams): Promise<PedidoCompraDto[]> {

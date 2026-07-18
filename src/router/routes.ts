@@ -849,6 +849,35 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'compras/contratos-fornecimento',
+        name: 'contratos-fornecimento',
+        component: () => import('pages/compras/ContratosFornecimentoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratosFornecimento',
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/contratos-fornecimento/novo',
+        name: 'contrato-fornecimento-novo',
+        component: () => import('pages/compras/ContratoFornecimentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoFornecimentoNovo',
+          breadcrumbPais: ['navegacao.contratosFornecimento'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/contratos-fornecimento/:id/editar',
+        name: 'contrato-fornecimento-editar',
+        component: () => import('pages/compras/ContratoFornecimentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoFornecimentoEditar',
+          breadcrumbPais: ['navegacao.contratosFornecimento'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
         path: 'compras/pedidos',
         name: 'pedidos-compra',
         component: () => import('pages/compras/PedidosCompraListPage.vue'),
@@ -1441,6 +1470,148 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'logistica',
+        name: 'logistica-dashboard',
+        component: () => import('pages/logistica/LogisticaDashboardPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaDashboard',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/veiculos',
+        name: 'logistica-veiculos',
+        component: () => import('pages/logistica/VeiculosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaVeiculos',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/veiculos/novo',
+        name: 'logistica-veiculo-novo',
+        component: () => import('pages/logistica/VeiculoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaVeiculoNovo',
+          breadcrumbPais: ['navegacao.logisticaVeiculos'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/veiculos/:id/editar',
+        name: 'logistica-veiculo-editar',
+        component: () => import('pages/logistica/VeiculoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaVeiculoEditar',
+          breadcrumbPais: ['navegacao.logisticaVeiculos'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/cargas',
+        name: 'logistica-cargas',
+        component: () => import('pages/logistica/CargasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaCargas',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/cargas/novo',
+        name: 'logistica-carga-nova',
+        component: () => import('pages/logistica/CargaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaCargaNova',
+          breadcrumbPais: ['navegacao.logisticaCargas'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/cargas/:id/editar',
+        name: 'logistica-carga-editar',
+        component: () => import('pages/logistica/CargaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaCargaEditar',
+          breadcrumbPais: ['navegacao.logisticaCargas'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/cargas/:id',
+        name: 'logistica-carga-detalhe',
+        component: () => import('pages/logistica/CargaDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaCargaDetalhe',
+          breadcrumbPais: ['navegacao.logisticaCargas'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/romaneios',
+        name: 'logistica-romaneios',
+        component: () => import('pages/logistica/RomaneiosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaRomaneios',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/romaneios/:id',
+        name: 'logistica-romaneio-detalhe',
+        component: () => import('pages/logistica/RomaneioDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaRomaneioDetalhe',
+          breadcrumbPais: ['navegacao.logisticaRomaneios'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/transportadoras',
+        name: 'logistica-transportadoras',
+        component: () => import('pages/logistica/TransportadorasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaTransportadoras',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/transportadoras/:id',
+        name: 'logistica-transportadora-detalhe',
+        component: () => import('pages/logistica/TransportadoraDetalhePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaTransportadoraDetalhe',
+          breadcrumbPais: ['navegacao.logisticaTransportadoras'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/abastecimentos',
+        name: 'logistica-abastecimentos',
+        component: () => import('pages/logistica/AbastecimentosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaAbastecimentos',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/docs-transporte',
+        name: 'logistica-docs-transporte',
+        component: () => import('pages/logistica/DocsTransporteListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaDocsTransporte',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/custos',
+        name: 'logistica-custos',
+        component: () => import('pages/logistica/CustoLogisticaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaCustos',
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
         path: 'crm',
         name: 'crm-dashboard',
         component: () => import('pages/crm/CrmDashboardPage.vue'),
@@ -1774,6 +1945,35 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.representantes',
           permissao: Permissoes.Representantes.Visualizar,
+        },
+      },
+      {
+        path: 'regras-comissao',
+        name: 'regras-comissao',
+        component: () => import('pages/regras-comissao/RegrasComissaoListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.regrasComissao',
+          permissao: Permissoes.RegrasComissao.Visualizar,
+        },
+      },
+      {
+        path: 'regras-comissao/nova',
+        name: 'regra-comissao-nova',
+        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.regraComissaoNova',
+          breadcrumbPais: ['navegacao.regrasComissao'],
+          permissao: Permissoes.RegrasComissao.Visualizar,
+        },
+      },
+      {
+        path: 'regras-comissao/:id/editar',
+        name: 'regra-comissao-editar',
+        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.regraComissaoEditar',
+          breadcrumbPais: ['navegacao.regrasComissao'],
+          permissao: Permissoes.RegrasComissao.Visualizar,
         },
       },
       {

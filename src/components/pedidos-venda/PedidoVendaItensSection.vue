@@ -136,7 +136,7 @@
                   v-model="itemForm.precoUnitario"
                   outlined
                   label="Preço unitário"
-                  hint="Resolvido pela tabela; pode ajustar manualmente"
+                  hint="Preço da tabela — sem fallback para preço de venda do produto"
                   type="number"
                   min="0.01"
                   step="0.01"
@@ -264,22 +264,16 @@ async function onProdutoSelecionado(produtoId: string): Promise<void> {
     return;
   }
 
-  const resolvido = await resolverPreco(
-    {
-      produtoId,
-      clienteId: props.clienteId || null,
-      tabelaPrecoId: props.tabelaPrecoId || null,
-    },
-    true,
-  );
+  itemForm.value.precoUnitario = '';
+
+  const resolvido = await resolverPreco({
+    produtoId,
+    clienteId: props.clienteId || null,
+    tabelaPrecoId: props.tabelaPrecoId || null,
+  });
 
   if (resolvido) {
     itemForm.value.precoUnitario = String(resolvido.preco);
-  } else {
-    const produto = produtos.value.find((item) => item.id === produtoId);
-    if (produto?.precoVenda != null) {
-      itemForm.value.precoUnitario = String(produto.precoVenda);
-    }
   }
 }
 

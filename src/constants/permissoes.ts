@@ -83,6 +83,9 @@ export const Permissoes = {
   Manutencao: {
     Visualizar: 'manutencao.visualizar',
   },
+  Logistica: {
+    Visualizar: 'logistica.visualizar',
+  },
   Crm: {
     Visualizar: 'crm.visualizar',
   },
@@ -94,6 +97,9 @@ export const Permissoes = {
   },
   Representantes: {
     Visualizar: 'representantes.visualizar',
+  },
+  RegrasComissao: {
+    Visualizar: 'regras-comissao.visualizar',
   },
   PermissoesGranulares: {
     Visualizar: 'permissoes-granulares.visualizar',

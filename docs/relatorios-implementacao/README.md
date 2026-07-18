@@ -37,43 +37,40 @@ Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Fr
 | Financeiro | [financeiro-OK.md](./financeiro-OK.md) | Domínio OK |
 | Fiscal e Tributário | [fiscal-tributario-OK.md](./fiscal-tributario-OK.md) | Domínio OK |
 | Gestão de Safras | [gestao-safras-OK.md](./gestao-safras-OK.md) | Domínio OK |
-| **Logística e Transporte** | [logistica-transporte.md](./logistica-transporte.md) | **Greenfield** |
+| Logística e Transporte | [logistica-transporte-OK.md](./logistica-transporte-OK.md) | Domínio OK |
 | Manutenção e Ativos | [manutencao-ativos-OK.md](./manutencao-ativos-OK.md) | Domínio OK |
 | CRM Agrícola | [crm-agricola-OK.md](./crm-agricola-OK.md) | Domínio OK |
 | Relatórios / Dashboards | [relatorios-dashboards-OK.md](./relatorios-dashboards-OK.md) | Domínio OK |
 | Cobrança e Crédito Rural | [cobranca-credito-rural-OK.md](./cobranca-credito-rural-OK.md) | Domínio OK |
 | Contratos Agrícolas | [contratos-agricolas-OK.md](./contratos-agricolas-OK.md) | Domínio OK |
 | RH e Folha | — | **Fora de escopo** |
+| Legado React — mocks / sem integração real | [legado-stub-integracoes.md](./legado-stub-integracoes.md) | Documento para cliente |
 
 ---
 
 ## Backlog priorizado (o que ainda precisa ser feito)
 
-### 1. Greenfield
-
-1. **Logística e Transporte** — módulo completo (frota, cargas, romaneio operacional, transportadoras, abastecimento, relatórios). Ver [logistica-transporte.md](./logistica-transporte.md). Hoje só existe expedição/romaneio FEFO pós-pedido.
-
-### 2. Integrações externas (stubs → real) — impacto alto
+### 1. Integrações externas (stubs → real) — impacto alto
 
 | Prioridade | Módulo | Pendência |
 |------------|--------|-----------|
 | Alta | Fiscal | Focus/SEFAZ real; contingência; cancelamento com reversão estoque/CR/CP; SPED além de blocos stub |
 | Alta | Financeiro | Boletos registrados; OFX/API bancária; PTAX Bacen |
-| Alta | Vendas | NF-e devolução; contingência PDV; bloqueio hard sem preço de tabela |
-| Média | Compras | SEFAZ documentos destinados; envio de cotação; contratos de fornecimento |
-| Média | Contratos | Estoque + NF-e reais na liquidação/barter; cotação CBOT/ESALQ |
-| Média | Cobrança | Serasa/SPC; revisão automática de limite; crédito bancário |
+| Alta | Vendas | NF-e devolução; contingência PDV; NF-e/NFC-e real |
+| Média | Compras | SEFAZ documentos destinados; e-mail/portal real no envio de cotação |
+| Média | Contratos | NF-e real na liquidação/barter; cotação CBOT/ESALQ |
+| Média | Cobrança | Serasa/SPC; crédito bancário BB/Sicredi |
+| Média | Logística | GPS/telemetria; CT-e/MDF-e SEFAZ; balança rodoviária |
 | Baixa | CRM | WhatsApp / e-mail |
 | Baixa | Relatórios | Power BI embed |
 | Baixa | Estoque / Produção / Manutenção / Safras | Hardware IoT, geo real, offline PWA, telemetria |
 
-### 3. Domínio interno ainda aberto (sem provider externo)
+### 2. Domínio interno ainda aberto (opcional)
 
-- Vendas: comissões por canal/faixa de desconto; alinhar trava de preço por safra com Contratos
-- Compras: contratos de fornecimento + alerta de vencimento
-- Estoque (opcional): cadastro hierárquico formal de locais
+- Estoque: cadastro hierárquico formal de locais (galpão → depósito → corredor → prateleira)
+- Relatórios: escopo fino por perfil além de `verCustos` (sem Power BI)
 
-### 4. Explicitamente fora de escopo
+### 3. Explicitamente fora de escopo
 
 - **RH e Folha** (eSocial, ponto, folha, FGTS, EPI, NR-31 como módulo)
 - Bonificação / fidelidade por volume (Vendas)
@@ -83,7 +80,7 @@ Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Fr
 
 ## Como usar estes arquivos
 
-1. Abrir o `*-OK.md` ou `logistica-transporte.md` do módulo.
+1. Abrir o `*-OK.md` do módulo.
 2. Conferir o mapa rápido e a seção **Pendente para fechar o módulo**.
 3. Antes de implementar: atualizar `new_agropulse_backend/api-contract/` e só então BE + FE no padrão AgroPulse.
 4. Referência de UX/legado: `C:\Users\Guilherme\Documents\AGROPULSE2026\AGROPULSE2026` (páginas React por módulo).

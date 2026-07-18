@@ -259,6 +259,18 @@
           <q-item-section>Representantes</q-item-section>
         </q-item>
         <q-item
+          v-if="podeGerenciarRegrasComissao"
+          clickable
+          :to="{ name: 'regras-comissao' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="percent" size="20px" />
+          </q-item-section>
+          <q-item-section>Comissões</q-item-section>
+        </q-item>
+        <q-item
           v-if="podeGerenciarAprovacoes"
           clickable
           :to="{ name: 'aprovacoes' }"
@@ -323,6 +335,18 @@
             <q-icon name="compare" size="20px" />
           </q-item-section>
           <q-item-section>Cotações</q-item-section>
+        </q-item>
+        <q-item
+          v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
+          clickable
+          :to="{ name: 'contratos-fornecimento' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="description" size="20px" />
+          </q-item-section>
+          <q-item-section>Contratos fornecimento</q-item-section>
         </q-item>
         <q-item
           v-if="podeGerenciarCompras && fluxoCompletoHabilitado"
@@ -550,6 +574,100 @@
         <q-item
           clickable
           :to="{ name: 'manutencao-custos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="payments" size="20px" />
+          </q-item-section>
+          <q-item-section>Custos</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <div v-if="podeGerenciarLogistica" class="app-sidebar__section">
+      <div class="text-overline app-sidebar__label">Logística</div>
+      <q-list padding class="app-sidebar__list">
+        <q-item
+          clickable
+          :to="{ name: 'logistica-dashboard' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="dashboard" size="20px" />
+          </q-item-section>
+          <q-item-section>Dashboard</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-veiculos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="local_shipping" size="20px" />
+          </q-item-section>
+          <q-item-section>Frota</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-cargas' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="inventory_2" size="20px" />
+          </q-item-section>
+          <q-item-section>Cargas</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-romaneios' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="assignment" size="20px" />
+          </q-item-section>
+          <q-item-section>Romaneios</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-transportadoras' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="business" size="20px" />
+          </q-item-section>
+          <q-item-section>Transportadoras</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-abastecimentos' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="local_gas_station" size="20px" />
+          </q-item-section>
+          <q-item-section>Abastecimento</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-docs-transporte' }"
+          active-class="app-sidebar__item--active"
+          class="app-sidebar__item"
+        >
+          <q-item-section avatar>
+            <q-icon name="description" size="20px" />
+          </q-item-section>
+          <q-item-section>Docs</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          :to="{ name: 'logistica-custos' }"
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
@@ -1316,6 +1434,9 @@ const podeGerenciarMetasVendedor = computed(() =>
 const podeGerenciarRepresentantes = computed(() =>
   possuiPermissao(Permissoes.Representantes.Visualizar),
 );
+const podeGerenciarRegrasComissao = computed(() =>
+  possuiPermissao(Permissoes.RegrasComissao.Visualizar),
+);
 const podeGerenciarCompras = computed(() =>
   possuiPermissao(Permissoes.Compras.Visualizar),
 );
@@ -1333,6 +1454,9 @@ const podeGerenciarProducao = computed(() =>
 );
 const podeGerenciarManutencao = computed(() =>
   possuiPermissao(Permissoes.Manutencao.Visualizar),
+);
+const podeGerenciarLogistica = computed(() =>
+  possuiPermissao(Permissoes.Logistica.Visualizar),
 );
 const podeGerenciarCrm = computed(() => possuiPermissao(Permissoes.Crm.Visualizar));
 const podeGerenciarCobrancaCredito = computed(() =>
@@ -1361,7 +1485,8 @@ const podeAcessarVendas = computed(
     podeGerenciarOrcamentos.value ||
     podeGerenciarPdv.value ||
     podeGerenciarMetasVendedor.value ||
-    podeGerenciarRepresentantes.value,
+    podeGerenciarRepresentantes.value ||
+    podeGerenciarRegrasComissao.value,
 );
 const podeAcessarCompras = computed(
   () =>

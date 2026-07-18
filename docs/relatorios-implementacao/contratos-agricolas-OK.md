@@ -51,7 +51,7 @@ CPR, Barter e contratos a termo / trava de preço — com liquidação física/f
 
 ### Barter
 
-#### 7–11 — ✅ BE/FE (estoque/NF stub)
+#### 7–11 — ✅ BE/FE (estoque real; NF stub)
 - Cadastro dual insumos × grãos
 - Cálculo equivalente (local no form + `POST .../calcular-equivalente` no salvo)
 - Entrega com NF stub + ajuste financeiro
@@ -96,7 +96,8 @@ Contrato API: `api-contract/contratos.md`
 | Alertas prazo | ✅ | ✅ |
 | Barter dual + equivalente | ✅ | ✅ |
 | Termo compra/venda + painel safra | ✅ | ✅ |
-| Estoque real / NF-e fiscal | ⚠️ stub | ⚠️ stub |
+| Estoque real na entrega | ✅ `OrigemMovimentacaoEstoque.Contrato` | ✅ via entrega parcial/total |
+| NF-e fiscal | ⚠️ stub (`StubNfe`) | ⚠️ stub |
 
 **Legenda:** ✅ pronto · ⚠️ stub · ❌ ausente
 
@@ -104,7 +105,7 @@ Contrato API: `api-contract/contratos.md`
 
 ## Síntese
 
-Contratos Agrícolas passaram de CRUD genérico para modelo tipado com entregas parciais, liquidação com cotação, painel, alertas e barter dual. Integrações reais de estoque/NF-e permanecem stub.
+Contratos Agrícolas passaram de CRUD genérico para modelo tipado com entregas parciais, liquidação com cotação, painel, alertas e barter dual. Entrega física gera movimentação real de estoque (`OrigemMovimentacaoEstoque.Contrato`); NF-e e cotação de mercado permanecem stub.
 
 ---
 
@@ -113,8 +114,7 @@ Contratos Agrícolas passaram de CRUD genérico para modelo tipado com entregas 
 | Tipo | Item |
 |------|------|
 | Integração | NF-e real na liquidação física / barter (hoje `StubNfe`) |
-| Domínio | Baixa/entrada de estoque real nas liquidações (hoje stub) |
 | Integração | Cotação CBOT / ESALQ real (hoje `GET /contratos/cotacao-mercado` stub) |
 | Fora de escopo | — |
 
-**Status:** CPR / Barter / Termo tipados com painel, alertas e entregas parciais; falta amarrar estoque e fiscal reais.
+**Status:** CPR / Barter / Termo tipados com painel, alertas, entregas parciais e estoque real na entrega; faltam NF-e e CBOT/ESALQ reais.

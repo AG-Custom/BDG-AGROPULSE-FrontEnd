@@ -96,8 +96,13 @@ export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): Usuari
       Permissoes.Producao.Visualizar,
       Permissoes.Rastreabilidade.Visualizar,
       Permissoes.Relatorios.Visualizar,
+      Permissoes.Manutencao.Visualizar,
+      Permissoes.Logistica.Visualizar,
+      Permissoes.Crm.Visualizar,
+      Permissoes.CobrancaCredito.Visualizar,
       Permissoes.MetasVendedor.Visualizar,
       Permissoes.Representantes.Visualizar,
+      Permissoes.RegrasComissao.Visualizar,
       Permissoes.PermissoesGranulares.Visualizar,
     ],
   };

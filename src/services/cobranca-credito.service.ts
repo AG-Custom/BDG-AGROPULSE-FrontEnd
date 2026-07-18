@@ -168,6 +168,12 @@ export const cobrancaCreditoService = {
       .then((r) => r.data);
   },
 
+  baixarPacoteJuridico(id: string): Promise<Blob> {
+    return api
+      .get<Blob>(`${BASE}/juridico/${id}/pacote`, { responseType: 'blob' })
+      .then((r) => r.data);
+  },
+
   listarAcordos(): Promise<AcordoJudicialDto[]> {
     return api.get<AcordoJudicialDto[]>(`${BASE}/acordos-judiciais`).then((r) => r.data);
   },

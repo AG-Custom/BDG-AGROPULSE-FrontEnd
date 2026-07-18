@@ -56,6 +56,7 @@ export function criarPedidoVendaFormVazio(): PedidoVendaFormModel {
     formaPagamento: '',
     observacao: '',
     tabelaPrecoId: '',
+    contratoId: '',
     itens: [],
   };
 }
@@ -68,6 +69,7 @@ export function pedidoDtoParaForm(dto: PedidoVendaDto): PedidoVendaFormModel {
     formaPagamento: dto.formaPagamento,
     observacao: dto.observacao ?? '',
     tabelaPrecoId: dto.tabelaPrecoId ?? '',
+    contratoId: dto.contratoId ?? '',
     itens: dto.itens.map((item) => ({
       chave: item.id,
       produtoId: item.produtoId,
@@ -86,6 +88,7 @@ export function formParaCriarPayload(form: PedidoVendaFormModel): CriarPedidoVen
     formaPagamento: form.formaPagamento as CriarPedidoVendaPayload['formaPagamento'],
     observacao: form.observacao.trim() || null,
     tabelaPrecoId: form.tabelaPrecoId || null,
+    contratoId: form.contratoId || null,
     itens: form.itens.map((item) => ({
       produtoId: item.produtoId,
       quantidade: parseNumeroObrigatorio(item.quantidade),

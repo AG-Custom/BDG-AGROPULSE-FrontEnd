@@ -54,6 +54,21 @@
         </div>
         <div class="col-12 col-md-6">
           <q-select
+            v-model="formulario.contratoId"
+            outlined
+            label="Contrato (trava de preço)"
+            hint="Opcional — CPR/Barter/Termo trava o preço do produto do contrato"
+            emit-value
+            map-options
+            clearable
+            :options="contratoOpcoes"
+            :loading="carregandoContratos"
+            :readonly="somenteLeitura"
+            :disable="!formulario.clienteId"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <q-select
             v-model="formulario.condicaoPagamentoId"
             outlined
             label="Condição de pagamento"
@@ -101,6 +116,10 @@
 <script setup lang="ts">
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
+import {
+  listarContratosAbertosPorCliente,
+  type ContratoComTipo,
+} from 'composables/useContratos';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
@@ -110,6 +129,7 @@ import {
 } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { PedidoVendaFormModel } from 'types/dtos/pedido-venda.dto';
+import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -120,6 +140,8 @@ defineProps<{
 const formulario = defineModel<PedidoVendaFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+const contratosCliente = ref<ContratoComTipo[]>([]);
+const carregandoContratos = ref(false);
 
 const {
   clientes,
@@ -172,8 +194,36 @@ const vendedorOpcoes = computed(() =>
     })),
 );
 
+const contratoOpcoes = computed(() =>
+  contratosCliente.value.map((contrato) => ({
+    label: `${contrato.tipoRotulo} — ${formatarMoeda(contrato.preco)} — ${contrato.id.slice(0, 8)}…`,
+    value: contrato.id,
+  })),
+);
+
+async function carregarContratosCliente(clienteId: string): Promise<void> {
+  if (!clienteId) {
+    contratosCliente.value = [];
+    return;
+  }
+
+  carregandoContratos.value = true;
+
+  try {
+    contratosCliente.value = await listarContratosAbertosPorCliente(clienteId);
+  } catch {
+    contratosCliente.value = [];
+  } finally {
+    carregandoContratos.value = false;
+  }
+}
+
 async function onClienteChange(clienteId: string): Promise<void> {
-  await carregarTabelasPermitidas({ clienteId: clienteId || null });
+  formulario.value.contratoId = '';
+  await Promise.all([
+    carregarTabelasPermitidas({ clienteId: clienteId || null }),
+    carregarContratosCliente(clienteId),
+  ]);
   if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }
@@ -188,6 +238,9 @@ watch(
   (clienteId) => {
     if (clienteId) {
       void carregarTabelasPermitidas({ clienteId });
+      void carregarContratosCliente(clienteId);
+    } else {
+      contratosCliente.value = [];
     }
   },
 );
@@ -199,6 +252,9 @@ onMounted(() => {
   void carregarTabelasPermitidas({
     clienteId: formulario.value.clienteId || null,
   });
+  if (formulario.value.clienteId) {
+    void carregarContratosCliente(formulario.value.clienteId);
+  }
 });
 
 defineExpose({ validar });

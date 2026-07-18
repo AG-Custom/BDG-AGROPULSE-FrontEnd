@@ -356,6 +356,7 @@ export const OrigemMovimentacaoEstoque = {
   Transferencia: 'Transferencia',
   NfeEntrada: 'NfeEntrada',
   Manutencao: 'Manutencao',
+  Contrato: 'Contrato',
 } as const;
 
 export type OrigemMovimentacaoEstoqueValor =
@@ -374,6 +375,7 @@ export const OrigemMovimentacaoEstoqueOpcoes = [
   { label: 'Transferência', value: OrigemMovimentacaoEstoque.Transferencia },
   { label: 'NF-e entrada', value: OrigemMovimentacaoEstoque.NfeEntrada },
   { label: 'Manutenção', value: OrigemMovimentacaoEstoque.Manutencao },
+  { label: 'Contrato', value: OrigemMovimentacaoEstoque.Contrato },
 ];
 
 export const MotivoSaidaEstoqueOpcoes = [
@@ -1781,3 +1783,152 @@ export const StatusAdimplenciaCarteira = {
 
 export type StatusAdimplenciaCarteiraValor =
   (typeof StatusAdimplenciaCarteira)[keyof typeof StatusAdimplenciaCarteira];
+
+export const TipoVeiculoLogistica = {
+  Caminhao: 'Caminhao',
+  Van: 'Van',
+  Pickup: 'Pickup',
+  Trator: 'Trator',
+  Outro: 'Outro',
+} as const;
+
+export type TipoVeiculoLogisticaValor =
+  (typeof TipoVeiculoLogistica)[keyof typeof TipoVeiculoLogistica];
+
+export const TipoVeiculoLogisticaOpcoes = [
+  { label: 'Caminhão', value: TipoVeiculoLogistica.Caminhao },
+  { label: 'Van', value: TipoVeiculoLogistica.Van },
+  { label: 'Pickup', value: TipoVeiculoLogistica.Pickup },
+  { label: 'Trator', value: TipoVeiculoLogistica.Trator },
+  { label: 'Outro', value: TipoVeiculoLogistica.Outro },
+];
+
+export const StatusVeiculoLogistica = {
+  Disponivel: 'Disponivel',
+  EmRota: 'EmRota',
+  Manutencao: 'Manutencao',
+  Inativo: 'Inativo',
+} as const;
+
+export type StatusVeiculoLogisticaValor =
+  (typeof StatusVeiculoLogistica)[keyof typeof StatusVeiculoLogistica];
+
+export const StatusVeiculoLogisticaOpcoes = [
+  { label: 'Disponível', value: StatusVeiculoLogistica.Disponivel },
+  { label: 'Em rota', value: StatusVeiculoLogistica.EmRota },
+  { label: 'Em manutenção', value: StatusVeiculoLogistica.Manutencao },
+  { label: 'Inativo', value: StatusVeiculoLogistica.Inativo },
+];
+
+export const StatusCargaLogistica = {
+  Programado: 'Programado',
+  EmRota: 'EmRota',
+  Concluido: 'Concluido',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type StatusCargaLogisticaValor =
+  (typeof StatusCargaLogistica)[keyof typeof StatusCargaLogistica];
+
+export const StatusCargaLogisticaOpcoes = [
+  { label: 'Programado', value: StatusCargaLogistica.Programado },
+  { label: 'Em rota', value: StatusCargaLogistica.EmRota },
+  { label: 'Concluído', value: StatusCargaLogistica.Concluido },
+  { label: 'Cancelado', value: StatusCargaLogistica.Cancelado },
+];
+
+export const StatusRomaneioLogistica = {
+  Pendente: 'Pendente',
+  EmRota: 'EmRota',
+  Entregue: 'Entregue',
+  Ocorrencia: 'Ocorrencia',
+  Devolvido: 'Devolvido',
+} as const;
+
+export type StatusRomaneioLogisticaValor =
+  (typeof StatusRomaneioLogistica)[keyof typeof StatusRomaneioLogistica];
+
+export const StatusRomaneioLogisticaOpcoes = [
+  { label: 'Pendente', value: StatusRomaneioLogistica.Pendente },
+  { label: 'Em rota', value: StatusRomaneioLogistica.EmRota },
+  { label: 'Entregue', value: StatusRomaneioLogistica.Entregue },
+  { label: 'Ocorrência', value: StatusRomaneioLogistica.Ocorrencia },
+  { label: 'Devolvido', value: StatusRomaneioLogistica.Devolvido },
+];
+
+export const TipoOcorrenciaEntrega = {
+  EnderecoNaoEncontrado: 'EnderecoNaoEncontrado',
+  ClienteAusente: 'ClienteAusente',
+  Recusa: 'Recusa',
+  Avaria: 'Avaria',
+  Extravio: 'Extravio',
+  Outro: 'Outro',
+} as const;
+
+export type TipoOcorrenciaEntregaValor =
+  (typeof TipoOcorrenciaEntrega)[keyof typeof TipoOcorrenciaEntrega];
+
+export const TipoOcorrenciaEntregaOpcoes = [
+  { label: 'Endereço não encontrado', value: TipoOcorrenciaEntrega.EnderecoNaoEncontrado },
+  { label: 'Cliente ausente', value: TipoOcorrenciaEntrega.ClienteAusente },
+  { label: 'Recusa', value: TipoOcorrenciaEntrega.Recusa },
+  { label: 'Avaria', value: TipoOcorrenciaEntrega.Avaria },
+  { label: 'Extravio', value: TipoOcorrenciaEntrega.Extravio },
+  { label: 'Outro', value: TipoOcorrenciaEntrega.Outro },
+];
+
+export const StatusOcorrenciaEntrega = {
+  Aberta: 'Aberta',
+  Resolvida: 'Resolvida',
+} as const;
+
+export type StatusOcorrenciaEntregaValor =
+  (typeof StatusOcorrenciaEntrega)[keyof typeof StatusOcorrenciaEntrega];
+
+export const StatusOcorrenciaEntregaOpcoes = [
+  { label: 'Aberta', value: StatusOcorrenciaEntrega.Aberta },
+  { label: 'Resolvida', value: StatusOcorrenciaEntrega.Resolvida },
+];
+
+export const TipoCombustivelLogistica = {
+  Diesel: 'Diesel',
+  Gasolina: 'Gasolina',
+  Etanol: 'Etanol',
+} as const;
+
+export type TipoCombustivelLogisticaValor =
+  (typeof TipoCombustivelLogistica)[keyof typeof TipoCombustivelLogistica];
+
+export const TipoCombustivelLogisticaOpcoes = [
+  { label: 'Diesel', value: TipoCombustivelLogistica.Diesel },
+  { label: 'Gasolina', value: TipoCombustivelLogistica.Gasolina },
+  { label: 'Etanol', value: TipoCombustivelLogistica.Etanol },
+];
+
+export const TipoDocTransporteLogistica = {
+  CTe: 'CTe',
+  MDFe: 'MDFe',
+} as const;
+
+export type TipoDocTransporteLogisticaValor =
+  (typeof TipoDocTransporteLogistica)[keyof typeof TipoDocTransporteLogistica];
+
+export const TipoDocTransporteLogisticaOpcoes = [
+  { label: 'CT-e', value: TipoDocTransporteLogistica.CTe },
+  { label: 'MDF-e', value: TipoDocTransporteLogistica.MDFe },
+];
+
+export const StatusDocTransporteLogistica = {
+  Rascunho: 'Rascunho',
+  Autorizado: 'Autorizado',
+  Cancelado: 'Cancelado',
+} as const;
+
+export type StatusDocTransporteLogisticaValor =
+  (typeof StatusDocTransporteLogistica)[keyof typeof StatusDocTransporteLogistica];
+
+export const StatusDocTransporteLogisticaOpcoes = [
+  { label: 'Rascunho', value: StatusDocTransporteLogistica.Rascunho },
+  { label: 'Autorizado', value: StatusDocTransporteLogistica.Autorizado },
+  { label: 'Cancelado', value: StatusDocTransporteLogistica.Cancelado },
+];

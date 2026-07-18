@@ -4,7 +4,7 @@ Módulo otimizado para revendas: ponto de entrada principal é o recebimento da 
 
 **Escopo analisado:** frontend (`new_agropulse_frontend`) + backend (`new_agropulse_backend`)  
 **Data:** 2026-07-13  
-**Atualizado:** 2026-07-13 (implementação dos gaps)
+**Atualizado:** 2026-07-17 (envio de cotação + contratos de fornecimento)
 
 ---
 
@@ -16,6 +16,8 @@ Módulo otimizado para revendas: ponto de entrada principal é o recebimento da 
 | Avaliação de desempenho do fornecedor | Notas preço/prazo/qualidade/**conformidade** + resumo/médias BE/FE |
 | Solicitação de compra | CRUD com urgência + justificativa BE/FE |
 | Cotação múltipla | Criar cotação, respostas (preço/prazo/condições/validade), comparativo BE/FE |
+| Envio de cotação (fila interna) | `POST /compras/cotacoes/{id}/enviar` + status `Enviada` + envios persistidos (sem SendGrid) BE/FE |
+| Contratos de fornecimento | CRUD `/compras/contratos-fornecimento` + alertas de vencimento BE/FE |
 | Ordem/pedido de compra com status | Inclui `AguardandoAprovacao`; receber abre recebimento BE/FE |
 | Recebimento NF-e (compras) | Preview XML, conferência, divergências, confirmar → estoque + CAP + histórico |
 | Contas a pagar | Listagem `/contas-pagar` BE/FE |
@@ -30,7 +32,8 @@ Módulo otimizado para revendas: ponto de entrada principal é o recebimento da 
 
 Aplicar manualmente:
 
-`new_agropulse_backend/scripts/20260713_Compras_GestaoCompleta.sql`
+1. `new_agropulse_backend/scripts/20260713_Compras_GestaoCompleta.sql`
+2. `new_agropulse_backend/scripts/20260717_Compras_ContratosFornecimento.sql` (envios de cotação + contratos de fornecimento)
 
 ---
 
@@ -50,10 +53,11 @@ Aplicar manualmente:
 | **Opcionais** | | |
 | Solicitação interna | ✅ urgência/justificativa | ✅ |
 | Cotação múltipla (preço/prazo) | ✅ | ✅ |
-| Envio cotação aos fornecedores | ❌ | ❌ |
+| Envio cotação aos fornecedores | ✅ fila interna | ✅ |
 | Comparativo de preços/condições | ✅ | ✅ |
 | Aprovação por alçada de valor | ✅ | ✅ |
 | Ordem de compra + status | ✅ efeitos via recebimento | ✅ |
+| Contratos de fornecimento + alerta vencimento | ✅ | ✅ |
 | Avaliação de fornecedores | ✅ + conformidade | ✅ |
 | Cadastro de fornecedores | ✅ | ✅ |
 
@@ -62,7 +66,7 @@ Aplicar manualmente:
 ### Observações
 
 - SEFAZ é stub (sem Focus NFe real nesta fase).
-- Envio de cotação por e-mail/portal permanece fora de escopo (agora no backlog pendente abaixo).
+- Envio de cotação é fila interna (persiste destinatários/`Enviada`); e-mail real (SendGrid/portal) permanece integração futura.
 
 ---
 
@@ -71,8 +75,7 @@ Aplicar manualmente:
 | Tipo | Item |
 |------|------|
 | Integração | SEFAZ documentos destinados real (hoje stub) |
-| Domínio | Envio de cotação a fornecedores (e-mail/portal) |
-| Domínio | Contratos de fornecimento + alerta de vencimento (spec comercial; ausente no `api-contract`) |
+| Integração | E-mail/portal real no envio de cotação (hoje fila interna) |
 | Fora de escopo | — |
 
-**Status:** fluxo essencial (NF-e → estoque + CAP) e opcionais SC/cotação/alçada/OC cobertos; faltam integração SEFAZ e contratos de fornecimento.
+**Status:** fluxo essencial (NF-e → estoque + CAP), SC/cotação/envio interno/alçada/OC e contratos de fornecimento cobertos; falta integração SEFAZ (e e-mail real opcional).

@@ -28,6 +28,7 @@ export interface PedidoVendaResumoDto {
   estoqueBaixado: boolean;
   observacao: string | null;
   tabelaPrecoId?: string | null;
+  contratoId?: string | null;
   createdAt: string;
 }
 
@@ -55,6 +56,7 @@ export interface CriarPedidoVendaPayload {
   formaPagamento: FormaPagamentoValor;
   observacao?: string | null;
   tabelaPrecoId?: string | null;
+  contratoId?: string | null;
   itens: PedidoVendaItemPayload[];
 }
 
@@ -79,6 +81,7 @@ export interface PedidoVendaFormModel {
   formaPagamento: FormaPagamentoValor | '';
   observacao: string;
   tabelaPrecoId: string;
+  contratoId: string;
   itens: PedidoVendaItemFormModel[];
 }
 

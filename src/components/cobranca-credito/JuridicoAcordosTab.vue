@@ -61,6 +61,17 @@
             descricao="Encaminhar ao jurídico"
             @click="encaminharJuridico(props.row.id)"
           />
+          <agro-btn
+            v-if="props.row.pacoteDocsUrl"
+            flat
+            dense
+            icon="download"
+            color="primary"
+            label="Pacote"
+            descricao="Baixar pacote jurídico"
+            :loading="salvando"
+            @click="baixarPacoteJuridico(props.row.id)"
+          />
         </q-td>
       </template>
     </q-table>
@@ -217,6 +228,7 @@ const {
   criarAcordo,
   criarEncaminhamento,
   encaminharJuridico,
+  baixarPacoteJuridico,
 } = useCobrancaCredito();
 
 const dialogAcordo = ref(false);

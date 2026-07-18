@@ -1,5 +1,13 @@
 export type SolicitacaoCompraStatusValor = 'Aberta' | 'EmCotacao' | 'Atendida' | 'Cancelada';
-export type CotacaoCompraStatusValor = 'Aberta' | 'EmResposta' | 'Encerrada' | 'Cancelada';
+export type CotacaoCompraStatusValor =
+  | 'Aberta'
+  | 'Enviada'
+  | 'EmResposta'
+  | 'Encerrada'
+  | 'Cancelada';
+
+export type ContratoFornecimentoStatusValor = 'Vigente' | 'Vencido' | 'Cancelado';
+export type SeveridadeAlertaFornecimentoValor = 'Info' | 'Alerta' | 'Critico';
 export type PedidoCompraStatusValor =
   | 'Rascunho'
   | 'AguardandoAprovacao'
@@ -44,15 +52,55 @@ export interface RespostaCotacaoDto {
   validadeProposta: string | null;
 }
 
+export interface EnvioCotacaoDto {
+  id: string;
+  fornecedorId: string;
+  email: string | null;
+  enviadoEm: string;
+}
+
 export interface CotacaoCompraDto {
   id: string;
   solicitacaoCompraId: string | null;
   dataLimite: string;
   status: CotacaoCompraStatusValor;
   observacao: string | null;
+  enviadoEm: string | null;
   createdAt: string;
   itens: ItemCotacaoDto[];
   respostas: RespostaCotacaoDto[];
+  envios: EnvioCotacaoDto[];
+}
+
+export interface ItemContratoFornecimentoDto {
+  id: string;
+  produtoId: string;
+  quantidade: number;
+  precoUnitario: number;
+}
+
+export interface ContratoFornecimentoDto {
+  id: string;
+  fornecedorId: string;
+  numero: string;
+  vigenciaInicio: string;
+  vigenciaFim: string;
+  valorTotal: number | null;
+  observacao: string | null;
+  status: ContratoFornecimentoStatusValor;
+  createdAt: string;
+  itens: ItemContratoFornecimentoDto[];
+}
+
+export interface ContratoFornecimentoAlertaDto {
+  contratoId: string;
+  numero: string;
+  fornecedorId: string;
+  status: ContratoFornecimentoStatusValor;
+  vigenciaFim: string;
+  diasParaVencimento: number;
+  severidade: SeveridadeAlertaFornecimentoValor;
+  mensagem: string;
 }
 
 export interface ComparativoCotacaoPropostaDto {
@@ -217,6 +265,39 @@ export interface ResponderCotacaoPayload {
   prazoEntregaDias: number;
   condicoesComerciais?: string | null;
   validadeProposta?: string | null;
+}
+
+export interface EnviarCotacaoPayload {
+  fornecedorIds: string[];
+}
+
+export interface ItemContratoFornecimentoPayload {
+  produtoId: string;
+  quantidade: number;
+  precoUnitario: number;
+}
+
+export interface CriarContratoFornecimentoPayload {
+  fornecedorId: string;
+  numero: string;
+  vigenciaInicio: string;
+  vigenciaFim: string;
+  itens: ItemContratoFornecimentoPayload[];
+  valorTotal?: number | null;
+  observacao?: string | null;
+}
+
+export interface AtualizarContratoFornecimentoPayload {
+  numero: string;
+  vigenciaInicio: string;
+  vigenciaFim: string;
+  itens: ItemContratoFornecimentoPayload[];
+  valorTotal?: number | null;
+  observacao?: string | null;
+}
+
+export interface ListarContratosFornecimentoParams {
+  status?: ContratoFornecimentoStatusValor;
 }
 
 export interface CriarPedidoCompraPayload {

@@ -115,7 +115,7 @@ Contrato: `api-contract/cobranca-credito.md`
 | Score pesos configuráveis | ✅ | ✅ |
 | Serasa / SPC | ⚠️ stub | ⚠️ stub |
 | Alçada gerente / diretor / CEO | ✅ | ✅ |
-| Revisão automática de limite | ⚠️ stub | ⚠️ stub |
+| Revisão automática de limite | ✅ persistência + job + notificações | ✅ botão revisar |
 | Painel carteira | ✅ | ✅ |
 | Aging 7 faixas | ✅ | ✅ |
 | Concentração | ✅ | ✅ |
@@ -125,7 +125,7 @@ Contrato: `api-contract/cobranca-credito.md`
 | Lista diária | ✅ | ✅ |
 | Tentativas de contato | ✅ | ✅ |
 | Disputa | ✅ | ✅ |
-| Jurídico | ✅ | ✅ |
+| Jurídico | ✅ pacote HTML + download | ✅ baixar pacote |
 | Acordos judiciais | ✅ | ✅ |
 | Régua / Renegociação / CR | ✅ (Financeiro) | ✅ (links) |
 
@@ -144,9 +144,9 @@ Módulo **Cobrança e Crédito Rural** criado sob `/api/cobranca-credito` e hub 
 | Tipo | Item |
 |------|------|
 | Integração | Serasa / SPC real (hoje consulta stub) |
-| Domínio + job | Revisão automática de limite com alertas periódicos (hoje `revisar-limites` stub) |
 | Integração | Crédito bancário BB/Sicredi real (hoje stub) |
-| Domínio | Pacote documental jurídico real (hoje URL `stub://juridico/...`) |
 | Fora de escopo | — |
 
-**Status:** ficha, score, carteira, aging, PDD, lista diária, disputa e acordos cobertos; faltam bureau e banking.
+**SQL adicional:** `scripts/20260717_Cobranca_RevisoesLimite.sql`
+
+**Status:** ficha, score, carteira, aging, PDD, lista diária, disputa, acordos, revisão de limite (job + notificações) e pacote jurídico cobertos; faltam bureau e banking.

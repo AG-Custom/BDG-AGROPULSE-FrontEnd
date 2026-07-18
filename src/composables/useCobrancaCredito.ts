@@ -7,6 +7,7 @@ import type {
   TipoGarantiaCreditoValor,
 } from 'constants/enums';
 import { cobrancaCreditoService } from 'services/cobranca-credito.service';
+import { baixarArquivo } from 'utils/download';
 import type {
   AcordoJudicialDto,
   AcordoJudicialFormModel,
@@ -437,6 +438,21 @@ export function useCobrancaCredito() {
     }
   }
 
+  async function baixarPacoteJuridico(id: string): Promise<boolean> {
+    salvando.value = true;
+    try {
+      const blob = await cobrancaCreditoService.baixarPacoteJuridico(id);
+      baixarArquivo(blob, `pacote-juridico-${id}.html`);
+      sucesso('Pacote jurídico baixado.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
   async function criarAcordo(form: AcordoJudicialFormModel): Promise<boolean> {
     salvando.value = true;
     try {
@@ -583,6 +599,7 @@ export function useCobrancaCredito() {
     carregarJuridico,
     criarEncaminhamento,
     encaminharJuridico,
+    baixarPacoteJuridico,
     criarAcordo,
     carregarGarantias,
     criarGarantia,

@@ -235,23 +235,16 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
     return;
   }
 
-  const resolvido = await resolverPreco(
-    {
-      produtoId,
-      clienteId: formulario.value.clienteId || null,
-      tabelaPrecoId: formulario.value.tabelaPrecoId || null,
-    },
-    true,
-  );
+  formulario.value.itens[index].precoUnitario = '';
+
+  const resolvido = await resolverPreco({
+    produtoId,
+    clienteId: formulario.value.clienteId || null,
+    tabelaPrecoId: formulario.value.tabelaPrecoId || null,
+  });
 
   if (resolvido) {
     formulario.value.itens[index].precoUnitario = String(resolvido.preco);
-    return;
-  }
-
-  const produto = produtos.value.find((item) => item.id === produtoId);
-  if (produto) {
-    formulario.value.itens[index].precoUnitario = String(produto.precoVenda);
   }
 }
 
