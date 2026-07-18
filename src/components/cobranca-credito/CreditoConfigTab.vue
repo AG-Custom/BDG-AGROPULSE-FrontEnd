@@ -181,7 +181,16 @@
         </template>
         <div class="row q-col-gutter-md items-end">
           <div class="col-12 col-md-5">
-            <q-input v-model="bureauClienteId" outlined label="Cliente ID" />
+            <q-select
+              v-model="bureauClienteId"
+              outlined
+              label="Cliente"
+              clearable
+              emit-value
+              map-options
+              :options="clienteOpcoes"
+              :loading="carregandoClientes"
+            />
           </div>
           <div class="col-12 col-md-3">
             <q-select
@@ -222,7 +231,16 @@
         </template>
         <div class="row q-col-gutter-md items-end">
           <div class="col-12 col-md-3">
-            <q-input v-model="bancoClienteId" outlined label="Cliente ID" />
+            <q-select
+              v-model="bancoClienteId"
+              outlined
+              label="Cliente"
+              clearable
+              emit-value
+              map-options
+              :options="clienteOpcoes"
+              :loading="carregandoClientes"
+            />
           </div>
           <div class="col-12 col-md-3">
             <q-select
@@ -269,6 +287,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useClientes } from 'composables/useClientes';
 import {
   configDtoParaForm,
   configVazia,
@@ -299,16 +318,28 @@ const {
   solicitarCreditoBancario,
   revisarLimites,
 } = useCobrancaCredito();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
 
 const form = reactive(configVazia());
-const bureauClienteId = ref('');
+const bureauClienteId = ref<string | null>('');
 const bureauTipo = ref<BureauCreditoValor>(BureauCredito.Serasa);
-const bancoClienteId = ref('');
+const bancoClienteId = ref<string | null>('');
 const bancoInstituicao = ref<InstituicaoCreditoBancarioValor>(
   InstituicaoCreditoBancario.BancoDoBrasil,
 );
 const bancoTipoOperacao = ref('Custeio');
 const bancoValor = ref('');
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
 
 const somaPesos = computed(
   () =>
@@ -340,12 +371,16 @@ async function onSalvar(): Promise<void> {
 }
 
 async function onBureau(): Promise<void> {
-  await consultarBureau(bureauClienteId.value.trim(), bureauTipo.value);
+  const id = bureauClienteId.value?.trim();
+  if (!id) return;
+  await consultarBureau(id, bureauTipo.value);
 }
 
 async function onBanco(): Promise<void> {
+  const id = bancoClienteId.value?.trim();
+  if (!id) return;
   await solicitarCreditoBancario(
-    bancoClienteId.value.trim(),
+    id,
     bancoInstituicao.value,
     bancoTipoOperacao.value.trim() || 'Custeio',
     Number(bancoValor.value) || 0,
@@ -354,6 +389,7 @@ async function onBanco(): Promise<void> {
 
 onMounted(() => {
   void carregarConfig();
+  void carregarClientes();
 });
 </script>
 

@@ -171,19 +171,6 @@
           :hint="ehVendedor ? 'Carteira vinculada ao seu usuário' : undefined"
         />
       </div>
-      <div class="col-12 col-md-4">
-        <q-select
-          v-model="formulario.consultorUsuarioId"
-          outlined
-          label="Consultor"
-          emit-value
-          map-options
-          clearable
-          :options="usuarioOpcoes"
-          :loading="carregandoUsuarios"
-          :readonly="somenteLeitura"
-        />
-      </div>
     </div>
   </fieldset>
 </q-form>
@@ -262,15 +249,6 @@ const documentoExibicao = computed({
     }
   },
 });
-
-const usuarioOpcoes = computed(() =>
-  usuarios.value
-    .filter((item) => item.status === UsuarioStatus.Ativo)
-    .map((item) => ({
-      label: nomeCompleto(item),
-      value: item.id,
-    })),
-);
 
 const vendedorOpcoes = computed(() => {
   if (ehVendedor.value && usuario.value) {

@@ -8,16 +8,29 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input
+              <q-select
                 v-model="formulario.clienteId"
                 outlined
-                label="Cliente ID"
+                label="Cliente"
+                emit-value
+                map-options
                 class="field-required"
+                :options="clienteOpcoes"
+                :loading="carregandoClientes"
                 :rules="[obrigatorio]"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.vendedorUsuarioId" outlined label="Vendedor ID" />
+              <q-select
+                v-model="formulario.vendedorUsuarioId"
+                outlined
+                label="Vendedor"
+                clearable
+                emit-value
+                map-options
+                :options="vendedorOpcoes"
+                :loading="carregandoUsuarios"
+              />
             </div>
             <div class="col-12 col-md-4">
               <q-select
@@ -65,13 +78,29 @@
               <q-input v-model="formulario.cultura" outlined label="Cultura" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.produtoId" outlined label="Produto ID" />
+              <q-select
+                v-model="formulario.produtoId"
+                outlined
+                label="Produto"
+                clearable
+                emit-value
+                map-options
+                :options="produtoOpcoes"
+                :loading="carregandoProdutos"
+                @update:model-value="onProdutoChange"
+              />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.produtoNome" outlined label="Produto (nome)" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input v-model="formulario.pedidoVendaId" outlined label="Pedido de venda ID" />
+              <q-select
+                v-model="formulario.pedidoVendaId"
+                outlined
+                label="Pedido de venda"
+                clearable
+                emit-value
+                map-options
+                :options="pedidoOpcoes"
+                :loading="carregandoPedidos"
+              />
             </div>
             <div class="col-12 col-md-6">
               <q-input v-model="formulario.resultado" outlined label="Resultado" />
@@ -98,9 +127,18 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useClientes } from 'composables/useClientes';
 import { amostraDtoParaForm, amostraVazia, useCrm } from 'composables/useCrm';
-import { StatusAmostraCampoOpcoes } from 'constants/enums';
+import { usePedidosVenda } from 'composables/usePedidosVenda';
+import { useProdutos } from 'composables/useProdutos';
+import { useUsuarios } from 'composables/useUsuarios';
+import {
+  PerfilUsuario,
+  StatusAmostraCampoOpcoes,
+  UsuarioStatus,
+} from 'constants/enums';
 import type { AmostraCampoFormModel } from 'types/dtos/crm.dto';
+import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -108,11 +146,72 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const { criarAmostra, editarAmostra, obterAmostra, amostra, salvando } = useCrm();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+const {
+  usuarios,
+  carregando: carregandoUsuarios,
+  carregar: carregarUsuarios,
+  nomeCompleto,
+} = useUsuarios();
+const {
+  produtos,
+  carregando: carregandoProdutos,
+  carregar: carregarProdutos,
+} = useProdutos();
+const {
+  pedidos,
+  carregando: carregandoPedidos,
+  carregar: carregarPedidos,
+} = usePedidosVenda();
 
 const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
 const titulo = computed(() => (modo.value === 'criar' ? 'Nova amostra' : 'Editar amostra'));
 const carregandoPagina = ref(modo.value === 'editar');
 const formulario = ref<AmostraCampoFormModel>(amostraVazia());
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const vendedorOpcoes = computed(() =>
+  usuarios.value
+    .filter(
+      (u) =>
+        u.status === UsuarioStatus.Ativo &&
+        (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Gerente ||
+          u.perfil === PerfilUsuario.Diretor ||
+          u.id === formulario.value.vendedorUsuarioId),
+    )
+    .map((u) => ({ label: nomeCompleto(u), value: u.id })),
+);
+
+const produtoOpcoes = computed(() =>
+  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+);
+
+const pedidoOpcoes = computed(() =>
+  pedidos.value.map((p) => ({
+    label: `${p.id.slice(0, 8)}… · ${formatarMoeda(p.valorTotal)} · ${formatarData(p.createdAt)}`,
+    value: p.id,
+  })),
+);
+
+function onProdutoChange(produtoId: string | null): void {
+  if (!produtoId) {
+    formulario.value.produtoNome = '';
+    return;
+  }
+  const produto = produtos.value.find((p) => p.id === produtoId);
+  formulario.value.produtoNome = produto?.descricao ?? '';
+}
 
 async function salvar(): Promise<void> {
   if (modo.value === 'criar') {
@@ -126,6 +225,10 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
+  void carregarClientes();
+  void carregarUsuarios();
+  void carregarProdutos();
+  void carregarPedidos();
   if (modo.value === 'editar') {
     const ok = await obterAmostra(String(route.params.id));
     if (ok && amostra.value) formulario.value = amostraDtoParaForm(amostra.value);

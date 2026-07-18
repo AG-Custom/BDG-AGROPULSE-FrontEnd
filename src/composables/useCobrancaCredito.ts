@@ -134,7 +134,7 @@ export function fichaVazia(): FichaCreditoRuralFormModel {
 function fichaFormParaPayload(form: FichaCreditoRuralFormModel): CriarFichaCreditoRuralPayload {
   return {
     clienteId: form.clienteId.trim(),
-    analiseCreditoId: form.analiseCreditoId.trim() || null,
+    analiseCreditoId: form.analiseCreditoId?.trim() || null,
     areaPlantadaHa: numOuNulo(form.areaPlantadaHa),
     culturaPrincipal: form.culturaPrincipal.trim() || null,
     produtividadeEsperada: numOuNulo(form.produtividadeEsperada),

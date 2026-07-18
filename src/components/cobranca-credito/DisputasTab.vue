@@ -36,6 +36,11 @@
       :loading="carregando"
       :rows-per-page-options="[10, 25, 50]"
     >
+      <template #body-cell-contaReceberId="props">
+        <q-td :props="props">
+          {{ mapaContas.get(props.row.contaReceberId) ?? props.row.contaReceberId }}
+        </q-td>
+      </template>
       <template #body-cell-status="props">
         <q-td :props="props">
           <agro-badge :label="rotuloStatus(props.row.status)" :variant="varianteStatus(props.row.status)" />
@@ -66,11 +71,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvar">
-            <q-input
+            <q-select
               v-model="contaReceberId"
               outlined
-              label="Conta a receber ID"
+              label="Conta a receber"
+              emit-value
+              map-options
               class="field-required q-mb-md"
+              :options="contaOpcoes"
+              :loading="carregandoContas"
               :rules="[obrigatorio]"
             />
             <q-input
@@ -133,15 +142,21 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCobrancaCredito } from 'composables/useCobrancaCredito';
+import { useContasReceber } from 'composables/useContasReceber';
 import { StatusDisputaTitulo, StatusDisputaTituloOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { DisputaTituloDto } from 'types/dtos/cobranca-credito.dto';
-import { formatarData } from 'utils/formatters';
+import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { disputas, carregando, salvando, carregarDisputas, criarDisputa, resolverDisputa } =
   useCobrancaCredito();
+const {
+  contas,
+  carregando: carregandoContas,
+  carregar: carregarContas,
+} = useContasReceber();
 
 const dialogNova = ref(false);
 const dialogResolver = ref(false);
@@ -151,6 +166,21 @@ const resolucao = ref('');
 const encerrar = ref(true);
 const disputaAlvo = ref<DisputaTituloDto | null>(null);
 const mapaStatus = new Map(StatusDisputaTituloOpcoes.map((o) => [o.value, o.label]));
+
+const contaOpcoes = computed(() =>
+  contas.value.map((c) => ({
+    label: `Parc. ${c.parcela} · ${formatarMoeda(c.valor)} · ${formatarData(c.vencimento)}`,
+    value: c.id,
+  })),
+);
+
+const mapaContas = computed(() => {
+  const m = new Map<string, string>();
+  for (const c of contas.value) {
+    m.set(c.id, `Parc. ${c.parcela} · ${formatarMoeda(c.valor)}`);
+  }
+  return m;
+});
 
 const colunas: QTableColumn<DisputaTituloDto>[] = [
   { name: 'contaReceberId', label: 'Conta a receber', field: 'contaReceberId', align: 'left' },
@@ -200,6 +230,7 @@ async function confirmarResolver(): Promise<void> {
 
 onMounted(() => {
   void carregarDisputas();
+  void carregarContas();
 });
 </script>
 

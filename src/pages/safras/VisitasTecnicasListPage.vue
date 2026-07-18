@@ -169,7 +169,16 @@
                 <q-input v-model="formulario.tecnicoNome" outlined label="Técnico" />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="formulario.clienteId" outlined label="Cliente ID" />
+                <q-select
+                  v-model="formulario.clienteId"
+                  outlined
+                  label="Cliente"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="clienteOpcoes"
+                  :loading="carregandoClientes"
+                />
               </div>
               <div class="col-12">
                 <q-input
@@ -284,6 +293,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useFazendas } from 'composables/useFazendas';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
@@ -312,6 +322,11 @@ const {
   adicionarFoto,
 } = useVisitasTecnicas();
 const { fazendas, fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
 const { erro: notificarErro } = useNotificacao();
 
@@ -326,6 +341,13 @@ const formFoto = ref<AdicionarFotoVisitaFormModel>({ url: '', descricao: '' });
 
 const talhaoOpcoes = computed(() =>
   talhoes.value.filter((t) => t.ativo).map((t) => ({ label: t.nome, value: t.id })),
+);
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
 );
 
 const mapaFazendas = computed(() => {
@@ -440,6 +462,7 @@ async function salvarFoto(): Promise<void> {
 onMounted(() => {
   void carregar();
   void carregarFazendas();
+  void carregarClientes();
   void carregarTalhoes();
 });
 </script>

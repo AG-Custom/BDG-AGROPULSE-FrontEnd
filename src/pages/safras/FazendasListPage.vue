@@ -104,7 +104,16 @@
                 />
               </div>
               <div class="col-12">
-                <q-input v-model="formulario.clienteId" outlined label="Cliente ID (opcional)" />
+                <q-select
+                  v-model="formulario.clienteId"
+                  outlined
+                  label="Cliente"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="clienteOpcoes"
+                  :loading="carregandoClientes"
+                />
               </div>
             </div>
             <div class="agro-form-actions">
@@ -129,14 +138,27 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useFazendas } from 'composables/useFazendas';
 import type { QTableColumn } from 'quasar';
 import type { FazendaDto, FazendaFormModel } from 'types/dtos/safras.dto';
 import { formatarDecimal } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { fazendas, carregando, salvando, carregar, criar, editar, inativar } = useFazendas();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<FazendaFormModel>({
@@ -177,6 +199,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarClientes();
 });
 </script>
 

@@ -46,7 +46,6 @@ export interface ClienteDto extends ClienteResumoDto {
   dataFundacao: string | null;
   prazoRecompra: number | null;
   limiteCredito: number | null;
-  consultorUsuarioId: string | null;
   unidadeIds?: string[];
   enderecos: ClienteEnderecoDto[];
   contatos: ClienteContatoDto[];
@@ -67,7 +66,6 @@ export interface CriarClientePayload {
   prazoRecompra?: number | null;
   limiteCredito?: number | null;
   vendedorUsuarioId?: string | null;
-  consultorUsuarioId?: string | null;
 }
 
 export type EditarClientePayload = CriarClientePayload;
@@ -108,7 +106,6 @@ export interface ClienteFormModel {
   prazoRecompra: string;
   limiteCredito: string;
   vendedorUsuarioId: string | null;
-  consultorUsuarioId: string | null;
 }
 
 export interface ClienteContatoFormModel {

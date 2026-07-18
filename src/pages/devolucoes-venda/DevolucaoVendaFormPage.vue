@@ -29,11 +29,15 @@
               </q-input>
             </div>
             <div class="col-12 col-md-6">
-              <q-input
+              <q-select
                 v-model="formulario.pedidoVendaId"
                 outlined
-                label="ID do pedido de venda"
+                label="Pedido de venda"
+                emit-value
+                map-options
                 class="field-required"
+                :options="pedidoOpcoes"
+                :loading="carregandoPedidos"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -152,6 +156,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
+import { usePedidosVenda } from 'composables/usePedidosVenda';
 import { useProdutos } from 'composables/useProdutos';
 import {
   DestinoCreditoDevolucaoOpcoes,
@@ -159,7 +164,7 @@ import {
   DestinoDevolucaoOpcoes,
 } from 'constants/enums';
 import type { DevolucaoItemFormModel, DevolucaoVendaFormModel } from 'types/dtos/devolucao-venda.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -179,6 +184,11 @@ function novoItem(): DevolucaoItemFormModel {
 const router = useRouter();
 const { salvando, buscandoOrigem, origem, criar, buscarOrigemPorNf } = useDevolucoesVenda();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const {
+  pedidos,
+  carregando: carregandoPedidos,
+  carregar: carregarPedidos,
+} = usePedidosVenda();
 
 const formulario = ref<DevolucaoVendaFormModel>({
   pedidoVendaId: '',
@@ -190,6 +200,13 @@ const formulario = ref<DevolucaoVendaFormModel>({
 
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+);
+
+const pedidoOpcoes = computed(() =>
+  pedidos.value.map((p) => ({
+    label: `${p.id.slice(0, 8)}… · ${formatarMoeda(p.valorTotal)} · ${formatarData(p.createdAt)}`,
+    value: p.id,
+  })),
 );
 
 function adicionar(): void {
@@ -223,6 +240,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregarProdutos();
+  void carregarPedidos();
 });
 </script>
 

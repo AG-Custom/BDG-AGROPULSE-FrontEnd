@@ -7,12 +7,12 @@ import { ref } from 'vue';
 
 function formParaPayload(form: RecomendacaoFormModel) {
   return {
-    visitaId: form.visitaId.trim() || null,
-    clienteId: form.clienteId.trim() || null,
-    fazendaId: form.fazendaId.trim() || null,
-    talhaoId: form.talhaoId.trim() || null,
-    safraId: form.safraId.trim() || null,
-    produtoId: form.produtoId.trim() || null,
+    visitaId: form.visitaId?.trim() || null,
+    clienteId: form.clienteId?.trim() || null,
+    fazendaId: form.fazendaId?.trim() || null,
+    talhaoId: form.talhaoId?.trim() || null,
+    safraId: form.safraId?.trim() || null,
+    produtoId: form.produtoId?.trim() || null,
     descricao: form.descricao.trim(),
     dose: form.dose.trim() || null,
     unidade: form.unidade.trim() || null,

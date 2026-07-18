@@ -83,17 +83,30 @@
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-input
+                <q-select
                   v-model="formulario.cnpjId"
                   outlined
-                  label="CNPJ ID"
+                  label="CNPJ"
+                  emit-value
+                  map-options
                   class="field-required"
+                  :options="cnpjOpcoes"
+                  :loading="carregandoCnpjs"
                   :rules="[obrigatorio]"
                   :readonly="!!editandoId"
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="formulario.unidadeId" outlined label="Unidade ID" />
+                <q-select
+                  v-model="formulario.unidadeId"
+                  outlined
+                  label="Unidade"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="unidadeOpcoes"
+                  :loading="carregandoUnidades"
+                />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -163,20 +176,41 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useCnpjs } from 'composables/useCnpjs';
 import { useContasBancarias } from 'composables/useContasBancarias';
-import { TipoContaBancariaOpcoes } from 'constants/enums';
+import { useUnidades } from 'composables/useUnidades';
+import { TipoContaBancariaOpcoes, UnidadeStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { ContaBancariaDto, ContaBancariaFormModel } from 'types/dtos/financeiro-gestao.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarCnpj, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { contas, carregando, salvando, carregar, criar, editar, solicitarInativacao } =
   useContasBancarias();
+const { cnpjs, carregando: carregandoCnpjs, carregar: carregarCnpjs } = useCnpjs();
+const {
+  unidades,
+  carregando: carregandoUnidades,
+  carregar: carregarUnidades,
+} = useUnidades();
 
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<ContaBancariaFormModel>(formVazio());
+
+const cnpjOpcoes = computed(() =>
+  cnpjs.value.map((c) => ({
+    label: `${formatarCnpj(c.numero)} — ${c.razaoSocial}`,
+    value: c.id,
+  })),
+);
+
+const unidadeOpcoes = computed(() =>
+  unidades.value
+    .filter((u) => u.status === UnidadeStatus.Ativa || u.id === formulario.value.unidadeId)
+    .map((u) => ({ label: u.nome, value: u.id })),
+);
 
 const colunas: QTableColumn<ContaBancariaDto>[] = [
   { name: 'banco', label: 'Banco', field: 'banco', align: 'left' },
@@ -228,6 +262,8 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarCnpjs();
+  void carregarUnidades();
 });
 </script>
 

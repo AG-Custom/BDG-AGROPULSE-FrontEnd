@@ -8,21 +8,29 @@
     <section class="agro-section">
       <agro-card>
         <div class="agro-filter-bar">
-          <q-input
+          <q-select
             v-model="filtroClienteId"
             outlined
             dense
-            label="Cliente ID"
+            label="Cliente"
             clearable
+            emit-value
+            map-options
             class="filtro"
+            :options="clienteOpcoes"
+            :loading="carregandoClientes"
           />
-          <q-input
+          <q-select
             v-model="filtroVendedorId"
             outlined
             dense
-            label="Vendedor ID"
+            label="Vendedor"
             clearable
+            emit-value
+            map-options
             class="filtro"
+            :options="vendedorOpcoes"
+            :loading="carregandoUsuarios"
           />
           <agro-btn
             color="primary"
@@ -109,17 +117,50 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useCrm } from 'composables/useCrm';
+import { useUsuarios } from 'composables/useUsuarios';
+import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { CarteiraClienteItemDto } from 'types/dtos/crm.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const { carteira, carregando, carregarCarteira } = useCrm();
-const filtroClienteId = ref('');
-const filtroVendedorId = ref('');
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+const {
+  usuarios,
+  carregando: carregandoUsuarios,
+  carregar: carregarUsuarios,
+  nomeCompleto,
+} = useUsuarios();
+const filtroClienteId = ref<string | null>('');
+const filtroVendedorId = ref<string | null>('');
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const vendedorOpcoes = computed(() =>
+  usuarios.value
+    .filter(
+      (u) =>
+        u.status === UsuarioStatus.Ativo &&
+        (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Gerente ||
+          u.perfil === PerfilUsuario.Diretor),
+    )
+    .map((u) => ({ label: nomeCompleto(u), value: u.id })),
+);
 
 const colunas: QTableColumn<CarteiraClienteItemDto>[] = [
   { name: 'clienteNome', label: 'Produtor', field: 'clienteNome', align: 'left', sortable: true },
@@ -132,12 +173,14 @@ const colunas: QTableColumn<CarteiraClienteItemDto>[] = [
 
 function aplicarFiltros(): void {
   void carregarCarteira({
-    clienteId: filtroClienteId.value.trim() || undefined,
-    vendedorId: filtroVendedorId.value.trim() || undefined,
+    clienteId: filtroClienteId.value?.trim() || undefined,
+    vendedorId: filtroVendedorId.value?.trim() || undefined,
   });
 }
 
 onMounted(() => {
+  void carregarClientes();
+  void carregarUsuarios();
   const qCliente = route.query.clienteId;
   if (typeof qCliente === 'string' && qCliente) {
     filtroClienteId.value = qCliente;

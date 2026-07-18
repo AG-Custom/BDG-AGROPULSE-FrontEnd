@@ -8,13 +8,17 @@
     <section class="agro-section">
       <agro-card>
         <div class="agro-filter-bar">
-          <q-input
+          <q-select
             v-model="filtros.clienteId"
             outlined
             dense
             clearable
-            label="Cliente ID"
+            emit-value
+            map-options
+            label="Cliente"
             class="filtro"
+            :options="clienteOpcoes"
+            :loading="carregandoClientes"
           />
           <q-select
             v-model="filtros.fazendaId"
@@ -103,6 +107,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useFazendas } from 'composables/useFazendas';
 import { useHistoricoSafras } from 'composables/useHistoricoSafras';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
@@ -112,11 +117,16 @@ import { computed, onMounted, reactive } from 'vue';
 
 const { historicoAplicacoes, carregando, carregarHistoricoAplicacoes } = useHistoricoSafras();
 const { fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
 const { safraOpcoes, carregar: carregarSafras } = useSafras();
 
 const filtros = reactive({
-  clienteId: '',
+  clienteId: '' as string | null,
   fazendaId: '' as string | null,
   talhaoId: '' as string | null,
   safraId: '' as string | null,
@@ -124,6 +134,12 @@ const filtros = reactive({
 
 const talhaoOpcoes = computed(() =>
   talhoes.value.map((t) => ({ label: t.nome, value: t.id })),
+);
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
 );
 
 function aplicarFiltros(): void {
@@ -137,6 +153,7 @@ function aplicarFiltros(): void {
 
 onMounted(() => {
   void carregarFazendas();
+  void carregarClientes();
   void carregarTalhoes();
   void carregarSafras();
   void carregarHistoricoAplicacoes();

@@ -38,33 +38,33 @@ function numOuZero(valor: string): number {
 function oportunidadeFormParaPayload(form: OportunidadeFormModel): CriarOportunidadePayload {
   return {
     clienteId: form.clienteId,
-    vendedorUsuarioId: form.vendedorUsuarioId.trim() || null,
-    produtoId: form.produtoId.trim() || null,
-    produtoNome: form.produtoNome.trim() || null,
-    cultura: form.cultura.trim() || null,
-    safraRef: form.safraRef.trim() || null,
+    vendedorUsuarioId: form.vendedorUsuarioId?.trim() || null,
+    produtoId: form.produtoId?.trim() || null,
+    produtoNome: form.produtoNome?.trim() || null,
+    cultura: form.cultura?.trim() || null,
+    safraRef: form.safraRef?.trim() || null,
     valorEstimado: Number(form.valorEstimado) || 0,
     etapa: form.etapa,
     probabilidade: numOuZero(form.probabilidade),
     dataPrevista: form.dataPrevista || null,
-    observacoes: form.observacoes.trim() || null,
+    observacoes: form.observacoes?.trim() || null,
   };
 }
 
 function amostraFormParaPayload(form: AmostraCampoFormModel): CriarAmostraCampoPayload {
   return {
     clienteId: form.clienteId,
-    vendedorUsuarioId: form.vendedorUsuarioId.trim() || null,
-    produtoId: form.produtoId.trim() || null,
-    produtoNome: form.produtoNome.trim() || null,
+    vendedorUsuarioId: form.vendedorUsuarioId?.trim() || null,
+    produtoId: form.produtoId?.trim() || null,
+    produtoNome: form.produtoNome?.trim() || null,
     quantidade: Number(form.quantidade) || 0,
-    unidade: form.unidade.trim() || null,
-    cultura: form.cultura.trim() || null,
+    unidade: form.unidade?.trim() || null,
+    cultura: form.cultura?.trim() || null,
     dataEntrega: form.dataEntrega,
     dataRetorno: form.dataRetorno || null,
     status: form.status,
-    resultado: form.resultado.trim() || null,
-    pedidoVendaId: form.pedidoVendaId.trim() || null,
+    resultado: form.resultado?.trim() || null,
+    pedidoVendaId: form.pedidoVendaId?.trim() || null,
   };
 }
 

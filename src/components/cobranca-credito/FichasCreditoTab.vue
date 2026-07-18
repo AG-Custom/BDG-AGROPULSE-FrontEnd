@@ -30,6 +30,11 @@
       :loading="carregando"
       :rows-per-page-options="[10, 25, 50]"
     >
+      <template #body-cell-clienteId="props">
+        <q-td :props="props">
+          {{ mapaClientes.get(props.row.clienteId) ?? props.row.clienteId }}
+        </q-td>
+      </template>
       <template #body-cell-areaCultura="props">
         <q-td :props="props">
           {{ props.row.culturaPrincipal || '—' }}
@@ -76,20 +81,29 @@
           <q-form greedy @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-input
+                <q-select
                   v-model="form.clienteId"
                   outlined
-                  label="Cliente ID"
+                  label="Cliente"
+                  emit-value
+                  map-options
                   class="field-required"
+                  :options="clienteOpcoes"
+                  :loading="carregandoClientes"
                   :rules="[obrigatorio]"
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <q-select
                   v-model="form.analiseCreditoId"
                   outlined
-                  label="Análise de crédito ID"
+                  label="Análise de crédito"
+                  clearable
+                  emit-value
+                  map-options
                   hint="Opcional — necessário para aplicar limite"
+                  :options="analiseOpcoes"
+                  :loading="carregandoAnalises"
                 />
               </div>
               <div class="col-12 col-md-6">
@@ -178,15 +192,27 @@
 <script setup lang="ts">
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { fichaVazia, useCobrancaCredito } from 'composables/useCobrancaCredito';
+import { useCrm } from 'composables/useCrm';
 import type { QTableColumn } from 'quasar';
 import type { FichaCreditoRuralDto } from 'types/dtos/cobranca-credito.dto';
 import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 const { fichas, carregando, salvando, carregarFichas, criarFicha, aplicarLimite } =
   useCobrancaCredito();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+const {
+  analises,
+  carregando: carregandoAnalises,
+  carregarAnalises,
+} = useCrm();
 
 const dialogNova = ref(false);
 const dialogAprovar = ref(false);
@@ -195,8 +221,28 @@ const fichaAlvo = ref<FichaCreditoRuralDto | null>(null);
 const limiteAprovado = ref('');
 const aprovarLimite = ref(true);
 
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const mapaClientes = computed(() => {
+  const m = new Map<string, string>();
+  for (const c of clientes.value) m.set(c.id, c.nomeFantasia || c.nomeRazao);
+  return m;
+});
+
+const analiseOpcoes = computed(() =>
+  analises.value.map((a) => ({
+    label: `${mapaClientes.value.get(a.clienteId) ?? a.clienteId.slice(0, 8)} · score ${a.score}`,
+    value: a.id,
+  })),
+);
+
 const colunas: QTableColumn<FichaCreditoRuralDto>[] = [
-  { name: 'clienteId', label: 'Cliente ID', field: 'clienteId', align: 'left' },
+  { name: 'clienteId', label: 'Cliente', field: 'clienteId', align: 'left' },
   { name: 'areaCultura', label: 'Cultura / área', field: 'culturaPrincipal', align: 'left' },
   { name: 'rendaEstimada', label: 'Renda', field: 'rendaEstimada', align: 'right' },
   {
@@ -242,6 +288,8 @@ async function confirmarAprovar(): Promise<void> {
 
 onMounted(() => {
   void carregarFichas();
+  void carregarClientes();
+  void carregarAnalises();
 });
 </script>
 

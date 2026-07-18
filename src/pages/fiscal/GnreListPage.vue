@@ -30,6 +30,11 @@
           :loading="carregando"
           :rows-per-page-options="[10, 25, 50]"
         >
+          <template #body-cell-notaFiscalId="props">
+            <q-td :props="props">
+              {{ mapaNotas.get(props.row.notaFiscalId) ?? props.row.notaFiscalId }}
+            </q-td>
+          </template>
           <template #body-cell-valor="props">
             <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.valor) }}</q-td>
           </template>
@@ -47,11 +52,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
-            <q-input
+            <q-select
               v-model="notaFiscalId"
               outlined
-              label="ID da nota fiscal"
+              label="Nota fiscal"
+              emit-value
+              map-options
               class="field-required"
+              :options="notaOpcoes"
+              :loading="carregandoNotas"
               :rules="[obrigatorio]"
             />
             <div class="agro-form-actions">
@@ -70,15 +79,36 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useGnre } from 'composables/useGnre';
+import { useNotasFiscais } from 'composables/useNotasFiscais';
 import type { QTableColumn } from 'quasar';
 import type { GuiaGnreDto } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { guias, carregando, salvando, carregar, gerar } = useGnre();
+const {
+  notas,
+  carregando: carregandoNotas,
+  carregar: carregarNotas,
+} = useNotasFiscais();
 const dialog = ref(false);
 const notaFiscalId = ref('');
+
+const notaOpcoes = computed(() =>
+  notas.value.map((n) => ({
+    label: `${n.numero ?? n.id.slice(0, 8)} · ${n.tipo} · ${formatarMoeda(n.valorTotal)}`,
+    value: n.id,
+  })),
+);
+
+const mapaNotas = computed(() => {
+  const m = new Map<string, string>();
+  for (const n of notas.value) {
+    m.set(n.id, `${n.numero ?? n.id.slice(0, 8)} · ${n.tipo}`);
+  }
+  return m;
+});
 
 const colunas: QTableColumn<GuiaGnreDto>[] = [
   { name: 'notaFiscalId', label: 'Nota', field: 'notaFiscalId', align: 'left' },
@@ -99,6 +129,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarNotas();
 });
 </script>
 

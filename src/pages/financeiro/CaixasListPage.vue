@@ -70,10 +70,15 @@
               class="field-required q-mb-md"
               :rules="[obrigatorio]"
             />
-            <q-input
+            <q-select
               v-model="formulario.unidadeId"
               outlined
-              label="Unidade ID"
+              label="Unidade"
+              clearable
+              emit-value
+              map-options
+              :options="unidadeOpcoes"
+              :loading="carregandoUnidades"
               :readonly="!!editandoId"
             />
             <div class="agro-form-actions">
@@ -93,16 +98,29 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCaixas } from 'composables/useCaixas';
+import { useUnidades } from 'composables/useUnidades';
+import { UnidadeStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { CaixaDto, CaixaFormModel } from 'types/dtos/financeiro-gestao.dto';
 import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { caixas, carregando, salvando, carregar, criar, editar } = useCaixas();
+const {
+  unidades,
+  carregando: carregandoUnidades,
+  carregar: carregarUnidades,
+} = useUnidades();
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<CaixaFormModel>({ nome: '', unidadeId: '' });
+
+const unidadeOpcoes = computed(() =>
+  unidades.value
+    .filter((u) => u.status === UnidadeStatus.Ativa || u.id === formulario.value.unidadeId)
+    .map((u) => ({ label: u.nome, value: u.id })),
+);
 
 const colunas: QTableColumn<CaixaDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
@@ -126,6 +144,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarUnidades();
 });
 </script>
 

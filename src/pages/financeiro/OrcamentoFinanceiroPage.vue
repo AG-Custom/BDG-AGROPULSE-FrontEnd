@@ -158,7 +158,16 @@
                 />
               </div>
               <div class="col-12">
-                <q-input v-model="formulario.unidadeId" outlined label="Unidade ID" />
+                <q-select
+                  v-model="formulario.unidadeId"
+                  outlined
+                  label="Unidade"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="unidadeOpcoes"
+                  :loading="carregandoUnidades"
+                />
               </div>
             </div>
             <div class="agro-form-actions">
@@ -178,7 +187,8 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useOrcamentoFinanceiro } from 'composables/useOrcamentoFinanceiro';
-import { VersaoOrcamentoFinanceiroOpcoes } from 'constants/enums';
+import { useUnidades } from 'composables/useUnidades';
+import { UnidadeStatus, VersaoOrcamentoFinanceiroOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type {
   DreLinhaDto,
@@ -187,10 +197,15 @@ import type {
 } from 'types/dtos/financeiro-gestao.dto';
 import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { orcamentos, dre, carregando, salvando, carregar, criar, carregarDre } =
   useOrcamentoFinanceiro();
+const {
+  unidades,
+  carregando: carregandoUnidades,
+  carregar: carregarUnidades,
+} = useUnidades();
 
 const dialog = ref(false);
 const formulario = ref<OrcamentoFinanceiroFormModel>({
@@ -199,6 +214,12 @@ const formulario = ref<OrcamentoFinanceiroFormModel>({
   descricao: '',
   unidadeId: '',
 });
+
+const unidadeOpcoes = computed(() =>
+  unidades.value
+    .filter((u) => u.status === UnidadeStatus.Ativa || u.id === formulario.value.unidadeId)
+    .map((u) => ({ label: u.nome, value: u.id })),
+);
 
 const colunas: QTableColumn<OrcamentoFinanceiroDto>[] = [
   { name: 'ano', label: 'Ano', field: 'ano', align: 'left' },
@@ -226,6 +247,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarUnidades();
 });
 </script>
 

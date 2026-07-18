@@ -10,11 +10,15 @@
         <q-form greedy class="agro-formulario" @submit.prevent="onCalcular">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <q-input
+              <q-select
                 v-model="form.produtoId"
                 outlined
-                label="Produto ID"
+                label="Produto"
+                emit-value
+                map-options
                 class="field-required"
+                :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -101,6 +105,11 @@
             :columns="colunas"
             :rows-per-page-options="[10, 25]"
           >
+            <template #body-cell-produtoId="props">
+              <q-td :props="props">
+                {{ mapaProdutos.get(props.row.produtoId) ?? props.row.produtoId }}
+              </q-td>
+            </template>
             <template #body-cell-baseSt="props">
               <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.baseSt) }}</q-td>
             </template>
@@ -127,11 +136,15 @@
         <q-form greedy class="agro-formulario" @submit.prevent="onSugerir">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <q-input
+              <q-select
                 v-model="sugestaoForm.produtoId"
                 outlined
-                label="Produto ID"
+                label="Produto"
+                emit-value
+                map-options
                 class="field-required"
+                :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -179,6 +192,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import { useCalculoImpostos } from 'composables/useCalculoImpostos';
 import { useFiscal } from 'composables/useFiscal';
+import { useProdutos } from 'composables/useProdutos';
 import {
   TipoDestinatarioFiscalOpcoes,
   type TipoDestinatarioFiscalValor,
@@ -187,10 +201,15 @@ import type { QTableColumn } from 'quasar';
 import type { CalculoImpostosItemDto } from 'types/dtos/fiscal-gestao.dto';
 import { formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 const { resultado, calculando, calcular } = useCalculoImpostos();
 const { sugestaoCompleta, sugerirCompleto } = useFiscal();
+const {
+  produtos,
+  carregando: carregandoProdutos,
+  carregar: carregarProdutos,
+} = useProdutos();
 const sugerindo = ref(false);
 
 const form = reactive({
@@ -206,6 +225,16 @@ const sugestaoForm = reactive({
   ufDestino: '',
   tipoDestinatario: null as TipoDestinatarioFiscalValor | null,
   naturezaOperacao: '',
+});
+
+const produtoOpcoes = computed(() =>
+  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+);
+
+const mapaProdutos = computed(() => {
+  const m = new Map<string, string>();
+  for (const p of produtos.value) m.set(p.id, `${p.codigo} — ${p.descricao}`);
+  return m;
 });
 
 const colunas: QTableColumn<CalculoImpostosItemDto>[] = [
@@ -233,6 +262,10 @@ async function onSugerir(): Promise<void> {
     sugerindo.value = false;
   }
 }
+
+onMounted(() => {
+  void carregarProdutos();
+});
 </script>
 
 <style scoped>

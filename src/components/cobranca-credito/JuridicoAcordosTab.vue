@@ -45,6 +45,11 @@
       :loading="carregando"
       :rows-per-page-options="[5, 10, 25]"
     >
+      <template #body-cell-clienteId="props">
+        <q-td :props="props">
+          {{ mapaClientes.get(props.row.clienteId) ?? props.row.clienteId }}
+        </q-td>
+      </template>
       <template #body-cell-status="props">
         <q-td :props="props">
           <agro-badge :label="String(props.row.status)" variant="info" />
@@ -94,6 +99,11 @@
       :loading="carregando"
       :rows-per-page-options="[5, 10, 25]"
     >
+      <template #body-cell-clienteId="props">
+        <q-td :props="props">
+          {{ mapaClientes.get(props.row.clienteId) ?? props.row.clienteId }}
+        </q-td>
+      </template>
       <template #body-cell-valorAcordado="props">
         <q-td :props="props" class="text-metric">
           {{ formatarMoeda(props.row.valorAcordado) }}
@@ -113,11 +123,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvarAcordo">
-            <q-input
+            <q-select
               v-model="formAcordo.clienteId"
               outlined
-              label="Cliente ID"
+              label="Cliente"
+              emit-value
+              map-options
               class="field-required q-mb-md"
+              :options="clienteOpcoes"
+              :loading="carregandoClientes"
               :rules="[obrigatorio]"
             />
             <q-input
@@ -172,18 +186,28 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvarEnc">
-            <q-input
+            <q-select
               v-model="encClienteId"
               outlined
-              label="Cliente ID"
+              label="Cliente"
+              emit-value
+              map-options
               class="field-required q-mb-md"
+              :options="clienteOpcoes"
+              :loading="carregandoClientes"
               :rules="[obrigatorio]"
             />
-            <q-input
+            <q-select
               v-model="encContas"
               outlined
-              label="IDs contas a receber (separados por vírgula)"
+              label="Contas a receber"
+              multiple
+              use-chips
+              emit-value
+              map-options
               class="q-mb-md"
+              :options="contaOpcoes"
+              :loading="carregandoContas"
             />
             <q-input v-model="encObs" outlined label="Observações" type="textarea" autogrow />
             <div class="agro-form-actions">
@@ -207,7 +231,9 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { acordoVazio, useCobrancaCredito } from 'composables/useCobrancaCredito';
+import { useContasReceber } from 'composables/useContasReceber';
 import {
   StatusAcordoJudicial,
   StatusAcordoJudicialOpcoes,
@@ -215,9 +241,9 @@ import {
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { AcordoJudicialDto, EncaminhamentoJuridicoDto } from 'types/dtos/cobranca-credito.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 const {
   encaminhamentos,
@@ -230,24 +256,54 @@ const {
   encaminharJuridico,
   baixarPacoteJuridico,
 } = useCobrancaCredito();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+const {
+  contas,
+  carregando: carregandoContas,
+  carregar: carregarContas,
+} = useContasReceber();
 
 const dialogAcordo = ref(false);
 const dialogEnc = ref(false);
 const formAcordo = reactive(acordoVazio());
 const encClienteId = ref('');
-const encContas = ref('');
+const encContas = ref<string[]>([]);
 const encObs = ref('');
 const mapaAcordo = new Map(StatusAcordoJudicialOpcoes.map((o) => [o.value, o.label]));
 
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const mapaClientes = computed(() => {
+  const m = new Map<string, string>();
+  for (const c of clientes.value) m.set(c.id, c.nomeFantasia || c.nomeRazao);
+  return m;
+});
+
+const contaOpcoes = computed(() =>
+  contas.value.map((c) => ({
+    label: `Parc. ${c.parcela} · ${formatarMoeda(c.valor)} · ${formatarData(c.vencimento)}`,
+    value: c.id,
+  })),
+);
+
 const colunasEnc: QTableColumn<EncaminhamentoJuridicoDto>[] = [
-  { name: 'clienteId', label: 'Cliente ID', field: 'clienteId', align: 'left' },
+  { name: 'clienteId', label: 'Cliente', field: 'clienteId', align: 'left' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'observacoes', label: 'Observações', field: 'observacoes', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
 const colunasAcordos: QTableColumn<AcordoJudicialDto>[] = [
-  { name: 'clienteId', label: 'Cliente ID', field: 'clienteId', align: 'left' },
+  { name: 'clienteId', label: 'Cliente', field: 'clienteId', align: 'left' },
   { name: 'valorAcordado', label: 'Valor', field: 'valorAcordado', align: 'right' },
   { name: 'parcelas', label: 'Parcelas', field: 'parcelas', align: 'right' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
@@ -272,26 +328,24 @@ async function salvarAcordo(): Promise<void> {
 }
 
 async function salvarEnc(): Promise<void> {
-  const ids = encContas.value
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
   if (
     await criarEncaminhamento({
       clienteId: encClienteId.value.trim(),
-      contaReceberIds: ids,
+      contaReceberIds: encContas.value,
       observacoes: encObs.value.trim() || null,
     })
   ) {
     dialogEnc.value = false;
     encClienteId.value = '';
-    encContas.value = '';
+    encContas.value = [];
     encObs.value = '';
   }
 }
 
 onMounted(() => {
   void carregarJuridico();
+  void carregarClientes();
+  void carregarContas();
 });
 </script>
 

@@ -36,7 +36,6 @@ export function criarClienteFormVazio(): ClienteFormModel {
     prazoRecompra: '',
     limiteCredito: '',
     vendedorUsuarioId: null,
-    consultorUsuarioId: null,
   };
 }
 
@@ -55,7 +54,6 @@ export function clienteDtoParaForm(dto: ClienteDto): ClienteFormModel {
     prazoRecompra: dto.prazoRecompra !== null ? String(dto.prazoRecompra) : '',
     limiteCredito: dto.limiteCredito !== null ? String(dto.limiteCredito) : '',
     vendedorUsuarioId: dto.vendedorUsuarioId,
-    consultorUsuarioId: dto.consultorUsuarioId,
   };
 }
 
@@ -86,7 +84,6 @@ function montarPayloadBase(form: ClienteFormModel): CriarClientePayload {
     prazoRecompra: parseNumeroOpcional(form.prazoRecompra),
     limiteCredito: parseNumeroOpcional(form.limiteCredito),
     vendedorUsuarioId: form.vendedorUsuarioId,
-    consultorUsuarioId: form.consultorUsuarioId,
   };
 }
 

@@ -33,6 +33,11 @@
           :loading="carregando"
           :rows-per-page-options="[10, 25, 50]"
         >
+          <template #body-cell-cnpjEmpresaId="props">
+            <q-td :props="props">
+              {{ mapaCnpjs.get(props.row.cnpjEmpresaId) ?? props.row.cnpjEmpresaId }}
+            </q-td>
+          </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-btn
@@ -59,11 +64,15 @@
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-input
+                <q-select
                   v-model="form.cnpjEmpresaId"
                   outlined
-                  label="CNPJ empresa ID"
+                  label="CNPJ empresa"
+                  emit-value
+                  map-options
                   class="field-required"
+                  :options="cnpjOpcoes"
+                  :loading="carregandoCnpjs"
                   :rules="[obrigatorio]"
                 />
               </div>
@@ -108,6 +117,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useCnpjs } from 'composables/useCnpjs';
 import { useRegimesCnpj } from 'composables/useRegimesCnpj';
 import { RegimeTributarioOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
@@ -115,10 +125,12 @@ import type {
   RegimeTributarioCnpjDto,
   RegimeTributarioCnpjFormModel,
 } from 'types/dtos/fiscal-gestao.dto';
+import { formatarCnpj } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { regimes, carregando, salvando, carregar, criar, editar } = useRegimesCnpj();
+const { cnpjs, carregando: carregandoCnpjs, carregar: carregarCnpjs } = useCnpjs();
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
 const form = ref<RegimeTributarioCnpjFormModel>({
@@ -128,8 +140,21 @@ const form = ref<RegimeTributarioCnpjFormModel>({
   vigenciaFim: '',
 });
 
+const cnpjOpcoes = computed(() =>
+  cnpjs.value.map((c) => ({
+    label: `${formatarCnpj(c.numero)} — ${c.razaoSocial}`,
+    value: c.id,
+  })),
+);
+
+const mapaCnpjs = computed(() => {
+  const m = new Map<string, string>();
+  for (const c of cnpjs.value) m.set(c.id, `${formatarCnpj(c.numero)} — ${c.razaoSocial}`);
+  return m;
+});
+
 const colunas: QTableColumn<RegimeTributarioCnpjDto>[] = [
-  { name: 'cnpjEmpresaId', label: 'CNPJ ID', field: 'cnpjEmpresaId', align: 'left' },
+  { name: 'cnpjEmpresaId', label: 'CNPJ', field: 'cnpjEmpresaId', align: 'left' },
   { name: 'regime', label: 'Regime', field: 'regime', align: 'left' },
   { name: 'vigenciaInicio', label: 'Início', field: 'vigenciaInicio', align: 'left' },
   { name: 'vigenciaFim', label: 'Fim', field: 'vigenciaFim', align: 'left' },
@@ -156,6 +181,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarCnpjs();
 });
 </script>
 

@@ -18,11 +18,15 @@ function numOuNulo(valor: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function textoOuNulo(valor: string | null | undefined): string | null {
+  return valor?.trim() || null;
+}
+
 function formParaPayload(form: VisitaTecnicaFormModel) {
   return {
-    clienteId: form.clienteId.trim() || null,
-    fazendaId: form.fazendaId.trim() || null,
-    talhaoId: form.talhaoId.trim() || null,
+    clienteId: textoOuNulo(form.clienteId),
+    fazendaId: textoOuNulo(form.fazendaId),
+    talhaoId: textoOuNulo(form.talhaoId),
     dataVisita: form.dataVisita,
     tipo: form.tipo as TipoVisitaTecnicaValor,
     status: form.status,

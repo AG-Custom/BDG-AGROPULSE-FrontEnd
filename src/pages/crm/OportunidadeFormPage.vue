@@ -8,16 +8,29 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input
+              <q-select
                 v-model="formulario.clienteId"
                 outlined
-                label="Cliente ID"
+                label="Cliente"
+                emit-value
+                map-options
                 class="field-required"
+                :options="clienteOpcoes"
+                :loading="carregandoClientes"
                 :rules="[obrigatorio]"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.vendedorUsuarioId" outlined label="Vendedor ID" />
+              <q-select
+                v-model="formulario.vendedorUsuarioId"
+                outlined
+                label="Vendedor"
+                clearable
+                emit-value
+                map-options
+                :options="vendedorOpcoes"
+                :loading="carregandoUsuarios"
+              />
             </div>
             <div class="col-12 col-md-4">
               <q-select
@@ -65,10 +78,17 @@
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.produtoId" outlined label="Produto ID" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input v-model="formulario.produtoNome" outlined label="Produto (nome)" />
+              <q-select
+                v-model="formulario.produtoId"
+                outlined
+                label="Produto"
+                clearable
+                emit-value
+                map-options
+                :options="produtoOpcoes"
+                :loading="carregandoProdutos"
+                @update:model-value="onProdutoChange"
+              />
             </div>
             <div class="col-12">
               <q-input
@@ -106,12 +126,19 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useClientes } from 'composables/useClientes';
 import {
   oportunidadeDtoParaForm,
   oportunidadeVazia,
   useCrm,
 } from 'composables/useCrm';
-import { EtapaOportunidadeOpcoes } from 'constants/enums';
+import { useProdutos } from 'composables/useProdutos';
+import { useUsuarios } from 'composables/useUsuarios';
+import {
+  EtapaOportunidadeOpcoes,
+  PerfilUsuario,
+  UsuarioStatus,
+} from 'constants/enums';
 import type { OportunidadeFormModel } from 'types/dtos/crm.dto';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
@@ -121,6 +148,22 @@ const route = useRoute();
 const router = useRouter();
 const { criarOportunidade, editarOportunidade, obterOportunidade, oportunidade, salvando } =
   useCrm();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
+const {
+  usuarios,
+  carregando: carregandoUsuarios,
+  carregar: carregarUsuarios,
+  nomeCompleto,
+} = useUsuarios();
+const {
+  produtos,
+  carregando: carregandoProdutos,
+  carregar: carregarProdutos,
+} = useProdutos();
 
 const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
 const titulo = computed(() =>
@@ -128,6 +171,39 @@ const titulo = computed(() =>
 );
 const carregandoPagina = ref(modo.value === 'editar');
 const formulario = ref<OportunidadeFormModel>(oportunidadeVazia());
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const vendedorOpcoes = computed(() =>
+  usuarios.value
+    .filter(
+      (u) =>
+        u.status === UsuarioStatus.Ativo &&
+        (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Gerente ||
+          u.perfil === PerfilUsuario.Diretor ||
+          u.id === formulario.value.vendedorUsuarioId),
+    )
+    .map((u) => ({ label: nomeCompleto(u), value: u.id })),
+);
+
+const produtoOpcoes = computed(() =>
+  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+);
+
+function onProdutoChange(produtoId: string | null): void {
+  if (!produtoId) {
+    formulario.value.produtoNome = '';
+    return;
+  }
+  const produto = produtos.value.find((p) => p.id === produtoId);
+  formulario.value.produtoNome = produto?.descricao ?? '';
+}
 
 async function salvar(): Promise<void> {
   if (modo.value === 'criar') {
@@ -141,6 +217,9 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
+  void carregarClientes();
+  void carregarUsuarios();
+  void carregarProdutos();
   if (modo.value === 'editar') {
     const ok = await obterOportunidade(String(route.params.id));
     if (ok && oportunidade.value) {

@@ -143,7 +143,16 @@
                 <q-input v-model="formulario.unidade" outlined label="Unidade" />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="formulario.clienteId" outlined label="Cliente ID" />
+                <q-select
+                  v-model="formulario.clienteId"
+                  outlined
+                  label="Cliente"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="clienteOpcoes"
+                  :loading="carregandoClientes"
+                />
               </div>
               <div class="col-12">
                 <q-input
@@ -179,6 +188,7 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useFazendas } from 'composables/useFazendas';
 import { useProdutos } from 'composables/useProdutos';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
@@ -193,6 +203,11 @@ import { computed, onMounted, ref } from 'vue';
 const { recomendacoes, carregando, salvando, carregar, criar, editar, aplicar, cancelar } =
   useRecomendacoes();
 const { fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
@@ -216,6 +231,12 @@ const talhaoOpcoes = computed(() =>
 );
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+);
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
 );
 
 const mapaStatus = computed(() => {
@@ -276,6 +297,7 @@ async function salvar(): Promise<void> {
 onMounted(() => {
   void carregar();
   void carregarFazendas();
+  void carregarClientes();
   void carregarTalhoes();
   void carregarProdutos();
 });

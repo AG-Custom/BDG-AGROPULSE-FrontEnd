@@ -76,7 +76,16 @@
               <q-input v-model="formulario.responsavelNome" outlined label="Responsável" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.colaboradorId" outlined label="Colaborador (ID, opcional)" />
+              <q-select
+                v-model="formulario.colaboradorId"
+                outlined
+                label="Colaborador"
+                clearable
+                emit-value
+                map-options
+                :options="colaboradorOpcoes"
+                :loading="carregandoColaboradores"
+              />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -128,8 +137,10 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useColaboradores } from 'composables/useColaboradores';
 import { osVazia, useManutencao } from 'composables/useManutencao';
 import {
+  ColaboradorStatus,
   PrioridadeOrdemServicoManutencaoOpcoes,
   TipoOrdemServicoManutencaoOpcoes,
 } from 'constants/enums';
@@ -147,6 +158,12 @@ const {
   carregarAtivos,
   carregarPlanos,
 } = useManutencao();
+const {
+  colaboradores,
+  carregando: carregandoColaboradores,
+  carregar: carregarColaboradores,
+  nomeCompleto,
+} = useColaboradores();
 
 const carregandoPagina = ref(true);
 const formulario = ref<OrdemServicoManutencaoFormModel>(osVazia());
@@ -160,6 +177,14 @@ const planoOpcoes = computed(() =>
     value: p.id,
   })),
 );
+const colaboradorOpcoes = computed(() =>
+  colaboradores.value
+    .filter(
+      (c) =>
+        c.status === ColaboradorStatus.Ativo || c.id === formulario.value.colaboradorId,
+    )
+    .map((c) => ({ label: nomeCompleto(c), value: c.id })),
+);
 
 async function salvar(): Promise<void> {
   const criada = await criarOrdem(formulario.value);
@@ -169,7 +194,11 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
-  await Promise.all([carregarAtivos(), carregarPlanos()]);
+  await Promise.all([
+    carregarAtivos(),
+    carregarPlanos(),
+    carregarColaboradores({ ativo: true }),
+  ]);
   carregandoPagina.value = false;
 });
 </script>

@@ -82,10 +82,15 @@
                 />
               </div>
               <div class="col-12">
-                <q-input
+                <q-select
                   v-model="formulario.unidadeId"
                   outlined
-                  label="Unidade ID"
+                  label="Unidade"
+                  clearable
+                  emit-value
+                  map-options
+                  :options="unidadeOpcoes"
+                  :loading="carregandoUnidades"
                   :readonly="!!editandoId"
                 />
               </div>
@@ -107,15 +112,28 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCentrosCusto } from 'composables/useCentrosCusto';
+import { useUnidades } from 'composables/useUnidades';
+import { UnidadeStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { CentroCustoDto, CentroCustoFormModel } from 'types/dtos/financeiro-gestao.dto';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { centros, carregando, salvando, carregar, criar, editar } = useCentrosCusto();
+const {
+  unidades,
+  carregando: carregandoUnidades,
+  carregar: carregarUnidades,
+} = useUnidades();
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<CentroCustoFormModel>({ codigo: '', nome: '', unidadeId: '' });
+
+const unidadeOpcoes = computed(() =>
+  unidades.value
+    .filter((u) => u.status === UnidadeStatus.Ativa || u.id === formulario.value.unidadeId)
+    .map((u) => ({ label: u.nome, value: u.id })),
+);
 
 const colunas: QTableColumn<CentroCustoDto>[] = [
   { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
@@ -143,6 +161,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregar();
+  void carregarUnidades();
 });
 </script>
 

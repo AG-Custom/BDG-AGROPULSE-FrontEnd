@@ -13,7 +13,7 @@ import { computed, ref } from 'vue';
 function formParaPayload(form: FazendaFormModel) {
   return {
     nome: form.nome.trim(),
-    clienteId: form.clienteId.trim() || null,
+    clienteId: form.clienteId?.trim() || null,
     municipio: form.municipio.trim() || null,
     uf: form.uf.trim() || null,
     areaTotalHa: form.areaTotalHa.trim() ? Number(form.areaTotalHa) : null,

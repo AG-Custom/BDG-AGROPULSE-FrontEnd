@@ -41,6 +41,11 @@
           :loading="carregando"
           :rows-per-page-options="[10, 25, 50]"
         >
+          <template #body-cell-clienteId="props">
+            <q-td :props="props">
+              {{ mapaClientes.get(props.row.clienteId) ?? props.row.clienteId }}
+            </q-td>
+          </template>
           <template #body-cell-score="props">
             <q-td :props="props" class="text-metric">{{ props.row.score }}</q-td>
           </template>
@@ -90,11 +95,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvar">
-            <q-input
+            <q-select
               v-model="clienteId"
               outlined
-              label="Cliente ID"
+              label="Cliente"
+              emit-value
+              map-options
               class="field-required"
+              :options="clienteOpcoes"
+              :loading="carregandoClientes"
               :rules="[obrigatorio]"
             />
             <div class="agro-form-actions">
@@ -118,6 +127,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useClientes } from 'composables/useClientes';
 import { useCrm } from 'composables/useCrm';
 import { StatusAnaliseCreditoOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
@@ -129,9 +139,27 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { analises, carregando, salvando, carregarAnalises, criarAnalise } = useCrm();
+const {
+  clientes,
+  carregando: carregandoClientes,
+  carregar: carregarClientes,
+} = useClientes();
 
 const dialog = ref(false);
 const clienteId = ref('');
+
+const clienteOpcoes = computed(() =>
+  clientes.value.map((c) => ({
+    label: c.nomeFantasia || c.nomeRazao,
+    value: c.id,
+  })),
+);
+
+const mapaClientes = computed(() => {
+  const m = new Map<string, string>();
+  for (const c of clientes.value) m.set(c.id, c.nomeFantasia || c.nomeRazao);
+  return m;
+});
 
 const mapaStatus = computed(() => {
   const m = new Map<string, string>();
@@ -170,6 +198,7 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregarAnalises();
+  void carregarClientes();
 });
 </script>
 
