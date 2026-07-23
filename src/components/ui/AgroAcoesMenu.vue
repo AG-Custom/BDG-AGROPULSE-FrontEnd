@@ -10,7 +10,8 @@
     menu-anchor="bottom end"
     menu-self="top end"
     aria-label="Ações"
-    :disable="disable"
+    :loading="loadingExcluir || loadingStatus"
+    :disable="disable || loadingExcluir || loadingStatus"
   >
     <q-list class="agro-acoes-menu__list" role="menu">
       <q-item

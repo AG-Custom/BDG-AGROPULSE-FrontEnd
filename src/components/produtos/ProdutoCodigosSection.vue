@@ -16,7 +16,7 @@
     </template>
 
     <empty-state
-      v-if="codigos.length === 0"
+      v-if="codigosInternos.length === 0"
       titulo="Nenhum código cadastrado"
       descricao="Adicione códigos SKU, EAN ou alternativos."
       icon="qr_code"
@@ -29,7 +29,7 @@
       row-key="id"
       hide-pagination
       class="produto-codigos__tabela"
-      :rows="codigos"
+      :rows="codigosInternos"
       :columns="colunas"
       :pagination="{ rowsPerPage: 0 }"
     >
@@ -52,7 +52,8 @@
             :mostrar-visualizar="false"
             :mostrar-status="false"
             mostrar-excluir
-            :loading-excluir="removendo"
+            :loading-excluir="removendoId === cell.row.id"
+            :disable="removendo"
             editar-label="Editar código"
             excluir-label="Remover código"
             @editar="abrirDialogEditar(cell.row)"
@@ -101,7 +102,7 @@ import { useProdutoCodigos } from 'composables/useProdutoCodigos';
 import type { ProdutoCodigoDto } from 'types/dtos/produto.dto';
 import { codigoDtoParaForm, criarCodigoFormVazio } from 'utils/mappers/produto.mapper';
 import type { QTableColumn } from 'quasar';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   produtoId?: string;
@@ -113,6 +114,7 @@ const codigos = defineModel<ProdutoCodigoDto[]>('codigos', { required: true });
 const {
   salvando,
   removendo,
+  removendoId,
   definirCodigos,
   adicionar,
   editar,
@@ -149,17 +151,17 @@ watch(
 
     definirCodigos(lista);
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 watch(
   codigosInternos,
-  (lista) => {
+  async (lista) => {
     sincronizando.value = true;
     codigos.value = [...lista];
+    await nextTick();
     sincronizando.value = false;
   },
-  { deep: true },
 );
 
 function rotuloTipo(tipo: TipoCodigoProdutoValor): string {

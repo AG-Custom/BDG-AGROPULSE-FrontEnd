@@ -115,7 +115,7 @@ import {
   criarConversaoFormVazio,
 } from 'utils/mappers/produto.mapper';
 import type { QTableColumn } from 'quasar';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   produtoId?: string;
@@ -170,17 +170,17 @@ watch(
 
     definirConversoes(lista);
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 watch(
   conversoesInternas,
-  (lista) => {
+  async (lista) => {
     sincronizando.value = true;
     conversoes.value = [...lista];
+    await nextTick();
     sincronizando.value = false;
   },
-  { deep: true },
 );
 
 function rotuloUnidadeMedidaPorId(unidadeId: string): string {

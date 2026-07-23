@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import ProdutoFiscalFormulario from 'components/produtos/ProdutoFiscalFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import { useNotificacao } from 'composables/useNotificacao';
 import { useProdutoFiscal } from 'composables/useProdutoFiscal';
 import type { ProdutoFiscalDto, ProdutoFiscalFormModel } from 'types/dtos/produto.dto';
 import { fiscalDtoParaForm } from 'utils/mappers/produto.mapper';
@@ -42,6 +43,7 @@ const props = defineProps<{
 const formulario = defineModel<ProdutoFiscalFormModel>('formulario', { required: true });
 
 const { salvando, salvar: salvarFiscal } = useProdutoFiscal(() => props.produtoId);
+const { erro } = useNotificacao();
 
 const formularioRef = ref<InstanceType<typeof ProdutoFiscalFormulario> | null>(null);
 
@@ -65,10 +67,22 @@ async function salvar(): Promise<void> {
   const valido = await validar();
 
   if (!valido) {
+    erro('Verifique os campos fiscais obrigatórios (NCM com 8 dígitos e origem da mercadoria).');
     return;
   }
 
-  await salvarFiscal(formulario.value);
+  const ok = await salvarFiscal(formulario.value);
+
+  if (ok && props.produtoId) {
+    // Mantém o formulário alinhado ao que foi persistido (normalização de dígitos).
+    formulario.value = {
+      ...formulario.value,
+      ncm: formulario.value.ncm.replace(/\D/g, ''),
+      cest: formulario.value.cest.replace(/\D/g, ''),
+      cfopPadraoInterno: formulario.value.cfopPadraoInterno.replace(/\D/g, ''),
+      cfopPadraoExterno: formulario.value.cfopPadraoExterno.replace(/\D/g, ''),
+    };
+  }
 }
 
 defineExpose({ validar });
