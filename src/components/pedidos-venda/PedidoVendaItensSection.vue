@@ -47,7 +47,7 @@
 
       <template #body-cell-precoUnitario="props">
         <q-td :props="props" class="text-metric">
-          {{ formatarMoeda(Number(props.row.precoUnitario.replace(',', '.')) || 0) }}
+          {{ formatarMoeda(parseMascaraMoeda(props.row.precoUnitario) ?? 0) }}
         </q-td>
       </template>
 
@@ -132,14 +132,10 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <AgroMoneyInput
                   v-model="itemForm.precoUnitario"
-                  outlined
                   label="Preço unitário"
                   hint="Preço da tabela — sem fallback para preço de venda do produto"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
                   :loading="resolvendoPreco"
                   :rules="[quantidadePositiva]"
                 />
@@ -179,12 +175,13 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import type { QForm, QTableColumn } from 'quasar';
 import type { PedidoVendaItemFormModel } from 'types/dtos/pedido-venda.dto';
-import { formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarDecimal, formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import {
   criarChaveItem,
   criarItemFormVazio,
@@ -277,7 +274,7 @@ async function onProdutoSelecionado(produtoId: string): Promise<void> {
   });
 
   if (resolvido) {
-    itemForm.value.precoUnitario = String(resolvido.preco);
+    itemForm.value.precoUnitario = formatarMoedaParaInput(resolvido.preco);
   }
 }
 
@@ -315,7 +312,7 @@ async function sincronizarItensComTabela(): Promise<void> {
           });
 
           if (resolvido) {
-            item.precoUnitario = String(resolvido.preco);
+            item.precoUnitario = formatarMoedaParaInput(resolvido.preco);
           }
         })(),
       );

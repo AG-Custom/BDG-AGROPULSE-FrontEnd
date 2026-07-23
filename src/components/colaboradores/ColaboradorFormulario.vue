@@ -78,12 +78,10 @@
         />
       </div>
       <div class="col-12 col-md-4">
-        <q-input
+        <AgroMoneyInput
           v-model="formulario.salarioBase"
-          outlined
           label="Salário base"
           hint="Opcional"
-          inputmode="decimal"
           :readonly="somenteLeitura"
         />
       </div>
@@ -164,11 +162,14 @@
           outlined
           label="CEP"
           class="field-required"
+          hint="8 dígitos — preenchimento automático do endereço"
           :mask="MASCARAS.CEP"
           :maxlength="TAMANHO_FORMATADO.CEP"
           inputmode="numeric"
+          :loading="buscandoCep"
           :rules="[obrigatorio, cepValidator]"
           :readonly="somenteLeitura"
+          @blur="buscarSeCepValido"
         />
       </div>
       <div class="col-12 col-md-8">
@@ -267,6 +268,8 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import { useBuscaCep } from 'composables/useBuscaCep';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   CargoColaborador,
@@ -296,6 +299,7 @@ const props = defineProps<{
 const formulario = defineModel<ColaboradorFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+const { buscandoCep, buscarSeCepValido } = useBuscaCep(formulario);
 const { usuarios, carregando: carregandoUsuarios, carregar: carregarUsuarios, nomeCompleto } =
   useUsuarios();
 

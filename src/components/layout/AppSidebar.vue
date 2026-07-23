@@ -1327,13 +1327,13 @@
 
 <script setup lang="ts">
 import AppSidebarSection from 'components/layout/AppSidebarSection.vue';
-import { useAuth } from 'composables/useAuth';
 import { useComprasConfig } from 'composables/useComprasConfig';
 import { usePerfilSafras } from 'composables/usePerfilSafras';
+import { usePermissao } from 'composables/usePermissao';
 import { Permissoes } from 'constants/permissoes';
 import { computed, onMounted } from 'vue';
 
-const { possuiPermissao } = useAuth();
+const { possuiPermissao } = usePermissao();
 const { config, carregar: carregarComprasConfig } = useComprasConfig();
 const { isRevenda, isIndustria, carregarPerfil } = usePerfilSafras();
 

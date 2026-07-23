@@ -9,15 +9,12 @@ import type {
   PdvVendaResumoDto,
 } from 'types/dtos/pdv.dto';
 import type { FormaPagamentoValor } from 'constants/enums';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 function parsePrecoOpcional(valor: string): number | null {
-  const texto = valor.trim();
-  if (!texto) {
-    return null;
-  }
-  const numero = Number(texto.replace(',', '.'));
-  return Number.isFinite(numero) && numero > 0 ? numero : null;
+  const numero = parseMascaraMoeda(valor);
+  return numero !== null && numero > 0 ? numero : null;
 }
 
 export function usePdv() {
@@ -78,7 +75,7 @@ export function usePdv() {
               .filter((pagamento) => pagamento.formaPagamento && pagamento.valor.trim())
               .map((pagamento) => ({
                 formaPagamento: pagamento.formaPagamento as FormaPagamentoValor,
-                valor: Number(pagamento.valor.replace(',', '.')),
+                valor: parseMascaraMoeda(pagamento.valor) ?? 0,
               })),
       });
       sucesso('Venda PDV registrada com sucesso.');

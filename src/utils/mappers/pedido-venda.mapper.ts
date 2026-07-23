@@ -5,6 +5,7 @@ import type {
   PedidoVendaFormModel,
   PedidoVendaItemFormModel,
 } from 'types/dtos/pedido-venda.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 
 function parseNumeroObrigatorio(valor: string): number {
   return Number(valor.replace(',', '.'));
@@ -21,14 +22,8 @@ function parseNumeroOpcional(valor: string): number {
 }
 
 function parsePrecoOpcional(valor: string): number | undefined {
-  const texto = valor.trim();
-
-  if (!texto) {
-    return undefined;
-  }
-
-  const numero = Number(texto.replace(',', '.'));
-  return Number.isFinite(numero) && numero > 0 ? numero : undefined;
+  const numero = parseMascaraMoeda(valor);
+  return numero !== null && numero > 0 ? numero : undefined;
 }
 
 let chaveSequencia = 0;
@@ -74,7 +69,7 @@ export function pedidoDtoParaForm(dto: PedidoVendaDto): PedidoVendaFormModel {
       chave: item.id,
       produtoId: item.produtoId,
       quantidade: String(item.quantidade),
-      precoUnitario: String(item.precoUnitario),
+      precoUnitario: formatarMoedaParaInput(item.precoUnitario),
       descontoPercentual: String(item.descontoPercentual ?? 0),
     })),
   };
@@ -104,7 +99,7 @@ export function formParaEditarPayload(form: PedidoVendaFormModel): EditarPedidoV
 
 export function subtotalItem(item: PedidoVendaItemFormModel): number {
   const quantidade = Number(item.quantidade.replace(',', '.'));
-  const preco = Number(item.precoUnitario.replace(',', '.'));
+  const preco = parseMascaraMoeda(item.precoUnitario) ?? 0;
   const desconto = parseNumeroOpcional(item.descontoPercentual);
 
   if (Number.isNaN(quantidade) || Number.isNaN(preco) || Number.isNaN(desconto)) {

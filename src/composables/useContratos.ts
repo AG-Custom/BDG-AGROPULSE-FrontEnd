@@ -24,6 +24,7 @@ import type {
   PainelSafraItemDto,
   VinculoPedidoContratoDto,
 } from 'types/dtos/contrato.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { type Ref, ref, unref } from 'vue';
 
 function parseOpcional(valor: string): number | null {
@@ -38,7 +39,7 @@ function formParaPayload(form: ContratoFormModel): CriarContratoPayload {
     clienteId: form.clienteId,
     produtoId: form.produtoId,
     quantidade: Number(form.quantidade),
-    preco: Number(form.preco),
+    preco: parseMascaraMoeda(form.preco) ?? 0,
     fontePreco: form.fontePreco as FontePrecoValor,
     dataInicio: form.dataInicio,
     dataFim: form.dataFim || null,
@@ -55,8 +56,8 @@ function formParaPayload(form: ContratoFormModel): CriarContratoPayload {
     payload.garantias = [{ descricao: form.garantias.trim() }];
   }
 
-  const valorInsumos = parseOpcional(form.valorInsumos);
-  const precoRef = parseOpcional(form.precoReferencia);
+  const valorInsumos = parseMascaraMoeda(form.valorInsumos);
+  const precoRef = parseMascaraMoeda(form.precoReferencia);
   if (valorInsumos !== null) {
     payload.quantidadeInsumo = 1;
     payload.precoInsumo = valorInsumos;
@@ -106,7 +107,7 @@ export function contratoParaForm(c: ContratoDto): ContratoFormModel {
     clienteId: c.clienteId,
     produtoId: c.produtoId,
     quantidade: String(c.quantidade),
-    preco: String(c.preco),
+    preco: formatarMoedaParaInput(c.preco),
     fontePreco: c.fontePreco,
     dataInicio: c.dataInicio.slice(0, 10),
     dataFim: c.dataFim?.slice(0, 10) ?? '',
@@ -120,12 +121,12 @@ export function contratoParaForm(c: ContratoDto): ContratoFormModel {
     garantias: c.garantias?.map((g) => g.descricao).join('; ') ?? '',
     valorInsumos:
       c.precoInsumo != null && c.quantidadeInsumo != null
-        ? String(c.precoInsumo * c.quantidadeInsumo)
+        ? formatarMoedaParaInput(c.precoInsumo * c.quantidadeInsumo)
         : '',
     produtoGraoId: c.produtoGraoId ?? '',
     quantidadeGraos: c.quantidadeGrao != null ? String(c.quantidadeGrao) : '',
     unidadeGrao: c.unidadeGrao ?? '',
-    precoReferencia: c.precoReferenciaGrao != null ? String(c.precoReferenciaGrao) : '',
+    precoReferencia: formatarMoedaParaInput(c.precoReferenciaGrao),
     quantidadeEquivalente: c.quantidadeGrao != null ? String(c.quantidadeGrao) : '',
     tipoOperacao: c.tipoOperacao ?? '',
   };

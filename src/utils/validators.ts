@@ -144,12 +144,18 @@ export function notaAvaliacao(val: number | null | undefined): true | string {
   return (val >= 1 && val <= 5) || 'A nota deve estar entre 1 e 5';
 }
 
+function paraNumero(val: string): number {
+  const texto = val.trim();
+  const normalizado = texto.includes(',') ? texto.replace(/\./g, '').replace(',', '.') : texto;
+  return Number(normalizado);
+}
+
 export function quantidadePositiva(val: string): true | string {
   if (!val || !val.trim()) {
     return 'Campo obrigatório';
   }
 
-  const numero = Number(val.replace(',', '.'));
+  const numero = paraNumero(val);
 
   if (Number.isNaN(numero)) {
     return 'Informe um número válido';
@@ -163,7 +169,7 @@ export function quantidadeNaoNegativa(val: string): true | string {
     return 'Campo obrigatório';
   }
 
-  const numero = Number(val.replace(',', '.'));
+  const numero = paraNumero(val);
 
   if (Number.isNaN(numero)) {
     return 'Informe um número válido';

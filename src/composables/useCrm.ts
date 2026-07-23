@@ -9,6 +9,7 @@ import {
 import type { EtapaOportunidadeValor } from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { crmService } from 'services/crm.service';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import type {
   AmostraCampoDto,
   AmostraCampoFormModel,
@@ -43,7 +44,7 @@ function oportunidadeFormParaPayload(form: OportunidadeFormModel): CriarOportuni
     produtoNome: form.produtoNome?.trim() || null,
     cultura: form.cultura?.trim() || null,
     safraRef: form.safraRef?.trim() || null,
-    valorEstimado: Number(form.valorEstimado) || 0,
+    valorEstimado: parseMascaraMoeda(form.valorEstimado) ?? 0,
     etapa: form.etapa,
     probabilidade: numOuZero(form.probabilidade),
     dataPrevista: form.dataPrevista || null,
@@ -103,7 +104,7 @@ export function oportunidadeDtoParaForm(dto: OportunidadeDto): OportunidadeFormM
     produtoNome: dto.produtoNome ?? '',
     cultura: dto.cultura ?? '',
     safraRef: dto.safraRef ?? '',
-    valorEstimado: String(dto.valorEstimado),
+    valorEstimado: formatarMoedaParaInput(dto.valorEstimado),
     etapa: dto.etapa,
     probabilidade: String(dto.probabilidade ?? 0),
     dataPrevista: dto.dataPrevista?.slice(0, 10) ?? '',

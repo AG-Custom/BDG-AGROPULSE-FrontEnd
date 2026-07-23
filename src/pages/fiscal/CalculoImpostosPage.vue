@@ -32,9 +32,8 @@
               />
             </div>
             <div class="col-6 col-md-2">
-              <q-input
+              <AgroMoneyInput
                 v-model="form.valor"
-                outlined
                 label="Valor"
                 class="field-required"
                 :rules="[obrigatorio]"
@@ -190,6 +189,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useCalculoImpostos } from 'composables/useCalculoImpostos';
 import { useFiscal } from 'composables/useFiscal';
 import { useProdutos } from 'composables/useProdutos';

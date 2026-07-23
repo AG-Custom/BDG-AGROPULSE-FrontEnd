@@ -98,13 +98,10 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
+              <AgroMoneyInput
                 v-model="item.precoUnitario"
-                outlined
                 dense
                 label="Preço unitário"
-                type="number"
-                step="0.01"
                 :loading="resolvendoPreco"
                 :rules="[obrigatorio]"
               />
@@ -148,6 +145,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
 import { useOrcamento } from 'composables/useOrcamento';
 import { useOrcamentos } from 'composables/useOrcamentos';
@@ -157,6 +155,7 @@ import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco
 import { useUsuarios } from 'composables/useUsuarios';
 import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
 import type { OrcamentoFormModel, OrcamentoItemFormModel } from 'types/dtos/orcamento.dto';
+import { formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -254,7 +253,7 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
   });
 
   if (resolvido) {
-    formulario.value.itens[index].precoUnitario = String(resolvido.preco);
+    formulario.value.itens[index].precoUnitario = formatarMoedaParaInput(resolvido.preco);
   }
 }
 
@@ -337,7 +336,7 @@ onMounted(async () => {
         chave: item.id,
         produtoId: item.produtoId,
         quantidade: String(item.quantidade),
-        precoUnitario: String(item.precoUnitario),
+        precoUnitario: formatarMoedaParaInput(item.precoUnitario),
       })),
     };
     await carregarTabelasPermitidas({ clienteId: orcamento.value.clienteId });

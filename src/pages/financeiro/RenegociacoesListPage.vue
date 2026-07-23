@@ -106,10 +106,10 @@
                 />
               </div>
               <div class="col-4">
-                <q-input v-model="formulario.valorMora" outlined label="Mora" />
+                <AgroMoneyInput v-model="formulario.valorMora" label="Mora" />
               </div>
               <div class="col-4">
-                <q-input v-model="formulario.valorMulta" outlined label="Multa" />
+                <AgroMoneyInput v-model="formulario.valorMulta" label="Multa" />
               </div>
               <div class="col-4">
                 <q-input
@@ -138,6 +138,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

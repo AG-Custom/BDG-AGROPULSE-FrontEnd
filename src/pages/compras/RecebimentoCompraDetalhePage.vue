@@ -80,13 +80,10 @@
               />
             </div>
             <div class="col-6 col-md-2">
-              <q-input
+              <AgroMoneyInput
                 v-model="item.custoUnitario"
-                outlined
                 dense
                 label="Custo"
-                type="number"
-                step="0.01"
                 :readonly="!podeEditar"
               />
             </div>
@@ -175,6 +172,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
@@ -182,7 +180,7 @@ import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import { RecebimentoCompraStatusOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { RecebimentoCompraDivergenciaDto } from 'types/dtos/compras.dto';
-import { formatarDataHora, formatarDecimal } from 'utils/formatters';
+import { formatarDataHora, formatarDecimal, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -259,7 +257,7 @@ function sincronizarItens(): void {
     produtoId: item.produtoId,
     quantidadeNota: item.quantidadeNota,
     quantidadeRecebida: String(item.quantidadeRecebida),
-    custoUnitario: String(item.custoUnitario),
+    custoUnitario: formatarMoedaParaInput(item.custoUnitario),
     numeroLote: item.numeroLote ?? '',
     dataValidade: item.dataValidade ?? '',
   }));
@@ -274,7 +272,7 @@ async function salvarItens(): Promise<void> {
       quantidadeRecebida: Number(item.quantidadeRecebida),
       numeroLote: item.numeroLote.trim() || null,
       dataValidade: item.dataValidade || null,
-      custoUnitario: Number(item.custoUnitario),
+      custoUnitario: parseMascaraMoeda(item.custoUnitario) ?? 0,
     })),
   });
 }

@@ -96,7 +96,7 @@
               <q-input v-model="item.quantidadeRecebida" outlined dense label="Qtd recebida" type="number" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input v-model="item.custoUnitario" outlined dense label="Custo" type="number" step="0.01" />
+              <AgroMoneyInput v-model="item.custoUnitario" dense label="Custo" />
             </div>
             <div class="col-5 col-md-1">
               <q-input v-model="item.numeroLote" outlined dense label="Lote" />
@@ -154,13 +154,14 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFiscal } from 'composables/useFiscal';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
 import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import type { QTableColumn } from 'quasar';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -225,7 +226,7 @@ function criarItemVazio(): ItemForm {
     codigoProdutoXml: '',
     quantidadeNota: '1',
     quantidadeRecebida: '1',
-    custoUnitario: '0',
+    custoUnitario: formatarMoedaParaInput(0),
     numeroLote: '',
     dataValidade: '',
   };
@@ -250,7 +251,7 @@ async function analisarXml(): Promise<void> {
     codigoProdutoXml: item.codigoProdutoXml,
     quantidadeNota: String(item.quantidade),
     quantidadeRecebida: String(item.quantidade),
-    custoUnitario: String(item.custoUnitario),
+    custoUnitario: formatarMoedaParaInput(item.custoUnitario),
     numeroLote: item.numeroLote ?? '',
     dataValidade: item.dataValidade ?? '',
   }));
@@ -285,7 +286,7 @@ async function salvar(): Promise<void> {
       codigoProdutoXml: i.codigoProdutoXml || null,
       quantidadeNota: Number(i.quantidadeNota),
       quantidadeRecebida: Number(i.quantidadeRecebida),
-      custoUnitario: Number(i.custoUnitario),
+      custoUnitario: parseMascaraMoeda(i.custoUnitario) ?? 0,
       numeroLote: i.numeroLote.trim() || null,
       dataValidade: i.dataValidade || null,
     })),

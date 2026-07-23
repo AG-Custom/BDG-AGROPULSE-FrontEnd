@@ -121,15 +121,10 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="form.rendaEstimada" outlined label="Renda estimada (R$)" type="number" />
+                <AgroMoneyInput v-model="form.rendaEstimada" label="Renda estimada" />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
-                  v-model="form.endividamentoTotal"
-                  outlined
-                  label="Endividamento total (R$)"
-                  type="number"
-                />
+                <AgroMoneyInput v-model="form.endividamentoTotal" label="Endividamento total" />
               </div>
               <div class="col-12">
                 <q-input
@@ -165,13 +160,7 @@
           </p>
         </q-card-section>
         <q-card-section>
-          <q-input
-            v-model="limiteAprovado"
-            outlined
-            label="Limite aprovado (R$)"
-            type="number"
-            class="q-mb-md"
-          />
+          <AgroMoneyInput v-model="limiteAprovado" label="Limite aprovado" class="q-mb-md" />
           <q-toggle v-model="aprovarLimite" label="Aprovar e aplicar limite" />
           <div class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogAprovar = false" />
@@ -190,6 +179,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';
@@ -197,7 +187,7 @@ import { fichaVazia, useCobrancaCredito } from 'composables/useCobrancaCredito';
 import { useCrm } from 'composables/useCrm';
 import type { QTableColumn } from 'quasar';
 import type { FichaCreditoRuralDto } from 'types/dtos/cobranca-credito.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, reactive, ref } from 'vue';
 
@@ -280,7 +270,7 @@ async function confirmarAprovar(): Promise<void> {
   const analiseId = fichaAlvo.value?.analiseCreditoId;
   if (!analiseId) return;
   if (
-    await aplicarLimite(analiseId, Number(limiteAprovado.value) || 0, aprovarLimite.value)
+    await aplicarLimite(analiseId, parseMascaraMoeda(limiteAprovado.value) ?? 0, aprovarLimite.value)
   ) {
     dialogAprovar.value = false;
   }

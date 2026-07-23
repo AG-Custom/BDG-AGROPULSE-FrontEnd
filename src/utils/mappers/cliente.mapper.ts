@@ -19,7 +19,14 @@ import type {
   EditarClientePayload,
 } from 'types/dtos/cliente.dto';
 import type { EnderecoDto } from 'types/dtos/unidade.dto';
-import { apenasDigitos, formatarCep, formatarDocumento, formatarTelefone } from 'utils/formatters';
+import {
+  apenasDigitos,
+  formatarCep,
+  formatarDocumento,
+  formatarMoedaParaInput,
+  formatarTelefone,
+  parseMascaraMoeda,
+} from 'utils/formatters';
 
 export function criarClienteFormVazio(): ClienteFormModel {
   return {
@@ -52,7 +59,7 @@ export function clienteDtoParaForm(dto: ClienteDto): ClienteFormModel {
     dataNascimento: dto.dataNascimento ?? '',
     dataFundacao: dto.dataFundacao ?? '',
     prazoRecompra: dto.prazoRecompra !== null ? String(dto.prazoRecompra) : '',
-    limiteCredito: dto.limiteCredito !== null ? String(dto.limiteCredito) : '',
+    limiteCredito: formatarMoedaParaInput(dto.limiteCredito),
     vendedorUsuarioId: dto.vendedorUsuarioId,
   };
 }
@@ -82,7 +89,7 @@ function montarPayloadBase(form: ClienteFormModel): CriarClientePayload {
     dataNascimento: ehPf ? form.dataNascimento.trim() || null : null,
     dataFundacao: ehPf ? null : form.dataFundacao.trim() || null,
     prazoRecompra: parseNumeroOpcional(form.prazoRecompra),
-    limiteCredito: parseNumeroOpcional(form.limiteCredito),
+    limiteCredito: parseMascaraMoeda(form.limiteCredito),
     vendedorUsuarioId: form.vendedorUsuarioId,
   };
 }

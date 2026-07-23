@@ -47,10 +47,10 @@
               <q-input v-model="alcada.ordem" outlined dense label="Ordem" type="number" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="alcada.valorMinimo" outlined dense label="Valor mínimo" type="number" step="0.01" />
+              <AgroMoneyInput v-model="alcada.valorMinimo" dense label="Valor mínimo" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="alcada.valorMaximo" outlined dense label="Valor máximo" type="number" step="0.01" />
+              <AgroMoneyInput v-model="alcada.valorMaximo" dense label="Valor máximo" />
             </div>
             <div class="col-10 col-md-3">
               <q-input v-model="alcada.perfil" outlined dense label="Perfil" />
@@ -87,10 +87,12 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useComprasAprovacoes } from 'composables/useComprasAprovacoes';
 import { useComprasConfig } from 'composables/useComprasConfig';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { onMounted, ref, watch } from 'vue';
 
 interface AlcadaForm {
@@ -132,8 +134,8 @@ watch(
   (lista) => {
     alcadasForm.value = lista.map((a) => ({
       chave: a.id,
-      valorMinimo: String(a.valorMinimo),
-      valorMaximo: String(a.valorMaximo),
+      valorMinimo: formatarMoedaParaInput(a.valorMinimo),
+      valorMaximo: formatarMoedaParaInput(a.valorMaximo),
       perfil: a.perfil,
       ordem: String(a.ordem),
     }));
@@ -144,8 +146,8 @@ watch(
 function adicionar(): void {
   alcadasForm.value.push({
     chave: crypto.randomUUID(),
-    valorMinimo: '0',
-    valorMaximo: '1000',
+    valorMinimo: formatarMoedaParaInput(0),
+    valorMaximo: formatarMoedaParaInput(1000),
     perfil: 'Gerente',
     ordem: String(alcadasForm.value.length + 1),
   });
@@ -158,8 +160,8 @@ async function salvarConfig(): Promise<void> {
 async function salvarAlcadasForm(): Promise<void> {
   await salvarAlcadas({
     alcadas: alcadasForm.value.map((a) => ({
-      valorMinimo: Number(a.valorMinimo),
-      valorMaximo: Number(a.valorMaximo),
+      valorMinimo: parseMascaraMoeda(a.valorMinimo) ?? 0,
+      valorMaximo: parseMascaraMoeda(a.valorMaximo) ?? 0,
       perfil: a.perfil.trim(),
       ordem: Number(a.ordem),
     })),

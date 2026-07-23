@@ -49,14 +49,7 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
-                v-model="formulario.preco"
-                outlined
-                label="Preço"
-                type="number"
-                step="0.01"
-                :rules="[obrigatorio]"
-              />
+              <AgroMoneyInput v-model="formulario.preco" label="Preço" :rules="[obrigatorio]" />
             </div>
             <div class="col-12 col-md-3">
               <q-select
@@ -135,13 +128,7 @@
             <template v-else-if="tipo === TipoContrato.Barter">
               <div class="col-12"><div class="text-subtitle2">Barter — insumos × grãos</div></div>
               <div class="col-12 col-md-4">
-                <q-input
-                  v-model="formulario.valorInsumos"
-                  outlined
-                  label="Valor dos insumos (R$)"
-                  type="number"
-                  step="0.01"
-                />
+                <AgroMoneyInput v-model="formulario.valorInsumos" label="Valor dos insumos" />
               </div>
               <div class="col-12 col-md-4">
                 <q-select
@@ -166,13 +153,7 @@
                 />
               </div>
               <div class="col-12 col-md-4">
-                <q-input
-                  v-model="formulario.precoReferencia"
-                  outlined
-                  label="Preço de referência"
-                  type="number"
-                  step="0.0001"
-                />
+                <AgroMoneyInput v-model="formulario.precoReferencia" label="Preço de referência" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -259,6 +240,7 @@
 import CotacaoMercadoCard from 'components/contratos/CotacaoMercadoCard.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
 import {
   contratoParaForm,
@@ -276,6 +258,7 @@ import {
   type TipoContratoValor,
 } from 'constants/enums';
 import type { CotacaoMercadoDto } from 'types/dtos/contrato.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -323,17 +306,17 @@ const produtoOpcoes = computed(() =>
 );
 
 function aplicarCotacao(c: CotacaoMercadoDto): void {
-  formulario.value.preco = String(c.preco);
+  formulario.value.preco = formatarMoedaParaInput(c.preco);
   formulario.value.fontePreco = c.fonte;
   if (tipo.value === TipoContrato.Barter) {
-    formulario.value.precoReferencia = String(c.preco);
+    formulario.value.precoReferencia = formatarMoedaParaInput(c.preco);
   }
 }
 
 async function calcular(): Promise<void> {
-  const valor = Number(formulario.value.valorInsumos);
-  const precoRef = Number(formulario.value.precoReferencia);
-  if (!Number.isFinite(valor) || !Number.isFinite(precoRef) || precoRef <= 0) return;
+  const valor = parseMascaraMoeda(formulario.value.valorInsumos);
+  const precoRef = parseMascaraMoeda(formulario.value.precoReferencia);
+  if (valor === null || precoRef === null || precoRef <= 0) return;
   calculando.value = true;
   const eq = await calcularEquivalente(
     valor,
@@ -382,7 +365,7 @@ onMounted(async () => {
   if (modo.value === 'criar') {
     const precoQuery = route.query.preco as string | undefined;
     const fonteQuery = route.query.fonte as FontePrecoValor | undefined;
-    if (precoQuery) formulario.value.preco = precoQuery;
+    if (precoQuery) formulario.value.preco = formatarMoedaParaInput(precoQuery);
     if (fonteQuery) formulario.value.fontePreco = fonteQuery;
   }
 

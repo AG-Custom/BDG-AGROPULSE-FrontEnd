@@ -107,6 +107,56 @@ export function formatarMoeda(valor: number): string {
   }).format(valor);
 }
 
+const MOEDA_INPUT_FORMATTER = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const DIGITOS_MOEDA_MAX = 15;
+
+export function formatarMoedaParaInput(valor: number | string | null | undefined): string {
+  if (valor === null || valor === undefined || valor === '') {
+    return '';
+  }
+
+  const numero = typeof valor === 'number' ? valor : parseMascaraMoeda(valor);
+
+  if (numero === null) {
+    return '';
+  }
+
+  return MOEDA_INPUT_FORMATTER.format(numero);
+}
+
+export function aplicarMascaraMoeda(valorDigitado: string): string {
+  const digitos = apenasDigitos(valorDigitado).slice(0, DIGITOS_MOEDA_MAX);
+
+  if (!digitos) {
+    return '';
+  }
+
+  return MOEDA_INPUT_FORMATTER.format(Number(digitos) / 100);
+}
+
+export function parseMascaraMoeda(valor: string): number | null {
+  let texto = valor.trim().replace(/R\$\s?/gi, '').replace(/\s/g, '');
+
+  if (!texto) {
+    return null;
+  }
+
+  if (texto.includes(',')) {
+    texto = texto.replace(/\./g, '').replace(',', '.');
+  }
+
+  const numero = Number(texto);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+export function parseMascaraMoedaObrigatorio(valor: string): number {
+  return parseMascaraMoeda(valor) ?? 0;
+}
+
 export function gerarCodigoUnidade(tipo: string, nome: string): string {
   const tipoSlug = slugify(tipo);
   const nomeSlug = slugify(nome);

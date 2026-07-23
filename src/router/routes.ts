@@ -78,6 +78,15 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'notificacoes',
+        name: 'notificacoes',
+        component: () => import('pages/notificacoes/NotificacoesPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.notificacoes',
+          permissao: Permissoes.Notificacoes.Visualizar,
+        },
+      },
+      {
         path: 'unidades',
         name: 'unidades',
         component: () => import('pages/unidades/UnidadesListPage.vue'),
@@ -536,7 +545,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.formaPagamentoConfigNova',
           breadcrumbPais: ['navegacao.formasPagamentoConfig'],
-          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+          permissao: Permissoes.FormasPagamentoConfig.Editar,
         },
       },
       {
@@ -546,7 +555,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.formaPagamentoConfigEditar',
           breadcrumbPais: ['navegacao.formasPagamentoConfig'],
-          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+          permissao: Permissoes.FormasPagamentoConfig.Editar,
         },
       },
       {
@@ -2001,7 +2010,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.permissoesGranulares',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.PermissoesGranulares.Visualizar,
+          permissao: Permissoes.PermissoesGranulares.Configurar,
         },
       },
       {
@@ -2010,7 +2019,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/usuarios/UsuariosListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.usuarios',
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2020,7 +2029,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioNovo',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2030,7 +2039,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioEditar',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2040,7 +2049,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioVisualizar',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {

@@ -186,6 +186,7 @@ const vendedorOpcoes = computed(() =>
       (u) =>
         u.status === UsuarioStatus.Ativo &&
         (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Consultor ||
           u.perfil === PerfilUsuario.Gerente ||
           u.perfil === PerfilUsuario.Diretor ||
           u.id === formulario.value.vendedorUsuarioId),

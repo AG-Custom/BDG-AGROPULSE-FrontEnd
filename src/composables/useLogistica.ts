@@ -43,6 +43,7 @@ import type {
   VeiculoLogisticaDto,
   VeiculoLogisticaFormModel,
 } from 'types/dtos/logistica.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 function numOuNulo(valor: string): number | null {
@@ -79,8 +80,8 @@ function cargaPayload(form: CargaLogisticaFormModel): CriarCargaLogisticaPayload
     veiculoId: form.veiculoId.trim() || null,
     distanciaKm: numOuNulo(form.distanciaKm),
     pesoKg: numOuNulo(form.pesoKg),
-    pedagio: numOuNulo(form.pedagio),
-    custoMotorista: numOuNulo(form.custoMotorista),
+    pedagio: parseMascaraMoeda(form.pedagio),
+    custoMotorista: parseMascaraMoeda(form.custoMotorista),
     paradas: form.paradas.map((p, i) => ({
       ordem: Number(p.ordem) || i + 1,
       clienteNome: p.clienteNome.trim(),
@@ -107,8 +108,8 @@ function transportadoraPayload(
 function fretePayload(form: FreteTransportadoraFormModel): FreteTransportadoraPayload {
   return {
     regiao: form.regiao.trim(),
-    valorPorKg: Number(form.valorPorKg),
-    valorMinimo: Number(form.valorMinimo),
+    valorPorKg: parseMascaraMoeda(form.valorPorKg) ?? 0,
+    valorMinimo: parseMascaraMoeda(form.valorMinimo) ?? 0,
     prazoDias: Number(form.prazoDias),
   };
 }
@@ -121,7 +122,7 @@ function abastecimentoPayload(
     data: form.data,
     kmHodometro: Number(form.kmHodometro),
     litros: Number(form.litros),
-    precoLitro: Number(form.precoLitro),
+    precoLitro: parseMascaraMoeda(form.precoLitro) ?? 0,
     combustivel: form.combustivel as TipoCombustivelLogisticaValor,
     posto: form.posto.trim() || null,
     motoristaNome: form.motoristaNome.trim() || null,
@@ -136,7 +137,7 @@ function docPayload(form: DocTransporteLogisticaFormModel): CriarDocTransporteLo
     tomador: form.tomador.trim(),
     ufIni: form.ufIni.trim().toUpperCase(),
     ufFim: form.ufFim.trim().toUpperCase(),
-    valor: Number(form.valor),
+    valor: parseMascaraMoeda(form.valor) ?? 0,
     dataEmissao: form.dataEmissao,
     chave: form.chave.trim() || null,
     pesoKg: numOuNulo(form.pesoKg),
@@ -206,8 +207,8 @@ export function cargaDtoParaForm(dto: CargaLogisticaDto): CargaLogisticaFormMode
     veiculoId: dto.veiculoId ?? '',
     distanciaKm: dto.distanciaKm != null ? String(dto.distanciaKm) : '',
     pesoKg: dto.pesoKg != null ? String(dto.pesoKg) : '',
-    pedagio: dto.pedagio != null ? String(dto.pedagio) : '',
-    custoMotorista: dto.custoMotorista != null ? String(dto.custoMotorista) : '',
+    pedagio: formatarMoedaParaInput(dto.pedagio),
+    custoMotorista: formatarMoedaParaInput(dto.custoMotorista),
     paradas: (dto.paradas ?? []).map((p) => ({
       chave: p.id,
       ordem: String(p.ordem),

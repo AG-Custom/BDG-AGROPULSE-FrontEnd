@@ -126,12 +126,9 @@
               class="field-required q-mb-md"
               :rules="[obrigatorio]"
             />
-            <q-input
+            <AgroMoneyInput
               v-model="formulario.precoLitro"
-              outlined
               label="Preço/litro"
-              type="number"
-              step="0.01"
               class="field-required q-mb-md"
               :rules="[obrigatorio]"
             />
@@ -167,6 +164,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { abastecimentoVazio, useLogistica } from 'composables/useLogistica';

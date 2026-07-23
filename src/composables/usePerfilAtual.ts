@@ -9,9 +9,17 @@ export function usePerfilAtual() {
 
   const ehVendedor = computed(() => perfil.value === PerfilUsuario.Vendedor);
 
+  const ehConsultor = computed(() => perfil.value === PerfilUsuario.Consultor);
+
+  const carteiraRestrita = computed(
+    () => ehVendedor.value || ehConsultor.value,
+  );
+
   return {
     usuario,
     perfil,
     ehVendedor,
+    ehConsultor,
+    carteiraRestrita,
   };
 }

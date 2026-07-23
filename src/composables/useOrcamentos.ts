@@ -9,15 +9,12 @@ import type {
   OrcamentoFormModel,
   OrcamentoResumoDto,
 } from 'types/dtos/orcamento.dto';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 function parsePrecoOpcional(valor: string): number | null {
-  const texto = valor.trim();
-  if (!texto) {
-    return null;
-  }
-  const numero = Number(texto.replace(',', '.'));
-  return Number.isFinite(numero) && numero > 0 ? numero : null;
+  const numero = parseMascaraMoeda(valor);
+  return numero !== null && numero > 0 ? numero : null;
 }
 
 function formParaPayload(form: OrcamentoFormModel): CriarOrcamentoPayload {

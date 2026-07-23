@@ -61,7 +61,7 @@
           />
 
           <q-select
-            v-if="!ehVendedor"
+            v-if="!carteiraRestrita"
             v-model="filtroVendedor"
             outlined
             dense
@@ -221,7 +221,7 @@ const {
   rotuloDocumento,
 } = useClientes();
 
-const { ehVendedor } = usePerfilAtual();
+const { carteiraRestrita } = usePerfilAtual();
 const {
   usuarios,
   carregando: carregandoUsuarios,
@@ -245,6 +245,7 @@ const vendedorOpcoes = computed(() =>
       (usuario) =>
         usuario.status === UsuarioStatus.Ativo &&
         (usuario.perfil === PerfilUsuario.Vendedor ||
+          usuario.perfil === PerfilUsuario.Consultor ||
           usuario.perfil === PerfilUsuario.Gerente ||
           usuario.perfil === PerfilUsuario.Diretor),
     )
@@ -286,7 +287,7 @@ function montarParams(): ListarClientesParams {
     params.busca = termo;
   }
 
-  if (!ehVendedor.value && filtroVendedor.value) {
+  if (!carteiraRestrita.value && filtroVendedor.value) {
     params.vendedorId = filtroVendedor.value;
   }
 
@@ -335,7 +336,7 @@ watch([busca, filtroAtivo, filtroVendedor], () => {
 });
 
 onMounted(() => {
-  if (!ehVendedor.value) {
+  if (!carteiraRestrita.value) {
     void carregarUsuarios();
   }
 

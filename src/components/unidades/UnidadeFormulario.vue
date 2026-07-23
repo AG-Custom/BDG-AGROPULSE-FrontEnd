@@ -144,13 +144,15 @@
             outlined
             label="CEP"
             class="field-required"
-            hint="8 dígitos"
+            hint="8 dígitos — preenchimento automático do endereço"
             aria-required="true"
             :mask="MASCARAS.CEP"
             :maxlength="TAMANHO_FORMATADO.CEP"
             inputmode="numeric"
+            :loading="buscandoCep"
             :readonly="bloqueado"
             :rules="bloqueado ? undefined : [obrigatorio, cepValidator]"
+            @blur="buscarSeCepValido"
           />
         </div>
         <div class="col-12 col-md-8">
@@ -226,6 +228,7 @@
 </template>
 
 <script setup lang="ts">
+import { useBuscaCep } from 'composables/useBuscaCep';
 import {
   TimeZoneOpcoes,
   TipoUnidadeOpcoes,
@@ -255,6 +258,7 @@ const props = withDefaults(
 const formulario = defineModel<UnidadeFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+const { buscandoCep, buscarSeCepValido } = useBuscaCep(formulario);
 
 const bloqueado = computed(() => props.somenteLeitura === true);
 

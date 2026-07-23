@@ -37,6 +37,7 @@ import type {
   RelatorioCustosManutencaoDto,
   TelemetriaLeituraFormModel,
 } from 'types/dtos/manutencao.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda, parseMascaraMoedaObrigatorio } from 'utils/formatters';
 import { ref } from 'vue';
 
 function numOuNulo(valor: string): number | null {
@@ -53,10 +54,10 @@ function ativoFormParaPayload(form: AtivoManutencaoFormModel): CriarAtivoManuten
     modelo: form.modelo.trim() || null,
     numeroSerie: form.numeroSerie.trim() || null,
     ano: numOuNulo(form.ano),
-    valorAquisicao: numOuNulo(form.valorAquisicao),
+    valorAquisicao: parseMascaraMoeda(form.valorAquisicao),
     dataAquisicao: form.dataAquisicao || null,
     vidaUtilAnos: numOuNulo(form.vidaUtilAnos),
-    valorResidual: numOuNulo(form.valorResidual),
+    valorResidual: parseMascaraMoeda(form.valorResidual),
     metodoDepreciacao: (form.metodoDepreciacao || MetodoDepreciacao.Linear) as MetodoDepreciacaoValor,
     horimetroAtual: numOuNulo(form.horimetroAtual),
     kmAtual: numOuNulo(form.kmAtual),
@@ -89,7 +90,7 @@ function osFormParaPayload(
     colaboradorId: form.colaboradorId.trim() || null,
     dataPrevisao: form.dataPrevisao || null,
     horasTrabalhadas: numOuNulo(form.horasTrabalhadas),
-    custoMaoObra: Number(form.custoMaoObra) || 0,
+    custoMaoObra: parseMascaraMoedaObrigatorio(form.custoMaoObra),
   };
 }
 
@@ -115,7 +116,7 @@ function pecaFormParaPayload(form: AdicionarPecaOsFormModel): AdicionarPecaOsPay
     produtoId: form.produtoId.trim() || null,
     descricao: form.descricao.trim(),
     quantidade: Number(form.quantidade),
-    valorUnitario: Number(form.valorUnitario),
+    valorUnitario: parseMascaraMoedaObrigatorio(form.valorUnitario),
     baixarAgora: form.baixarAgora,
   };
 }
@@ -128,10 +129,10 @@ export function ativoVazio(): AtivoManutencaoFormModel {
     modelo: '',
     numeroSerie: '',
     ano: '',
-    valorAquisicao: '',
+    valorAquisicao: formatarMoedaParaInput(0),
     dataAquisicao: '',
     vidaUtilAnos: '',
-    valorResidual: '',
+    valorResidual: formatarMoedaParaInput(0),
     metodoDepreciacao: MetodoDepreciacao.Linear,
     horimetroAtual: '',
     kmAtual: '',
@@ -148,10 +149,10 @@ export function ativoDtoParaForm(dto: AtivoManutencaoDto): AtivoManutencaoFormMo
     modelo: dto.modelo ?? '',
     numeroSerie: dto.numeroSerie ?? '',
     ano: dto.ano != null ? String(dto.ano) : '',
-    valorAquisicao: dto.valorAquisicao != null ? String(dto.valorAquisicao) : '',
+    valorAquisicao: formatarMoedaParaInput(dto.valorAquisicao),
     dataAquisicao: dto.dataAquisicao?.slice(0, 10) ?? '',
     vidaUtilAnos: dto.vidaUtilAnos != null ? String(dto.vidaUtilAnos) : '',
-    valorResidual: dto.valorResidual != null ? String(dto.valorResidual) : '',
+    valorResidual: formatarMoedaParaInput(dto.valorResidual),
     metodoDepreciacao: dto.metodoDepreciacao ?? MetodoDepreciacao.Linear,
     horimetroAtual: dto.horimetroAtual != null ? String(dto.horimetroAtual) : '',
     kmAtual: dto.kmAtual != null ? String(dto.kmAtual) : '',
@@ -191,7 +192,7 @@ export function osVazia(): OrdemServicoManutencaoFormModel {
     colaboradorId: '',
     dataPrevisao: '',
     horasTrabalhadas: '',
-    custoMaoObra: '0',
+    custoMaoObra: formatarMoedaParaInput(0),
   };
 }
 

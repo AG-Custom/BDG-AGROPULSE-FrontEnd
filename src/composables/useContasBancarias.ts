@@ -8,6 +8,7 @@ import type {
   EscopoListagemParams,
 } from 'types/dtos/financeiro-gestao.dto';
 import type { TipoContaBancariaValor } from 'constants/enums';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { computed, ref } from 'vue';
 
 function formParaCriar(form: ContaBancariaFormModel) {
@@ -18,7 +19,7 @@ function formParaCriar(form: ContaBancariaFormModel) {
     agencia: form.agencia.trim(),
     numero: form.numero.trim(),
     tipo: form.tipo as TipoContaBancariaValor,
-    saldoMinimo: form.saldoMinimo ? Number(form.saldoMinimo.replace(',', '.')) : null,
+    saldoMinimo: parseMascaraMoeda(form.saldoMinimo),
     descricao: form.descricao.trim() || null,
   };
 }

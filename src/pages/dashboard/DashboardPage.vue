@@ -155,17 +155,25 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import MetricTile from 'components/ui/MetricTile.vue';
+import { useAuth } from 'composables/useAuth';
 import { useDashboard } from 'composables/useDashboard';
 import { useVerCustos } from 'composables/useVerCustos';
 import type { QTableColumn } from 'quasar';
+import { filtrarAlertasGerenciaisPorPolitica } from 'utils/alerta-politica';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
+const { usuario } = useAuth();
 const { kpis, ranking, alertas, carregando, carregar } = useDashboard();
 const { verCustos } = useVerCustos();
 const dias = ref('30');
 
-const alertasResumo = computed(() => alertas.value.slice(0, 5));
+const alertasResumo = computed(() =>
+  filtrarAlertasGerenciaisPorPolitica(
+    alertas.value,
+    usuario.value?.perfil ?? null,
+  ).slice(0, 5),
+);
 
 const rankingComPosicao = computed(() =>
   ranking.value.map((item, index) => ({ ...item, posicao: index + 1 })),
