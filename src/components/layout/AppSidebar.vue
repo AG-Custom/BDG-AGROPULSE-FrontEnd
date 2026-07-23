@@ -1,8 +1,6 @@
 <template>
   <nav class="app-sidebar">
-    <div class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Principal</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section label="Principal" :rotas-ativas="['/']" default-opened>
         <q-item
           clickable
           :to="{ name: 'dashboard' }"
@@ -15,12 +13,9 @@
           </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Cadastros</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section label="Cadastros" :rotas-ativas="['/unidades', '/fornecedores', '/clientes']">
         <q-item
           clickable
           :to="{ name: 'unidades' }"
@@ -55,12 +50,9 @@
           </q-item-section>
           <q-item-section>Clientes</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeAcessarProdutos" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Produtos</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeAcessarProdutos" label="Produtos" :rotas-ativas="['/produtos', '/categorias-produto', '/unidades-medida', '/tabelas-preco']">
         <q-item
           v-if="podeGerenciarProdutos"
           clickable
@@ -109,12 +101,9 @@
           </q-item-section>
           <q-item-section>Tabelas de preço</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarEstoque" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Estoque</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarEstoque" label="Estoque" :rotas-ativas="['/estoque']">
         <q-item
           clickable
           :to="{ name: 'estoque-saldos' }"
@@ -192,12 +181,9 @@
           </q-item-section>
           <q-item-section>Alertas</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeAcessarVendas" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Vendas</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeAcessarVendas" label="Vendas" :rotas-ativas="['/pedidos-venda', '/orcamentos', '/pdv', '/metas-vendedor', '/representantes', '/regras-comissao', '/aprovacoes']">
         <q-item
           v-if="podeGerenciarPedidosVenda"
           clickable
@@ -282,12 +268,9 @@
           </q-item-section>
           <q-item-section>Aprovações</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeAcessarCompras" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Compras</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeAcessarCompras" label="Compras" :rotas-ativas="['/compras', '/devolucoes-venda', '/expedicao']">
         <q-item
           v-if="podeGerenciarCompras"
           clickable
@@ -408,12 +391,9 @@
           </q-item-section>
           <q-item-section>Expedição</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeAcessarOperacoes" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Operações</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeAcessarOperacoes" label="Operações" :rotas-ativas="['/contratos', '/producao']">
         <q-item
           v-if="podeGerenciarContratos"
           clickable
@@ -510,12 +490,9 @@
           </q-item-section>
           <q-item-section>OEE</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarManutencao" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Manutenção</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarManutencao" label="Manutenção" :rotas-ativas="['/manutencao']">
         <q-item
           clickable
           :to="{ name: 'manutencao-dashboard' }"
@@ -582,12 +559,9 @@
           </q-item-section>
           <q-item-section>Custos</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarLogistica" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Logística</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarLogistica" label="Logística" :rotas-ativas="['/logistica']">
         <q-item
           clickable
           :to="{ name: 'logistica-dashboard' }"
@@ -676,12 +650,9 @@
           </q-item-section>
           <q-item-section>Custos</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarCrm" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">CRM Agrícola</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarCrm" label="CRM Agrícola" :rotas-ativas="['/crm']">
         <q-item
           clickable
           :to="{ name: 'crm-dashboard' }"
@@ -748,12 +719,9 @@
           </q-item-section>
           <q-item-section>Crédito</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarCobrancaCredito" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Cobrança e Crédito</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarCobrancaCredito" label="Cobrança e Crédito" :rotas-ativas="['/cobranca-credito', '/financeiro/contas-receber', '/financeiro/regua-cobranca', '/financeiro/renegociacoes', '/crm/credito']">
         <q-item
           clickable
           :to="{ name: 'cobranca-credito' }"
@@ -817,12 +785,9 @@
           </q-item-section>
           <q-item-section>CRM Crédito</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarRastreabilidade" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Safras</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarRastreabilidade" label="Safras" :rotas-ativas="['/safras', '/rastreabilidade']">
         <q-item
           clickable
           :to="{ name: 'safras-fazendas' }"
@@ -983,12 +948,9 @@
           </q-item-section>
           <q-item-section>OEE campo</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarFiscal" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Fiscal</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarFiscal" label="Fiscal" :rotas-ativas="['/fiscal']">
         <q-item
           clickable
           :to="{ name: 'fiscal-notas-fiscais' }"
@@ -1099,15 +1061,9 @@
           </q-item-section>
           <q-item-section>Configuração fiscal</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div
-      v-if="podeGerenciarFinanceiro || podeGerenciarFormasPagamentoConfig"
-      class="app-sidebar__section"
-    >
-      <div class="text-overline app-sidebar__label">Financeiro</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarFinanceiro || podeGerenciarFormasPagamentoConfig" label="Financeiro" :rotas-ativas="['/financeiro', '/formas-pagamento-config']">
         <q-item
           v-if="podeGerenciarFinanceiro"
           clickable
@@ -1324,12 +1280,9 @@
           </q-item-section>
           <q-item-section>Cotações / multi-moeda</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeGerenciarRelatorios" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Relatórios</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeGerenciarRelatorios" label="Relatórios" :rotas-ativas="['/relatorios']">
         <q-item
           clickable
           :to="{ name: 'relatorios' }"
@@ -1341,12 +1294,9 @@
           </q-item-section>
           <q-item-section>Relatórios</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
 
-    <div v-if="podeAcessarAdministracao" class="app-sidebar__section">
-      <div class="text-overline app-sidebar__label">Administração</div>
-      <q-list padding class="app-sidebar__list">
+    <app-sidebar-section v-if="podeAcessarAdministracao" label="Administração" :rotas-ativas="['/usuarios', '/colaboradores']">
         <q-item
           v-if="podeGerenciarUsuarios"
           clickable
@@ -1371,12 +1321,12 @@
           </q-item-section>
           <q-item-section>Colaboradores</q-item-section>
         </q-item>
-      </q-list>
-    </div>
+    </app-sidebar-section>
   </nav>
 </template>
 
 <script setup lang="ts">
+import AppSidebarSection from 'components/layout/AppSidebarSection.vue';
 import { useAuth } from 'composables/useAuth';
 import { useComprasConfig } from 'composables/useComprasConfig';
 import { usePerfilSafras } from 'composables/usePerfilSafras';
@@ -1450,7 +1400,7 @@ const podeGerenciarContratos = computed(() =>
   possuiPermissao(Permissoes.Contratos.Visualizar),
 );
 const podeGerenciarProducao = computed(() =>
-  possuiPermissao(Permissoes.Producao.Visualizar),
+  possuiPermissao(Permissoes.Producao.Visualizar) && isIndustria.value,
 );
 const podeGerenciarManutencao = computed(() =>
   possuiPermissao(Permissoes.Manutencao.Visualizar),
@@ -1512,28 +1462,13 @@ onMounted(() => {
   if (podeGerenciarCompras.value) {
     void carregarComprasConfig();
   }
-  if (podeGerenciarRastreabilidade.value) {
-    void carregarPerfil();
-  }
+  void carregarPerfil();
 });
 </script>
 
 <style scoped>
 .app-sidebar {
   padding: var(--spacing-2) 0;
-}
-
-.app-sidebar__section + .app-sidebar__section {
-  margin-top: var(--spacing-4);
-}
-
-.app-sidebar__label {
-  color: var(--color-sidebar-text-muted);
-  padding: var(--spacing-2) var(--spacing-4);
-}
-
-.app-sidebar__list {
-  padding: 0 var(--spacing-2);
 }
 
 .app-sidebar__item {

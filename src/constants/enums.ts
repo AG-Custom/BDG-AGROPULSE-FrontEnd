@@ -1190,6 +1190,19 @@ export const OrigemGenealogiaLote = {
 export type OrigemGenealogiaLoteValor =
   (typeof OrigemGenealogiaLote)[keyof typeof OrigemGenealogiaLote];
 
+export const TipoOperacaoEmpresa = {
+  Revenda: 'Revenda',
+  Industria: 'Industria',
+} as const;
+
+export type TipoOperacaoEmpresaValor =
+  (typeof TipoOperacaoEmpresa)[keyof typeof TipoOperacaoEmpresa];
+
+export const TipoOperacaoEmpresaOpcoes = [
+  { label: 'Revenda', value: TipoOperacaoEmpresa.Revenda },
+  { label: 'Indústria', value: TipoOperacaoEmpresa.Industria },
+];
+
 export const TipoOperacaoSafras = {
   Revenda: 'Revenda',
   Industria: 'Industria',

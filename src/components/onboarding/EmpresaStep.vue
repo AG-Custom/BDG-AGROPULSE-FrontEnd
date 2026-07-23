@@ -32,11 +32,25 @@
       inputmode="numeric"
       :rules="[obrigatorio, cnpj]"
     />
+
+    <q-select
+      v-model="empresa.tipoOperacao"
+      outlined
+      label="Tipo de operação"
+      class="field-required"
+      emit-value
+      map-options
+      aria-required="true"
+      :options="TipoOperacaoEmpresaOpcoes"
+      :rules="[obrigatorio]"
+      hint="Indústria libera o módulo de produção"
+    />
   </q-form>
 </template>
 
 <script setup lang="ts">
 import { MASCARAS, TAMANHO_FORMATADO } from 'constants/masks';
+import { TipoOperacaoEmpresaOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { EmpresaFormModel } from 'types/dtos/onboarding.dto';
 import { cnpj, obrigatorio } from 'utils/validators';

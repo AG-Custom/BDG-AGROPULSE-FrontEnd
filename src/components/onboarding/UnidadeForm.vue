@@ -72,12 +72,14 @@
           outlined
           label="CEP"
           class="field-required"
-          hint="8 dígitos"
+          hint="8 dígitos — preenchimento automático do endereço"
           aria-required="true"
           :mask="MASCARAS.CEP"
           :maxlength="TAMANHO_FORMATADO.CEP"
           inputmode="numeric"
+          :loading="buscandoCep"
           :rules="[obrigatorio, cepValidator]"
+          @blur="buscarSeCepValido"
         />
       </div>
       <div class="col-12 col-md-8">
@@ -142,6 +144,7 @@
 </template>
 
 <script setup lang="ts">
+import { useBuscaCep } from 'composables/useBuscaCep';
 import { TipoUnidadeOpcoes } from 'constants/enums';
 import { MASCARAS, TAMANHO_FORMATADO, mascaraTelefone, tamanhoFormatadoTelefone } from 'constants/masks';
 import type { QForm } from 'quasar';
@@ -157,6 +160,7 @@ const emit = defineEmits<{
 }>();
 
 const formRef = ref<QForm | null>(null);
+const { buscandoCep, buscarSeCepValido } = useBuscaCep(unidade);
 
 const cepValidator = cep;
 const ufValidator = uf;

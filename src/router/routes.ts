@@ -1169,6 +1169,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.ordensProducao',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1179,6 +1180,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoNova',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1189,6 +1191,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoEditar',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1199,6 +1202,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoDetalhe',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1208,6 +1212,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.beneficiamentos',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1218,6 +1223,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.beneficiamentoNovo',
           breadcrumbPais: ['navegacao.beneficiamentos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1228,6 +1234,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.beneficiamentoEditar',
           breadcrumbPais: ['navegacao.beneficiamentos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1237,6 +1244,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.receitasProducao',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1247,6 +1255,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.receitaProducaoNova',
           breadcrumbPais: ['navegacao.receitasProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1257,6 +1266,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.receitaProducaoEditar',
           breadcrumbPais: ['navegacao.receitasProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1266,6 +1276,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.laudos',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1276,6 +1287,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.laudoNovo',
           breadcrumbPais: ['navegacao.laudos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1286,6 +1298,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.laudoDetalhe',
           breadcrumbPais: ['navegacao.laudos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1295,6 +1308,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.fichasTecnicas',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1305,6 +1319,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.fichaTecnicaNova',
           breadcrumbPais: ['navegacao.fichasTecnicas'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1315,6 +1330,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.fichaTecnicaEditar',
           breadcrumbPais: ['navegacao.fichasTecnicas'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1324,6 +1340,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.paradasLinha',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1333,6 +1350,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.oee',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {

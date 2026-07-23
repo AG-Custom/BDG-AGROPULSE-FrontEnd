@@ -6,11 +6,21 @@ import { type Ref, ref, watch } from 'vue';
 
 export interface EnderecoViaCepForm {
   cep: string;
-  logradouro: string;
   bairro: string;
   cidade: string;
   estado: string;
-  complemento?: string;
+  complemento?: string | null;
+  logradouro?: string;
+  endereco?: string;
+}
+
+function aplicarLogradouro(formulario: EnderecoViaCepForm, logradouro: string): void {
+  if ('endereco' in formulario && !('logradouro' in formulario)) {
+    formulario.endereco = logradouro;
+    return;
+  }
+
+  formulario.logradouro = logradouro;
 }
 
 export function useBuscaCep(formulario: Ref<EnderecoViaCepForm>) {
@@ -35,7 +45,7 @@ export function useBuscaCep(formulario: Ref<EnderecoViaCepForm>) {
       }
 
       if (resultado.logradouro) {
-        formulario.value.logradouro = resultado.logradouro;
+        aplicarLogradouro(formulario.value, resultado.logradouro);
       }
 
       if (resultado.bairro) {
