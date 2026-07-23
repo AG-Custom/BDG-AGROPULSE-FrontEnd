@@ -1,5 +1,5 @@
 <template>
-  <q-btn v-bind="attrs" :aria-label="ariaLabel">
+  <q-btn v-bind="attrsSemLabel" :label="textoLabel" :aria-label="ariaLabel">
     <slot />
     <q-tooltip v-if="textoDescricao">{{ textoDescricao }}</q-tooltip>
   </q-btn>
@@ -16,13 +16,22 @@ const props = defineProps<{
 
 const attrs = useAttrs();
 
+const textoLabel = computed(() => {
+  const label = attrs.label;
+  return typeof label === 'string' ? label : undefined;
+});
+
+const attrsSemLabel = computed(() => {
+  const { label: _label, ...rest } = attrs as Record<string, unknown>;
+  return rest;
+});
+
 const textoDescricao = computed(() => {
   if (props.descricao) {
     return props.descricao;
   }
 
-  const label = attrs.label;
-  return typeof label === 'string' && label.length > 0 ? label : undefined;
+  return textoLabel.value && textoLabel.value.length > 0 ? textoLabel.value : undefined;
 });
 
 const ariaLabel = computed(() => {
