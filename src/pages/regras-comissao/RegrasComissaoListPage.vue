@@ -80,23 +80,12 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar regra"
-                @click="irParaEditar(props.row.id)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Excluir regra"
-                @click="confirmarExclusao(props.row.id)"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                mostrar-excluir
+                @editar="irParaEditar(props.row.id)"
+                @excluir="confirmarExclusao(props.row.id)"
               />
             </q-td>
           </template>
@@ -107,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

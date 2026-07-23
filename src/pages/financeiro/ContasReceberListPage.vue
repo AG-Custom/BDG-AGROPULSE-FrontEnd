@@ -75,41 +75,47 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
+              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+                <q-item
                   v-if="podeBaixar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="check_circle"
-                  color="positive"
-                  descricao="Baixar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="abrirBaixa(props.row)"
-                />
-                <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
+                  <q-item-section>Baixar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                   v-if="podeBaixar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="receipt_long"
-                  color="primary"
-                  descricao="Emitir boleto"
-                  :loading="emitindo"
+                  class="agro-acoes-menu__item"
+                  :disable="emitindo"
                   @click="onEmitirBoleto(props.row)"
-                />
-                <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="receipt_long" size="16px" /></span></q-item-section>
+                  <q-item-section>Emitir boleto</q-item-section>
+                  <q-item-section v-if="emitindo" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                   v-if="podeCancelar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="cancel"
-                  color="negative"
-                  descricao="Cancelar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="onCancelar(props.row)"
-                />
-              </div>
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -129,6 +135,7 @@
 <script setup lang="ts">
 import BaixaContaReceberDialog from 'components/financeiro/BaixaContaReceberDialog.vue';
 import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -247,12 +254,3 @@ onMounted(() => {
   void carregar(paramsFiltro());
 });
 </script>
-
-<style scoped>
-.acoes {
-  display: flex;
-  gap: var(--spacing-1);
-  justify-content: flex-end;
-  white-space: nowrap;
-}
-</style>

@@ -60,37 +60,33 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'safra-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="podeEncerrar(props.row.status)"
-                flat
-                round
-                dense
-                icon="flag"
-                color="positive"
-                descricao="Encerrar"
-                :loading="salvando"
-                @click="encerrar(props.row.id)"
-              />
-              <agro-btn
-                v-if="podeCancelar(props.row.status)"
-                flat
-                round
-                dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
-                @click="cancelar(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :editar-to="{ name: 'safra-editar', params: { id: props.row.id } }"
+              >
+                <q-item
+                  v-if="podeEncerrar(props.row.status)"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="encerrar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="flag" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Encerrar</q-item-section>
+                </q-item>
+                <q-item
+                  v-if="podeCancelar(props.row.status)"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="cancelar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="cancel" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -100,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

@@ -160,24 +160,11 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="pedidos-venda-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver pedido"
-                :to="{ name: 'pedido-venda-detalhe', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status === PedidoVendaStatus.Orcamento"
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar pedido"
-                :to="{ name: 'pedido-venda-editar', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-editar="props.row.status === PedidoVendaStatus.Orcamento"
+                :mostrar-status="false"
+                :visualizar-to="{ name: 'pedido-venda-detalhe', params: { id: props.row.id } }"
+                :editar-to="{ name: 'pedido-venda-editar', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
@@ -188,6 +175,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

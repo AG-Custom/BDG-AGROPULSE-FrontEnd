@@ -119,34 +119,13 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="fornecedores-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar fornecedor"
-                :to="{ name: 'fornecedor-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar fornecedor"
-                :to="{ name: 'fornecedor-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar fornecedor"
-                :loading="inativando"
-                @click="inativarFornecedor(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :visualizar-to="{ name: 'fornecedor-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'fornecedor-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarFornecedor(props.row)"
+                @ativar="ativarFornecedor(props.row)"
               />
             </q-td>
           </template>
@@ -157,6 +136,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -175,9 +155,11 @@ const {
   fornecedores,
   carregando,
   inativando,
+  ativando,
   exportando,
   carregar,
   solicitarInativacao,
+  solicitarAtivacao,
   exportar,
   rotuloDocumento,
 } = useFornecedores();
@@ -235,6 +217,14 @@ async function recarregar(): Promise<void> {
 
 async function inativarFornecedor(fornecedor: FornecedorResumoDto): Promise<void> {
   const sucesso = await solicitarInativacao(fornecedor);
+
+  if (sucesso) {
+    await recarregar();
+  }
+}
+
+async function ativarFornecedor(fornecedor: FornecedorResumoDto): Promise<void> {
+  const sucesso = await solicitarAtivacao(fornecedor);
 
   if (sucesso) {
     await recarregar();

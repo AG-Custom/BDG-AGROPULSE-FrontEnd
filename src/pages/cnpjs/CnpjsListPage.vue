@@ -46,14 +46,10 @@
               </div>
               <div class="empresa-cnpjs__principal-acoes">
                 <agro-badge label="Principal" variant="accent" />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Editar CNPJ principal"
-                  :to="{ name: 'cnpj-editar', params: { id: cnpjPrincipal.id } }"
+                <agro-acoes-menu
+                  :mostrar-visualizar="false"
+                  :mostrar-status="false"
+                  :editar-to="{ name: 'cnpj-editar', params: { id: cnpjPrincipal.id } }"
                 />
               </div>
             </div>
@@ -117,24 +113,13 @@
 
             <template #body-cell-acoes="props">
               <q-td :props="props" class="empresa-cnpjs__acoes">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Editar CNPJ"
-                  :to="{ name: 'cnpj-editar', params: { id: props.row.id } }"
-                />
-                <agro-btn
-                  v-if="props.row.ativo"
-                  flat
-                  round
-                  dense
-                  icon="block"
-                  color="negative"
-                  descricao="Inativar CNPJ"
-                  @click="solicitarInativacao(props.row)"
+                <agro-acoes-menu
+                  :ativo="props.row.ativo"
+                  :editar-to="{ name: 'cnpj-editar', params: { id: props.row.id } }"
+                  :mostrar-visualizar="false"
+                  :loading-status="ativando"
+                  @desabilitar="solicitarInativacao(props.row)"
+                  @ativar="solicitarAtivacao(props.row)"
                 />
               </q-td>
             </template>
@@ -146,6 +131,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -156,7 +142,7 @@ import { formatarCnpj } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted } from 'vue';
 
-const { cnpjs, carregando, carregar, solicitarInativacao } = useCnpjs();
+const { cnpjs, carregando, ativando, carregar, solicitarInativacao, solicitarAtivacao } = useCnpjs();
 
 const cnpjPrincipal = computed(
   () => cnpjs.value.find((cnpj) => cnpj.principal) ?? cnpjs.value[0] ?? null,

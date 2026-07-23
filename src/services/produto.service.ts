@@ -47,8 +47,8 @@ export const produtoService = {
     return api.put<ProdutoDto>(`/produtos/${produtoId}`, payload).then((r) => r.data);
   },
 
-  inativar(produtoId: string): Promise<void> {
-    return api.patch(`/produtos/${produtoId}/inativar`);
+  inativar(produtoId: string, justificativa: string): Promise<void> {
+    return api.patch(`/produtos/${produtoId}/inativar`, { justificativa });
   },
 
   ativar(produtoId: string): Promise<void> {

@@ -72,28 +72,16 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="formas-pagamento-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar configuração"
-                :to="{
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{
                   name: 'forma-pagamento-config-editar',
                   params: { id: props.row.id },
                 }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar configuração"
-                :loading="salvando"
-                @click="solicitarInativacao(props.row)"
+                :mostrar-visualizar="false"
+                :loading-status="salvando"
+                @desabilitar="solicitarInativacao(props.row)"
+                @ativar="solicitarAtivacao(props.row)"
               />
             </q-td>
           </template>
@@ -104,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -114,7 +103,7 @@ import type { QTableColumn } from 'quasar';
 import type { ConfigFormaPagamentoDto } from 'types/dtos/financeiro.dto';
 import { onMounted } from 'vue';
 
-const { configs, carregando, salvando, carregar, solicitarInativacao } =
+const { configs, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
   useFormasPagamentoConfig();
 
 const colunas: QTableColumn<ConfigFormaPagamentoDto>[] = [

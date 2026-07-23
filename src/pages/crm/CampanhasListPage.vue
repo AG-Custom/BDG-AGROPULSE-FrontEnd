@@ -52,33 +52,15 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver campanha"
-                :to="{ name: 'crm-campanha-detalhe', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="removerCampanha(props.row.id)"
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :visualizar-to="{ name: 'crm-campanha-detalhe', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @editar="abrirDialog(props.row)"
+                @excluir="removerCampanha(props.row.id)"
               />
             </q-td>
           </template>
@@ -156,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

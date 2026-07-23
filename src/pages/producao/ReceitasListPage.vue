@@ -51,38 +51,18 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Editar"
-                  :to="{ name: 'receita-producao-editar', params: { id: props.row.id } }"
-                />
-                <agro-btn
-                  v-if="!props.row.ativa"
-                  flat
-                  round
-                  dense
-                  icon="check_circle"
-                  color="positive"
-                  descricao="Ativar"
-                  :loading="salvando"
-                  @click="ativar(props.row.id)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover"
-                  :loading="salvando"
-                  @click="onRemover(props.row.id)"
-                />
-              </div>
+              <agro-acoes-menu
+                :ativo="props.row.ativa"
+                :mostrar-visualizar="false"
+                :mostrar-status="!props.row.ativa"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'receita-producao-editar', params: { id: props.row.id } }"
+                :loading-status="salvando"
+                :loading-excluir="salvando"
+                @ativar="ativar(props.row.id)"
+                @excluir="onRemover(props.row.id)"
+              />
             </q-td>
           </template>
         </q-table>
@@ -92,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

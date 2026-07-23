@@ -84,15 +84,14 @@
             </template>
             <template #body-cell-acoes="props">
               <q-td :props="props">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover frete"
-                  :loading="salvando"
-                  @click="removerFrete(id, props.row.id)"
+                <agro-acoes-menu
+                  :mostrar-visualizar="false"
+                  :mostrar-editar="false"
+                  :mostrar-status="false"
+                  mostrar-excluir
+                  :loading-excluir="salvando"
+                  excluir-label="Remover frete"
+                  @excluir="removerFrete(id, props.row.id)"
                 />
               </q-td>
             </template>
@@ -105,6 +104,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { freteVazio, useLogistica } from 'composables/useLogistica';

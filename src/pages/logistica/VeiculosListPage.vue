@@ -74,14 +74,10 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar veículo"
-                :to="{ name: 'logistica-veiculo-editar', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :editar-to="{ name: 'logistica-veiculo-editar', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
@@ -93,6 +89,7 @@
 
 <script setup lang="ts">
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

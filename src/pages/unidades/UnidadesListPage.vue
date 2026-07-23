@@ -87,45 +87,13 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="unidades-table__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar unidade"
-                :to="{ name: 'unidade-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar unidade"
-                :to="{ name: 'unidade-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status === UnidadeStatus.Ativa"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar unidade"
-                :loading="inativando"
-                @click="inativarUnidade(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.status === UnidadeStatus.Inativa"
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar unidade"
-                :loading="ativando"
-                @click="ativarUnidade(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.status === UnidadeStatus.Ativa"
+                :visualizar-to="{ name: 'unidade-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'unidade-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarUnidade(props.row)"
+                @ativar="ativarUnidade(props.row)"
               />
             </q-td>
           </template>
@@ -136,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

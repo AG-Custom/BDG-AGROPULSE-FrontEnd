@@ -89,45 +89,13 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="categorias-produto-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar categoria"
-                :to="{ name: 'categoria-produto-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar categoria"
-                :to="{ name: 'categoria-produto-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar categoria"
-                :loading="inativando"
-                @click="inativarCategoria(props.row)"
-              />
-              <agro-btn
-                v-else
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar categoria"
-                :loading="ativando"
-                @click="ativarCategoria(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :visualizar-to="{ name: 'categoria-produto-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'categoria-produto-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarCategoria(props.row)"
+                @ativar="ativarCategoria(props.row)"
               />
             </q-td>
           </template>
@@ -138,6 +106,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

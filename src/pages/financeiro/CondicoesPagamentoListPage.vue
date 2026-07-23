@@ -51,25 +51,13 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar"
-                :loading="salvando"
-                @click="solicitarInativacao(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
+                :mostrar-visualizar="false"
+                :loading-status="salvando"
+                @desabilitar="solicitarInativacao(props.row)"
+                @ativar="solicitarAtivacao(props.row)"
               />
             </q-td>
           </template>
@@ -80,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -89,7 +78,7 @@ import type { QTableColumn } from 'quasar';
 import type { CondicaoPagamentoDto } from 'types/dtos/financeiro.dto';
 import { onMounted } from 'vue';
 
-const { condicoes, carregando, salvando, carregar, solicitarInativacao } =
+const { condicoes, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
   useCondicoesPagamento();
 
 const colunas: QTableColumn<CondicaoPagamentoDto>[] = [

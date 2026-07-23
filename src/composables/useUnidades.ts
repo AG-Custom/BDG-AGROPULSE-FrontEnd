@@ -1,13 +1,8 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
-import { UnidadeStatus } from 'constants/enums';
 import { messageService } from 'services/message.service';
 import { unidadeService } from 'services/unidade.service';
 import type { ListarUnidadesParams, UnidadeDto } from 'types/dtos/unidade.dto';
-import {
-  formParaEditarPayload,
-  unidadeDtoParaForm,
-} from 'utils/mappers/unidade.mapper';
 import { ref } from 'vue';
 
 export function useUnidades() {
@@ -32,11 +27,11 @@ export function useUnidades() {
     }
   }
 
-  async function inativar(unidadeId: string): Promise<boolean> {
+  async function inativar(unidadeId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await unidadeService.inativar(unidadeId);
+      await unidadeService.inativar(unidadeId, justificativa);
       sucesso('Unidade inativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -52,10 +47,7 @@ export function useUnidades() {
     ativando.value = true;
 
     try {
-      const unidade = await unidadeService.obter(unidadeId);
-      const formulario = unidadeDtoParaForm(unidade);
-      formulario.status = UnidadeStatus.Ativa;
-      await unidadeService.editar(unidadeId, formParaEditarPayload(formulario));
+      await unidadeService.ativar(unidadeId);
       sucesso('Unidade reativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -68,18 +60,18 @@ export function useUnidades() {
   }
 
   async function solicitarInativacao(unidade: UnidadeDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar unidade',
       mensagem: `Deseja inativar a unidade ${unidade.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(unidade.id);
+    return inativar(unidade.id, justificativa);
   }
 
   async function solicitarAtivacao(unidade: UnidadeDto): Promise<boolean> {

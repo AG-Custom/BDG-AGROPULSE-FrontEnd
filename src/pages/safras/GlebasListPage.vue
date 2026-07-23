@@ -63,25 +63,13 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar"
-                :loading="salvando"
-                @click="inativar(props.row.id, filtroFazendaId || undefined)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :mostrar-visualizar="false"
+                :mostrar-status="props.row.ativo"
+                :loading-status="salvando"
+                @editar="abrirDialog(props.row)"
+                @desabilitar="inativar(props.row.id, filtroFazendaId || undefined)"
               />
             </q-td>
           </template>
@@ -147,6 +135,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

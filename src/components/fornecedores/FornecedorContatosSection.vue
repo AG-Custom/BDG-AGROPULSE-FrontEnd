@@ -52,24 +52,15 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="props">
         <q-td :props="props" class="fornecedor-contatos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar contato"
-            @click="abrirDialogEditar(props.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover contato"
-            :loading="removendo"
-            @click="solicitarRemocao(props.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendo"
+            editar-label="Editar contato"
+            excluir-label="Remover contato"
+            @editar="abrirDialogEditar(props.row)"
+            @excluir="solicitarRemocao(props.row)"
           />
         </q-td>
       </template>
@@ -114,6 +105,7 @@
 
 <script setup lang="ts">
 import ContatoFornecedorFormulario from 'components/fornecedores/ContatoFornecedorFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

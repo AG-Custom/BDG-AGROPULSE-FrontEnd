@@ -87,15 +87,14 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="cell">
         <q-td :props="cell" class="produto-documentos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover documento"
-            :loading="removendo"
-            @click="solicitarRemocao(cell.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-editar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendo"
+            excluir-label="Remover documento"
+            @excluir="solicitarRemocao(cell.row)"
           />
         </q-td>
       </template>
@@ -105,6 +104,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { TipoDocumentoProduto, TipoDocumentoProdutoOpcoes } from 'constants/enums';
 import type { TipoDocumentoProdutoValor } from 'constants/enums';

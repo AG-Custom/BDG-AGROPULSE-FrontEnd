@@ -70,23 +70,20 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="play_arrow"
-                color="primary"
-                descricao="Registrar execução"
-                @click="abrirExecucao(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                descricao="Editar plano"
-                :to="{ name: 'manutencao-plano-editar', params: { id: props.row.id } }"
-              />
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :editar-to="{ name: 'manutencao-plano-editar', params: { id: props.row.id } }"
+              >
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirExecucao(props.row)">
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
+                      <q-icon name="play_arrow" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Registrar execução</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -134,6 +131,7 @@
 
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

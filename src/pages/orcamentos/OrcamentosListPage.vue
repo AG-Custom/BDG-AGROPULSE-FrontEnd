@@ -75,24 +75,11 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="orcamentos-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver orçamento"
-                :to="{ name: 'orcamento-detalhe', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status === OrcamentoStatus.Aberto"
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar orçamento"
-                :to="{ name: 'orcamento-editar', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-editar="props.row.status === OrcamentoStatus.Aberto"
+                :mostrar-status="false"
+                :visualizar-to="{ name: 'orcamento-detalhe', params: { id: props.row.id } }"
+                :editar-to="{ name: 'orcamento-editar', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
@@ -103,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

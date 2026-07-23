@@ -53,24 +53,13 @@
 
       <template #body-cell-acoes="props">
         <q-td :props="props" class="cliente-tabelas-preco__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="visibility"
-            color="primary"
-            descricao="Visualizar tabela de preço"
-            :to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
-          />
-          <agro-btn
-            v-if="!somenteLeitura && props.row.ativo"
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar tabela de preço"
-            :to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
+          <agro-acoes-menu
+            :mostrar-editar="!somenteLeitura && props.row.ativo"
+            :mostrar-status="false"
+            :visualizar-to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
+            :editar-to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
+            visualizar-label="Visualizar tabela de preço"
+            editar-label="Editar tabela de preço"
           />
         </q-td>
       </template>
@@ -117,6 +106,7 @@
 
 <script setup lang="ts">
 import TabelaPrecoFormulario from 'components/tabelas-preco/TabelaPrecoFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

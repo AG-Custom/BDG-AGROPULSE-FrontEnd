@@ -45,28 +45,18 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                v-if="props.row.status === StatusRenegociacao.Pendente"
-                flat
-                round
-                dense
-                icon="done"
-                color="positive"
-                descricao="Aprovar"
-                :loading="salvando"
-                @click="aprovar(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusRenegociacao.Pendente"
-                flat
-                round
-                dense
-                icon="close"
-                color="negative"
-                descricao="Rejeitar"
-                :loading="salvando"
-                @click="rejeitar(props.row)"
-              />
+              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+                <q-item v-if="props.row.status === StatusRenegociacao.Pendente" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="salvando" @click="aprovar(props.row)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="done" size="16px" /></span></q-item-section>
+                  <q-item-section>Aprovar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item v-if="props.row.status === StatusRenegociacao.Pendente" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="salvando" @click="rejeitar(props.row)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="close" size="16px" /></span></q-item-section>
+                  <q-item-section>Rejeitar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -136,6 +126,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

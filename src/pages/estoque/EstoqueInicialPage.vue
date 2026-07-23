@@ -24,8 +24,8 @@
 
           <template v-else>
             <p class="estoque-inicial__descricao">
-              Informe os itens que compõem o estoque inicial. Produtos que exigem lote ou
-              validade terão os campos correspondentes obrigatórios.
+              Informe ao menos um produto para o estoque inicial. Produtos que exigem lote
+              ou validade terão os campos correspondentes obrigatórios.
             </p>
 
             <div class="estoque-inicial__lista">
@@ -117,8 +117,16 @@ function removerItem(index: number): void {
 }
 
 async function lancarEstoque(): Promise<void> {
+  const formularios = formulariosRef.value
+    .slice(0, itens.value.length)
+    .filter((formulario): formulario is EntradaFormularioExposto => formulario != null);
+
+  if (formularios.length !== itens.value.length) {
+    return;
+  }
+
   const validacoes = await Promise.all(
-    formulariosRef.value.map(async (formulario) => (await formulario?.validar()) ?? false),
+    formularios.map(async (formulario) => formulario.validar()),
   );
 
   if (validacoes.some((valido) => !valido)) {

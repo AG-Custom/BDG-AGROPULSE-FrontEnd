@@ -90,38 +90,28 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn flat round dense icon="description" descricao="DANFE" @click="abrirDanfe(props.row.id)" />
-                <agro-btn flat round dense icon="code" descricao="XML" @click="baixarXml(props.row.id)" />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit_note"
-                  descricao="CC-e"
-                  :disable="props.row.status !== StatusNotaFiscal.Emitida"
-                  @click="abrirCce(props.row)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="add_circle"
-                  descricao="Complementar"
-                  :disable="props.row.status !== StatusNotaFiscal.Emitida"
-                  @click="abrirComplementar(props.row)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="cancel"
-                  color="negative"
-                  descricao="Cancelar"
-                  :disable="props.row.status !== StatusNotaFiscal.Emitida"
-                  @click="abrirCancelar(props.row)"
-                />
-              </div>
+              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirDanfe(props.row.id)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="description" size="16px" /></span></q-item-section>
+                  <q-item-section>DANFE</q-item-section>
+                </q-item>
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="baixarXml(props.row.id)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="code" size="16px" /></span></q-item-section>
+                  <q-item-section>XML</q-item-section>
+                </q-item>
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCce(props.row)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="edit_note" size="16px" /></span></q-item-section>
+                  <q-item-section>CC-e</q-item-section>
+                </q-item>
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirComplementar(props.row)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="add_circle" size="16px" /></span></q-item-section>
+                  <q-item-section>Complementar</q-item-section>
+                </q-item>
+                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCancelar(props.row)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -157,6 +147,7 @@ import CancelarNotaDialog from 'components/fiscal/CancelarNotaDialog.vue';
 import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
 import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
 import EmitirDocumentosDialog from 'components/fiscal/EmitirDocumentosDialog.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -297,11 +288,3 @@ onMounted(() => {
   void aplicarFiltro();
 });
 </script>
-
-<style scoped>
-.acoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-1);
-}
-</style>

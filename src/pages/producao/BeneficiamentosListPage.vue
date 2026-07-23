@@ -56,25 +56,15 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'beneficiamento-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status !== BeneficiamentoLoteStatus.Confirmado"
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="onRemover(props.row.id)"
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="props.row.status !== BeneficiamentoLoteStatus.Confirmado"
+                excluir-label="Remover"
+                :editar-to="{ name: 'beneficiamento-editar', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
               />
             </q-td>
           </template>
@@ -85,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

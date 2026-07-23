@@ -68,15 +68,13 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover abastecimento"
-                :loading="salvando"
-                @click="onRemover(props.row.id)"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
               />
             </q-td>
           </template>
@@ -166,6 +164,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

@@ -53,25 +53,13 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar talhão"
-                :to="{ name: 'talhao-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar talhão"
-                :loading="salvando"
-                @click="onInativar(props.row.id)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :mostrar-visualizar="false"
+                :mostrar-status="props.row.ativo"
+                :editar-to="{ name: 'talhao-editar', params: { id: props.row.id } }"
+                :loading-status="salvando"
+                @desabilitar="onInativar(props.row.id)"
               />
             </q-td>
           </template>
@@ -82,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

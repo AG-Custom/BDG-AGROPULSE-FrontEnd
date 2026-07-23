@@ -84,55 +84,32 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="usuarios-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar usuário"
-                :to="{ name: 'usuario-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar usuário"
-                :to="{ name: 'usuario-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="admin_panel_settings"
-                color="primary"
-                descricao="Permissões granulares"
-                :to="{ name: 'usuario-permissoes', params: { usuarioId: props.row.id } }"
-              />
-              <agro-btn
-                v-if="podeInativar(props.row.status)"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar usuário"
-                :loading="inativando"
-                @click="inativarUsuario(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.status === UsuarioStatus.Inativo"
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar usuário"
-                :loading="ativando"
-                @click="ativarUsuario(props.row)"
-              />
+              <agro-acoes-menu
+                :ativo="podeInativar(props.row.status)"
+                :visualizar-to="{ name: 'usuario-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'usuario-editar', params: { id: props.row.id } }"
+                :mostrar-status="
+                  podeInativar(props.row.status) || props.row.status === UsuarioStatus.Inativo
+                "
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarUsuario(props.row)"
+                @ativar="ativarUsuario(props.row)"
+              >
+                <q-item
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :to="{ name: 'usuario-permissoes', params: { usuarioId: props.row.id } }"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit">
+                      <q-icon name="admin_panel_settings" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Permissões granulares</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -142,6 +119,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

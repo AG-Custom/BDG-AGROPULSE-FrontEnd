@@ -45,14 +45,10 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver transportadora"
-                :to="{ name: 'logistica-transportadora-detalhe', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                :visualizar-to="{ name: 'logistica-transportadora-detalhe', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
@@ -103,6 +99,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

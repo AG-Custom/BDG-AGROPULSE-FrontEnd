@@ -96,57 +96,34 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="tabelas-preco-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar tabela de preço"
-                :to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar tabela de preço"
-                :to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo && !props.row.ehPadrao"
-                flat
-                round
-                dense
-                icon="star"
-                color="primary"
-                descricao="Definir como tabela padrão"
-                :loading="salvando"
-                @click="definirComoPadrao(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar tabela de preço"
-                :loading="inativando"
-                @click="inativarTabela(props.row)"
-              />
-              <agro-btn
-                v-else
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar tabela de preço"
-                :loading="ativando"
-                @click="ativarTabela(props.row)"
-              />
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :visualizar-to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarTabela(props.row)"
+                @ativar="ativarTabela(props.row)"
+              >
+                <q-item
+                  v-if="props.row.ativo && !props.row.ehPadrao"
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
+                  @click="definirComoPadrao(props.row)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit">
+                      <q-icon name="star" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Definir como padrão</q-item-section>
+                  <q-item-section v-if="salvando" side>
+                    <q-spinner size="16px" color="primary" />
+                  </q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -156,6 +133,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

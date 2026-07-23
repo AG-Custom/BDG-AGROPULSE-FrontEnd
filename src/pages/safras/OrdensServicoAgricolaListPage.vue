@@ -51,48 +51,25 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusOrdemServicoAgricola.Aberta"
-                flat
-                round
-                dense
-                icon="play_arrow"
-                color="positive"
-                descricao="Iniciar"
-                :loading="salvando"
-                @click="iniciar(props.row.id)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusOrdemServicoAgricola.EmAndamento"
-                flat
-                round
-                dense
-                icon="done_all"
-                color="positive"
-                descricao="Concluir"
-                :loading="salvando"
-                @click="concluir(props.row.id)"
-              />
-              <agro-btn
-                v-if="podeCancelar(props.row.status)"
-                flat
-                round
-                dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
-                @click="cancelar(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                @editar="abrirDialog(props.row)"
+              >
+                <q-item v-if="props.row.status === StatusOrdemServicoAgricola.Aberta" v-close-popup clickable class="agro-acoes-menu__item" @click="iniciar(props.row.id)">
+                  <q-item-section avatar><q-icon name="play_arrow" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Iniciar</q-item-section>
+                </q-item>
+                <q-item v-if="props.row.status === StatusOrdemServicoAgricola.EmAndamento" v-close-popup clickable class="agro-acoes-menu__item" @click="concluir(props.row.id)">
+                  <q-item-section avatar><q-icon name="done_all" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Concluir</q-item-section>
+                </q-item>
+                <q-item v-if="podeCancelar(props.row.status)" v-close-popup clickable class="agro-acoes-menu__item" @click="cancelar(props.row.id)">
+                  <q-item-section avatar><q-icon name="cancel" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -180,6 +157,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

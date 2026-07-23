@@ -23,6 +23,7 @@ export function useColaboradores() {
   const carregando = ref(false);
   const salvando = ref(false);
   const inativando = ref(false);
+  const ativando = ref(false);
   const ultimosParams = ref<ListarColaboradoresParams | undefined>();
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
@@ -70,11 +71,11 @@ export function useColaboradores() {
     }
   }
 
-  async function inativar(colaboradorId: string): Promise<boolean> {
+  async function inativar(colaboradorId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await colaboradorService.inativar(colaboradorId);
+      await colaboradorService.inativar(colaboradorId, justificativa);
       sucesso('Colaborador inativado com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -86,23 +87,50 @@ export function useColaboradores() {
     }
   }
 
+  async function ativar(colaboradorId: string): Promise<boolean> {
+    ativando.value = true;
+
+    try {
+      await colaboradorService.ativar(colaboradorId);
+      sucesso('Colaborador ativado com sucesso.');
+      await carregar(ultimosParams.value);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      ativando.value = false;
+    }
+  }
+
   async function solicitarInativacao(colaborador: ColaboradorResumoDto): Promise<boolean> {
     const mensagemConfirmacao = colaborador.usuarioId
       ? `Deseja inativar o colaborador ${colaborador.nomeCompleto}? O usuário vinculado também será inativado e suas sessões encerradas.`
       : `Deseja inativar o colaborador ${colaborador.nomeCompleto}?`;
 
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar colaborador',
       mensagem: mensagemConfirmacao,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(colaborador.id);
+    return inativar(colaborador.id, justificativa);
+  }
+
+  async function solicitarAtivacao(colaborador: ColaboradorResumoDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar colaborador',
+      mensagem: `Deseja reativar o colaborador ${colaborador.nomeCompleto}?`,
+      textoConfirmar: 'Ativar',
+      icone: 'info',
+    });
+
+    return confirmou ? ativar(colaborador.id) : false;
   }
 
   function nomeCompleto(colaborador: Pick<ColaboradorResumoDto, 'nomeCompleto'>): string {
@@ -134,10 +162,12 @@ export function useColaboradores() {
     carregando,
     salvando,
     inativando,
+    ativando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
     nomeCompleto,
     rotuloCargo,
     rotuloCpf,

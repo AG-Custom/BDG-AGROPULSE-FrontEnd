@@ -106,24 +106,15 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'aplicacao-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="onRemover(props.row.id)"
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'aplicacao-editar', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
               />
             </q-td>
           </template>
@@ -134,6 +125,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

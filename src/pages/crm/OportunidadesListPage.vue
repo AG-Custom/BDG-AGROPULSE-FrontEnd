@@ -82,34 +82,21 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="swap_horiz"
-                color="primary"
-                descricao="Alterar etapa"
-                @click="abrirEtapa(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'crm-oportunidade-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="removerOportunidade(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'crm-oportunidade-editar', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @excluir="removerOportunidade(props.row.id)"
+              >
+                <q-item v-close-popup clickable class="agro-acoes-menu__item" @click="abrirEtapa(props.row)">
+                  <q-item-section avatar><q-icon name="swap_horiz" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Alterar etapa</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -148,6 +135,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

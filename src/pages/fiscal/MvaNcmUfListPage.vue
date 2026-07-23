@@ -28,7 +28,11 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn flat round dense icon="edit" color="primary" descricao="Editar" @click="abrirDialog(props.row)" />
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                @editar="abrirDialog(props.row)"
+              />
             </q-td>
           </template>
         </q-table>
@@ -83,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

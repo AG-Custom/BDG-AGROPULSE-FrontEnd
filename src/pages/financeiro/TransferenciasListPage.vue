@@ -46,28 +46,38 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+              >
+                <q-item
                 v-if="props.row.status === StatusTransferencia.Pendente"
-                flat
-                round
                 dense
-                icon="done"
-                color="positive"
-                descricao="Confirmar"
-                :loading="salvando"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="confirmar(props.row)"
-              />
-              <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="done" size="16px" /></span></q-item-section>
+                  <q-item-section>Confirmar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                 v-if="props.row.status === StatusTransferencia.Pendente"
-                flat
-                round
                 dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="cancelar(props.row)"
-              />
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -159,6 +169,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

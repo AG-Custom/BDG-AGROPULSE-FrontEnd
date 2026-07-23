@@ -97,14 +97,12 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar taxa"
-                @click="abrirTaxa(props.row)"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="false"
+                editar-label="Editar taxa"
+                @editar="abrirTaxa(props.row)"
               />
             </q-td>
           </template>
@@ -179,6 +177,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFormasPagamentoConfig } from 'composables/useFormasPagamentoConfig';

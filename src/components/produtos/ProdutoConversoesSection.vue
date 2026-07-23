@@ -47,24 +47,15 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="cell">
         <q-td :props="cell" class="produto-conversoes__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar fator de conversão"
-            @click="abrirDialogEditar(cell.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover conversão"
-            :loading="removendo"
-            @click="solicitarRemocao(cell.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendo"
+            editar-label="Editar fator de conversão"
+            excluir-label="Remover conversão"
+            @editar="abrirDialogEditar(cell.row)"
+            @excluir="solicitarRemocao(cell.row)"
           />
         </q-td>
       </template>
@@ -110,6 +101,7 @@
 
 <script setup lang="ts">
 import ConversaoUnidadeFormulario from 'components/produtos/ConversaoUnidadeFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useProdutoConversoes } from 'composables/useProdutoConversoes';

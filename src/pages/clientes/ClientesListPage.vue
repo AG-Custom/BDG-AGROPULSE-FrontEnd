@@ -139,45 +139,13 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="clientes-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar cliente"
-                :to="{ name: 'cliente-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar cliente"
-                :to="{ name: 'cliente-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar cliente"
-                :loading="inativando"
-                @click="inativarCliente(props.row)"
-              />
-              <agro-btn
-                v-else
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar cliente"
-                :loading="ativando"
-                @click="ativarCliente(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :visualizar-to="{ name: 'cliente-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'cliente-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarCliente(props.row)"
+                @ativar="ativarCliente(props.row)"
               />
             </q-td>
           </template>
@@ -188,6 +156,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

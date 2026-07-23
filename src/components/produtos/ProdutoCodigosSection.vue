@@ -48,24 +48,15 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="cell">
         <q-td :props="cell" class="produto-codigos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar código"
-            @click="abrirDialogEditar(cell.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover código"
-            :loading="removendo"
-            @click="aoRemover(cell.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendo"
+            editar-label="Editar código"
+            excluir-label="Remover código"
+            @editar="abrirDialogEditar(cell.row)"
+            @excluir="aoRemover(cell.row)"
           />
         </q-td>
       </template>
@@ -100,6 +91,7 @@
 
 <script setup lang="ts">
 import CodigoProdutoFormulario from 'components/produtos/CodigoProdutoFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

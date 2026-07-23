@@ -101,34 +101,13 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="colaboradores-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar colaborador"
-                :to="{ name: 'colaborador-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar colaborador"
-                :to="{ name: 'colaborador-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status === ColaboradorStatus.Ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar colaborador"
-                :loading="inativando"
-                @click="inativarColaborador(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.status === ColaboradorStatus.Ativo"
+                :visualizar-to="{ name: 'colaborador-visualizar', params: { id: props.row.id } }"
+                :editar-to="{ name: 'colaborador-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarColaborador(props.row)"
+                @ativar="ativarColaborador(props.row)"
               />
             </q-td>
           </template>
@@ -139,6 +118,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -154,8 +134,10 @@ const {
   colaboradores,
   carregando,
   inativando,
+  ativando,
   carregar,
   solicitarInativacao,
+  solicitarAtivacao,
   rotuloCargo,
   rotuloCpf,
   rotuloStatus,
@@ -222,6 +204,10 @@ async function recarregar(): Promise<void> {
 
 async function inativarColaborador(colaborador: ColaboradorResumoDto): Promise<void> {
   await solicitarInativacao(colaborador);
+}
+
+async function ativarColaborador(colaborador: ColaboradorResumoDto): Promise<void> {
+  await solicitarAtivacao(colaborador);
 }
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;

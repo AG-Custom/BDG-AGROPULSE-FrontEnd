@@ -52,43 +52,25 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="my_location"
-                color="primary"
-                descricao="Check-in"
-                @click="abrirCheckIn(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="photo_camera"
-                color="primary"
-                descricao="Adicionar foto"
-                @click="abrirFoto(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="remover(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :loading-excluir="salvando"
+                @editar="abrirDialog(props.row)"
+                @excluir="remover(props.row.id)"
+              >
+                <q-item v-close-popup clickable class="agro-acoes-menu__item" @click="abrirCheckIn(props.row)">
+                  <q-item-section avatar><q-icon name="my_location" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Check-in</q-item-section>
+                </q-item>
+                <q-item v-close-popup clickable class="agro-acoes-menu__item" @click="abrirFoto(props.row)">
+                  <q-item-section avatar><q-icon name="photo_camera" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Adicionar foto</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -290,6 +272,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

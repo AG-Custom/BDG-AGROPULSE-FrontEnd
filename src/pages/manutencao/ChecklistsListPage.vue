@@ -65,16 +65,29 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                v-if="!props.row.sincronizado"
-                flat
-                dense
-                icon="sync"
-                label="Sincronizar"
-                descricao="Sincronizar checklist"
-                :loading="salvando"
-                @click="sincronizarChecklist(props.row.id)"
-              />
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+              >
+                <q-item
+                  v-if="!props.row.sincronizado"
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
+                  @click="sincronizarChecklist(props.row.id)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
+                      <q-icon name="sync" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Sincronizar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -85,6 +98,7 @@
 
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

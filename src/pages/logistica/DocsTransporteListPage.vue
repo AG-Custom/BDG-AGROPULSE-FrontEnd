@@ -81,26 +81,34 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
+              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+                <q-item
                 v-if="props.row.status === StatusDocTransporteLogistica.Rascunho"
-                flat
+                  v-close-popup
+                  clickable
                 dense
-                label="Autorizar"
-                descricao="Autorizar documento"
-                color="primary"
-                :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="autorizarDocTransporte(props.row.id)"
-              />
-              <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
+                  <q-item-section>Autorizar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                 v-if="props.row.status !== StatusDocTransporteLogistica.Cancelado"
-                flat
+                  v-close-popup
+                  clickable
                 dense
-                label="Cancelar"
-                descricao="Cancelar documento"
-                color="negative"
-                :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="cancelarDocTransporte(props.row.id)"
-              />
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -222,6 +230,7 @@
 
 <script setup lang="ts">
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

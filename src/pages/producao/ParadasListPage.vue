@@ -51,29 +51,21 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
-                  v-if="!props.row.resolvida"
-                  flat
-                  round
-                  dense
-                  icon="done"
-                  color="positive"
-                  descricao="Resolver"
-                  :loading="salvando"
-                  @click="onResolver(props.row.id)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover"
-                  :loading="salvando"
-                  @click="onRemover(props.row.id)"
-                />
-              </div>
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-visualizar="false"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
+              >
+                <q-item v-if="!props.row.resolvida" v-close-popup clickable class="agro-acoes-menu__item" @click="onResolver(props.row.id)">
+                  <q-item-section avatar><q-icon name="done" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Resolver</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -148,6 +140,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';

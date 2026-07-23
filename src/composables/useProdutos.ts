@@ -142,11 +142,11 @@ export function useProdutos() {
     }
   }
 
-  async function inativar(produtoId: string): Promise<boolean> {
+  async function inativar(produtoId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await produtoService.inativar(produtoId);
+      await produtoService.inativar(produtoId, justificativa);
       sucesso('Produto inativado com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -175,18 +175,18 @@ export function useProdutos() {
   }
 
   async function solicitarInativacao(produto: ProdutoResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar produto',
       mensagem: `Deseja inativar o produto ${produto.descricao}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(produto.id);
+    return inativar(produto.id, justificativa);
   }
 
   async function solicitarAtivacao(produto: ProdutoResumoDto): Promise<boolean> {

@@ -11,6 +11,7 @@ export function useCnpjs() {
   const carregando = ref(false);
   const salvando = ref(false);
   const inativando = ref(false);
+  const ativando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -56,11 +57,11 @@ export function useCnpjs() {
     }
   }
 
-  async function inativar(cnpjId: string): Promise<boolean> {
+  async function inativar(cnpjId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await cnpjService.inativar(cnpjId);
+      await cnpjService.inativar(cnpjId, justificativa);
       sucesso('CNPJ inativado com sucesso.');
       await carregar();
       return true;
@@ -72,19 +73,46 @@ export function useCnpjs() {
     }
   }
 
+  async function ativar(cnpjId: string): Promise<boolean> {
+    ativando.value = true;
+
+    try {
+      await cnpjService.ativar(cnpjId);
+      sucesso('CNPJ ativado com sucesso.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      ativando.value = false;
+    }
+  }
+
   async function solicitarInativacao(cnpj: CnpjEmpresaDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar CNPJ',
       mensagem: `Deseja inativar o CNPJ ${formatarCnpj(cnpj.numero)}? Unidades ativas vinculadas impedem esta ação.`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(cnpj.id);
+    return inativar(cnpj.id, justificativa);
+  }
+
+  async function solicitarAtivacao(cnpj: CnpjEmpresaDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar CNPJ',
+      mensagem: `Deseja reativar o CNPJ ${formatarCnpj(cnpj.numero)}?`,
+      textoConfirmar: 'Ativar',
+      icone: 'info',
+    });
+
+    return confirmou ? ativar(cnpj.id) : false;
   }
 
   return {
@@ -92,9 +120,11 @@ export function useCnpjs() {
     carregando,
     salvando,
     inativando,
+    ativando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
   };
 }
