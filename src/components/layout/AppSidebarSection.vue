@@ -2,11 +2,12 @@
   <q-expansion-item
     v-model="aberto"
     group="sidebar-modulos"
+    :icon="icon"
     :label="label"
     dense
     class="app-sidebar-section"
     header-class="app-sidebar-section__header"
-    expand-icon-class="app-sidebar-section__icon"
+    expand-icon-class="app-sidebar-section__expand-icon"
   >
     <q-list class="app-sidebar-section__list">
       <slot />
@@ -20,6 +21,7 @@ import { useRoute } from 'vue-router';
 
 const props = defineProps<{
   label: string;
+  icon?: string;
   /** Prefixo(s) de path que mantêm a seção aberta (ex.: '/estoque'). Use '/' só para o Dashboard. */
   rotasAtivas?: string | string[];
   defaultOpened?: boolean;
@@ -83,7 +85,21 @@ watch(
   color: var(--color-sidebar-text);
 }
 
-.app-sidebar-section :deep(.app-sidebar-section__icon) {
+.app-sidebar-section :deep(.q-item__section--avatar) {
+  min-width: 28px;
+  padding-right: var(--spacing-2);
+}
+
+.app-sidebar-section :deep(.q-item__section--avatar .q-icon) {
+  color: var(--color-sidebar-text-muted);
+  font-size: 20px;
+}
+
+.app-sidebar-section :deep(.q-expansion-item--expanded > .q-expansion-item__container > .app-sidebar-section__header .q-item__section--avatar .q-icon) {
+  color: var(--color-sidebar-accent);
+}
+
+.app-sidebar-section :deep(.app-sidebar-section__expand-icon) {
   color: var(--color-sidebar-text-muted);
   font-size: 18px;
 }
