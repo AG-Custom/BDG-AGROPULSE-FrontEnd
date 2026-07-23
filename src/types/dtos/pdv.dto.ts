@@ -90,8 +90,9 @@ export interface PdvVendaFormModel {
 }
 
 export interface EmitirNfcePdvDto {
-  vendaId: string;
-  status: string;
-  mensagem: string | null;
-  chaveAcesso: string | null;
+  mensagem: string;
+  notaFiscalId?: string | null;
+  status?: string | null;
+  chaveAcesso?: string | null;
+  focusReferencia?: string | null;
 }

@@ -44,6 +44,7 @@ export interface ConfiguracaoFiscalDto {
   id: string;
   regimeTributario: RegimeTributarioValor;
   possuiTokenFocus: boolean;
+  focusNfeHomologacao: boolean;
   ativo: boolean;
   createdAt: string;
 }
@@ -51,13 +52,16 @@ export interface ConfiguracaoFiscalDto {
 export interface SalvarConfiguracaoFiscalPayload {
   regimeTributario: RegimeTributarioValor;
   focusNfeToken?: string | null;
+  focusNfeHomologacao?: boolean;
 }
 
 export interface DocumentoSefazDto {
-  chaveAcesso: string | null;
-  numero: string | null;
-  emitente: string | null;
-  dataEmissao: string | null;
+  chaveAcesso: string;
+  tipo: string;
+  dataEmissao: string;
+  cnpjEmitente?: string | null;
+  nomeEmitente?: string | null;
+  valorTotal?: number | null;
 }
 
 export interface DocumentosSefazDto {
@@ -73,4 +77,5 @@ export interface ListarDocumentosSefazParams {
 export interface ConfiguracaoFiscalFormModel {
   regimeTributario: RegimeTributarioValor | '';
   focusNfeToken: string;
+  focusNfeHomologacao: boolean;
 }

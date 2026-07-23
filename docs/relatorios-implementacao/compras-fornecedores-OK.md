@@ -74,8 +74,7 @@ Aplicar manualmente:
 
 | Tipo | Item |
 |------|------|
-| Integração | SEFAZ documentos destinados real (hoje stub) |
-| Integração | E-mail/portal real no envio de cotação (hoje fila interna) |
+| — | SEFAZ documentos destinados + e-mail cotação cobertos (2026-07-22) |
 | Fora de escopo | — |
 
-**Status:** fluxo essencial (NF-e → estoque + CAP), SC/cotação/envio interno/alçada/OC e contratos de fornecimento cobertos; falta integração SEFAZ (e e-mail real opcional).
+**Status:** fluxo essencial e completo cobertos; Focus destinadas e e-mail SMTP/log no envio de cotação ativos.

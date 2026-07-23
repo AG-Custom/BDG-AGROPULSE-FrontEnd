@@ -61,6 +61,7 @@ export function useFiscal() {
       configuracao.value = await fiscalService.salvarConfiguracao({
         regimeTributario: form.regimeTributario as RegimeTributarioValor,
         focusNfeToken: form.focusNfeToken.trim() || null,
+        focusNfeHomologacao: form.focusNfeHomologacao,
       });
       sucesso('Configuração fiscal salva.');
       return true;

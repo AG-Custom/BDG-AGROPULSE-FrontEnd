@@ -179,12 +179,9 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 
 | Tipo | Item |
 |------|------|
-| Integração | Contingência SEFAZ no PDV |
-| Integração | NF-e / NFC-e automática real (hoje stub) |
-| Integração | NF-e de devolução + efeitos fiscais (ICMS / PIS/COFINS) |
+| — | Domínio + Focus NFC-e/NF-e/devolução + crédito financeiro devolução fechados (2026-07-22) |
+| Integração | Contingência SEFAZ offline avançada (retransmissão básica via job já existe) |
 | Fora de escopo | Bonificação / fidelidade por volume |
 | Fora de escopo | App mobile vendedor / consultor |
 
-**Domínio fechado (2026-07-17):** bloqueio hard sem preço de tabela; comissões por canal/faixa; trava de preço por `contratoId`.
-
-**Status:** domínio de precificação, comissão e trava por contrato fechados; restam integrações fiscais (SEFAZ / NF-e).
+**Status:** domínio e emissão Focus NFC-e/devolução cobertos; contingência com fila + job de retransmissão.

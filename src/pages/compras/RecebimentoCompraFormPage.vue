@@ -28,13 +28,29 @@
           />
           <agro-btn
             flat
-            label="Consultar SEFAZ (stub)"
-            descricao="Consultar documentos destinados"
+            label="Consultar SEFAZ"
+            descricao="Consultar documentos destinados Focus/SEFAZ"
             :loading="consultandoSefaz"
             @click="consultarSefaz"
           />
         </div>
         <p v-if="mensagemSefaz" class="texto-sefaz">{{ mensagemSefaz }}</p>
+        <q-list v-if="documentosSefaz?.documentos?.length" bordered class="q-mt-md lista-sefaz">
+          <q-item
+            v-for="doc in documentosSefaz.documentos"
+            :key="doc.chaveAcesso"
+            clickable
+            @click="selecionarDocumentoSefaz(doc)"
+          >
+            <q-item-section>
+              <q-item-label>{{ doc.nomeEmitente || doc.cnpjEmitente || doc.tipo }}</q-item-label>
+              <q-item-label caption>{{ doc.chaveAcesso }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>{{ doc.dataEmissao }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </agro-card>
 
       <agro-card>
@@ -270,6 +286,14 @@ async function analisarXml(): Promise<void> {
 async function consultarSefaz(): Promise<void> {
   const resp = await listarDocumentosSefaz();
   mensagemSefaz.value = resp?.mensagem ?? documentosSefaz.value?.mensagem ?? '';
+}
+
+function selecionarDocumentoSefaz(doc: {
+  chaveAcesso: string;
+  nomeEmitente?: string | null;
+}): void {
+  chaveAcesso.value = doc.chaveAcesso;
+  mensagemSefaz.value = `Documento selecionado: ${doc.nomeEmitente ?? doc.chaveAcesso}`;
 }
 
 async function salvar(): Promise<void> {
