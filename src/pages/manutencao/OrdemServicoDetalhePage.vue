@@ -246,7 +246,7 @@ const podeEditarPecas = computed(() => {
 
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({
-    label: `${p.codigo} — ${p.descricao}`,
+    label: `${p.descricao}`,
     value: p.id,
   })),
 );

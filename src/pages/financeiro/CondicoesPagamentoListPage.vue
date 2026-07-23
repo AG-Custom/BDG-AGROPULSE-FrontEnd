@@ -16,7 +16,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && condicoes.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && condicoes.length === 0" :colunas="4" />
         <empty-state
           v-else-if="!carregando && condicoes.length === 0"
           titulo="Nenhuma condição"
@@ -93,7 +93,6 @@ const { condicoes, carregando, salvando, carregar, solicitarInativacao } =
   useCondicoesPagamento();
 
 const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'numeroParcelas', label: 'Parcelas', field: 'numeroParcelas', align: 'right' },
   { name: 'intervaloDias', label: 'Intervalo (dias)', field: 'intervaloDias', align: 'right' },

@@ -10,7 +10,6 @@ export interface CategoriaProdutoResumoDto {
 export type CategoriaProdutoDto = CategoriaProdutoResumoDto;
 
 export interface SalvarCategoriaProdutoPayload {
-  codigo: string;
   nome: string;
   margemMinimaPercentual?: number | null;
 }
@@ -21,7 +20,6 @@ export interface ListarCategoriasProdutoParams {
 }
 
 export interface CategoriaProdutoFormModel {
-  codigo: string;
   nome: string;
   margemMinimaPercentual: string;
 }

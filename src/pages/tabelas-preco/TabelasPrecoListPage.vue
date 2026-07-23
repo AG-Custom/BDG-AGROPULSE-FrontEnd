@@ -43,7 +43,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && tabelas.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && tabelas.length === 0" :colunas="4" />
 
         <empty-state
           v-else-if="!carregando && tabelas.length === 0"
@@ -187,7 +187,6 @@ const opcoesStatus = [
 ];
 
 const colunas: QTableColumn<TabelaPrecoResumoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'vigencia', label: 'Vigência', field: 'vigenciaInicio', align: 'left' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },

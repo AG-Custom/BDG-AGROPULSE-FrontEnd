@@ -3,19 +3,7 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="produto-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.codigo"
-          outlined
-          label="Código"
-          class="field-required"
-          maxlength="50"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-8">
+      <div class="col-12">
         <q-input
           v-model="formulario.descricao"
           outlined

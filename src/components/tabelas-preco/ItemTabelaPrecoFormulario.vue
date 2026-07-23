@@ -66,7 +66,7 @@ const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } =
 
 const produtoOpcoes = computed(() =>
   produtos.value.map((produto) => ({
-    label: `${produto.codigo} — ${produto.descricao}`,
+    label: `${produto.descricao}`,
     value: produto.id,
   })),
 );

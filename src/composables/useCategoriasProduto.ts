@@ -126,7 +126,7 @@ export function useCategoriasProduto() {
   }
 
   function rotuloCategoria(categoria: CategoriaProdutoResumoDto): string {
-    return `${categoria.codigo} — ${categoria.nome}`;
+    return `${categoria.nome}`;
   }
 
   return {

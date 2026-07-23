@@ -103,6 +103,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :loading="carregandoItensTabela"
                 :rules="[obrigatorio]"
                 @update:model-value="(id: string) => void onProdutoItem(index, id)"
               />
@@ -233,6 +234,7 @@ import { useNotificacao } from 'composables/useNotificacao';
 import { usePdv } from 'composables/usePdv';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
+import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import { FormaPagamento, FormaPagamentoPdvOpcoes } from 'constants/enums';
 import type {
   PdvItemFormModel,
@@ -290,6 +292,17 @@ const formulario = ref<PdvVendaFormModel>({
   pagamentos: [novoPagamento()],
 });
 
+const {
+  produtoOpcoes,
+  carregandoItensTabela,
+  produtoIdsPermitidos,
+  produtoPermitido,
+} = useProdutosPorTabelaPreco(
+  () => formulario.value.tabelaPrecoId,
+  () => produtos.value,
+);
+
+const reResolverPrecosPendente = ref(false);
 const filtroCliente = ref('');
 
 const clienteOpcoes = computed(() =>
@@ -306,10 +319,6 @@ const clienteOpcoesFiltradas = computed(() => {
   }
   return clienteOpcoes.value.filter((opcao) => opcao.label.toLowerCase().includes(termo));
 });
-
-const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
-);
 
 const totalItens = computed(() =>
   formulario.value.itens.reduce((acc, item) => {
@@ -386,6 +395,11 @@ async function adicionarPorCodigo(): Promise<void> {
     return;
   }
 
+  if (!produtoPermitido(produto.id)) {
+    erro('Produto não está disponível na tabela de preço selecionada.');
+    return;
+  }
+
   let alvo = formulario.value.itens.find((item) => !item.produtoId);
   if (!alvo) {
     formulario.value.itens.push(novoItem());
@@ -396,6 +410,38 @@ async function adicionarPorCodigo(): Promise<void> {
   const indice = formulario.value.itens.findIndex((item) => item.chave === alvo!.chave);
   await onProdutoItem(indice, produto.id);
   formulario.value.codigoBarras = '';
+}
+
+async function sincronizarItensComTabela(): Promise<void> {
+  if (carregandoItensTabela.value) {
+    return;
+  }
+
+  const deveReResolver = reResolverPrecosPendente.value;
+  reResolverPrecosPendente.value = false;
+
+  const ids = produtoIdsPermitidos.value;
+  const tarefas: Promise<void>[] = [];
+
+  for (let index = 0; index < formulario.value.itens.length; index++) {
+    const item = formulario.value.itens[index];
+
+    if (!item.produtoId) {
+      continue;
+    }
+
+    if (ids && !ids.has(item.produtoId)) {
+      item.produtoId = '';
+      item.precoUnitario = '';
+      continue;
+    }
+
+    if (deveReResolver) {
+      tarefas.push(onProdutoItem(index, item.produtoId));
+    }
+  }
+
+  await Promise.all(tarefas);
 }
 
 async function salvar(): Promise<void> {
@@ -415,6 +461,20 @@ watch(tabelaPadraoId, (id) => {
     formulario.value.tabelaPrecoId = id;
   }
 });
+
+watch(
+  [() => formulario.value.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
+  (atual, anterior) => {
+    const tabelaAtual = String(atual[0] ?? '');
+    const tabelaAnterior = String(anterior?.[0] ?? '');
+
+    if (anterior != null && tabelaAtual !== tabelaAnterior) {
+      reResolverPrecosPendente.value = true;
+    }
+
+    void sincronizarItensComTabela();
+  },
+);
 
 onMounted(async () => {
   void carregarClientes({ ativo: true });

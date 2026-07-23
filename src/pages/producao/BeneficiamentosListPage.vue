@@ -108,7 +108,7 @@ const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const mapa = computed(() => {
   const m = new Map<string, string>();
-  for (const p of produtos.value) m.set(p.id, `${p.codigo} — ${p.descricao}`);
+  for (const p of produtos.value) m.set(p.id, `${p.descricao}`);
   return m;
 });
 

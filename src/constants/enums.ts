@@ -310,22 +310,16 @@ export const MetodoCusteioOpcoes = [
 
 export const CanalVenda = {
   Balcao: 'Balcao',
-  Varejo: 'Varejo',
-  Atacado: 'Atacado',
-  Ecommerce: 'Ecommerce',
   Representante: 'Representante',
-  Outro: 'Outro',
+  Varejo: 'Varejo',
 } as const;
 
 export type CanalVendaValor = (typeof CanalVenda)[keyof typeof CanalVenda];
 
 export const CanalVendaOpcoes = [
   { label: 'Balcão', value: CanalVenda.Balcao },
-  { label: 'Varejo', value: CanalVenda.Varejo },
-  { label: 'Atacado', value: CanalVenda.Atacado },
-  { label: 'E-commerce', value: CanalVenda.Ecommerce },
   { label: 'Representante', value: CanalVenda.Representante },
-  { label: 'Outro', value: CanalVenda.Outro },
+  { label: 'Varejo', value: CanalVenda.Varejo },
 ];
 
 export const TipoMovimentacaoEstoque = {

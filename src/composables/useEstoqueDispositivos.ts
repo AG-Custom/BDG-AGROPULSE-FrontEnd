@@ -19,7 +19,7 @@ export function useEstoqueDispositivos() {
     buscandoCodigo.value = true;
     try {
       const produto = await estoqueService.obterProdutoPorCodigo(valor);
-      sucesso(`Produto ${produto.codigo} selecionado.`);
+      sucesso(`Produto ${produto.descricao} selecionado.`);
       return produto;
     } catch (e) {
       erro(mensagem(e));

@@ -110,7 +110,7 @@ const fornecedorOpcoes = computed(() =>
   fornecedores.value.map((f) => ({ label: f.razaoSocial, value: f.id })),
 );
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 function adicionar(): void {

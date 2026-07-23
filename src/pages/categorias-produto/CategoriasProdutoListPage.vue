@@ -170,7 +170,6 @@ const opcoesStatus = [
 ];
 
 const colunas: QTableColumn<CategoriaProdutoResumoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'margemMinimaPercentual', label: 'Margem mín.', field: 'margemMinimaPercentual', align: 'left' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },

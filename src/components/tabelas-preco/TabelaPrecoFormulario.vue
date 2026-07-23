@@ -3,19 +3,7 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="tabela-preco-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.codigo"
-          outlined
-          label="Código"
-          class="field-required"
-          maxlength="50"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-8">
+      <div class="col-12">
         <q-input
           v-model="formulario.nome"
           outlined
@@ -53,7 +41,7 @@
 
     <h3 class="tabela-preco-formulario__secao-titulo">Escopo (opcional)</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
+      <div v-if="!clienteIdFixo" class="col-12 col-md-4">
         <q-select
           v-model="formulario.clienteId"
           outlined
@@ -110,10 +98,11 @@ import { CanalVendaOpcoes, GrupoComercialOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { TabelaPrecoFormModel } from 'types/dtos/tabela-preco.dto';
 import { obrigatorio } from 'utils/validators';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   somenteLeitura?: boolean;
+  clienteIdFixo?: string;
 }>();
 
 const formulario = defineModel<TabelaPrecoFormModel>('formulario', { required: true });
@@ -131,12 +120,24 @@ const clienteOpcoes = computed(() =>
     })),
 );
 
+watch(
+  () => props.clienteIdFixo,
+  (clienteId) => {
+    if (clienteId) {
+      formulario.value.clienteId = clienteId;
+    }
+  },
+  { immediate: true },
+);
+
 async function validar(): Promise<boolean> {
   return (await formRef.value?.validate()) ?? false;
 }
 
 onMounted(() => {
-  void carregarClientes({ ativo: true });
+  if (!props.clienteIdFixo) {
+    void carregarClientes({ ativo: true });
+  }
 });
 
 defineExpose({ validar });

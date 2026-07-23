@@ -86,7 +86,6 @@ export interface ProdutoDto extends Omit<ProdutoResumoDto, 'precoVenda' | 'custo
 }
 
 export interface CriarProdutoPayload {
-  codigo: string;
   descricao: string;
   categoriaProdutoId: string;
   tipoProduto: TipoProdutoValor;
@@ -153,7 +152,6 @@ export interface ListarProdutosParams {
 }
 
 export interface ProdutoFormModel {
-  codigo: string;
   descricao: string;
   categoriaProdutoId: string | null;
   tipoProduto: TipoProdutoValor;

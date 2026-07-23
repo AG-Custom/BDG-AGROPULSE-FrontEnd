@@ -4,7 +4,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-form-skeleton v-if="carregandoPagina" :campos="4" />
+        <agro-form-skeleton v-if="carregandoPagina" :campos="2" />
 
         <q-form v-else ref="formRef" greedy class="agro-formulario">
           <div class="row q-col-gutter-md">
@@ -28,34 +28,6 @@
                 class="field-required"
                 type="number"
                 min="0"
-                step="0.01"
-                aria-required="true"
-                :rules="[obrigatorio, percentualZeroACem]"
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="formulario.descontoDe"
-                outlined
-                label="Desconto de %"
-                class="field-required"
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                aria-required="true"
-                :rules="[obrigatorio, percentualZeroACem]"
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="formulario.descontoAte"
-                outlined
-                label="Desconto até %"
-                class="field-required"
-                type="number"
-                min="0"
-                max="100"
                 step="0.01"
                 aria-required="true"
                 :rules="[obrigatorio, percentualZeroACem]"
@@ -123,7 +95,7 @@ const tituloPagina = computed(() =>
 
 const subtituloPagina = computed(() =>
   modo.value === 'criar'
-    ? 'Defina canal, faixa de desconto e percentual de comissão.'
+    ? 'Defina canal e percentual de comissão.'
     : 'Atualize a regra de comissão selecionada.',
 );
 

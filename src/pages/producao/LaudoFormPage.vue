@@ -250,7 +250,7 @@ const formulario = ref<LaudoQualidadeFormModel>({
 });
 
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 const loteOpcoes = computed(() =>
@@ -268,7 +268,7 @@ const ordemOpcoes = computed(() =>
 
 const mapa = computed(() => {
   const m = new Map<string, string>();
-  for (const p of produtos.value) m.set(p.id, `${p.codigo} — ${p.descricao}`);
+  for (const p of produtos.value) m.set(p.id, `${p.descricao}`);
   return m;
 });
 

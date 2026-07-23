@@ -82,7 +82,7 @@ const observacao = ref('');
 const itens = ref<ItemForm[]>([{ chave: crypto.randomUUID(), produtoId: '', quantidade: '1' }]);
 
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 function adicionar(): void {

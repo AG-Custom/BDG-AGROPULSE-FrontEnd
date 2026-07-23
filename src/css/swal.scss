@@ -1,3 +1,7 @@
+.agro-swal.swal2-container {
+  z-index: var(--z-index-swal) !important;
+}
+
 .agro-swal__popup {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);

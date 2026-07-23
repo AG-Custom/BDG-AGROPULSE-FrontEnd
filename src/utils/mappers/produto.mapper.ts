@@ -89,7 +89,6 @@ export function conversaoFormParaDtoLocal(
 
 export function criarProdutoFormVazio(): ProdutoFormModel {
   return {
-    codigo: '',
     descricao: '',
     categoriaProdutoId: null,
     tipoProduto: TipoProduto.InsumoAgricola,
@@ -109,7 +108,6 @@ export function criarProdutoFormVazio(): ProdutoFormModel {
 
 export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
   return {
-    codigo: dto.codigo,
     descricao: dto.descricao,
     categoriaProdutoId: dto.categoriaProdutoId,
     tipoProduto: dto.tipoProduto,
@@ -143,7 +141,6 @@ function parseNumeroOpcional(valor: string): number | null {
 
 function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
   return {
-    codigo: form.codigo.trim(),
     descricao: form.descricao.trim(),
     categoriaProdutoId: form.categoriaProdutoId!,
     tipoProduto: form.tipoProduto,

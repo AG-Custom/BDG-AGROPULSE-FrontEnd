@@ -6,7 +6,6 @@ import type {
 
 export function criarCategoriaProdutoFormVazia(): CategoriaProdutoFormModel {
   return {
-    codigo: '',
     nome: '',
     margemMinimaPercentual: '',
   };
@@ -14,7 +13,6 @@ export function criarCategoriaProdutoFormVazia(): CategoriaProdutoFormModel {
 
 export function categoriaProdutoDtoParaForm(dto: CategoriaProdutoDto): CategoriaProdutoFormModel {
   return {
-    codigo: dto.codigo,
     nome: dto.nome,
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
@@ -35,7 +33,6 @@ export function formParaSalvarCategoriaProdutoPayload(
   form: CategoriaProdutoFormModel,
 ): SalvarCategoriaProdutoPayload {
   return {
-    codigo: form.codigo.trim(),
     nome: form.nome.trim(),
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
   };

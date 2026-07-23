@@ -5,16 +5,12 @@ export interface RegraComissaoDto {
   empresaId: string;
   unidadeId: string;
   canal: CanalVendaValor | null;
-  descontoDe: number;
-  descontoAte: number;
   percentual: number;
   ativo: boolean;
 }
 
 export interface CriarRegraComissaoPayload {
   canal?: CanalVendaValor | null;
-  descontoDe: number;
-  descontoAte: number;
   percentual: number;
 }
 
@@ -26,7 +22,5 @@ export interface ListarRegrasComissaoParams {
 
 export interface RegraComissaoFormModel {
   canal: CanalVendaValor | '';
-  descontoDe: string;
-  descontoAte: string;
   percentual: string;
 }

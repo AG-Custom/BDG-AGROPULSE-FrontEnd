@@ -319,7 +319,7 @@ const clienteOpcoes = computed(() =>
   clientes.value.map((c) => ({ label: c.nomeRazao, value: c.id })),
 );
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 function aplicarCotacao(c: CotacaoMercadoDto): void {

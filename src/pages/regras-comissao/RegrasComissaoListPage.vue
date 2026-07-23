@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Regras de comissão"
-      subtitulo="Percentual por canal de venda e faixa de desconto."
+      subtitulo="Percentual por canal de venda."
     >
       <agro-btn
         color="primary"
@@ -38,12 +38,12 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && regras.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && regras.length === 0" :colunas="4" />
 
         <empty-state
           v-else-if="!carregando && regras.length === 0"
           titulo="Nenhuma regra cadastrada"
-          descricao="Cadastre regras por canal e faixa de desconto para aplicar comissão no pedido."
+          descricao="Cadastre regras por canal para aplicar comissão no pedido."
           icon="percent"
         />
 
@@ -60,13 +60,6 @@
           <template #body-cell-canal="props">
             <q-td :props="props">
               {{ rotuloCanal(props.row.canal) }}
-            </q-td>
-          </template>
-
-          <template #body-cell-faixa="props">
-            <q-td :props="props" class="text-metric">
-              {{ formatarDecimal(props.row.descontoDe) }}% —
-              {{ formatarDecimal(props.row.descontoAte) }}%
             </q-td>
           </template>
 
@@ -137,7 +130,6 @@ const statusOpcoes = [
 
 const colunas: QTableColumn<RegraComissaoDto>[] = [
   { name: 'canal', label: 'Canal', field: 'canal', align: 'left' },
-  { name: 'faixa', label: 'Faixa desconto', field: 'descontoDe', align: 'right' },
   { name: 'percentual', label: 'Comissão %', field: 'percentual', align: 'right' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },

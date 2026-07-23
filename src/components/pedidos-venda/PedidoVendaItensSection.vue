@@ -113,7 +113,7 @@
                   map-options
                   aria-required="true"
                   :options="produtoOpcoes"
-                  :loading="carregandoProdutos"
+                  :loading="carregandoProdutos || carregandoItensTabela"
                   :rules="[obrigatorio]"
                   @update:model-value="onProdutoSelecionado"
                 />
@@ -181,6 +181,7 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
+import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import type { QForm, QTableColumn } from 'quasar';
 import type { PedidoVendaItemFormModel } from 'types/dtos/pedido-venda.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
@@ -191,7 +192,7 @@ import {
   totalPedidoPreview,
 } from 'utils/mappers/pedido-venda.mapper';
 import { obrigatorio, percentualZeroACem, quantidadePositiva } from 'utils/validators';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   somenteLeitura?: boolean;
@@ -209,23 +210,26 @@ const {
 
 const { resolvendoPreco, resolverPreco } = usePrecificacao();
 
+const {
+  produtoOpcoes,
+  carregandoItensTabela,
+  produtoIdsPermitidos,
+} = useProdutosPorTabelaPreco(
+  () => props.tabelaPrecoId,
+  () => produtos.value,
+);
+
+const reResolverPrecosPendente = ref(false);
 const dialogAberto = ref(false);
 const indiceEdicao = ref<number | null>(null);
 const itemForm = ref<PedidoVendaItemFormModel>(criarItemFormVazio());
 const formRef = ref<QForm | null>(null);
 
-const produtoOpcoes = computed(() =>
-  produtos.value.map((produto) => ({
-    label: `${produto.codigo} — ${produto.descricao}`,
-    value: produto.id,
-  })),
-);
-
 const mapaProdutos = computed(() => {
   const mapa = new Map<string, string>();
 
   for (const produto of produtos.value) {
-    mapa.set(produto.id, `${produto.codigo} — ${produto.descricao}`);
+    mapa.set(produto.id, `${produto.descricao}`);
   }
 
   return mapa;
@@ -277,6 +281,61 @@ async function onProdutoSelecionado(produtoId: string): Promise<void> {
   }
 }
 
+async function sincronizarItensComTabela(): Promise<void> {
+  if (carregandoItensTabela.value || props.somenteLeitura) {
+    return;
+  }
+
+  const deveReResolver = reResolverPrecosPendente.value;
+  reResolverPrecosPendente.value = false;
+
+  const ids = produtoIdsPermitidos.value;
+  const atualizados: PedidoVendaItemFormModel[] = [];
+  const tarefas: Promise<void>[] = [];
+
+  for (const item of itens.value) {
+    if (!item.produtoId) {
+      atualizados.push(item);
+      continue;
+    }
+
+    if (ids && !ids.has(item.produtoId)) {
+      continue;
+    }
+
+    atualizados.push(item);
+
+    if (deveReResolver) {
+      tarefas.push(
+        (async () => {
+          const resolvido = await resolverPreco({
+            produtoId: item.produtoId,
+            clienteId: props.clienteId || null,
+            tabelaPrecoId: props.tabelaPrecoId || null,
+          });
+
+          if (resolvido) {
+            item.precoUnitario = String(resolvido.preco);
+          }
+        })(),
+      );
+    }
+  }
+
+  itens.value = atualizados;
+
+  if (dialogAberto.value && itemForm.value.produtoId) {
+    if (ids && !ids.has(itemForm.value.produtoId)) {
+      itemForm.value.produtoId = '';
+      itemForm.value.precoUnitario = '';
+    } else if (deveReResolver) {
+      await onProdutoSelecionado(itemForm.value.produtoId);
+    }
+  }
+
+  await Promise.all(tarefas);
+}
+
 function abrirDialog(): void {
   indiceEdicao.value = null;
   itemForm.value = criarItemFormVazio();
@@ -321,6 +380,20 @@ async function salvarItem(): Promise<void> {
 
   fecharDialog();
 }
+
+watch(
+  [() => props.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
+  (atual, anterior) => {
+    const tabelaAtual = String(atual[0] ?? '');
+    const tabelaAnterior = String(anterior?.[0] ?? '');
+
+    if (anterior != null && tabelaAtual !== tabelaAnterior) {
+      reResolverPrecosPendente.value = true;
+    }
+
+    void sincronizarItensComTabela();
+  },
+);
 
 onMounted(() => {
   void carregarProdutos({ ativo: true });

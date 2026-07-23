@@ -64,6 +64,17 @@
         :somente-leitura="somenteLeitura"
       />
 
+      <cliente-tabelas-preco-section
+        v-if="
+          podeGerenciarTabelasPreco
+          && (modo === 'editar' || modo === 'visualizar')
+          && (modo === 'visualizar' || clienteAtivo)
+          && clienteCarregado
+        "
+        :cliente-id="clienteId!"
+        :somente-leitura="somenteLeitura"
+      />
+
       <cliente-perfil360-section
         v-if="(modo === 'editar' || modo === 'visualizar') && clienteCarregado"
         :cliente-id="clienteId!"
@@ -76,12 +87,15 @@
 import ClienteContatosSection from 'components/clientes/ClienteContatosSection.vue';
 import ClienteEnderecosSection from 'components/clientes/ClienteEnderecosSection.vue';
 import ClienteFormulario from 'components/clientes/ClienteFormulario.vue';
+import ClienteTabelasPrecoSection from 'components/clientes/ClienteTabelasPrecoSection.vue';
 import ClientePerfil360Section from 'components/crm/ClientePerfil360Section.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useAuth } from 'composables/useAuth';
 import { useClientes } from 'composables/useClientes';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import { Permissoes } from 'constants/permissoes';
 import { clienteService } from 'services/cliente.service';
 import type { ClienteDto, ClienteFormModel } from 'types/dtos/cliente.dto';
 import { clienteDtoParaForm, criarClienteFormVazio } from 'utils/mappers/cliente.mapper';
@@ -91,6 +105,7 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const { salvando, criar, editar } = useClientes();
+const { possuiPermissao } = useAuth();
 const { erro } = useNotificacao();
 const { mensagem } = useTratarErroFormulario();
 
@@ -98,6 +113,10 @@ const formularioRef = ref<InstanceType<typeof ClienteFormulario> | null>(null);
 const formulario = ref<ClienteFormModel>(criarClienteFormVazio());
 const clienteCarregado = ref<ClienteDto | null>(null);
 const carregandoPagina = ref(true);
+
+const podeGerenciarTabelasPreco = computed(() =>
+  possuiPermissao(Permissoes.TabelasPreco.Visualizar),
+);
 
 const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
   if (route.name === 'cliente-visualizar') {

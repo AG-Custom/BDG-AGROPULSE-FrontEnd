@@ -8,16 +8,7 @@
         <template v-else>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="formulario.codigo"
-                  outlined
-                  label="Código"
-                  class="field-required"
-                  :rules="[obrigatorio]"
-                />
-              </div>
-              <div class="col-12 col-md-8">
+              <div class="col-12">
                 <q-input
                   v-model="formulario.nome"
                   outlined
@@ -83,13 +74,12 @@ const titulo = computed(() =>
 );
 const subtitulo = computed(() =>
   modo.value === 'criar'
-    ? 'Defina código, parcelas e intervalo.'
+    ? 'Defina nome, parcelas e intervalo.'
     : 'Atualize os dados da condição.',
 );
 const carregandoPagina = computed(() => modo.value === 'editar' && carregando.value);
 
 const formulario = ref<CondicaoPagamentoFormModel>({
-  codigo: '',
   nome: '',
   numeroParcelas: '1',
   intervaloDias: '30',
@@ -124,7 +114,6 @@ onMounted(async () => {
     return;
   }
   formulario.value = {
-    codigo: condicao.value.codigo,
     nome: condicao.value.nome,
     numeroParcelas: String(condicao.value.numeroParcelas),
     intervaloDias: String(condicao.value.intervaloDias),

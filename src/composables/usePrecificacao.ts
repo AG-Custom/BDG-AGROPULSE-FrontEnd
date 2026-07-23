@@ -19,8 +19,8 @@ export function usePrecificacao() {
   const tabelaOpcoes = computed(() =>
     tabelasPermitidas.value.map((tabela) => ({
       label: tabela.ehPadrao
-        ? `${tabela.codigo} — ${tabela.nome} (padrão)`
-        : `${tabela.codigo} — ${tabela.nome}`,
+        ? `${tabela.nome} (padrão)`
+        : `${tabela.nome}`,
       value: tabela.id,
     })),
   );

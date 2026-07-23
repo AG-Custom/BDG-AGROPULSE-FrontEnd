@@ -74,7 +74,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="6" />
+        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="5" />
 
         <empty-state
           v-else-if="!carregando && produtos.length === 0"
@@ -231,7 +231,6 @@ const categoriaOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<ProdutoResumoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left', sortable: true },
   { name: 'tipoProduto', label: 'Tipo', field: 'tipoProduto', align: 'left', sortable: true },
   { name: 'categoriaProdutoId', label: 'Categoria', field: 'categoriaProdutoId', align: 'left' },

@@ -4,11 +4,26 @@ import { messageService } from 'services/message.service';
 import { tabelaPrecoService } from 'services/tabela-preco.service';
 import type {
   ListarTabelasPrecoParams,
+  TabelaPrecoDto,
   TabelaPrecoFormModel,
   TabelaPrecoResumoDto,
 } from 'types/dtos/tabela-preco.dto';
 import { formParaSalvarTabelaPrecoPayload } from 'utils/mappers/tabela-preco.mapper';
 import { ref } from 'vue';
+
+function tabelaDtoParaResumo(dto: TabelaPrecoDto): TabelaPrecoResumoDto {
+  return {
+    id: dto.id,
+    empresaId: dto.empresaId,
+    codigo: dto.codigo,
+    nome: dto.nome,
+    vigenciaInicio: dto.vigenciaInicio,
+    vigenciaFim: dto.vigenciaFim,
+    ativo: dto.ativo,
+    ehPadrao: dto.ehPadrao,
+    clienteId: dto.clienteId,
+  };
+}
 
 export function useTabelasPreco() {
   const tabelas = ref<TabelaPrecoResumoDto[]>([]);
@@ -37,8 +52,19 @@ export function useTabelasPreco() {
     salvando.value = true;
 
     try {
-      await tabelaPrecoService.criar(formParaSalvarTabelaPrecoPayload(form));
+      const criada = await tabelaPrecoService.criar(formParaSalvarTabelaPrecoPayload(form));
       sucesso('Tabela de preço cadastrada com sucesso.');
+      await carregar(ultimosParams.value);
+
+      const resumo = tabelaDtoParaResumo(criada);
+      const indice = tabelas.value.findIndex((tabela) => tabela.id === criada.id);
+
+      if (indice >= 0) {
+        tabelas.value[indice] = { ...tabelas.value[indice], ...resumo };
+      } else {
+        tabelas.value = [resumo, ...tabelas.value];
+      }
+
       return true;
     } catch (e) {
       erro(mensagem(e));

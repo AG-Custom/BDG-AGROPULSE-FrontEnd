@@ -10,7 +10,6 @@ import { computed, ref } from 'vue';
 
 function formParaPayload(form: CondicaoPagamentoFormModel) {
   return {
-    codigo: form.codigo.trim(),
     nome: form.nome.trim(),
     numeroParcelas: Number(form.numeroParcelas),
     intervaloDias: Number(form.intervaloDias),
@@ -29,7 +28,7 @@ export function useCondicoesPagamento() {
     condicoes.value
       .filter((item) => item.ativo)
       .map((item) => ({
-        label: `${item.codigo} — ${item.nome}`,
+        label: `${item.nome}`,
         value: item.id,
       })),
   );
@@ -98,7 +97,7 @@ export function useCondicoesPagamento() {
   async function solicitarInativacao(item: CondicaoPagamentoDto): Promise<boolean> {
     const confirmou = await messageService.confirmar({
       titulo: 'Inativar condição',
-      mensagem: `Deseja inativar a condição ${item.codigo}?`,
+      mensagem: `Deseja inativar a condição ${item.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
@@ -127,7 +126,7 @@ export function useCondicoesPagamento() {
     if (!item) {
       return condicaoId;
     }
-    return `${item.codigo} — ${item.nome}`;
+    return `${item.nome}`;
   }
 
   return {

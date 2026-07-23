@@ -182,7 +182,7 @@ watch(
 
 function rotuloProduto(produtoId: string): string {
   const produto = produtos.value.find((item) => item.id === produtoId);
-  return produto ? `${produto.codigo} — ${produto.descricao}` : produtoId;
+  return produto ? `${produto.descricao}` : produtoId;
 }
 
 function formatarPreco(valor: number): string {

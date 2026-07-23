@@ -82,6 +82,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :loading="carregandoItensTabela"
                 :rules="[obrigatorio]"
                 @update:model-value="(id: string) => void onProdutoItem(index, id)"
               />
@@ -152,11 +153,12 @@ import { useOrcamento } from 'composables/useOrcamento';
 import { useOrcamentos } from 'composables/useOrcamentos';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
+import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import { useUsuarios } from 'composables/useUsuarios';
 import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
 import type { OrcamentoFormModel, OrcamentoItemFormModel } from 'types/dtos/orcamento.dto';
 import { obrigatorio } from 'utils/validators';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 function novoItem(): OrcamentoItemFormModel {
@@ -194,6 +196,17 @@ const formulario = ref<OrcamentoFormModel>({
 });
 const carregandoPagina = ref(false);
 
+const {
+  produtoOpcoes,
+  carregandoItensTabela,
+  produtoIdsPermitidos,
+} = useProdutosPorTabelaPreco(
+  () => formulario.value.tabelaPrecoId,
+  () => produtos.value,
+);
+
+const reResolverPrecosPendente = ref(false);
+
 const modo = computed(() => (route.name === 'orcamento-editar' ? 'editar' : 'criar'));
 const orcamentoId = computed(() => route.params.id as string | undefined);
 const tituloPagina = computed(() =>
@@ -207,9 +220,6 @@ const subtituloPagina = computed(() =>
 
 const clienteOpcoes = computed(() =>
   clientes.value.map((c) => ({ label: c.nomeRazao, value: c.id })),
-);
-const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
 );
 const vendedorOpcoes = computed(() =>
   usuarios.value
@@ -246,6 +256,38 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
   if (resolvido) {
     formulario.value.itens[index].precoUnitario = String(resolvido.preco);
   }
+}
+
+async function sincronizarItensComTabela(): Promise<void> {
+  if (carregandoItensTabela.value || carregandoPagina.value) {
+    return;
+  }
+
+  const deveReResolver = reResolverPrecosPendente.value;
+  reResolverPrecosPendente.value = false;
+
+  const ids = produtoIdsPermitidos.value;
+  const tarefas: Promise<void>[] = [];
+
+  for (let index = 0; index < formulario.value.itens.length; index++) {
+    const item = formulario.value.itens[index];
+
+    if (!item.produtoId) {
+      continue;
+    }
+
+    if (ids && !ids.has(item.produtoId)) {
+      item.produtoId = '';
+      item.precoUnitario = '';
+      continue;
+    }
+
+    if (deveReResolver) {
+      tarefas.push(onProdutoItem(index, item.produtoId));
+    }
+  }
+
+  await Promise.all(tarefas);
 }
 
 function adicionarItem(): void {
@@ -299,11 +341,26 @@ onMounted(async () => {
       })),
     };
     await carregarTabelasPermitidas({ clienteId: orcamento.value.clienteId });
+    reResolverPrecosPendente.value = false;
     carregandoPagina.value = false;
   } else if (tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }
 });
+
+watch(
+  [() => formulario.value.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela, carregandoPagina],
+  (atual, anterior) => {
+    const tabelaAtual = String(atual[0] ?? '');
+    const tabelaAnterior = String(anterior?.[0] ?? '');
+
+    if (anterior != null && tabelaAtual !== tabelaAnterior) {
+      reResolverPrecosPendente.value = true;
+    }
+
+    void sincronizarItensComTabela();
+  },
+);
 </script>
 
 <style scoped>

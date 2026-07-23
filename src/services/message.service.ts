@@ -5,6 +5,7 @@ const CONFIG_PADRAO: SweetAlertOptions = {
   showConfirmButton: true,
   confirmButtonText: 'OK',
   buttonsStyling: false,
+  zIndex: 7000,
   customClass: {
     container: 'agro-swal',
     popup: 'agro-swal__popup',

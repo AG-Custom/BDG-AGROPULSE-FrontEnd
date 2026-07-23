@@ -13,7 +13,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && centros.length === 0" :colunas="4" />
+        <agro-table-skeleton v-if="carregando && centros.length === 0" :colunas="3" />
         <empty-state
           v-else-if="!carregando && centros.length === 0"
           titulo="Nenhum centro de custo"
@@ -63,16 +63,7 @@
         <q-card-section>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="formulario.codigo"
-                  outlined
-                  label="Código"
-                  class="field-required"
-                  :rules="[obrigatorio]"
-                />
-              </div>
-              <div class="col-12 col-md-8">
+              <div class="col-12">
                 <q-input
                   v-model="formulario.nome"
                   outlined
@@ -127,7 +118,7 @@ const {
 } = useUnidades();
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
-const formulario = ref<CentroCustoFormModel>({ codigo: '', nome: '', unidadeId: '' });
+const formulario = ref<CentroCustoFormModel>({ nome: '', unidadeId: '' });
 
 const unidadeOpcoes = computed(() =>
   unidades.value
@@ -136,7 +127,6 @@ const unidadeOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<CentroCustoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
@@ -145,7 +135,6 @@ const colunas: QTableColumn<CentroCustoDto>[] = [
 function abrirDialog(item?: CentroCustoDto): void {
   editandoId.value = item?.id ?? null;
   formulario.value = {
-    codigo: item?.codigo ?? '',
     nome: item?.nome ?? '',
     unidadeId: item?.unidadeId ?? '',
   };

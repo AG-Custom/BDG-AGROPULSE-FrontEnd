@@ -9,6 +9,7 @@ export interface TabelaPrecoResumoDto {
   vigenciaFim: string | null;
   ativo: boolean;
   ehPadrao?: boolean;
+  clienteId?: string | null;
 }
 
 export interface TabelaPrecoItemDto {
@@ -28,7 +29,6 @@ export interface TabelaPrecoDto extends TabelaPrecoResumoDto {
 }
 
 export interface SalvarTabelaPrecoPayload {
-  codigo: string;
   nome: string;
   vigenciaInicio: string;
   vigenciaFim?: string | null;
@@ -55,7 +55,6 @@ export interface ListarTabelasPrecoParams {
 }
 
 export interface TabelaPrecoFormModel {
-  codigo: string;
   nome: string;
   vigenciaInicio: string;
   vigenciaFim: string;
