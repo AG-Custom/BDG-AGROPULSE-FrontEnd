@@ -145,14 +145,10 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <AgroMoneyInput
                   v-model="taxaForm.taxaFixa"
-                  outlined
                   label="Taxa fixa"
                   class="field-required"
-                  type="number"
-                  min="0"
-                  step="0.01"
                   aria-required="true"
                   :rules="[quantidadeNaoNegativa]"
                 />
@@ -179,6 +175,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFormasPagamentoConfig } from 'composables/useFormasPagamentoConfig';
 import { FormaPagamentoOpcoes } from 'constants/enums';
@@ -188,7 +185,7 @@ import type {
   TaxaFormaPagamentoDto,
   TaxaFormaPagamentoFormModel,
 } from 'types/dtos/financeiro.dto';
-import { formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarDecimal, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import {
   criarConfigFormaPagamentoFormVazio,
   criarTaxaFormVazia,
@@ -248,7 +245,7 @@ function abrirTaxa(taxa?: TaxaFormaPagamentoDto): void {
     taxaForm.value = {
       parcelas: String(taxa.parcelas),
       taxaPercentual: String(taxa.taxaPercentual),
-      taxaFixa: String(taxa.taxaFixa),
+      taxaFixa: formatarMoedaParaInput(taxa.taxaFixa),
     };
   } else {
     taxaForm.value = criarTaxaFormVazia();

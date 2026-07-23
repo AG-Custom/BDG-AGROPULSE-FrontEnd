@@ -135,9 +135,8 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <AgroMoneyInput
                   v-model="formulario.valor"
-                  outlined
                   label="Valor"
                   class="field-required"
                   :rules="[obrigatorio]"
@@ -172,6 +171,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCaixas } from 'composables/useCaixas';

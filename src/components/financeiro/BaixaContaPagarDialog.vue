@@ -8,9 +8,8 @@
         <q-form greedy class="agro-formulario" @submit.prevent="confirmar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input
+              <AgroMoneyInput
                 v-model="form.valor"
-                outlined
                 label="Valor"
                 class="field-required"
                 :rules="[obrigatorio]"
@@ -41,10 +40,10 @@
               />
             </div>
             <div class="col-6">
-              <q-input v-model="form.juros" outlined label="Juros" />
+              <AgroMoneyInput v-model="form.juros" label="Juros" />
             </div>
             <div class="col-6">
-              <q-input v-model="form.multa" outlined label="Multa" />
+              <AgroMoneyInput v-model="form.multa" label="Multa" />
             </div>
             <div class="col-12">
               <q-input v-model="form.observacao" outlined label="Observação" type="textarea" autogrow />
@@ -68,8 +67,10 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { FormaPagamentoOpcoes, type FormaPagamentoValor } from 'constants/enums';
 import type { BaixaContaPagarFormModel, BaixarContaPagarPayload } from 'types/dtos/financeiro.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { reactive, watch } from 'vue';
 
@@ -99,7 +100,7 @@ watch(
   () => props.modelValue,
   (aberto) => {
     if (aberto) {
-      form.valor = props.valorSugerido != null ? String(props.valorSugerido) : '';
+      form.valor = formatarMoedaParaInput(props.valorSugerido ?? null);
       form.formaPagamento = '';
       form.contaBancariaId = '';
       form.dataPagamento = new Date().toISOString().slice(0, 10);
@@ -112,12 +113,12 @@ watch(
 
 function confirmar(): void {
   emit('confirmar', {
-    valor: form.valor ? Number(form.valor.replace(',', '.')) : undefined,
+    valor: parseMascaraMoeda(form.valor) ?? undefined,
     formaPagamento: (form.formaPagamento || null) as FormaPagamentoValor | null,
     contaBancariaId: form.contaBancariaId || null,
     dataPagamento: form.dataPagamento || null,
-    juros: form.juros ? Number(form.juros.replace(',', '.')) : null,
-    multa: form.multa ? Number(form.multa.replace(',', '.')) : null,
+    juros: parseMascaraMoeda(form.juros),
+    multa: parseMascaraMoeda(form.multa),
     observacao: form.observacao.trim() || null,
   });
 }

@@ -7,6 +7,7 @@ import type {
   TransferenciaFinanceiraDto,
   TransferenciaFormModel,
 } from 'types/dtos/financeiro-gestao.dto';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useTransferenciasFinanceiras() {
@@ -36,7 +37,7 @@ export function useTransferenciasFinanceiras() {
         origemCaixaId: form.origemCaixaId || null,
         destinoContaBancariaId: form.destinoContaBancariaId || null,
         destinoCaixaId: form.destinoCaixaId || null,
-        valor: Number(form.valor.replace(',', '.')),
+        valor: parseMascaraMoeda(form.valor) ?? 0,
         data: form.data,
         observacao: form.observacao.trim() || null,
       });

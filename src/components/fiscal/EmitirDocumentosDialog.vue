@@ -97,7 +97,7 @@
                   />
                 </div>
                 <div class="col-12 col-md-4">
-                  <q-input v-model="cte.valor" outlined label="Valor" class="field-required" :rules="[obrigatorio]" />
+                  <AgroMoneyInput v-model="cte.valor" label="Valor" class="field-required" :rules="[obrigatorio]" />
                 </div>
                 <div class="col-12 col-md-4">
                   <q-input v-model="cte.ufDestino" outlined label="UF destino" maxlength="2" />
@@ -137,9 +137,8 @@
                   />
                 </div>
                 <div class="col-12 col-md-4">
-                  <q-input
+                  <AgroMoneyInput
                     v-model="mdfe.valorCarga"
-                    outlined
                     label="Valor carga"
                     class="field-required"
                     :rules="[obrigatorio]"
@@ -192,7 +191,7 @@
                   />
                 </div>
                 <div class="col-12 col-md-3">
-                  <q-input v-model="nfpr.valor" outlined label="Valor" class="field-required" :rules="[obrigatorio]" />
+                  <AgroMoneyInput v-model="nfpr.valor" label="Valor" class="field-required" :rules="[obrigatorio]" />
                 </div>
                 <div class="col-12 col-md-3">
                   <q-input v-model="nfpr.cultura" outlined label="Cultura" />
@@ -214,6 +213,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
 import { usePdv } from 'composables/usePdv';

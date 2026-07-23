@@ -147,13 +147,9 @@
         />
       </div>
       <div class="col-12 col-md-4">
-        <q-input
+        <AgroMoneyInput
           v-model="formulario.limiteCredito"
-          outlined
           label="Limite de crédito"
-          type="number"
-          min="0"
-          step="0.01"
           :readonly="somenteLeitura"
         />
       </div>
@@ -164,11 +160,11 @@
           label="Vendedor"
           emit-value
           map-options
-          :clearable="!ehVendedor && !somenteLeitura"
+          :clearable="!carteiraRestrita && !somenteLeitura"
           :options="vendedorOpcoes"
           :loading="carregandoUsuarios"
-          :readonly="somenteLeitura || ehVendedor"
-          :hint="ehVendedor ? 'Carteira vinculada ao seu usuário' : undefined"
+          :readonly="somenteLeitura || carteiraRestrita"
+          :hint="carteiraRestrita ? 'Carteira vinculada ao seu usuário' : undefined"
         />
       </div>
     </div>
@@ -177,6 +173,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
@@ -202,7 +199,7 @@ const props = defineProps<{
 const formulario = defineModel<ClienteFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
-const { ehVendedor, usuario } = usePerfilAtual();
+const { carteiraRestrita, usuario } = usePerfilAtual();
 const {
   usuarios,
   carregando: carregandoUsuarios,
@@ -251,7 +248,7 @@ const documentoExibicao = computed({
 });
 
 const vendedorOpcoes = computed(() => {
-  if (ehVendedor.value && usuario.value) {
+  if (carteiraRestrita.value && usuario.value) {
     return [
       {
         label: usuario.value.nome,
@@ -265,6 +262,7 @@ const vendedorOpcoes = computed(() => {
       (item) =>
         item.status === UsuarioStatus.Ativo &&
         (item.perfil === PerfilUsuario.Vendedor ||
+          item.perfil === PerfilUsuario.Consultor ||
           item.perfil === PerfilUsuario.Gerente ||
           item.perfil === PerfilUsuario.Diretor ||
           item.id === formulario.value.vendedorUsuarioId),
@@ -276,7 +274,7 @@ const vendedorOpcoes = computed(() => {
 });
 
 function aplicarCarteiraVendedor(): void {
-  if (!ehVendedor.value || !usuario.value || props.somenteLeitura) {
+  if (!carteiraRestrita.value || !usuario.value || props.somenteLeitura) {
     return;
   }
 
@@ -295,7 +293,7 @@ watch(
   },
 );
 
-watch(ehVendedor, () => {
+watch(carteiraRestrita, () => {
   aplicarCarteiraVendedor();
 });
 

@@ -34,13 +34,7 @@
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.precoEntrega"
-                outlined
-                label="Preço na entrega"
-                type="number"
-                step="0.0001"
-              />
+              <AgroMoneyInput v-model="form.precoEntrega" label="Preço na entrega" />
             </div>
             <div class="col-12">
               <q-input v-model="form.observacao" outlined label="Observação" type="textarea" autogrow />
@@ -64,8 +58,9 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import type { EntregaFormModel, EntregaPayload } from 'types/dtos/contrato.dto';
-import { formatarDecimal } from 'utils/formatters';
+import { formatarDecimal, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { reactive, watch } from 'vue';
 
@@ -109,7 +104,7 @@ function confirmar(): void {
     dataEntrega: form.dataEntrega || new Date().toISOString().slice(0, 10),
     numeroNfe: form.notaFiscal.trim() || null,
     observacao: form.observacao.trim() || null,
-    precoEntrega: form.precoEntrega.trim() ? Number(form.precoEntrega) : null,
+    precoEntrega: parseMascaraMoeda(form.precoEntrega),
     stubNfe: true,
   };
   emit('confirmar', payload);

@@ -1,25 +1,5 @@
 <template>
   <q-form ref="formRef" class="entrada-estoque-formulario" greedy>
-    <q-input
-      v-model="formulario.codigoBarras"
-      outlined
-      label="Código de barras"
-      hint="Leia o código ou digite e pressione Enter"
-      @keyup.enter.prevent="buscarPorCodigo"
-    >
-      <template #append>
-        <q-btn
-          flat
-          dense
-          round
-          icon="qr_code_scanner"
-          aria-label="Buscar produto por código"
-          :loading="buscandoCodigo"
-          @click="buscarPorCodigo"
-        />
-      </template>
-    </q-input>
-
     <q-select
       v-model="formulario.produtoId"
       outlined
@@ -44,19 +24,7 @@
       step="any"
       aria-required="true"
       :rules="[quantidadePositivaValidator]"
-    >
-      <template #append>
-        <q-btn
-          flat
-          dense
-          round
-          icon="scale"
-          aria-label="Ler peso da balança"
-          :loading="lendoPeso"
-          @click="lerPeso"
-        />
-      </template>
-    </q-input>
+    />
 
     <q-input
       v-if="exigeLote"
@@ -88,13 +56,9 @@
       hint="Opcional"
     />
 
-    <q-input
+    <AgroMoneyInput
       v-model="formulario.custoUnitario"
-      outlined
       label="Custo unitário"
-      type="number"
-      min="0"
-      step="0.01"
       hint="Opcional"
     />
 
@@ -108,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { useEstoqueDispositivos } from 'composables/useEstoqueDispositivos';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import type { QForm } from 'quasar';
 import type { EntradaEstoqueFormModel } from 'types/dtos/estoque.dto';
@@ -119,8 +83,6 @@ const formulario = defineModel<EntradaEstoqueFormModel>('formulario', { required
 
 const formRef = ref<QForm | null>(null);
 const quantidadePositivaValidator = quantidadePositiva;
-const { buscandoCodigo, lendoPeso, buscarProdutoPorCodigo, lerPesoBalanca } =
-  useEstoqueDispositivos();
 
 const {
   produtoOpcoes,
@@ -142,23 +104,6 @@ async function onProdutoAlterado(produtoId: string | null): Promise<void> {
   }
 
   await carregarDetalhe(produtoId);
-}
-
-async function buscarPorCodigo(): Promise<void> {
-  const produto = await buscarProdutoPorCodigo(formulario.value.codigoBarras);
-  if (!produto) {
-    return;
-  }
-
-  formulario.value.produtoId = produto.id;
-  await carregarDetalhe(produto.id);
-}
-
-async function lerPeso(): Promise<void> {
-  const leitura = await lerPesoBalanca();
-  if (leitura) {
-    formulario.value.quantidade = String(leitura.peso);
-  }
 }
 
 watch(

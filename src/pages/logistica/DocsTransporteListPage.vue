@@ -183,12 +183,9 @@
                 />
               </div>
               <div class="col-3">
-                <q-input
+                <AgroMoneyInput
                   v-model="formulario.valor"
-                  outlined
                   label="Valor"
-                  type="number"
-                  step="0.01"
                   class="field-required"
                   :rules="[obrigatorio]"
                 />
@@ -232,6 +229,7 @@
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { docTransporteVazio, useLogistica } from 'composables/useLogistica';

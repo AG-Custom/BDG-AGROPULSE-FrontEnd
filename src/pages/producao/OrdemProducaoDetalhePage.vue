@@ -182,25 +182,13 @@
 
         <agro-card v-if="podeApontar">
           <div class="header">
-            <h3 class="titulo-sec">Apontar produção (balança stub)</h3>
+            <h3 class="titulo-sec">Apontar produção</h3>
           </div>
           <div class="row q-col-gutter-md">
-            <div class="col-6 col-md-3">
+            <div class="col-6 col-md-4">
               <q-input v-model="producaoQtd" outlined dense label="Quantidade" type="number" />
             </div>
-            <div class="col-6 col-md-3">
-              <q-input v-model="dispositivoId" outlined dense label="Dispositivo (opcional)" />
-            </div>
-            <div class="col-12 col-md-3">
-              <agro-btn
-                flat
-                label="Ler balança"
-                descricao="Stub leitura de peso"
-                :loading="lendoPeso"
-                @click="lerBalanca"
-              />
-            </div>
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-4">
               <agro-btn
                 color="primary"
                 unelevated
@@ -241,10 +229,10 @@
             <q-input v-model="qtdProduzida" outlined label="Quantidade produzida" type="number" />
           </div>
           <div class="col-6">
-            <q-input v-model="custoMaoObra" outlined label="Custo mão de obra" type="number" />
+            <AgroMoneyInput v-model="custoMaoObra" label="Custo mão de obra" />
           </div>
           <div class="col-6">
-            <q-input v-model="custoOverhead" outlined label="Custo overhead" type="number" />
+            <AgroMoneyInput v-model="custoOverhead" label="Custo overhead" />
           </div>
         </q-card-section>
         <q-card-actions align="right">
@@ -267,7 +255,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
-import { useEstoqueDispositivos } from 'composables/useEstoqueDispositivos';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
@@ -278,7 +266,7 @@ import type {
   ApontamentoProducaoDto,
   ItemOrdemProducaoDto,
 } from 'types/dtos/producao.dto';
-import { formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarDecimal, formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -297,7 +285,6 @@ const {
 } = useProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { lotes, carregar: carregarLotes } = useEstoqueLotes();
-const { lendoPeso, lerPesoBalanca } = useEstoqueDispositivos();
 
 const id = computed(() => route.params.id as string);
 const dialogConcluir = ref(false);
@@ -305,7 +292,6 @@ const qtdProduzida = ref('');
 const custoMaoObra = ref('');
 const custoOverhead = ref('');
 const producaoQtd = ref('');
-const dispositivoId = ref('');
 const consumo = ref({
   produtoInsumoId: '',
   loteId: '',
@@ -364,7 +350,6 @@ const colunasConsumo: QTableColumn<ApontamentoConsumoDto>[] = [
 
 const colunasProducao: QTableColumn<ApontamentoProducaoDto>[] = [
   { name: 'quantidade', label: 'Qtd', field: 'quantidade', align: 'right' },
-  { name: 'dispositivoId', label: 'Dispositivo', field: 'dispositivoId', align: 'left' },
   { name: 'apontadoEm', label: 'Quando', field: 'apontadoEm', align: 'left' },
 ];
 
@@ -386,8 +371,8 @@ function abrirConcluir(): void {
 async function confirmarConcluir(): Promise<void> {
   const ok = await concluirOrdem(id.value, {
     quantidadeProduzida: Number(qtdProduzida.value),
-    custoMaoObra: custoMaoObra.value ? Number(custoMaoObra.value) : null,
-    custoOverhead: custoOverhead.value ? Number(custoOverhead.value) : null,
+    custoMaoObra: parseMascaraMoeda(custoMaoObra.value),
+    custoOverhead: parseMascaraMoeda(custoOverhead.value),
   });
   if (ok) dialogConcluir.value = false;
 }
@@ -405,16 +390,10 @@ async function salvarConsumo(): Promise<void> {
   }
 }
 
-async function lerBalanca(): Promise<void> {
-  const leitura = await lerPesoBalanca(dispositivoId.value || undefined);
-  if (leitura) producaoQtd.value = String(leitura.peso);
-}
-
 async function salvarProducao(): Promise<void> {
   if (!producaoQtd.value) return;
   const ok = await apontarProducao(id.value, {
     quantidade: Number(producaoQtd.value),
-    dispositivoId: dispositivoId.value || null,
   });
   if (ok) producaoQtd.value = '';
 }

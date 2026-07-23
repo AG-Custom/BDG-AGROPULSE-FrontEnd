@@ -233,7 +233,7 @@
             />
           </div>
           <div class="col-6">
-            <q-input v-model="resposta.precoUnitario" outlined label="Preço unitário" type="number" step="0.01" />
+            <AgroMoneyInput v-model="resposta.precoUnitario" label="Preço unitário" />
           </div>
           <div class="col-6">
             <q-input v-model="resposta.prazoEntregaDias" outlined label="Prazo (dias)" type="number" />
@@ -276,6 +276,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
@@ -287,7 +288,7 @@ import type {
   ItemCotacaoDto,
   RespostaCotacaoDto,
 } from 'types/dtos/compras.dto';
-import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarDecimal, formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -390,7 +391,7 @@ async function salvarResposta(): Promise<void> {
   const ok = await responderCotacao(id.value, {
     fornecedorId: resposta.fornecedorId,
     itemCotacaoId: resposta.itemCotacaoId,
-    precoUnitario: Number(resposta.precoUnitario),
+    precoUnitario: parseMascaraMoeda(resposta.precoUnitario) ?? 0,
     prazoEntregaDias: Number(resposta.prazoEntregaDias),
     condicoesComerciais: resposta.condicoesComerciais.trim() || null,
     validadeProposta: resposta.validadeProposta || null,

@@ -11,9 +11,9 @@
       />
     </div>
 
-    <agro-table-skeleton v-if="carregando && alertas.length === 0" :colunas="4" />
+    <agro-table-skeleton v-if="carregando && alertasVisiveis.length === 0" :colunas="4" />
     <empty-state
-      v-else-if="!carregando && alertas.length === 0"
+      v-else-if="!carregando && alertasVisiveis.length === 0"
       titulo="Sem alertas"
       descricao="Não há alertas gerenciais no momento."
       icon="notifications_none"
@@ -23,7 +23,7 @@
       flat
       bordered
       :row-key="rowKey"
-      :rows="alertas"
+      :rows="alertasVisiveis"
       :columns="colunas"
       :loading="carregando"
       :rows-per-page-options="[10, 25, 50]"
@@ -44,12 +44,22 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useAuth } from 'composables/useAuth';
 import { useRelatorios } from 'composables/useRelatorios';
 import type { QTableColumn } from 'quasar';
 import type { AlertaGerencialDto } from 'types/dtos/relatorio.dto';
-import { onMounted } from 'vue';
+import { filtrarAlertasGerenciaisPorPolitica } from 'utils/alerta-politica';
+import { computed, onMounted } from 'vue';
 
+const { usuario } = useAuth();
 const { alertas, carregando, carregarAlertas } = useRelatorios();
+
+const alertasVisiveis = computed(() =>
+  filtrarAlertasGerenciaisPorPolitica(
+    alertas.value,
+    usuario.value?.perfil ?? null,
+  ),
+);
 
 const colunas: QTableColumn<AlertaGerencialDto>[] = [
   { name: 'severidade', label: 'Severidade', field: 'severidade', align: 'left' },

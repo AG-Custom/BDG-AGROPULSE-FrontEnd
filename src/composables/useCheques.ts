@@ -7,6 +7,7 @@ import type {
   ListarChequesParams,
 } from 'types/dtos/financeiro-gestao.dto';
 import type { TipoChequeValor } from 'constants/enums';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useCheques() {
@@ -36,7 +37,7 @@ export function useCheques() {
         numero: form.numero.trim(),
         banco: form.banco.trim(),
         agencia: form.agencia.trim(),
-        valor: Number(form.valor.replace(',', '.')),
+        valor: parseMascaraMoeda(form.valor) ?? 0,
         bomPara: form.bomPara,
         emitente: form.emitente.trim() || null,
         contaBancariaId: form.contaBancariaId || null,

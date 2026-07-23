@@ -23,7 +23,7 @@ import type {
   ProdutoConversaoPayload,
 } from 'types/dtos/produto.dto';
 import type { TipoDocumentoProdutoValor } from 'constants/enums';
-import { apenasDigitos } from 'utils/formatters';
+import { apenasDigitos, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 
 export function gerarIdTemporario(): string {
   return `temp-${crypto.randomUUID()}`;
@@ -119,7 +119,7 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
       dto.diasAlertaValidade !== null && dto.diasAlertaValidade !== undefined
         ? String(dto.diasAlertaValidade)
         : '',
-    precoVenda: String(dto.precoVenda),
+    precoVenda: formatarMoedaParaInput(dto.precoVenda),
     fatorDivisaoNfe: String(dto.fatorDivisaoNfe),
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
@@ -149,7 +149,7 @@ function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
     exigeValidade: form.exigeValidade,
     exigeFabricacao: form.exigeFabricacao,
     diasAlertaValidade: parseNumeroOpcional(form.diasAlertaValidade),
-    precoVenda: Number(form.precoVenda.replace(',', '.')),
+    precoVenda: parseMascaraMoeda(form.precoVenda) ?? 0,
     fatorDivisaoNfe: parseNumeroOpcional(form.fatorDivisaoNfe) ?? 1,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
     comissaoPercentual: parseNumeroOpcional(form.comissaoPercentual),

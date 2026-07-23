@@ -12,6 +12,7 @@ import type {
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { baixarArquivo } from 'utils/download';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useNotasFiscais() {
@@ -84,7 +85,7 @@ export function useNotasFiscais() {
       await fiscalGestaoService.emitirCte({
         remetente: form.remetente.trim(),
         destinatario: form.destinatario.trim(),
-        valor: Number(form.valor),
+        valor: parseMascaraMoeda(form.valor) ?? 0,
         ufDestino: form.ufDestino.trim() || null,
       });
       sucesso('CT-e emitido.');
@@ -105,7 +106,7 @@ export function useNotasFiscais() {
         veiculo: form.veiculo.trim(),
         ufInicio: form.ufInicio.trim(),
         ufFim: form.ufFim.trim(),
-        valorCarga: Number(form.valorCarga),
+        valorCarga: parseMascaraMoeda(form.valorCarga) ?? 0,
       });
       sucesso('MDF-e emitido.');
       await carregar();
@@ -127,7 +128,7 @@ export function useNotasFiscais() {
           {
             produtoId: form.produtoId.trim(),
             quantidade: Number(form.quantidade),
-            valor: Number(form.valor),
+            valor: parseMascaraMoeda(form.valor) ?? 0,
           },
         ],
         cultura: form.cultura.trim() || null,
@@ -205,7 +206,7 @@ export function useNotasFiscais() {
     salvando.value = true;
     try {
       await fiscalGestaoService.emitirComplementar(id, {
-        valorAdicional: Number(form.valorAdicional),
+        valorAdicional: parseMascaraMoeda(form.valorAdicional) ?? 0,
         motivo: form.motivo.trim(),
       });
       sucesso('Nota complementar emitida.');

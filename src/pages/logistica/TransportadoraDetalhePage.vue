@@ -40,10 +40,10 @@
               <q-input v-model="formFrete.regiao" outlined dense label="Região" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input v-model="formFrete.valorPorKg" outlined dense label="R$/kg" type="number" step="0.01" />
+              <AgroMoneyInput v-model="formFrete.valorPorKg" dense label="R$/kg" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input v-model="formFrete.valorMinimo" outlined dense label="Mínimo" type="number" step="0.01" />
+              <AgroMoneyInput v-model="formFrete.valorMinimo" dense label="Mínimo" />
             </div>
             <div class="col-6 col-md-2">
               <q-input v-model="formFrete.prazoDias" outlined dense label="Prazo (dias)" type="number" />
@@ -106,6 +106,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { freteVazio, useLogistica } from 'composables/useLogistica';
 import type { QTableColumn } from 'quasar';

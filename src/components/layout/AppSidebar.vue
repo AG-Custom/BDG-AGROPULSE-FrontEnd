@@ -1,6 +1,6 @@
 <template>
   <nav class="app-sidebar">
-    <app-sidebar-section label="Principal" :rotas-ativas="['/']" default-opened>
+    <app-sidebar-section label="Principal" icon="home" :rotas-ativas="['/']" default-opened>
         <q-item
           clickable
           :to="{ name: 'dashboard' }"
@@ -15,7 +15,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section label="Cadastros" :rotas-ativas="['/unidades', '/fornecedores', '/clientes']">
+    <app-sidebar-section label="Cadastros" icon="folder_shared" :rotas-ativas="['/unidades', '/fornecedores', '/clientes']">
         <q-item
           clickable
           :to="{ name: 'unidades' }"
@@ -52,7 +52,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeAcessarProdutos" label="Produtos" :rotas-ativas="['/produtos', '/categorias-produto', '/unidades-medida', '/tabelas-preco']">
+    <app-sidebar-section v-if="podeAcessarProdutos" label="Produtos" icon="inventory_2" :rotas-ativas="['/produtos', '/categorias-produto', '/unidades-medida', '/tabelas-preco']">
         <q-item
           v-if="podeGerenciarProdutos"
           clickable
@@ -103,7 +103,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarEstoque" label="Estoque" :rotas-ativas="['/estoque']">
+    <app-sidebar-section v-if="podeGerenciarEstoque" label="Estoque" icon="warehouse" :rotas-ativas="['/estoque']">
         <q-item
           clickable
           :to="{ name: 'estoque-saldos' }"
@@ -183,7 +183,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeAcessarVendas" label="Vendas" :rotas-ativas="['/pedidos-venda', '/orcamentos', '/pdv', '/metas-vendedor', '/representantes', '/regras-comissao', '/aprovacoes']">
+    <app-sidebar-section v-if="podeAcessarVendas" label="Vendas" icon="shopping_cart" :rotas-ativas="['/pedidos-venda', '/orcamentos', '/pdv', '/metas-vendedor', '/representantes', '/regras-comissao', '/aprovacoes']">
         <q-item
           v-if="podeGerenciarPedidosVenda"
           clickable
@@ -270,7 +270,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeAcessarCompras" label="Compras" :rotas-ativas="['/compras', '/devolucoes-venda', '/expedicao']">
+    <app-sidebar-section v-if="podeAcessarCompras" label="Compras" icon="local_mall" :rotas-ativas="['/compras', '/devolucoes-venda', '/expedicao']">
         <q-item
           v-if="podeGerenciarCompras"
           clickable
@@ -393,7 +393,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeAcessarOperacoes" label="Operações" :rotas-ativas="['/contratos', '/producao']">
+    <app-sidebar-section v-if="podeAcessarOperacoes" label="Operações" icon="precision_manufacturing" :rotas-ativas="['/contratos', '/producao']">
         <q-item
           v-if="podeGerenciarContratos"
           clickable
@@ -492,7 +492,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarManutencao" label="Manutenção" :rotas-ativas="['/manutencao']">
+    <app-sidebar-section v-if="podeGerenciarManutencao" label="Manutenção" icon="handyman" :rotas-ativas="['/manutencao']">
         <q-item
           clickable
           :to="{ name: 'manutencao-dashboard' }"
@@ -561,7 +561,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarLogistica" label="Logística" :rotas-ativas="['/logistica']">
+    <app-sidebar-section v-if="podeGerenciarLogistica" label="Logística" icon="local_shipping" :rotas-ativas="['/logistica']">
         <q-item
           clickable
           :to="{ name: 'logistica-dashboard' }"
@@ -652,7 +652,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarCrm" label="CRM Agrícola" :rotas-ativas="['/crm']">
+    <app-sidebar-section v-if="podeGerenciarCrm" label="CRM Agrícola" icon="support_agent" :rotas-ativas="['/crm']">
         <q-item
           clickable
           :to="{ name: 'crm-dashboard' }"
@@ -721,7 +721,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarCobrancaCredito" label="Cobrança e Crédito" :rotas-ativas="['/cobranca-credito', '/financeiro/contas-receber', '/financeiro/regua-cobranca', '/financeiro/renegociacoes', '/crm/credito']">
+    <app-sidebar-section v-if="podeGerenciarCobrancaCredito" label="Cobrança e Crédito" icon="account_balance_wallet" :rotas-ativas="['/cobranca-credito', '/financeiro/contas-receber', '/financeiro/regua-cobranca', '/financeiro/renegociacoes', '/crm/credito']">
         <q-item
           clickable
           :to="{ name: 'cobranca-credito' }"
@@ -787,7 +787,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarRastreabilidade" label="Safras" :rotas-ativas="['/safras', '/rastreabilidade']">
+    <app-sidebar-section v-if="podeGerenciarRastreabilidade" label="Safras" icon="agriculture" :rotas-ativas="['/safras', '/rastreabilidade']">
         <q-item
           clickable
           :to="{ name: 'safras-fazendas' }"
@@ -950,7 +950,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarFiscal" label="Fiscal" :rotas-ativas="['/fiscal']">
+    <app-sidebar-section v-if="podeGerenciarFiscal" label="Fiscal" icon="receipt_long" :rotas-ativas="['/fiscal']">
         <q-item
           clickable
           :to="{ name: 'fiscal-notas-fiscais' }"
@@ -1063,7 +1063,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarFinanceiro || podeGerenciarFormasPagamentoConfig" label="Financeiro" :rotas-ativas="['/financeiro', '/formas-pagamento-config']">
+    <app-sidebar-section v-if="podeGerenciarFinanceiro || podeGerenciarFormasPagamentoConfig" label="Financeiro" icon="account_balance" :rotas-ativas="['/financeiro', '/formas-pagamento-config']">
         <q-item
           v-if="podeGerenciarFinanceiro"
           clickable
@@ -1282,7 +1282,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeGerenciarRelatorios" label="Relatórios" :rotas-ativas="['/relatorios']">
+    <app-sidebar-section v-if="podeGerenciarRelatorios" label="Relatórios" icon="analytics" :rotas-ativas="['/relatorios']">
         <q-item
           clickable
           :to="{ name: 'relatorios' }"
@@ -1296,7 +1296,7 @@
         </q-item>
     </app-sidebar-section>
 
-    <app-sidebar-section v-if="podeAcessarAdministracao" label="Administração" :rotas-ativas="['/usuarios', '/colaboradores']">
+    <app-sidebar-section v-if="podeAcessarAdministracao" label="Administração" icon="admin_panel_settings" :rotas-ativas="['/usuarios', '/colaboradores']">
         <q-item
           v-if="podeGerenciarUsuarios"
           clickable
@@ -1327,13 +1327,13 @@
 
 <script setup lang="ts">
 import AppSidebarSection from 'components/layout/AppSidebarSection.vue';
-import { useAuth } from 'composables/useAuth';
 import { useComprasConfig } from 'composables/useComprasConfig';
 import { usePerfilSafras } from 'composables/usePerfilSafras';
+import { usePermissao } from 'composables/usePermissao';
 import { Permissoes } from 'constants/permissoes';
 import { computed, onMounted } from 'vue';
 
-const { possuiPermissao } = useAuth();
+const { possuiPermissao } = usePermissao();
 const { config, carregar: carregarComprasConfig } = useComprasConfig();
 const { isRevenda, isIndustria, carregarPerfil } = usePerfilSafras();
 

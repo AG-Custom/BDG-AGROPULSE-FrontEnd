@@ -7,6 +7,7 @@ import type {
   EscopoListagemParams,
 } from 'types/dtos/financeiro-gestao.dto';
 import type { TipoAplicacaoValor } from 'constants/enums';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useAplicacoesFinanceiras() {
@@ -35,7 +36,7 @@ export function useAplicacoesFinanceiras() {
         contaBancariaId: form.contaBancariaId,
         tipo: form.tipo as TipoAplicacaoValor,
         descricao: form.descricao.trim(),
-        valorAplicado: Number(form.valorAplicado.replace(',', '.')),
+        valorAplicado: parseMascaraMoeda(form.valorAplicado) ?? 0,
         dataAplicacao: form.dataAplicacao,
         dataVencimento: form.dataVencimento || null,
         taxaPercentual: form.taxaPercentual

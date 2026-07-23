@@ -143,14 +143,7 @@
                 <q-input v-model="formPeca.quantidade" outlined dense label="Qtd" type="number" />
               </div>
               <div class="col-6 col-md-2">
-                <q-input
-                  v-model="formPeca.valorUnitario"
-                  outlined
-                  dense
-                  label="Unitário"
-                  type="number"
-                  step="0.01"
-                />
+                <AgroMoneyInput v-model="formPeca.valorUnitario" dense label="Unitário" />
               </div>
               <div class="col-12 col-md-3">
                 <q-toggle
@@ -183,11 +176,12 @@ import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.v
 import PecasOsTable from 'components/manutencao/PecasOsTable.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useManutencao } from 'composables/useManutencao';
 import { useProdutos } from 'composables/useProdutos';
 import { StatusOrdemServicoManutencao } from 'constants/enums';
 import type { AdicionarPecaOsFormModel } from 'types/dtos/manutencao.dto';
-import { formatarData, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -213,7 +207,7 @@ const formPeca = ref<AdicionarPecaOsFormModel>({
   produtoId: '',
   descricao: '',
   quantidade: '1',
-  valorUnitario: '0',
+  valorUnitario: formatarMoedaParaInput(0),
   baixarAgora: false,
 });
 
@@ -271,7 +265,7 @@ async function salvarPeca(): Promise<void> {
       produtoId: '',
       descricao: '',
       quantidade: '1',
-      valorUnitario: '0',
+      valorUnitario: formatarMoedaParaInput(0),
       baixarAgora: false,
     };
   }

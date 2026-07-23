@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     aplicarSessao(sessao: SessaoPersistida) {
-      this.usuario = usuarioDtoParaLogado(sessao.usuario);
+      this.usuario = usuarioDtoParaLogado(sessao.usuario, sessao.empresaId);
       this.empresaId = sessao.empresaId;
       this.unidadeId = sessao.unidadeId;
       this.requiresUnidadeSelection = sessao.requiresUnidadeSelection;

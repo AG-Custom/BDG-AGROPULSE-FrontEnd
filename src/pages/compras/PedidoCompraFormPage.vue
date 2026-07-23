@@ -45,15 +45,7 @@
               <q-input v-model="item.quantidade" outlined dense label="Qtd" type="number" :rules="[obrigatorio]" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
-                v-model="item.precoUnitario"
-                outlined
-                dense
-                label="Preço"
-                type="number"
-                step="0.01"
-                :rules="[obrigatorio]"
-              />
+              <AgroMoneyInput v-model="item.precoUnitario" dense label="Preço" :rules="[obrigatorio]" />
             </div>
             <div class="col-2 col-md-2">
               <agro-btn
@@ -81,9 +73,11 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -129,7 +123,7 @@ async function salvar(): Promise<void> {
     itens: itens.value.map((i) => ({
       produtoId: i.produtoId,
       quantidade: Number(i.quantidade),
-      precoUnitario: Number(i.precoUnitario),
+      precoUnitario: parseMascaraMoeda(i.precoUnitario) ?? 0,
     })),
   });
   if (criado) await router.push({ name: 'pedido-compra-detalhe', params: { id: criado.id } });

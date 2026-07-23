@@ -50,7 +50,7 @@
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="valorTotal" outlined label="Valor total" type="number" step="0.01" />
+              <AgroMoneyInput v-model="valorTotal" label="Valor total" />
             </div>
             <div class="col-12 col-md-8">
               <q-input v-model="observacao" outlined label="Observação" />
@@ -86,15 +86,7 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
-                v-model="item.precoUnitario"
-                outlined
-                dense
-                label="Preço"
-                type="number"
-                step="0.01"
-                :rules="[obrigatorio]"
-              />
+              <AgroMoneyInput v-model="item.precoUnitario" dense label="Preço" :rules="[obrigatorio]" />
             </div>
             <div class="col-2 col-md-2">
               <agro-btn
@@ -135,9 +127,11 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useContratosFornecimento } from 'composables/useContratosFornecimento';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -191,12 +185,12 @@ function montarItens() {
   return itens.value.map((i) => ({
     produtoId: i.produtoId,
     quantidade: Number(i.quantidade),
-    precoUnitario: Number(i.precoUnitario),
+    precoUnitario: parseMascaraMoeda(i.precoUnitario) ?? 0,
   }));
 }
 
 async function salvar(): Promise<void> {
-  const valor = valorTotal.value.trim() ? Number(valorTotal.value) : null;
+  const valor = parseMascaraMoeda(valorTotal.value);
   if (editando.value && id.value) {
     const ok = await atualizar(id.value, {
       numero: numero.value.trim(),
@@ -235,8 +229,7 @@ onMounted(async () => {
   fornecedorId.value = contrato.value.fornecedorId;
   vigenciaInicio.value = contrato.value.vigenciaInicio;
   vigenciaFim.value = contrato.value.vigenciaFim;
-  valorTotal.value =
-    contrato.value.valorTotal != null ? String(contrato.value.valorTotal) : '';
+  valorTotal.value = formatarMoedaParaInput(contrato.value.valorTotal);
   observacao.value = contrato.value.observacao ?? '';
   itens.value =
     contrato.value.itens.length > 0
@@ -244,7 +237,7 @@ onMounted(async () => {
           chave: crypto.randomUUID(),
           produtoId: i.produtoId,
           quantidade: String(i.quantidade),
-          precoUnitario: String(i.precoUnitario),
+          precoUnitario: formatarMoedaParaInput(i.precoUnitario),
         }))
       : [{ chave: crypto.randomUUID(), produtoId: '', quantidade: '1', precoUnitario: '' }];
 });

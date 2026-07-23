@@ -134,18 +134,14 @@
               :loading="carregandoClientes"
               :rules="[obrigatorio]"
             />
-            <q-input
+            <AgroMoneyInput
               v-model="formAcordo.valorOriginal"
-              outlined
-              label="Valor original (R$)"
-              type="number"
+              label="Valor original"
               class="q-mb-md"
             />
-            <q-input
+            <AgroMoneyInput
               v-model="formAcordo.valorAcordado"
-              outlined
-              label="Valor acordado (R$)"
-              type="number"
+              label="Valor acordado"
               class="field-required q-mb-md"
               :rules="[obrigatorio]"
             />
@@ -229,6 +225,7 @@
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

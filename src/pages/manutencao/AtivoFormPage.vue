@@ -51,13 +51,7 @@
               <q-input v-model="formulario.ano" outlined label="Ano" type="number" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
-                v-model="formulario.valorAquisicao"
-                outlined
-                label="Valor aquisição"
-                type="number"
-                step="0.01"
-              />
+              <AgroMoneyInput v-model="formulario.valorAquisicao" label="Valor aquisição" />
             </div>
             <div class="col-6 col-md-3">
               <q-input v-model="formulario.dataAquisicao" outlined label="Data aquisição" type="date" />
@@ -66,13 +60,7 @@
               <q-input v-model="formulario.vidaUtilAnos" outlined label="Vida útil (anos)" type="number" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input
-                v-model="formulario.valorResidual"
-                outlined
-                label="Valor residual"
-                type="number"
-                step="0.01"
-              />
+              <AgroMoneyInput v-model="formulario.valorResidual" label="Valor residual" />
             </div>
             <div class="col-6 col-md-3">
               <q-select
@@ -121,6 +109,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import {
   ativoDtoParaForm,
   ativoVazio,

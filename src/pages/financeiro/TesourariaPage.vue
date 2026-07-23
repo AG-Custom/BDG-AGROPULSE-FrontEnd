@@ -215,9 +215,8 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <AgroMoneyInput
                   v-model="formApp.valorAplicado"
-                  outlined
                   label="Valor"
                   class="field-required"
                   :rules="[obrigatorio]"
@@ -270,6 +269,7 @@
 import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useAplicacoesFinanceiras } from 'composables/useAplicacoesFinanceiras';

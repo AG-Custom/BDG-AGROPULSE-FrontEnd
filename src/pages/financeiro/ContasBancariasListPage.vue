@@ -136,7 +136,7 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="formulario.saldoMinimo" outlined label="Saldo mínimo" />
+                <AgroMoneyInput v-model="formulario.saldoMinimo" label="Saldo mínimo" />
               </div>
               <div class="col-12">
                 <q-input v-model="formulario.descricao" outlined label="Descrição" />
@@ -163,6 +163,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCnpjs } from 'composables/useCnpjs';
@@ -171,7 +172,7 @@ import { useUnidades } from 'composables/useUnidades';
 import { TipoContaBancariaOpcoes, UnidadeStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { ContaBancariaDto, ContaBancariaFormModel } from 'types/dtos/financeiro-gestao.dto';
-import { formatarCnpj, formatarMoeda } from 'utils/formatters';
+import { formatarCnpj, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
@@ -245,7 +246,7 @@ function abrirDialog(item?: ContaBancariaDto): void {
         agencia: item.agencia,
         numero: item.numero,
         tipo: item.tipo,
-        saldoMinimo: item.saldoMinimo != null ? String(item.saldoMinimo) : '',
+        saldoMinimo: formatarMoedaParaInput(item.saldoMinimo),
         descricao: item.descricao ?? '',
       }
     : formVazio();

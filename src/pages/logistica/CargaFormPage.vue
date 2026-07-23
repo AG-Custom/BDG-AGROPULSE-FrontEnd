@@ -53,16 +53,10 @@
               <q-input v-model="formulario.pesoKg" outlined label="Peso (kg)" type="number" step="0.01" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input v-model="formulario.pedagio" outlined label="Pedágio" type="number" step="0.01" />
+              <AgroMoneyInput v-model="formulario.pedagio" label="Pedágio" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input
-                v-model="formulario.custoMotorista"
-                outlined
-                label="Custo motorista"
-                type="number"
-                step="0.01"
-              />
+              <AgroMoneyInput v-model="formulario.custoMotorista" label="Custo motorista" />
             </div>
           </div>
 
@@ -125,6 +119,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { cargaDtoParaForm, cargaVazia, useLogistica } from 'composables/useLogistica';
 import type { CargaLogisticaFormModel } from 'types/dtos/logistica.dto';
 import { obrigatorio } from 'utils/validators';

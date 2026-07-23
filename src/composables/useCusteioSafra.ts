@@ -10,6 +10,7 @@ import type {
   ListarCusteiosParams,
   ProdutividadeSafraDto,
 } from 'types/dtos/safras.dto';
+import { parseMascaraMoedaObrigatorio } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useCusteioSafra() {
@@ -57,7 +58,7 @@ export function useCusteioSafra() {
         talhaoId: form.talhaoId.trim() || null,
         categoria: form.categoria as CategoriaCusteioSafraValor,
         descricao: form.descricao.trim(),
-        valor: Number(form.valor),
+        valor: parseMascaraMoedaObrigatorio(form.valor),
         data: form.data || null,
         quantidade: form.quantidade.trim() ? Number(form.quantidade) : null,
         unidade: form.unidade.trim() || null,

@@ -10,7 +10,9 @@ import {
   apenasDigitos,
   formatarCep,
   formatarCpf,
+  formatarMoedaParaInput,
   formatarTelefone,
+  parseMascaraMoeda,
 } from 'utils/formatters';
 
 function dataHojeIso(): string {
@@ -52,7 +54,7 @@ export function colaboradorDtoParaForm(dto: ColaboradorDto): ColaboradorFormMode
     dataNascimento: dto.dataNascimento ?? '',
     cargo: dto.cargo,
     cargoPersonalizado: dto.cargoPersonalizado ?? '',
-    salarioBase: dto.salarioBase !== null ? String(dto.salarioBase) : '',
+    salarioBase: formatarMoedaParaInput(dto.salarioBase),
     dataAdmissao: dto.dataAdmissao,
     dataDemissao: dto.dataDemissao ?? '',
     status: dto.status,
@@ -88,17 +90,6 @@ function montarEndereco(form: ColaboradorFormModel): EnderecoDto | null {
   };
 }
 
-function montarSalarioBase(valor: string): number | null {
-  const normalizado = valor.trim().replace(',', '.');
-
-  if (!normalizado) {
-    return null;
-  }
-
-  const numero = Number(normalizado);
-  return Number.isFinite(numero) ? numero : null;
-}
-
 export function formParaSalvarPayload(form: ColaboradorFormModel): SalvarColaboradorPayload {
   return {
     nomeCompleto: form.nomeCompleto.trim(),
@@ -108,7 +99,7 @@ export function formParaSalvarPayload(form: ColaboradorFormModel): SalvarColabor
     cargo: form.cargo,
     cargoPersonalizado:
       form.cargo === CargoColaborador.Personalizado ? form.cargoPersonalizado.trim() || null : null,
-    salarioBase: montarSalarioBase(form.salarioBase),
+    salarioBase: parseMascaraMoeda(form.salarioBase),
     dataAdmissao: form.dataAdmissao,
     dataDemissao: form.dataDemissao || null,
     status: form.status,

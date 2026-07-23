@@ -6,6 +6,7 @@ import type {
   ConfigFunruralFormModel,
   FunruralCalculoDto,
 } from 'types/dtos/fiscal-gestao.dto';
+import { parseMascaraMoedaObrigatorio } from 'utils/formatters';
 import { ref } from 'vue';
 
 function toNumber(value: string): number {
@@ -57,7 +58,7 @@ export function useFunrural() {
     calculando.value = true;
     try {
       calculo.value = await fiscalGestaoService.calcularFunrural({
-        baseCalculo: toNumber(baseCalculo),
+        baseCalculo: parseMascaraMoedaObrigatorio(baseCalculo),
         isProdutorRural,
       });
       sucesso('Cálculo Funrural concluído.');

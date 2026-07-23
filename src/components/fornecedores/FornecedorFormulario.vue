@@ -114,13 +114,15 @@
           outlined
           label="CEP"
           class="field-required"
-          hint="8 dígitos"
+          hint="8 dígitos — preenchimento automático do endereço"
           aria-required="true"
           :mask="MASCARAS.CEP"
           :maxlength="TAMANHO_FORMATADO.CEP"
           inputmode="numeric"
+          :loading="buscandoCep"
           :rules="[obrigatorio, cepValidator]"
           :readonly="somenteLeitura"
+          @blur="buscarSeCepValido"
         />
       </div>
       <div class="col-12 col-md-8">
@@ -207,6 +209,7 @@
 </template>
 
 <script setup lang="ts">
+import { useBuscaCep } from 'composables/useBuscaCep';
 import { TipoPessoaFornecedor, TipoPessoaFornecedorOpcoes } from 'constants/enums';
 import { DIGITOS, MASCARAS, TAMANHO_FORMATADO, mascaraTelefone } from 'constants/masks';
 import type { QForm } from 'quasar';
@@ -231,6 +234,7 @@ const props = defineProps<{
 const formulario = defineModel<FornecedorFormModel>('formulario', { required: true });
 
 const formRef = ref<QForm | null>(null);
+const { buscandoCep, buscarSeCepValido } = useBuscaCep(formulario);
 
 const cepValidator = cep;
 const ufValidator = uf;
