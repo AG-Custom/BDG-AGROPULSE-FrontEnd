@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Análises de crédito"
@@ -77,7 +77,7 @@
                 :ativo="true"
                 :mostrar-editar="false"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'crm-credito-detalhe', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -117,11 +117,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -134,6 +141,11 @@ import { formatarDataHora, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Análises de crédito');
 
 const router = useRouter();
 const { analises, carregando, salvando, carregarAnalises, criarAnalise } = useCrm();
@@ -198,6 +210,11 @@ onMounted(() => {
   void carregarAnalises();
   void carregarClientes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

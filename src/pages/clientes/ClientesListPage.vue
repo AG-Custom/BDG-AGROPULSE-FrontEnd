@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Clientes"
@@ -141,22 +141,29 @@
             <q-td :props="props" class="clientes-list__acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
-                :visualizar-to="{ name: 'cliente-visualizar', params: { id: props.row.id } }"
                 :editar-to="{ name: 'cliente-editar', params: { id: props.row.id } }"
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarCliente(props.row)"
                 @ativar="ativarCliente(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -176,6 +183,11 @@ import {
 import type { ClienteResumoDto, ListarClientesParams } from 'types/dtos/cliente.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhar cliente');
 
 const {
   clientes,
@@ -311,6 +323,11 @@ onMounted(() => {
 
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

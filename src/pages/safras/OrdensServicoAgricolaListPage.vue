@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Ordens de serviço agrícola"
@@ -53,10 +53,9 @@
             <q-td :props="props" class="acoes">
               <agro-acoes-menu
                 :ativo="true"
-                :mostrar-visualizar="false"
                 :mostrar-status="false"
                 @editar="abrirDialog(props.row)"
-              >
+               @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item v-if="props.row.status === StatusOrdemServicoAgricola.Aberta" v-close-popup clickable class="agro-acoes-menu__item" @click="iniciar(props.row.id)">
                   <q-item-section avatar><q-icon name="play_arrow" class="agro-acoes-menu__icon" /></q-item-section>
                   <q-item-section>Iniciar</q-item-section>
@@ -153,11 +152,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -178,6 +184,11 @@ import type {
 import { formatarData } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Ordens de serviço agrícola');
 
 const {
   ordens,
@@ -272,6 +283,11 @@ onMounted(() => {
   void carregarSafras();
   void carregarTalhoes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Formas de pagamento"
@@ -78,21 +78,28 @@
                   name: 'forma-pagamento-config-editar',
                   params: { id: props.row.id },
                 }"
-                :mostrar-visualizar="false"
                 :loading-status="salvando"
                 @desabilitar="solicitarInativacao(props.row)"
                 @ativar="solicitarAtivacao(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -101,7 +108,12 @@ import { useFormasPagamentoConfig } from 'composables/useFormasPagamentoConfig';
 import { FormaPagamentoOpcoes, type FormaPagamentoValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { ConfigFormaPagamentoDto } from 'types/dtos/financeiro.dto';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Formas de pagamento');
 
 const { configs, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
   useFormasPagamentoConfig();
@@ -133,6 +145,11 @@ function rotuloForma(forma: FormaPagamentoValor): string {
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Solicitações de compra" subtitulo="Solicite itens para cotação e pedidos.">
       <agro-btn
@@ -52,18 +52,25 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'solicitacao-compra-detalhe', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -72,7 +79,12 @@ import { useCompras } from 'composables/useCompras';
 import type { QTableColumn } from 'quasar';
 import type { SolicitacaoCompraDto } from 'types/dtos/compras.dto';
 import { formatarDataHora } from 'utils/formatters';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Solicitações de compra');
 
 const { solicitacoes, carregando, carregarSolicitacoes } = useCompras();
 
@@ -86,4 +98,9 @@ const colunas: QTableColumn<SolicitacaoCompraDto>[] = [
 onMounted(() => {
   void carregarSolicitacoes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

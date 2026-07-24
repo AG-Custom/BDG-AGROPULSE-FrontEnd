@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Ordens de produção" subtitulo="Planeje e acompanhe a produção.">
       <agro-btn
@@ -55,18 +55,25 @@
                 :ativo="true"
                 :mostrar-editar="false"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'ordem-producao-detalhe', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -76,7 +83,12 @@ import { useProdutos } from 'composables/useProdutos';
 import type { QTableColumn } from 'quasar';
 import type { OrdemProducaoDto } from 'types/dtos/producao.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Ordens de produção');
 
 const { ordens, carregando, carregarOrdens } = useProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
@@ -102,4 +114,9 @@ onMounted(() => {
   void carregarProdutos();
   void carregarOrdens();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

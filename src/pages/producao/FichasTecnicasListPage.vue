@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Fichas técnicas de processo"
@@ -52,24 +52,31 @@
             <q-td :props="props">
               <agro-acoes-menu
                 :ativo="true"
-                :mostrar-visualizar="false"
                 :mostrar-status="false"
                 :mostrar-excluir="true"
                 excluir-label="Remover"
                 :editar-to="{ name: 'ficha-tecnica-editar', params: { id: props.row.id } }"
                 :loading-excluir="salvando"
                 @excluir="onRemover(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -77,7 +84,12 @@ import { useFichasTecnicas } from 'composables/useFichasTecnicas';
 import { useProdutos } from 'composables/useProdutos';
 import type { QTableColumn } from 'quasar';
 import type { FichaTecnicaProcessoDto } from 'types/dtos/producao.dto';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Fichas técnicas de processo');
 
 const { fichas, carregando, salvando, carregar, remover } = useFichasTecnicas();
 const { produtos, carregar: carregarProdutos } = useProdutos();
@@ -113,6 +125,11 @@ onMounted(() => {
   void carregarProdutos();
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

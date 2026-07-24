@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Contas a pagar"
@@ -75,7 +75,7 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+              <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item
                   v-if="podeBaixar(props.row.status)"
                   v-close-popup
@@ -116,6 +116,12 @@
       :loading="salvando"
       @confirmar="onBaixar"
     />
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
@@ -123,6 +129,7 @@
 import BaixaContaPagarDialog from 'components/financeiro/BaixaContaPagarDialog.vue';
 import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -141,6 +148,11 @@ import type { QTableColumn } from 'quasar';
 import type { BaixarContaPagarPayload, ContaPagarDto } from 'types/dtos/financeiro.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Contas a pagar');
 
 const { contas, carregando, salvando, carregar, baixar, cancelar } = useContasPagar();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
@@ -229,4 +241,9 @@ onMounted(() => {
   void carregarContasBancarias();
   void carregar(paramsFiltro());
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

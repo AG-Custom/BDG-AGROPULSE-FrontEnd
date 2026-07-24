@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Notas fiscais" subtitulo="Emissão, eventos e documentos fiscais.">
       <agro-btn
@@ -90,7 +90,7 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-acoes-menu :mostrar-visualizar="false" :mostrar-editar="false" :mostrar-status="false">
+              <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirDanfe(props.row.id)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="description" size="16px" /></span></q-item-section>
                   <q-item-section>DANFE</q-item-section>
@@ -139,6 +139,12 @@
       @mdfe="onEmitirMdfe"
       @nfpr="onEmitirNfpr"
     />
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
@@ -148,6 +154,7 @@ import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
 import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
 import EmitirDocumentosDialog from 'components/fiscal/EmitirDocumentosDialog.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -169,7 +176,12 @@ import type {
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Notas fiscais');
 
 const {
   notas,
@@ -287,4 +299,9 @@ async function onEmitirNfpr(form: EmitirNfprFormModel): Promise<void> {
 onMounted(() => {
   void aplicarFiltro();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

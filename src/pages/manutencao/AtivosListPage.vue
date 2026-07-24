@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Ativos" subtitulo="Cadastro de máquinas, veículos e equipamentos.">
       <agro-btn
@@ -88,19 +88,26 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'manutencao-ativo-detalhe', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -110,6 +117,11 @@ import type { QTableColumn } from 'quasar';
 import type { AtivoManutencaoDto } from 'types/dtos/manutencao.dto';
 import { formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Ativos');
 
 const { ativos, carregando, carregarAtivos } = useManutencao();
 const busca = ref('');
@@ -157,6 +169,11 @@ const colunas: QTableColumn<AtivoManutencaoDto>[] = [
 onMounted(() => {
   void carregarAtivos();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

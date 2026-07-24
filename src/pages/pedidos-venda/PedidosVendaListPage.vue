@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Pedidos de venda"
@@ -163,19 +163,26 @@
               <agro-acoes-menu
                 :mostrar-editar="props.row.status === PedidoVendaStatus.Orcamento"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'pedido-venda-detalhe', params: { id: props.row.id } }"
                 :editar-to="{ name: 'pedido-venda-editar', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -199,6 +206,11 @@ import {
   variantePedidoVendaStatus,
 } from 'utils/pedido-venda.helpers';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Pedidos de venda');
 
 const { pedidos, carregando, exportando, carregar, exportar } = usePedidosVenda();
 const {
@@ -348,6 +360,11 @@ onMounted(() => {
   void carregarUsuarios();
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

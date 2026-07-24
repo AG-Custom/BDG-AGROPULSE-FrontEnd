@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Tabelas de preço"
@@ -98,12 +98,11 @@
             <q-td :props="props" class="tabelas-preco-list__acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
-                :visualizar-to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
                 :editar-to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarTabela(props.row)"
                 @ativar="ativarTabela(props.row)"
-              >
+               @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item
                   v-if="props.row.ativo && !props.row.ehPadrao"
                   v-close-popup
@@ -129,11 +128,18 @@
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -142,6 +148,11 @@ import { useTabelasPreco } from 'composables/useTabelasPreco';
 import type { ListarTabelasPrecoParams, TabelaPrecoResumoDto } from 'types/dtos/tabela-preco.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Tabelas de preço');
 
 const {
   tabelas,
@@ -232,6 +243,11 @@ watch([busca, filtroAtivo], () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Transferências financeiras"
@@ -47,10 +47,9 @@
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
               <agro-acoes-menu
-                :mostrar-visualizar="false"
                 :mostrar-editar="false"
                 :mostrar-status="false"
-              >
+               @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item
                 v-if="props.row.status === StatusTransferencia.Pendente"
                 dense
@@ -164,11 +163,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -185,7 +191,12 @@ import type {
 } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Transferências financeiras');
 
 const { transferencias, carregando, salvando, carregar, criar, confirmar, cancelar } =
   useTransferenciasFinanceiras();
@@ -228,6 +239,11 @@ onMounted(() => {
   void carregarContas();
   void carregarCaixas();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

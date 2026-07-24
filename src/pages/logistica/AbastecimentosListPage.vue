@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Abastecimentos" subtitulo="Registro de combustível por veículo.">
       <agro-btn
@@ -69,12 +69,12 @@
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu
-                :mostrar-visualizar="false"
                 :mostrar-editar="false"
                 :mostrar-status="false"
                 :mostrar-excluir="true"
                 :loading-excluir="salvando"
                 @excluir="onRemover(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -157,11 +157,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -176,6 +183,11 @@ import type {
 import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Abastecimentos');
 
 const {
   abastecimentos,
@@ -237,6 +249,11 @@ onMounted(async () => {
   await carregarVeiculos();
   aplicar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

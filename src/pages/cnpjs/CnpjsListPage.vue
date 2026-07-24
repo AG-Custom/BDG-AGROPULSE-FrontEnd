@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Empresa"
@@ -47,10 +47,10 @@
               <div class="empresa-cnpjs__principal-acoes">
                 <agro-badge label="Principal" variant="accent" />
                 <agro-acoes-menu
-                  :mostrar-visualizar="false"
                   :mostrar-status="false"
                   :editar-to="{ name: 'cnpj-editar', params: { id: cnpjPrincipal.id } }"
-                />
+                  @visualizar="abrirDialogVisualizar(cnpjPrincipal)"
+              />
               </div>
             </div>
           </template>
@@ -116,22 +116,29 @@
                 <agro-acoes-menu
                   :ativo="props.row.ativo"
                   :editar-to="{ name: 'cnpj-editar', params: { id: props.row.id } }"
-                  :mostrar-visualizar="false"
                   :loading-status="ativando"
                   @desabilitar="solicitarInativacao(props.row)"
                   @ativar="solicitarAtivacao(props.row)"
-                />
+                  @visualizar="abrirDialogVisualizar(props.row)"
+              />
               </q-td>
             </template>
           </q-table>
         </agro-card>
       </template>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -140,7 +147,12 @@ import { useCnpjs } from 'composables/useCnpjs';
 import type { CnpjEmpresaDto } from 'types/dtos/cnpj.dto';
 import { formatarCnpj } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Empresa');
 
 const { cnpjs, carregando, ativando, carregar, solicitarInativacao, solicitarAtivacao } = useCnpjs();
 
@@ -163,6 +175,11 @@ const colunas: QTableColumn<CnpjEmpresaDto>[] = [
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

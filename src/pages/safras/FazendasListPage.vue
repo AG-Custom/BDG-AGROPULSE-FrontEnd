@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Fazendas" subtitulo="Cadastro de propriedades rurais.">
       <agro-btn
@@ -47,11 +47,11 @@
             <q-td :props="props" class="acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
-                :mostrar-visualizar="false"
                 :mostrar-status="props.row.ativo"
                 :loading-status="salvando"
                 @editar="abrirDialog(props.row)"
                 @desabilitar="inativar(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -118,11 +118,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -134,6 +141,11 @@ import type { FazendaDto, FazendaFormModel } from 'types/dtos/safras.dto';
 import { formatarDecimal } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Fazendas');
 
 const { fazendas, carregando, salvando, carregar, criar, editar, inativar } = useFazendas();
 const {
@@ -190,6 +202,11 @@ onMounted(() => {
   void carregar();
   void carregarClientes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

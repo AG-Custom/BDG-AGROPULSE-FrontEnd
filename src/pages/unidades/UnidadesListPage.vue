@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Unidades" subtitulo="Gerencie as unidades da sua empresa.">
       <agro-btn
@@ -89,22 +89,29 @@
             <q-td :props="props" class="unidades-table__acoes">
               <agro-acoes-menu
                 :ativo="props.row.status === UnidadeStatus.Ativa"
-                :visualizar-to="{ name: 'unidade-visualizar', params: { id: props.row.id } }"
                 :editar-to="{ name: 'unidade-editar', params: { id: props.row.id } }"
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarUnidade(props.row)"
                 @ativar="ativarUnidade(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -114,6 +121,11 @@ import { useUnidades } from 'composables/useUnidades';
 import type { ListarUnidadesParams, UnidadeDto } from 'types/dtos/unidade.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhar unidade');
 
 const {
   unidades,
@@ -189,6 +201,11 @@ watch(filtroStatus, () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

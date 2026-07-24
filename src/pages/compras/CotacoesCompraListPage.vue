@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Cotações de compra" subtitulo="Compare respostas de fornecedores.">
       <agro-btn
@@ -52,18 +52,25 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-                :visualizar-to="{ name: 'cotacao-compra-detalhe', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -72,7 +79,12 @@ import { useCompras } from 'composables/useCompras';
 import type { QTableColumn } from 'quasar';
 import type { CotacaoCompraDto } from 'types/dtos/compras.dto';
 import { formatarData } from 'utils/formatters';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Cotações de compra');
 
 const { cotacoes, carregando, carregarCotacoes } = useCompras();
 
@@ -86,4 +98,9 @@ const colunas: QTableColumn<CotacaoCompraDto>[] = [
 onMounted(() => {
   void carregarCotacoes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

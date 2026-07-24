@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Lotes"
@@ -102,10 +102,9 @@
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu
-                :mostrar-visualizar="false"
                 :mostrar-editar="false"
                 :mostrar-status="false"
-              >
+               @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item
                   v-close-popup
                   clickable
@@ -177,11 +176,18 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -193,6 +199,11 @@ import type { QTableColumn } from 'quasar';
 import type { LoteDto } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Lotes');
 
 const { lotes, genealogia, carregando, carregandoGenealogia, carregar, obterGenealogia } =
   useEstoqueLotes();
@@ -281,6 +292,11 @@ watch([filtroProduto, apenasComSaldo], () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>
