@@ -200,7 +200,7 @@ const categoriaOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<ProdutoResumoDto>[] = [
-  { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left', sortable: true },
+  { name: 'descricao', label: 'Nome', field: 'descricao', align: 'left', sortable: true },
   { name: 'tipoProduto', label: 'Tipo', field: 'tipoProduto', align: 'left', sortable: true },
   { name: 'categoriaProdutoId', label: 'Categoria', field: 'categoriaProdutoId', align: 'left' },
   { name: 'precoVenda', label: 'Preço', field: 'precoVenda', align: 'right', sortable: true },

@@ -7,7 +7,7 @@
         <q-input
           v-model="formulario.descricao"
           outlined
-          label="Descrição"
+          label="Nome"
           class="field-required"
           maxlength="300"
           aria-required="true"
