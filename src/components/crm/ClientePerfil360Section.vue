@@ -154,24 +154,15 @@
           >
             <template #body-cell-acoes="props">
               <q-td :props="props" class="acoes">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Editar preferência"
-                  @click="abrirPreferencia(props.row)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover preferência"
-                  :loading="salvando"
-                  @click="removerPreferencia(props.row.id, clienteId)"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-status="false"
+                mostrar-excluir
+                :loading-excluir="salvando"
+                editar-label="Editar preferência"
+                excluir-label="Remover preferência"
+                @editar="abrirPreferencia(props.row)"
+                @excluir="removerPreferencia(props.row.id, clienteId)"
                 />
               </q-td>
             </template>
@@ -237,6 +228,7 @@
 
 <script setup lang="ts">
 import ClienteHistoricoComercialSection from 'components/clientes/ClienteHistoricoComercialSection.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

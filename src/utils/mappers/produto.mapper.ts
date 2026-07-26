@@ -45,8 +45,8 @@ export function fiscalFormTemDados(form: ProdutoFiscalFormModel): boolean {
     apenasDigitos(form.cest).length > 0 ||
     form.csosn.trim().length > 0 ||
     form.cstIcms.trim().length > 0 ||
-    form.aliquotaIcms.trim().length > 0 ||
-    form.mva.trim().length > 0 ||
+    String(form.aliquotaIcms ?? '').trim().length > 0 ||
+    String(form.mva ?? '').trim().length > 0 ||
     form.observacoesFiscais.trim().length > 0 ||
     apenasDigitos(form.cfopPadraoInterno).length > 0 ||
     apenasDigitos(form.cfopPadraoExterno).length > 0
@@ -129,8 +129,12 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
   };
 }
 
-function parseNumeroOpcional(valor: string): number | null {
-  const texto = valor.trim();
+function parseNumeroOpcional(valor: string | number | null | undefined): number | null {
+  if (valor === null || valor === undefined) {
+    return null;
+  }
+
+  const texto = String(valor).trim();
   if (!texto) {
     return null;
   }

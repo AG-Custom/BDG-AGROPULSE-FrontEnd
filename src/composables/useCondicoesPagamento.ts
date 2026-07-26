@@ -95,11 +95,38 @@ export function useCondicoesPagamento() {
   }
 
   async function solicitarInativacao(item: CondicaoPagamentoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar condição',
       mensagem: `Deseja inativar a condição ${item.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
+    });
+
+    if (!justificativa) {
+      return false;
+    }
+
+    salvando.value = true;
+
+    try {
+      await financeiroService.inativarCondicaoPagamento(item.id, justificativa);
+      sucesso('Condição inativada.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function solicitarAtivacao(item: CondicaoPagamentoDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar condição',
+      mensagem: `Deseja reativar a condição ${item.nome}?`,
+      textoConfirmar: 'Ativar',
+      icone: 'info',
     });
 
     if (!confirmou) {
@@ -109,8 +136,8 @@ export function useCondicoesPagamento() {
     salvando.value = true;
 
     try {
-      await financeiroService.inativarCondicaoPagamento(item.id);
-      sucesso('Condição inativada.');
+      await financeiroService.ativarCondicaoPagamento(item.id);
+      sucesso('Condição ativada.');
       await carregar();
       return true;
     } catch (e) {
@@ -140,6 +167,7 @@ export function useCondicoesPagamento() {
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
     rotuloCondicao,
   };
 }

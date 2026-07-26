@@ -65,23 +65,14 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="props">
         <q-td :props="props" class="pedido-venda-itens__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar item"
-            @click="abrirDialogEditar(props.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover item"
-            @click="removerItem(props.row.chave)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            editar-label="Editar item"
+            excluir-label="Remover item"
+            @editar="abrirDialogEditar(props.row)"
+            @excluir="removerItem(props.row.chave)"
           />
         </q-td>
       </template>
@@ -174,6 +165,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';

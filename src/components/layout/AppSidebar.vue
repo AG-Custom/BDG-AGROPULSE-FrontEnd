@@ -8,9 +8,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="dashboard" size="20px" />
-          </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -22,9 +19,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="store" size="20px" />
-          </q-item-section>
           <q-item-section>Unidades</q-item-section>
         </q-item>
         <q-item
@@ -33,9 +27,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="local_shipping" size="20px" />
-          </q-item-section>
           <q-item-section>Fornecedores</q-item-section>
         </q-item>
         <q-item
@@ -45,9 +36,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="groups" size="20px" />
-          </q-item-section>
           <q-item-section>Clientes</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -60,9 +48,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="inventory_2" size="20px" />
-          </q-item-section>
           <q-item-section>Produtos</q-item-section>
         </q-item>
         <q-item
@@ -72,9 +57,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="category" size="20px" />
-          </q-item-section>
           <q-item-section>Categorias</q-item-section>
         </q-item>
         <q-item
@@ -84,9 +66,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="straighten" size="20px" />
-          </q-item-section>
           <q-item-section>Unid. de medida</q-item-section>
         </q-item>
         <q-item
@@ -96,9 +75,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="sell" size="20px" />
-          </q-item-section>
           <q-item-section>Tabelas de preço</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -110,9 +86,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="warehouse" size="20px" />
-          </q-item-section>
           <q-item-section>Saldos</q-item-section>
         </q-item>
         <q-item
@@ -121,9 +94,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="qr_code_2" size="20px" />
-          </q-item-section>
           <q-item-section>Lotes</q-item-section>
         </q-item>
         <q-item
@@ -132,9 +102,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="swap_vert" size="20px" />
-          </q-item-section>
           <q-item-section>Movimentações</q-item-section>
         </q-item>
         <q-item
@@ -143,9 +110,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="start" size="20px" />
-          </q-item-section>
           <q-item-section>Estoque inicial</q-item-section>
         </q-item>
         <q-item
@@ -154,9 +118,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="fact_check" size="20px" />
-          </q-item-section>
           <q-item-section>Inventários</q-item-section>
         </q-item>
         <q-item
@@ -165,9 +126,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="swap_horiz" size="20px" />
-          </q-item-section>
           <q-item-section>Transferências</q-item-section>
         </q-item>
         <q-item
@@ -176,9 +134,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="notification_important" size="20px" />
-          </q-item-section>
           <q-item-section>Alertas</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -191,9 +146,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="shopping_cart" size="20px" />
-          </q-item-section>
           <q-item-section>Pedidos</q-item-section>
         </q-item>
         <q-item
@@ -203,9 +155,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="request_quote" size="20px" />
-          </q-item-section>
           <q-item-section>Orçamentos</q-item-section>
         </q-item>
         <q-item
@@ -215,9 +164,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="point_of_sale" size="20px" />
-          </q-item-section>
           <q-item-section>PDV</q-item-section>
         </q-item>
         <q-item
@@ -227,9 +173,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="flag" size="20px" />
-          </q-item-section>
           <q-item-section>Metas</q-item-section>
         </q-item>
         <q-item
@@ -239,9 +182,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="handshake" size="20px" />
-          </q-item-section>
           <q-item-section>Representantes</q-item-section>
         </q-item>
         <q-item
@@ -251,9 +191,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="percent" size="20px" />
-          </q-item-section>
           <q-item-section>Comissões</q-item-section>
         </q-item>
         <q-item
@@ -263,9 +200,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="rule" size="20px" />
-          </q-item-section>
           <q-item-section>Aprovações</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -278,9 +212,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="inventory_2" size="20px" />
-          </q-item-section>
           <q-item-section>Recebimentos</q-item-section>
         </q-item>
         <q-item
@@ -290,9 +221,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="history" size="20px" />
-          </q-item-section>
           <q-item-section>Histórico</q-item-section>
         </q-item>
         <q-item
@@ -302,9 +230,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="assignment" size="20px" />
-          </q-item-section>
           <q-item-section>Solicitações</q-item-section>
         </q-item>
         <q-item
@@ -314,9 +239,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="compare" size="20px" />
-          </q-item-section>
           <q-item-section>Cotações</q-item-section>
         </q-item>
         <q-item
@@ -326,9 +248,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="description" size="20px" />
-          </q-item-section>
           <q-item-section>Contratos fornecimento</q-item-section>
         </q-item>
         <q-item
@@ -338,9 +257,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="local_mall" size="20px" />
-          </q-item-section>
           <q-item-section>Pedidos compra</q-item-section>
         </q-item>
         <q-item
@@ -350,9 +266,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="verified" size="20px" />
-          </q-item-section>
           <q-item-section>Aprovações</q-item-section>
         </q-item>
         <q-item
@@ -362,9 +275,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="rule" size="20px" />
-          </q-item-section>
           <q-item-section>Alçadas / config</q-item-section>
         </q-item>
         <q-item
@@ -374,9 +284,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="assignment_return" size="20px" />
-          </q-item-section>
           <q-item-section>Devoluções</q-item-section>
         </q-item>
         <q-item
@@ -386,9 +293,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="local_shipping" size="20px" />
-          </q-item-section>
           <q-item-section>Expedição</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -401,9 +305,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="handshake" size="20px" />
-          </q-item-section>
           <q-item-section>Contratos</q-item-section>
         </q-item>
         <q-item
@@ -413,9 +314,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="precision_manufacturing" size="20px" />
-          </q-item-section>
           <q-item-section>Ordens produção</q-item-section>
         </q-item>
         <q-item
@@ -425,9 +323,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="menu_book" size="20px" />
-          </q-item-section>
           <q-item-section>Receitas / BOM</q-item-section>
         </q-item>
         <q-item
@@ -437,9 +332,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="transform" size="20px" />
-          </q-item-section>
           <q-item-section>Beneficiamentos</q-item-section>
         </q-item>
         <q-item
@@ -449,9 +341,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="biotech" size="20px" />
-          </q-item-section>
           <q-item-section>Laudos qualidade</q-item-section>
         </q-item>
         <q-item
@@ -461,9 +350,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="description" size="20px" />
-          </q-item-section>
           <q-item-section>Fichas técnicas</q-item-section>
         </q-item>
         <q-item
@@ -473,9 +359,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="pause_circle" size="20px" />
-          </q-item-section>
           <q-item-section>Paradas de linha</q-item-section>
         </q-item>
         <q-item
@@ -485,9 +368,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="speed" size="20px" />
-          </q-item-section>
           <q-item-section>OEE</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -499,9 +379,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="dashboard" size="20px" />
-          </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
         <q-item
@@ -510,9 +387,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="agriculture" size="20px" />
-          </q-item-section>
           <q-item-section>Ativos</q-item-section>
         </q-item>
         <q-item
@@ -521,9 +395,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="event_repeat" size="20px" />
-          </q-item-section>
           <q-item-section>Planos preventivos</q-item-section>
         </q-item>
         <q-item
@@ -532,9 +403,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="handyman" size="20px" />
-          </q-item-section>
           <q-item-section>Ordens de serviço</q-item-section>
         </q-item>
         <q-item
@@ -543,9 +411,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="checklist" size="20px" />
-          </q-item-section>
           <q-item-section>Checklists</q-item-section>
         </q-item>
         <q-item
@@ -554,9 +419,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="payments" size="20px" />
-          </q-item-section>
           <q-item-section>Custos</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -568,9 +430,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="dashboard" size="20px" />
-          </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
         <q-item
@@ -579,9 +438,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="local_shipping" size="20px" />
-          </q-item-section>
           <q-item-section>Frota</q-item-section>
         </q-item>
         <q-item
@@ -590,9 +446,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="inventory_2" size="20px" />
-          </q-item-section>
           <q-item-section>Cargas</q-item-section>
         </q-item>
         <q-item
@@ -601,9 +454,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="assignment" size="20px" />
-          </q-item-section>
           <q-item-section>Romaneios</q-item-section>
         </q-item>
         <q-item
@@ -612,9 +462,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="business" size="20px" />
-          </q-item-section>
           <q-item-section>Transportadoras</q-item-section>
         </q-item>
         <q-item
@@ -623,9 +470,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="local_gas_station" size="20px" />
-          </q-item-section>
           <q-item-section>Abastecimento</q-item-section>
         </q-item>
         <q-item
@@ -634,9 +478,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="description" size="20px" />
-          </q-item-section>
           <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item
@@ -645,9 +486,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="payments" size="20px" />
-          </q-item-section>
           <q-item-section>Custos</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -659,9 +497,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="dashboard" size="20px" />
-          </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
         <q-item
@@ -670,9 +505,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="agriculture" size="20px" />
-          </q-item-section>
           <q-item-section>Carteira</q-item-section>
         </q-item>
         <q-item
@@ -681,9 +513,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="trending_up" size="20px" />
-          </q-item-section>
           <q-item-section>Oportunidades</q-item-section>
         </q-item>
         <q-item
@@ -692,9 +521,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="science" size="20px" />
-          </q-item-section>
           <q-item-section>Amostras</q-item-section>
         </q-item>
         <q-item
@@ -703,9 +529,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="campaign" size="20px" />
-          </q-item-section>
           <q-item-section>Campanhas</q-item-section>
         </q-item>
         <q-item
@@ -714,9 +537,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance" size="20px" />
-          </q-item-section>
           <q-item-section>Crédito</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -728,9 +548,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance_wallet" size="20px" />
-          </q-item-section>
           <q-item-section>Painel crédito</q-item-section>
         </q-item>
         <q-item
@@ -741,9 +558,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item app-sidebar__item--atalho"
         >
-          <q-item-section avatar>
-            <q-icon name="receipt_long" size="18px" />
-          </q-item-section>
           <q-item-section>Contas a receber</q-item-section>
         </q-item>
         <q-item
@@ -754,9 +568,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item app-sidebar__item--atalho"
         >
-          <q-item-section avatar>
-            <q-icon name="campaign" size="18px" />
-          </q-item-section>
           <q-item-section>Régua de cobrança</q-item-section>
         </q-item>
         <q-item
@@ -767,9 +578,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item app-sidebar__item--atalho"
         >
-          <q-item-section avatar>
-            <q-icon name="handshake" size="18px" />
-          </q-item-section>
           <q-item-section>Renegociações</q-item-section>
         </q-item>
         <q-item
@@ -780,9 +588,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item app-sidebar__item--atalho"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance" size="18px" />
-          </q-item-section>
           <q-item-section>CRM Crédito</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -794,9 +599,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="agriculture" size="20px" />
-          </q-item-section>
           <q-item-section>Fazendas</q-item-section>
         </q-item>
         <q-item
@@ -805,9 +607,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="map" size="20px" />
-          </q-item-section>
           <q-item-section>Glebas</q-item-section>
         </q-item>
         <q-item
@@ -816,9 +615,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="grass" size="20px" />
-          </q-item-section>
           <q-item-section>Talhões</q-item-section>
         </q-item>
         <q-item
@@ -827,9 +623,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="science" size="20px" />
-          </q-item-section>
           <q-item-section>Aplicações</q-item-section>
         </q-item>
         <q-item
@@ -838,9 +631,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="menu_book" size="20px" />
-          </q-item-section>
           <q-item-section>Diário de campo</q-item-section>
         </q-item>
         <q-item
@@ -849,9 +639,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="timeline" size="20px" />
-          </q-item-section>
           <q-item-section>Histórico aplicações</q-item-section>
         </q-item>
         <q-item
@@ -860,9 +647,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="insights" size="20px" />
-          </q-item-section>
           <q-item-section>Histórico produtividade</q-item-section>
         </q-item>
         <q-item
@@ -871,9 +655,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="public" size="20px" />
-          </q-item-section>
           <q-item-section>Importação geo</q-item-section>
         </q-item>
         <q-item
@@ -883,9 +664,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="support_agent" size="20px" />
-          </q-item-section>
           <q-item-section>Visitas técnicas</q-item-section>
         </q-item>
         <q-item
@@ -895,9 +673,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="recommend" size="20px" />
-          </q-item-section>
           <q-item-section>Recomendações</q-item-section>
         </q-item>
         <q-item
@@ -907,9 +682,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="calendar_month" size="20px" />
-          </q-item-section>
           <q-item-section>Planejamento de safras</q-item-section>
         </q-item>
         <q-item
@@ -919,9 +691,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="assignment" size="20px" />
-          </q-item-section>
           <q-item-section>OS agrícola</q-item-section>
         </q-item>
         <q-item
@@ -931,9 +700,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="payments" size="20px" />
-          </q-item-section>
           <q-item-section>Custeio</q-item-section>
         </q-item>
         <q-item
@@ -943,9 +709,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="speed" size="20px" />
-          </q-item-section>
           <q-item-section>OEE campo</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -957,9 +720,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="description" size="20px" />
-          </q-item-section>
           <q-item-section>Notas fiscais</q-item-section>
         </q-item>
         <q-item
@@ -968,9 +728,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="cloud_off" size="20px" />
-          </q-item-section>
           <q-item-section>Contingência</q-item-section>
         </q-item>
         <q-item
@@ -979,9 +736,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="block" size="20px" />
-          </q-item-section>
           <q-item-section>Inutilizações</q-item-section>
         </q-item>
         <q-item
@@ -990,9 +744,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="percent" size="20px" />
-          </q-item-section>
           <q-item-section>PIS/COFINS NCM</q-item-section>
         </q-item>
         <q-item
@@ -1001,9 +752,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="swap_horiz" size="20px" />
-          </q-item-section>
           <q-item-section>MVA NCM/UF</q-item-section>
         </q-item>
         <q-item
@@ -1012,9 +760,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance" size="20px" />
-          </q-item-section>
           <q-item-section>GNRE</q-item-section>
         </q-item>
         <q-item
@@ -1023,9 +768,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="agriculture" size="20px" />
-          </q-item-section>
           <q-item-section>Funrural</q-item-section>
         </q-item>
         <q-item
@@ -1034,9 +776,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="business" size="20px" />
-          </q-item-section>
           <q-item-section>Regimes por CNPJ</q-item-section>
         </q-item>
         <q-item
@@ -1045,9 +784,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="folder_zip" size="20px" />
-          </q-item-section>
           <q-item-section>SPED</q-item-section>
         </q-item>
         <q-item
@@ -1056,9 +792,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="receipt_long" size="20px" />
-          </q-item-section>
           <q-item-section>Configuração fiscal</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -1071,9 +804,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="request_quote" size="20px" />
-          </q-item-section>
           <q-item-section>Contas a receber</q-item-section>
         </q-item>
         <q-item
@@ -1083,9 +813,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="payments" size="20px" />
-          </q-item-section>
           <q-item-section>Contas a pagar</q-item-section>
         </q-item>
         <q-item
@@ -1095,9 +822,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="event_repeat" size="20px" />
-          </q-item-section>
           <q-item-section>Condições de pagamento</q-item-section>
         </q-item>
         <q-item
@@ -1107,9 +831,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="credit_card" size="20px" />
-          </q-item-section>
           <q-item-section>Formas de pagamento</q-item-section>
         </q-item>
         <q-item
@@ -1119,9 +840,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance" size="20px" />
-          </q-item-section>
           <q-item-section>Contas bancárias</q-item-section>
         </q-item>
         <q-item
@@ -1131,9 +849,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="point_of_sale" size="20px" />
-          </q-item-section>
           <q-item-section>Caixas</q-item-section>
         </q-item>
         <q-item
@@ -1143,9 +858,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_tree" size="20px" />
-          </q-item-section>
           <q-item-section>Centros de custo</q-item-section>
         </q-item>
         <q-item
@@ -1155,9 +867,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="swap_horiz" size="20px" />
-          </q-item-section>
           <q-item-section>Transferências</q-item-section>
         </q-item>
         <q-item
@@ -1167,9 +876,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="money" size="20px" />
-          </q-item-section>
           <q-item-section>Cheques</q-item-section>
         </q-item>
         <q-item
@@ -1179,9 +885,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="waterfall_chart" size="20px" />
-          </q-item-section>
           <q-item-section>Fluxo de caixa</q-item-section>
         </q-item>
         <q-item
@@ -1191,9 +894,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="savings" size="20px" />
-          </q-item-section>
           <q-item-section>Tesouraria</q-item-section>
         </q-item>
         <q-item
@@ -1203,9 +903,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="sync_alt" size="20px" />
-          </q-item-section>
           <q-item-section>Conciliação</q-item-section>
         </q-item>
         <q-item
@@ -1215,9 +912,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="receipt" size="20px" />
-          </q-item-section>
           <q-item-section>Boletos</q-item-section>
         </q-item>
         <q-item
@@ -1227,9 +921,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="campaign" size="20px" />
-          </q-item-section>
           <q-item-section>Régua de cobrança</q-item-section>
         </q-item>
         <q-item
@@ -1239,9 +930,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="handshake" size="20px" />
-          </q-item-section>
           <q-item-section>Renegociações</q-item-section>
         </q-item>
         <q-item
@@ -1251,9 +939,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="account_balance_wallet" size="20px" />
-          </q-item-section>
           <q-item-section>Antecipações</q-item-section>
         </q-item>
         <q-item
@@ -1263,9 +948,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="pie_chart" size="20px" />
-          </q-item-section>
           <q-item-section>Orçamento financeiro</q-item-section>
         </q-item>
         <q-item
@@ -1275,9 +957,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="currency_exchange" size="20px" />
-          </q-item-section>
           <q-item-section>Cotações / multi-moeda</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -1289,9 +968,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="analytics" size="20px" />
-          </q-item-section>
           <q-item-section>Relatórios</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -1304,9 +980,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="manage_accounts" size="20px" />
-          </q-item-section>
           <q-item-section>Usuários</q-item-section>
         </q-item>
         <q-item
@@ -1316,9 +989,6 @@
           active-class="app-sidebar__item--active"
           class="app-sidebar__item"
         >
-          <q-item-section avatar>
-            <q-icon name="badge" size="20px" />
-          </q-item-section>
           <q-item-section>Colaboradores</q-item-section>
         </q-item>
     </app-sidebar-section>
@@ -1489,9 +1159,5 @@ onMounted(() => {
   border-left: var(--border-width-accent) solid var(--color-sidebar-accent);
   color: var(--color-sidebar-item-active-text);
   font-weight: var(--font-weight-medium);
-}
-
-:deep(.app-sidebar__item--active .q-icon) {
-  color: var(--color-sidebar-accent);
 }
 </style>

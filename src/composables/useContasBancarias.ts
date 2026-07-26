@@ -28,6 +28,7 @@ export function useContasBancarias() {
   const contas = ref<ContaBancariaDto[]>([]);
   const carregando = ref(false);
   const salvando = ref(false);
+  const ativando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -92,17 +93,17 @@ export function useContasBancarias() {
   }
 
   async function solicitarInativacao(item: ContaBancariaDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar conta',
       mensagem: 'Deseja inativar esta conta bancária?',
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
-    if (!confirmou) return false;
+    if (!justificativa) return false;
 
     salvando.value = true;
     try {
-      await financeiroGestaoService.inativarContaBancaria(item.id);
+      await financeiroGestaoService.inativarContaBancaria(item.id, justificativa);
       sucesso('Conta inativada.');
       await carregar();
       return true;
@@ -114,14 +115,40 @@ export function useContasBancarias() {
     }
   }
 
+  async function solicitarAtivacao(item: ContaBancariaDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar conta',
+      mensagem: 'Deseja reativar esta conta bancária?',
+      textoConfirmar: 'Ativar',
+      icone: 'info',
+    });
+
+    if (!confirmou) return false;
+
+    ativando.value = true;
+    try {
+      await financeiroGestaoService.ativarContaBancaria(item.id);
+      sucesso('Conta ativada.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      ativando.value = false;
+    }
+  }
+
   return {
     contas,
     contaOpcoes,
     carregando,
     salvando,
+    ativando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
   };
 }

@@ -45,8 +45,12 @@ export const financeiroService = {
       .then((r) => r.data);
   },
 
-  inativarCondicaoPagamento(id: string): Promise<void> {
-    return api.patch(`/condicoes-pagamento/${id}/inativar`).then(() => undefined);
+  inativarCondicaoPagamento(id: string, justificativa: string): Promise<void> {
+    return api.patch(`/condicoes-pagamento/${id}/inativar`, { justificativa }).then(() => undefined);
+  },
+
+  ativarCondicaoPagamento(id: string): Promise<void> {
+    return api.patch(`/condicoes-pagamento/${id}/ativar`).then(() => undefined);
   },
 
   listarContasReceber(params?: ListarContasReceberParams): Promise<ContaReceberDto[]> {
@@ -117,10 +121,14 @@ export const financeiroService = {
       .then((r) => r.data);
   },
 
-  inativarFormaPagamentoConfig(id: string): Promise<void> {
+  inativarFormaPagamentoConfig(id: string, justificativa: string): Promise<void> {
     return api
-      .patch(`/formas-pagamento-config/${id}/inativar`)
+      .patch(`/formas-pagamento-config/${id}/inativar`, { justificativa })
       .then(() => undefined);
+  },
+
+  ativarFormaPagamentoConfig(id: string): Promise<void> {
+    return api.patch(`/formas-pagamento-config/${id}/ativar`).then(() => undefined);
   },
 
   upsertTaxaFormaPagamento(

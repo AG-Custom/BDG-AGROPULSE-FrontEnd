@@ -13,6 +13,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
   const codigos = ref<ProdutoCodigoDto[]>([]);
   const salvando = ref(false);
   const removendo = ref(false);
+  const removendoId = ref<string | null>(null);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -21,7 +22,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
   }
 
   function definirCodigos(lista: ProdutoCodigoDto[]): void {
-    codigos.value = lista;
+    codigos.value = Array.isArray(lista) ? [...lista] : [];
   }
 
   function aplicarPrincipalLocal(form: ProdutoCodigoFormModel, codigoId?: string): void {
@@ -104,6 +105,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
 
   async function remover(codigoId: string): Promise<boolean> {
     removendo.value = true;
+    removendoId.value = codigoId;
 
     try {
       const id = produtoId();
@@ -114,7 +116,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
       }
 
       await produtoService.removerCodigo(id, codigoId);
-      codigos.value = codigos.value.filter((item) => item.id !== codigoId);
+      await recarregar();
       sucesso('Código removido com sucesso.');
       return true;
     } catch (e) {
@@ -122,6 +124,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
       return false;
     } finally {
       removendo.value = false;
+      removendoId.value = null;
     }
   }
 
@@ -144,6 +147,7 @@ export function useProdutoCodigos(produtoId: () => string | undefined) {
     codigos,
     salvando,
     removendo,
+    removendoId,
     estaPersistido,
     definirCodigos,
     adicionar,

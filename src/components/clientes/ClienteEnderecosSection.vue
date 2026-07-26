@@ -56,24 +56,15 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="props">
         <q-td :props="props" class="cliente-enderecos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar endereço"
-            @click="abrirDialogEditar(props.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover endereço"
-            :loading="removendo"
-            @click="solicitarRemocao(props.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendo"
+            editar-label="Editar endereço"
+            excluir-label="Remover endereço"
+            @editar="abrirDialogEditar(props.row)"
+            @excluir="solicitarRemocao(props.row)"
           />
         </q-td>
       </template>
@@ -118,6 +109,7 @@
 
 <script setup lang="ts">
 import EnderecoClienteFormulario from 'components/clientes/EnderecoClienteFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { TipoEnderecoClienteOpcoes } from 'constants/enums';

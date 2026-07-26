@@ -64,11 +64,11 @@ export function useUsuarios() {
     }
   }
 
-  async function inativar(usuarioId: string): Promise<boolean> {
+  async function inativar(usuarioId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await usuarioService.inativar(usuarioId);
+      await usuarioService.inativar(usuarioId, justificativa);
       sucesso('Usuário inativado com sucesso.');
       return true;
     } catch (e) {
@@ -110,18 +110,18 @@ export function useUsuarios() {
   }
 
   async function solicitarInativacao(usuario: UsuarioResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar usuário',
       mensagem: `Deseja inativar o usuário ${nomeCompleto(usuario)}? As sessões ativas serão encerradas.`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(usuario.id);
+    return inativar(usuario.id, justificativa);
   }
 
   async function solicitarAtivacao(usuario: UsuarioResumoDto): Promise<boolean> {

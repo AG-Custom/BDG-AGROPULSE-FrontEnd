@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Checklists de inspeção"
@@ -65,26 +65,46 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                v-if="!props.row.sincronizado"
-                flat
-                dense
-                icon="sync"
-                label="Sincronizar"
-                descricao="Sincronizar checklist"
-                :loading="salvando"
-                @click="sincronizarChecklist(props.row.id)"
-              />
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-if="!props.row.sincronizado"
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
+                  @click="sincronizarChecklist(props.row.id)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
+                      <q-icon name="sync" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Sincronizar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -93,7 +113,12 @@ import { useManutencao } from 'composables/useManutencao';
 import type { QTableColumn } from 'quasar';
 import type { ChecklistManutencaoDto } from 'types/dtos/manutencao.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Checklists de inspeção');
 
 const {
   checklists,
@@ -124,4 +149,9 @@ onMounted(() => {
   void carregarAtivos();
   void carregarChecklists();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

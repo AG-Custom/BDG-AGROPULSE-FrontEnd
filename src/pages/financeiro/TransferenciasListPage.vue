@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Transferências financeiras"
@@ -46,28 +46,37 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
                 v-if="props.row.status === StatusTransferencia.Pendente"
-                flat
-                round
                 dense
-                icon="done"
-                color="positive"
-                descricao="Confirmar"
-                :loading="salvando"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="confirmar(props.row)"
-              />
-              <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="done" size="16px" /></span></q-item-section>
+                  <q-item-section>Confirmar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                 v-if="props.row.status === StatusTransferencia.Pendente"
-                flat
-                round
                 dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="cancelar(props.row)"
-              />
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -154,10 +163,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -174,7 +191,12 @@ import type {
 } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Transferências financeiras');
 
 const { transferencias, carregando, salvando, carregar, criar, confirmar, cancelar } =
   useTransferenciasFinanceiras();
@@ -217,6 +239,11 @@ onMounted(() => {
   void carregarContas();
   void carregarCaixas();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

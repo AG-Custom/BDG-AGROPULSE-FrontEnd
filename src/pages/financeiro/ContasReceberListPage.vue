@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Contas a receber"
@@ -75,41 +75,47 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
+              <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
                   v-if="podeBaixar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="check_circle"
-                  color="positive"
-                  descricao="Baixar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="abrirBaixa(props.row)"
-                />
-                <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
+                  <q-item-section>Baixar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                   v-if="podeBaixar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="receipt_long"
-                  color="primary"
-                  descricao="Emitir boleto"
-                  :loading="emitindo"
+                  class="agro-acoes-menu__item"
+                  :disable="emitindo"
                   @click="onEmitirBoleto(props.row)"
-                />
-                <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="receipt_long" size="16px" /></span></q-item-section>
+                  <q-item-section>Emitir boleto</q-item-section>
+                  <q-item-section v-if="emitindo" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                   v-if="podeCancelar(props.row.status)"
-                  flat
-                  round
+                  v-close-popup
+                  clickable
                   dense
-                  icon="cancel"
-                  color="negative"
-                  descricao="Cancelar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="onCancelar(props.row)"
-                />
-              </div>
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -123,12 +129,20 @@
       :loading="salvando"
       @confirmar="onBaixar"
     />
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import BaixaContaReceberDialog from 'components/financeiro/BaixaContaReceberDialog.vue';
 import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -148,6 +162,11 @@ import type { QTableColumn } from 'quasar';
 import type { BaixarContaReceberPayload, ContaReceberDto } from 'types/dtos/financeiro.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Contas a receber');
 
 const { contas, carregando, salvando, carregar, baixar, cancelar } = useContasReceber();
 const { clientes, carregar: carregarClientes } = useClientes();
@@ -246,13 +265,9 @@ onMounted(() => {
   void carregarContasBancarias();
   void carregar(paramsFiltro());
 });
-</script>
-
-<style scoped>
-.acoes {
-  display: flex;
-  gap: var(--spacing-1);
-  justify-content: flex-end;
-  white-space: nowrap;
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
 }
-</style>
+
+</script>

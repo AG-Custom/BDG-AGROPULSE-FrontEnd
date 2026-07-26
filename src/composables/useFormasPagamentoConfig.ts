@@ -89,11 +89,38 @@ export function useFormasPagamentoConfig() {
   }
 
   async function solicitarInativacao(item: ConfigFormaPagamentoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar configuração',
       mensagem: 'Deseja inativar esta forma de pagamento?',
       textoConfirmar: 'Inativar',
       icone: 'warning',
+    });
+
+    if (!justificativa) {
+      return false;
+    }
+
+    salvando.value = true;
+
+    try {
+      await financeiroService.inativarFormaPagamentoConfig(item.id, justificativa);
+      sucesso('Configuração inativada.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function solicitarAtivacao(item: ConfigFormaPagamentoDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar configuração',
+      mensagem: 'Deseja reativar esta forma de pagamento?',
+      textoConfirmar: 'Ativar',
+      icone: 'info',
     });
 
     if (!confirmou) {
@@ -103,8 +130,8 @@ export function useFormasPagamentoConfig() {
     salvando.value = true;
 
     try {
-      await financeiroService.inativarFormaPagamentoConfig(item.id);
-      sucesso('Configuração inativada.');
+      await financeiroService.ativarFormaPagamentoConfig(item.id);
+      sucesso('Configuração ativada.');
       await carregar();
       return true;
     } catch (e) {
@@ -146,6 +173,7 @@ export function useFormasPagamentoConfig() {
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
     salvarTaxa,
   };
 }

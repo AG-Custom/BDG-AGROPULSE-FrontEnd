@@ -136,6 +136,15 @@ export function cest(val: string): true | string {
   return digits.length === 7 || 'Informe um CEST com 7 dígitos';
 }
 
+export function cfop(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = String(val).replace(/\D/g, '');
+  return digits.length === 4 || 'Informe um CFOP com 4 dígitos';
+}
+
 export function notaAvaliacao(val: number | null | undefined): true | string {
   if (val === null || val === undefined || val === 0) {
     return 'Campo obrigatório';

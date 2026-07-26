@@ -63,11 +63,11 @@ export function useUnidadesMedida() {
     }
   }
 
-  async function inativar(unidadeMedidaId: string): Promise<boolean> {
+  async function inativar(unidadeMedidaId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await unidadeMedidaService.inativar(unidadeMedidaId);
+      await unidadeMedidaService.inativar(unidadeMedidaId, justificativa);
       sucesso('Unidade de medida inativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -96,18 +96,18 @@ export function useUnidadesMedida() {
   }
 
   async function solicitarInativacao(unidade: UnidadeMedidaResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar unidade de medida',
       mensagem: `Deseja inativar a unidade ${unidade.codigo}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(unidade.id);
+    return inativar(unidade.id, justificativa);
   }
 
   async function solicitarAtivacao(unidade: UnidadeMedidaResumoDto): Promise<boolean> {

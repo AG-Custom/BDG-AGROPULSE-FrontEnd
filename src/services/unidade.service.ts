@@ -24,7 +24,11 @@ export const unidadeService = {
     return api.put<UnidadeDto>(`/empresas/unidades/${unidadeId}`, payload).then((r) => r.data);
   },
 
-  inativar(unidadeId: string): Promise<void> {
-    return api.post(`/empresas/unidades/${unidadeId}/inativar`);
+  inativar(unidadeId: string, justificativa: string): Promise<void> {
+    return api.post(`/empresas/unidades/${unidadeId}/inativar`, { justificativa });
+  },
+
+  ativar(unidadeId: string): Promise<void> {
+    return api.post(`/empresas/unidades/${unidadeId}/ativar`);
   },
 };

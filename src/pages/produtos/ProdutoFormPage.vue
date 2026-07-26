@@ -34,8 +34,8 @@
           <agro-btn
             color="primary"
             unelevated
-            :label="modo === 'criar' ? 'Cadastrar' : 'Salvar'"
-            :descricao="modo === 'criar' ? 'Cadastrar novo produto' : 'Salvar alterações do produto'"
+            label="Salvar"
+            :descricao="descricaoBotaoPrincipal"
             :loading="salvando"
             @click="salvar"
           />
@@ -53,7 +53,6 @@
 
       <template v-if="mostrarComplementos">
         <produto-fiscal-section
-          ref="fiscalSectionRef"
           :produto-id="produtoIdPersistido"
           :fiscal-inicial="produtoCarregado?.fiscal"
           :somente-leitura="somenteLeitura"
@@ -84,6 +83,20 @@
           :somente-leitura="somenteLeitura"
           v-model:conversoes="complementos.conversoes"
         />
+
+        <div
+          v-if="fluxoCadastro && !somenteLeitura && !produtoInativo"
+          class="agro-form-actions produto-form-page__acoes-finais"
+        >
+          <agro-btn
+            color="primary"
+            unelevated
+            label="Cadastrar produto"
+            descricao="Concluir o cadastro do produto e voltar à listagem"
+            :loading="salvando"
+            @click="concluirCadastro"
+          />
+        </div>
       </template>
     </section>
   </q-page>
@@ -111,11 +124,10 @@ import {
   criarComplementosFormVazio,
   criarProdutoFormVazio,
   fiscalDtoParaForm,
-  fiscalFormTemDados,
   limiteDtoParaForm,
   produtoDtoParaForm,
 } from 'utils/mappers/produto.mapper';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -125,7 +137,6 @@ const { erro } = useNotificacao();
 const { mensagem } = useTratarErroFormulario();
 
 const formularioRef = ref<InstanceType<typeof ProdutoFormulario> | null>(null);
-const fiscalSectionRef = ref<InstanceType<typeof ProdutoFiscalSection> | null>(null);
 const limitesSectionRef = ref<InstanceType<typeof ProdutoLimitesEstoqueSection> | null>(null);
 const formulario = ref<ProdutoFormModel>(criarProdutoFormVazio());
 const complementos = ref<ProdutoComplementosFormModel>(criarComplementosFormVazio());
@@ -140,6 +151,16 @@ const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
   return route.name === 'produto-editar' ? 'editar' : 'criar';
 });
 
+/** Cadastro em etapas: URL pode ser editar, mas a UX permanece como "Novo produto". */
+const fluxoCadastro = computed(
+  () =>
+    modo.value === 'criar' ||
+    (modo.value === 'editar' && route.query.origem === 'cadastro'),
+);
+
+/** Etapa 1: formulário completo (identificação + estoque + comercial), sem complementos. */
+const etapaInicialCadastro = computed(() => modo.value === 'criar');
+
 const modoFormulario = computed<'criar' | 'editar'>(() =>
   modo.value === 'criar' ? 'criar' : 'editar',
 );
@@ -153,7 +174,7 @@ const produtoIdPersistido = computed(() =>
 );
 
 const tituloPagina = computed(() => {
-  if (modo.value === 'criar') {
+  if (fluxoCadastro.value) {
     return 'Novo produto';
   }
 
@@ -165,8 +186,12 @@ const tituloPagina = computed(() => {
 });
 
 const subtituloPagina = computed(() => {
-  if (modo.value === 'criar') {
+  if (etapaInicialCadastro.value) {
     return 'Cadastre o produto e os dados complementares na mesma tela.';
+  }
+
+  if (fluxoCadastro.value) {
+    return 'Complete as configurações do produto e finalize o cadastro.';
   }
 
   if (modo.value === 'visualizar') {
@@ -183,10 +208,21 @@ const produtoInativo = computed(
 const mostrarComplementos = computed(
   () =>
     !carregandoPagina.value &&
-    (modo.value === 'criar' ||
-      modo.value === 'visualizar' ||
-      (modo.value === 'editar' && !produtoInativo.value)),
+    !etapaInicialCadastro.value &&
+    (modo.value === 'visualizar' || (modo.value === 'editar' && !produtoInativo.value)),
 );
+
+const descricaoBotaoPrincipal = computed(() => {
+  if (etapaInicialCadastro.value) {
+    return 'Salvar o produto e liberar as configurações complementares';
+  }
+
+  if (fluxoCadastro.value) {
+    return 'Salvar alterações do produto sem sair do cadastro';
+  }
+
+  return 'Salvar alterações do produto';
+});
 
 function hidratarComplementos(produto: ProdutoDto): void {
   complementos.value = {
@@ -231,15 +267,24 @@ function voltar(): void {
   void router.push({ name: 'produtos' });
 }
 
-async function validarComplementosCriacao(): Promise<boolean> {
-  if (fiscalFormTemDados(complementos.value.fiscal)) {
-    const fiscalValido = (await fiscalSectionRef.value?.validar()) ?? false;
+async function salvarCadastroInicial(): Promise<void> {
+  const produto = await criar(formulario.value, undefined, {
+    mensagemSucesso: 'Produto salvo. Continue com as configurações complementares.',
+  });
 
-    if (!fiscalValido) {
-      return false;
-    }
+  if (!produto) {
+    return;
   }
 
+  // Mantém a sensação de cadastro; internamente passa a editar o registro criado.
+  await router.replace({
+    name: 'produto-editar',
+    params: { id: produto.id },
+    query: { origem: 'cadastro' },
+  });
+}
+
+async function salvarEdicao(opcoes?: { mensagemSucesso?: string; irParaLista?: boolean }): Promise<boolean> {
   if (complementos.value.limites.length > 0) {
     const limitesValidos = limitesSectionRef.value?.validarLimites() ?? false;
 
@@ -249,7 +294,15 @@ async function validarComplementosCriacao(): Promise<boolean> {
     }
   }
 
-  return true;
+  const sucesso = await editar(produtoId.value!, formulario.value, {
+    mensagemSucesso: opcoes?.mensagemSucesso,
+  });
+
+  if (sucesso && opcoes?.irParaLista) {
+    await router.push({ name: 'produtos' });
+  }
+
+  return sucesso;
 }
 
 async function salvar(): Promise<void> {
@@ -259,32 +312,42 @@ async function salvar(): Promise<void> {
     return;
   }
 
-  if (modo.value === 'criar') {
-    const complementosValidos = await validarComplementosCriacao();
-
-    if (!complementosValidos) {
-      return;
-    }
-
-    const sucesso = await criar(formulario.value, complementos.value);
-
-    if (sucesso) {
-      await router.push({ name: 'produtos' });
-    }
-
+  if (etapaInicialCadastro.value) {
+    await salvarCadastroInicial();
     return;
   }
 
-  const sucesso = await editar(produtoId.value!, formulario.value);
+  await salvarEdicao(
+    fluxoCadastro.value
+      ? { mensagemSucesso: 'Dados do produto atualizados.' }
+      : undefined,
+  );
 
-  if (sucesso) {
+  if (!fluxoCadastro.value) {
     await router.push({ name: 'produtos' });
   }
 }
 
-onMounted(() => {
-  void inicializar();
-});
+async function concluirCadastro(): Promise<void> {
+  const valido = (await formularioRef.value?.validar()) ?? false;
+
+  if (!valido) {
+    return;
+  }
+
+  await salvarEdicao({
+    mensagemSucesso: 'Produto cadastrado com sucesso.',
+    irParaLista: true,
+  });
+}
+
+watch(
+  () => [route.name, route.params.id] as const,
+  () => {
+    void inicializar();
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>
@@ -297,5 +360,10 @@ onMounted(() => {
   background: var(--color-warning-50);
   color: var(--color-warning-700);
   margin-bottom: var(--spacing-4);
+}
+
+.produto-form-page__acoes-finais {
+  justify-content: flex-end;
+  margin-top: var(--spacing-2);
 }
 </style>

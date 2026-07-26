@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Orçamentos"
@@ -75,34 +75,29 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="orcamentos-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver orçamento"
-                :to="{ name: 'orcamento-detalhe', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status === OrcamentoStatus.Aberto"
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar orçamento"
-                :to="{ name: 'orcamento-editar', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-editar="props.row.status === OrcamentoStatus.Aberto"
+                :mostrar-status="false"
+                :editar-to="{ name: 'orcamento-editar', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -118,6 +113,11 @@ import type { QTableColumn } from 'quasar';
 import type { OrcamentoResumoDto } from 'types/dtos/orcamento.dto';
 import { formatarDataHora, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Orçamentos');
 
 const { orcamentos, carregando, carregar } = useOrcamentos();
 const { clientes, carregar: carregarClientes } = useClientes();
@@ -150,6 +150,11 @@ onMounted(() => {
   void carregarClientes();
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

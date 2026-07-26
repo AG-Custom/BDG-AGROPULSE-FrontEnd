@@ -5,7 +5,6 @@ const CONFIG_PADRAO: SweetAlertOptions = {
   showConfirmButton: true,
   confirmButtonText: 'OK',
   buttonsStyling: false,
-  zIndex: 7000,
   customClass: {
     container: 'agro-swal',
     popup: 'agro-swal__popup',
@@ -73,6 +72,49 @@ export class MessageService {
     });
 
     return resultado.isConfirmed;
+  }
+
+  async confirmarComJustificativa(opcoes: {
+    titulo: string;
+    mensagem: string;
+    textoConfirmar?: string;
+    textoCancelar?: string;
+    icone?: SweetAlertOptions['icon'];
+    minimoCaracteres?: number;
+  }): Promise<string | null> {
+    const minimo = opcoes.minimoCaracteres ?? 10;
+    const resultado = await Swal.fire({
+      ...CONFIG_PADRAO,
+      icon: opcoes.icone ?? 'warning',
+      title: opcoes.titulo,
+      text: opcoes.mensagem,
+      input: 'textarea',
+      inputLabel: 'Justificativa',
+      inputPlaceholder: 'Informe o motivo da inativação (mín. 10 caracteres)',
+      inputAttributes: {
+        maxlength: '1000',
+      },
+      inputValidator: (valor) => {
+        const texto = String(valor ?? '').trim();
+        if (texto.length < minimo) {
+          return `Informe ao menos ${minimo} caracteres.`;
+        }
+        if (texto.length > 1000) {
+          return 'Justificativa deve ter no máximo 1000 caracteres.';
+        }
+        return undefined;
+      },
+      showCancelButton: true,
+      confirmButtonText: opcoes.textoConfirmar ?? 'Inativar',
+      cancelButtonText: opcoes.textoCancelar ?? 'Cancelar',
+      reverseButtons: true,
+    });
+
+    if (!resultado.isConfirmed || typeof resultado.value !== 'string') {
+      return null;
+    }
+
+    return resultado.value.trim();
   }
 }
 

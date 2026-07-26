@@ -24,8 +24,8 @@ export const usuarioService = {
     return api.put<UsuarioDto>(`/usuarios/${usuarioId}`, payload).then((r) => r.data);
   },
 
-  inativar(usuarioId: string): Promise<void> {
-    return api.patch(`/usuarios/${usuarioId}/inativar`);
+  inativar(usuarioId: string, justificativa: string): Promise<void> {
+    return api.patch(`/usuarios/${usuarioId}/inativar`, { justificativa });
   },
 
   ativar(usuarioId: string): Promise<void> {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Cheques" subtitulo="Carteira de cheques recebidos e emitidos.">
       <agro-btn
@@ -72,42 +72,34 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                v-if="props.row.status === StatusCheque.EmCarteira"
-                flat
-                round
-                dense
-                icon="account_balance"
-                color="primary"
-                descricao="Depositar"
-                :loading="salvando"
-                @click="depositar(props.row.id)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusCheque.Depositado"
-                flat
-                round
-                dense
-                icon="done_all"
-                color="positive"
-                descricao="Compensar"
-                :loading="salvando"
-                @click="compensar(props.row.id)"
-              />
-              <agro-btn
+              <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item v-if="props.row.status === StatusCheque.EmCarteira" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="salvando" @click="depositar(props.row.id)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="account_balance" size="16px" /></span></q-item-section>
+                  <q-item-section>Depositar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item v-if="props.row.status === StatusCheque.Depositado" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="salvando" @click="compensar(props.row.id)">
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="done_all" size="16px" /></span></q-item-section>
+                  <q-item-section>Compensar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                 v-if="
                   props.row.status === StatusCheque.EmCarteira ||
                   props.row.status === StatusCheque.Depositado
                 "
-                flat
-                round
+                  v-close-popup
+                  clickable
                 dense
-                icon="undo"
-                color="negative"
-                descricao="Devolver"
-                :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="devolver(props.row.id)"
-              />
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="undo" size="16px" /></span></q-item-section>
+                  <q-item-section>Devolver</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -191,10 +183,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -213,7 +213,12 @@ import type { QTableColumn } from 'quasar';
 import type { ChequeDto, ChequeFormModel } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Cheques');
 
 const { cheques, carregando, salvando, carregar, criar, depositar, compensar, devolver } =
   useCheques();
@@ -263,6 +268,11 @@ onMounted(() => {
   void carregarContas();
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>
