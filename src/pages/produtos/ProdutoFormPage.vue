@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form-wide">
     <app-page-header :titulo="tituloPagina" :subtitulo="subtituloPagina" />
 
     <section class="agro-section produto-form-page">

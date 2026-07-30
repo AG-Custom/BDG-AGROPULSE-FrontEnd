@@ -15,6 +15,14 @@
             class="field-required"
             :rules="[obrigatorio, minMotivo]"
           />
+          <q-input
+            v-model="confirmacao"
+            outlined
+            label="Digite CONFIRMAR"
+            class="field-required"
+            autocomplete="off"
+            :rules="[obrigatorio, confirmarDigitacao]"
+          />
           <div class="agro-form-actions">
             <agro-btn flat label="Fechar" descricao="Fechar" @click="emit('update:modelValue', false)" />
             <agro-btn
@@ -34,7 +42,7 @@
 <script setup lang="ts">
 import type { CancelarNotaFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { obrigatorio } from 'utils/validators';
-import { reactive, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -47,16 +55,24 @@ const emit = defineEmits<{
 }>();
 
 const form = reactive<CancelarNotaFormModel>({ motivo: '' });
+const confirmacao = ref('');
 
 watch(
   () => props.modelValue,
   (open) => {
-    if (open) form.motivo = '';
+    if (open) {
+      form.motivo = '';
+      confirmacao.value = '';
+    }
   },
 );
 
 function minMotivo(val: string): true | string {
   return val.trim().length >= 15 || 'Informe ao menos 15 caracteres';
+}
+
+function confirmarDigitacao(val: string): true | string {
+  return val.trim() === 'CONFIRMAR' || 'Digite exatamente CONFIRMAR';
 }
 
 function confirmar(): void {

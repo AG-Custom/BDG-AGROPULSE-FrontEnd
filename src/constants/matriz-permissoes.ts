@@ -1,6 +1,7 @@
 import { AreaAcesso, type AreaAcessoValor } from 'constants/areas-acesso';
 import { PerfilUsuario, type PerfilUsuarioValor } from 'constants/enums';
 import { NivelAcesso, type NivelAcessoValor } from 'constants/niveis-acesso';
+import { Permissoes } from 'constants/permissoes';
 
 type MatrizPerfil = Record<AreaAcessoValor, NivelAcessoValor>;
 
@@ -134,6 +135,16 @@ export const MatrizPermissoesPorPerfil: Record<PerfilUsuarioValor, MatrizPerfil>
     [PerfilUsuario.Consultor]: MATRIZ_CONSULTOR,
     [PerfilUsuario.Rh]: MATRIZ_RH,
   };
+
+/**
+ * Slugs extras além do nível da área (ex.: Vendedor edita clientes
+ * sem receber TabelasPreco.Editar via Cadastros.Editar).
+ */
+export const OverridesSlugPorPerfil: Partial<
+  Record<PerfilUsuarioValor, readonly string[]>
+> = {
+  [PerfilUsuario.Vendedor]: [Permissoes.Clientes.Editar],
+};
 
 export function nivelAreaDoPerfil(
   perfil: PerfilUsuarioValor | null | undefined,

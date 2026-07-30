@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form-wide">
     <app-page-header
       titulo="Novo recebimento"
       subtitulo="Importe o XML da NF-e ou registre manualmente."

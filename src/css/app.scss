@@ -6,7 +6,7 @@
   color: var(--color-text-primary);
   background: var(--color-bg-default);
   font-family: var(--font-family-base);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-root);
   line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -89,12 +89,33 @@ body {
   width: 100%;
 }
 
+.agro-page--form {
+  --page-form-width: var(--container-form-page);
+}
+
+.agro-page--form-wide {
+  --page-form-width: var(--container-form-page-wide);
+}
+
+.agro-page--form .agro-section,
+.agro-page--form-wide .agro-section,
+.agro-page--form .app-page-header,
+.agro-page--form-wide .app-page-header {
+  max-width: var(--page-form-width);
+  margin-inline: auto;
+  width: 100%;
+}
+
 .agro-section {
   width: 100%;
 }
 
 .agro-section + .agro-section {
   margin-top: var(--section-gap);
+}
+
+.agro-section--wide {
+  max-width: none !important;
 }
 
 // ─── Superfícies ───
@@ -152,7 +173,8 @@ body {
 // ─── Quasar premium overrides ───
 .q-btn {
   font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-wide);
+  letter-spacing: normal;
+  text-transform: none;
   transition: var(--transition-bg), var(--transition-shadow), var(--transition-transform);
 
   &.q-btn--unelevated.bg-primary:not(.disabled):hover {
@@ -186,6 +208,80 @@ body {
 
 .q-field__bottom {
   color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+// Texto “placeholder” no Quasar: label dentro do campo vazio + ::placeholder nativo + QSelect
+.q-field--outlined .q-field__label {
+  font-size: var(--font-size-sm);
+}
+
+.q-field__native::placeholder,
+.q-field__input::placeholder,
+.q-field__native::-webkit-input-placeholder,
+.q-field__input::-webkit-input-placeholder,
+.q-field__native::-moz-placeholder,
+.q-field__input::-moz-placeholder {
+  color: var(--color-text-tertiary) !important;
+  font-size: var(--font-size-xs) !important;
+  opacity: 1;
+}
+
+.q-placeholder {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs) !important;
+}
+
+// ─── Formulários criar/editar — densidade compacta ───
+// Inputs padrão Quasar outlined ~56px; em forms usamos ~40px (equiv. dense)
+// para reduzir a sensação de UI “esticada” em cadastros longos.
+.agro-formulario {
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__control {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__marginal {
+    height: 40px;
+  }
+
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__native,
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__input,
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__prefix,
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__suffix {
+    min-height: 24px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__label {
+    top: 10px;
+  }
+
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height).q-field--float .q-field__label {
+    transform: translateY(-27%) scale(0.75);
+  }
+
+  .q-field--with-bottom {
+    padding-bottom: 12px;
+  }
+
+  .q-field__bottom {
+    min-height: 12px;
+    padding-top: 2px;
+  }
+
+  .row.q-col-gutter-md {
+    margin-left: calc(-1 * var(--spacing-3));
+    margin-right: calc(-1 * var(--spacing-3));
+    margin-top: calc(-1 * var(--spacing-3));
+  }
+
+  .row.q-col-gutter-md > * {
+    padding-left: var(--spacing-3);
+    padding-right: var(--spacing-3);
+    padding-top: var(--spacing-3);
+  }
 }
 
 .q-header {
@@ -256,8 +352,8 @@ body {
   display: flex;
   gap: var(--spacing-3);
   justify-content: flex-end;
-  margin-top: var(--spacing-6);
-  padding-top: var(--spacing-5);
+  margin-top: var(--spacing-5);
+  padding-top: var(--spacing-4);
 }
 
 .auth-link {

@@ -7,7 +7,10 @@ import {
   PerfilUsuario,
   type PerfilUsuarioValor,
 } from 'constants/enums';
-import { MatrizPermissoesPorPerfil } from 'constants/matriz-permissoes';
+import {
+  MatrizPermissoesPorPerfil,
+  OverridesSlugPorPerfil,
+} from 'constants/matriz-permissoes';
 import {
   NivelAcesso,
   niveisIncluidos,
@@ -105,6 +108,10 @@ export function resolverPermissoesPorPerfil(
         permissoes.add(slug);
       }
     }
+  }
+
+  for (const slug of OverridesSlugPorPerfil[perfil] ?? []) {
+    permissoes.add(slug);
   }
 
   return Array.from(permissoes);

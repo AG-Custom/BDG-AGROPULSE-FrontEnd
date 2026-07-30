@@ -43,4 +43,5 @@ export const Permissoes = {
   Representantes: definirModulo('representantes'),
   RegrasComissao: definirModulo('regras-comissao'),
   PermissoesGranulares: definirModulo('permissoes-granulares'),
+  Auditoria: definirModulo('auditoria'),
 } as const;

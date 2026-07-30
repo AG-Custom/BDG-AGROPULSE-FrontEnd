@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form-wide">
     <app-page-header
       titulo="Nova transferência"
       subtitulo="Cria a transferência em status pendente. Confirme depois para movimentar o estoque."

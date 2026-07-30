@@ -47,8 +47,7 @@ import MargemPorLoteTab from 'components/relatorios/MargemPorLoteTab.vue';
 import PowerBiTab from 'components/relatorios/PowerBiTab.vue';
 import RentabilidadeTab from 'components/relatorios/RentabilidadeTab.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
-import { useAuth } from 'composables/useAuth';
-import { PerfilUsuario } from 'constants/enums';
+import { useVerCustos } from 'composables/useVerCustos';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -78,12 +77,7 @@ const ABAS_VALIDAS: AbaRelatorio[] = [
 ];
 
 const route = useRoute();
-const { usuario } = useAuth();
-
-const perfilOperacional = computed(() => {
-  const perfil = usuario.value?.perfil;
-  return perfil === PerfilUsuario.Operacional || perfil === PerfilUsuario.Rh;
-});
+const { verCustos } = useVerCustos();
 
 const abasVisiveis = computed(() => {
   const todas: { name: AbaRelatorio; label: string; sensivel?: boolean }[] = [
@@ -92,14 +86,14 @@ const abasVisiveis = computed(() => {
     { name: 'giro', label: 'Giro' },
     { name: 'margem', label: 'Margem por lote', sensivel: true },
     { name: 'dre', label: 'DRE', sensivel: true },
-    { name: 'rentabilidade', label: 'Rentabilidade' },
-    { name: 'inadimplencia', label: 'Inadimplência' },
-    { name: 'desempenho', label: 'Desempenho' },
+    { name: 'rentabilidade', label: 'Rentabilidade', sensivel: true },
+    { name: 'inadimplencia', label: 'Inadimplência', sensivel: true },
+    { name: 'desempenho', label: 'Desempenho', sensivel: true },
     { name: 'alertas', label: 'Alertas' },
     { name: 'powerbi', label: 'Power BI' },
   ];
 
-  return todas.filter((abaItem) => !(abaItem.sensivel && perfilOperacional.value));
+  return todas.filter((abaItem) => !(abaItem.sensivel && !verCustos.value));
 });
 
 function abaInicial(): AbaRelatorio {

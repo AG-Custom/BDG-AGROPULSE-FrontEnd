@@ -57,6 +57,7 @@
     />
 
     <AgroMoneyInput
+      v-if="verCustos"
       v-model="formulario.custoUnitario"
       label="Custo unitário"
       hint="Opcional"
@@ -74,12 +75,14 @@
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QForm } from 'quasar';
 import type { EntradaEstoqueFormModel } from 'types/dtos/estoque.dto';
 import { obrigatorio, quantidadePositiva } from 'utils/validators';
 import { computed, ref, watch } from 'vue';
 
 const formulario = defineModel<EntradaEstoqueFormModel>('formulario', { required: true });
+const { verCustos } = useVerCustos();
 
 const formRef = ref<QForm | null>(null);
 const quantidadePositivaValidator = quantidadePositiva;

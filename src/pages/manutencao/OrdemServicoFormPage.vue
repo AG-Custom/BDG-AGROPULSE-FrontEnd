@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header titulo="Abrir ordem de serviço" subtitulo="Preventiva ou corretiva." />
 
     <section class="agro-section">

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Parâmetros analisados e decisão de qualidade.">
       <div v-if="modo === 'detalhe' && laudo?.status === LaudoQualidadeStatus.Pendente" class="acoes">
         <agro-btn

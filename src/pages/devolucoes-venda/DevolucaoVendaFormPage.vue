@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form-wide">
     <app-page-header
       titulo="Nova devolução"
       subtitulo="Busque a NF de origem e informe destino do estoque e crédito."

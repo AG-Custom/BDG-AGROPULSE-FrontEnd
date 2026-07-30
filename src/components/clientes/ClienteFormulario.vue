@@ -80,7 +80,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div v-if="ehPessoaFisica" class="col-12 col-md-6">
+      <div v-if="ehPessoaFisica" class="col-12 col-md-3">
         <q-input
           v-model="formulario.dataNascimento"
           outlined
@@ -92,7 +92,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div v-else class="col-12 col-md-6">
+      <div v-else class="col-12 col-md-3">
         <q-input
           v-model="formulario.dataFundacao"
           outlined
@@ -136,7 +136,7 @@
 
     <h3 class="cliente-formulario__secao-titulo">Comercial</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.prazoRecompra"
           outlined
@@ -146,14 +146,14 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <AgroMoneyInput
           v-model="formulario.limiteCredito"
           label="Limite de crédito"
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6">
         <q-select
           v-model="formulario.vendedorUsuarioId"
           outlined

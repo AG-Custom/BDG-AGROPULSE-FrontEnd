@@ -826,6 +826,9 @@ export const NotificacaoTipo = {
   MetasLoja: 'MetasLoja',
   PedidoAguardandoAprovacao: 'PedidoAguardandoAprovacao',
   ContingenciaSefaz: 'ContingenciaSefaz',
+  RecomendacaoPendente: 'RecomendacaoPendente',
+  OsAgricolaAtrasada: 'OsAgricolaAtrasada',
+  SaldoMinimoCaixa: 'SaldoMinimoCaixa',
 } as const;
 
 export type NotificacaoTipoValor =
@@ -854,6 +857,9 @@ export const NotificacaoTipoOpcoes = [
   { label: 'Metas da loja', value: NotificacaoTipo.MetasLoja },
   { label: 'Pedido aguardando aprovação', value: NotificacaoTipo.PedidoAguardandoAprovacao },
   { label: 'Contingência SEFAZ', value: NotificacaoTipo.ContingenciaSefaz },
+  { label: 'Recomendação pendente', value: NotificacaoTipo.RecomendacaoPendente },
+  { label: 'OS agrícola atrasada', value: NotificacaoTipo.OsAgricolaAtrasada },
+  { label: 'Saldo mínimo de caixa', value: NotificacaoTipo.SaldoMinimoCaixa },
 ];
 
 export const NotificacaoPrioridade = {

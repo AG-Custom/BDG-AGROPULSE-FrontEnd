@@ -1,11 +1,12 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Dados da oportunidade no pipeline." />
 
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario oportunidade-form" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
+          <h3 class="oportunidade-form__secao-titulo">Pipeline</h3>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -34,7 +35,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-6">
               <q-select
                 v-model="formulario.etapa"
                 outlined
@@ -45,7 +46,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-4">
+            <div class="col-12 col-md-3">
               <AgroMoneyInput
                 v-model="formulario.valorEstimado"
                 label="Valor estimado"
@@ -54,7 +55,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-4">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.probabilidade"
                 outlined
@@ -65,15 +66,19 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-12 col-md-4">
+          </div>
+
+          <h3 class="oportunidade-form__secao-titulo">Produto e prazo</h3>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-6">
               <q-input v-model="formulario.cultura" outlined label="Cultura"
                 :readonly="somenteLeitura" />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
               <q-input v-model="formulario.safraRef" outlined label="Safra (ref.)"
                 :readonly="somenteLeitura" />
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.dataPrevista"
                 outlined
@@ -254,3 +259,12 @@ onMounted(async () => {
   carregandoPagina.value = false;
 });
 </script>
+
+<style scoped>
+.oportunidade-form__secao-titulo {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--spacing-2) 0 0;
+}
+</style>

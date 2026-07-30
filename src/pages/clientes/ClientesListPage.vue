@@ -22,6 +22,7 @@
           @click="exportarLista('pdf')"
         />
         <agro-btn
+          v-if="podeEditarCliente"
           color="primary"
           unelevated
           icon="add"
@@ -84,7 +85,7 @@
           icon="groups"
         >
           <agro-btn
-            v-if="!busca && filtroAtivo === 'todos'"
+            v-if="!busca && filtroAtivo === 'todos' && podeEditarCliente"
             color="primary"
             unelevated
             label="Cadastrar cliente"
@@ -141,12 +142,13 @@
             <q-td :props="props" class="clientes-list__acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
+                :mostrar-editar="podeEditarCliente"
                 :editar-to="{ name: 'cliente-editar', params: { id: props.row.id } }"
                 :visualizar-to="{ name: 'cliente-visualizar', params: { id: props.row.id } }"
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarCliente(props.row)"
                 @ativar="ativarCliente(props.row)"
-/>
+              />
             </q-td>
           </template>
         </q-table>
@@ -162,6 +164,7 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useAuth } from 'composables/useAuth';
 import { useClientes } from 'composables/useClientes';
 import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
@@ -174,6 +177,7 @@ import {
   type GrupoComercialValor,
   type TipoClienteValor,
 } from 'constants/enums';
+import { Permissoes } from 'constants/permissoes';
 import type { ClienteResumoDto, ListarClientesParams } from 'types/dtos/cliente.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -192,6 +196,11 @@ const {
   exportar,
   rotuloDocumento,
 } = useClientes();
+
+const { possuiPermissao } = useAuth();
+const podeEditarCliente = computed(() =>
+  possuiPermissao(Permissoes.Clientes.Editar),
+);
 
 const { carteiraRestrita } = usePerfilAtual();
 const {

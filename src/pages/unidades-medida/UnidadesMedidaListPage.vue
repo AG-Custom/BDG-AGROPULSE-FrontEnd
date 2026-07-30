@@ -10,7 +10,7 @@
         icon="add"
         label="Nova unidade"
         descricao="Cadastrar uma nova unidade de medida"
-        :to="{ name: 'unidade-medida-novo' }"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -56,8 +56,8 @@
             color="primary"
             unelevated
             label="Cadastrar unidade"
-            descricao="Ir para o cadastro de unidade de medida"
-            :to="{ name: 'unidade-medida-novo' }"
+            descricao="Cadastrar uma nova unidade de medida"
+            @click="abrirDialog()"
           />
         </empty-state>
 
@@ -85,55 +85,117 @@
             <q-td :props="props" class="unidades-medida-list__acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
-                :editar-to="{ name: 'unidade-medida-editar', params: { id: props.row.id } }"
-                :visualizar-to="{ name: 'unidade-medida-visualizar', params: { id: props.row.id } }"
+                :pode-editar="props.row.ativo"
                 :loading-status="inativando || ativando"
+                @editar="abrirDialog(props.row)"
+                @visualizar="abrirDialogVisualizar(props.row)"
                 @desabilitar="inativarUnidade(props.row)"
                 @ativar="ativarUnidade(props.row)"
-/>
+              />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <q-dialog v-model="dialogAberto" persistent>
+      <q-card class="unidades-medida-list__dialog">
+        <q-card-section>
+          <h4 class="unidades-medida-list__dialog-titulo">{{ tituloDialog }}</h4>
+        </q-card-section>
+
+        <q-card-section>
+          <unidade-medida-formulario
+            ref="formularioRef"
+            v-model:formulario="formulario"
+            :somente-leitura="somenteLeitura"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <template v-if="somenteLeitura">
+            <agro-btn flat label="Fechar" descricao="Fechar o formulário" @click="fecharDialog" />
+          </template>
+          <template v-else>
+            <agro-btn
+              flat
+              label="Cancelar"
+              descricao="Fechar sem salvar"
+              :disable="salvando"
+              @click="fecharDialog"
+            />
+            <agro-btn
+              color="primary"
+              unelevated
+              :label="editandoId ? 'Salvar' : 'Cadastrar'"
+              :descricao="
+                editandoId
+                  ? 'Salvar alterações da unidade de medida'
+                  : 'Cadastrar nova unidade de medida'
+              "
+              :loading="salvando"
+              @click="salvar"
+            />
+          </template>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import UnidadeMedidaFormulario from 'components/unidades-medida/UnidadeMedidaFormulario.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
+import type { QTableColumn } from 'quasar';
 import type {
   ListarUnidadesMedidaParams,
+  UnidadeMedidaFormModel,
   UnidadeMedidaResumoDto,
 } from 'types/dtos/unidade-medida.dto';
-import type { QTableColumn } from 'quasar';
+import {
+  criarUnidadeMedidaFormVazia,
+  unidadeMedidaDtoParaForm,
+} from 'utils/mappers/unidade-medida.mapper';
 import { computed, onMounted, ref, watch } from 'vue';
-
-
 
 const {
   unidadesMedida,
   carregando,
+  salvando,
   inativando,
   ativando,
   carregar,
+  criar,
+  editar,
   solicitarInativacao,
   solicitarAtivacao,
 } = useUnidadesMedida();
 
 const busca = ref('');
 const filtroAtivo = ref<'ativos' | 'inativos' | 'todos'>('ativos');
+const dialogAberto = ref(false);
+const somenteLeitura = ref(false);
+const editandoId = ref<string | null>(null);
+const formularioRef = ref<InstanceType<typeof UnidadeMedidaFormulario> | null>(null);
+const formulario = ref<UnidadeMedidaFormModel>(criarUnidadeMedidaFormVazia());
 
 const opcoesStatus = [
   { label: 'Ativos', value: 'ativos' },
   { label: 'Inativos', value: 'inativos' },
   { label: 'Todos', value: 'todos' },
 ];
+
+const tituloDialog = computed(() => {
+  if (somenteLeitura.value) {
+    return 'Visualizar unidade de medida';
+  }
+  return editandoId.value ? 'Editar unidade de medida' : 'Nova unidade de medida';
+});
 
 const colunas: QTableColumn<UnidadeMedidaResumoDto>[] = [
   { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
@@ -171,6 +233,40 @@ async function recarregar(): Promise<void> {
   await carregar(montarParams());
 }
 
+function abrirDialog(item?: UnidadeMedidaResumoDto): void {
+  somenteLeitura.value = false;
+  editandoId.value = item?.id ?? null;
+  formulario.value = item
+    ? unidadeMedidaDtoParaForm(item)
+    : criarUnidadeMedidaFormVazia();
+  dialogAberto.value = true;
+}
+
+function abrirDialogVisualizar(item: UnidadeMedidaResumoDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
+function fecharDialog(): void {
+  dialogAberto.value = false;
+}
+
+async function salvar(): Promise<void> {
+  const valido = (await formularioRef.value?.validar()) ?? false;
+  if (!valido) {
+    return;
+  }
+
+  const ok = editandoId.value
+    ? await editar(editandoId.value, formulario.value)
+    : await criar(formulario.value);
+
+  if (ok) {
+    fecharDialog();
+    await recarregar();
+  }
+}
+
 async function inativarUnidade(unidade: UnidadeMedidaResumoDto): Promise<void> {
   await solicitarInativacao(unidade);
 }
@@ -191,7 +287,6 @@ watch([busca, filtroAtivo], () => {
 onMounted(() => {
   void recarregar();
 });
-
 </script>
 
 <style scoped>
@@ -206,5 +301,16 @@ onMounted(() => {
 
 .unidades-medida-list__acoes {
   white-space: nowrap;
+}
+
+.unidades-medida-list__dialog {
+  min-width: min(480px, 94vw);
+  max-width: 560px;
+}
+
+.unidades-medida-list__dialog-titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
 }
 </style>

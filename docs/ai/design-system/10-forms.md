@@ -16,23 +16,61 @@
 ## Estrutura padrão
 
 ```vue
-<q-form @submit.prevent="salvar" @validation-error="onValidationError">
-  <div class="row q-col-gutter-md">
-    <div class="col-12 col-md-6">
-      <q-input v-model="form.nome" outlined label="Nome" class="field-required" :rules="[obrigatorio]" />
-    </div>
-  </div>
-  <div class="agro-form-actions">
-    <q-btn flat label="Cancelar" @click="cancelar" />
-    <q-btn color="primary" unelevated type="submit" label="Salvar" :loading="salvando" />
-  </div>
-</q-form>
+<q-page class="agro-page agro-page--form">
+  <app-page-header titulo="..." />
+  <section class="agro-section">
+    <agro-card>
+      <q-form class="agro-formulario" @submit.prevent="salvar">
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <q-input v-model="form.nome" outlined label="Nome" class="field-required" :rules="[obrigatorio]" />
+          </div>
+        </div>
+        <div class="agro-form-actions">
+          <q-btn flat label="Cancelar" @click="cancelar" />
+          <q-btn color="primary" unelevated type="submit" label="Salvar" :loading="salvando" />
+        </div>
+      </q-form>
+    </agro-card>
+  </section>
+</q-page>
 ```
 
-Gap entre campos: `var(--form-gap)` = 16px.
+Gap entre campos: `var(--spacing-3)` (12px) dentro de `.agro-formulario` com `q-col-gutter-md`.
 Gap entre seções: `var(--section-gap)` = 24px.
 
+**Densidade:** formulários com classe `agro-formulario` usam inputs outlined em ~40px de altura (equiv. Quasar `dense`). Textareas e campos `autogrow` mantêm altura maior.
+
+**Largura da página:** usar `.agro-page--form` (920px) ou `.agro-page--form-wide` (1200px). Ver [05-layout.md](./05-layout.md).
+
 Inputs `outlined` têm fundo `color.surface.default` (branco), borda `color.border.strong` no hover e borda 2px `color.primary.500` no focus. Hints (`q-field__bottom`) em `color.text.tertiary` — estilos globais em `app.scss`.
+
+---
+
+## Modal vs página
+
+Critério objetivo para decidir a UI do cadastro:
+
+| Condição | UI |
+|---|---|
+| Até 5 campos, 1 seção, sem tabelas internas, sem upload, sem abas | **Modal** (`q-dialog`, 400–560px) aberto da listagem |
+| 6–20 campos | **Página** + `.agro-page--form` (920px) |
+| 20+ campos, várias seções, ou tabelas de itens | **Página** + `.agro-page--form` ou `.agro-page--form-wide` (1200px) |
+
+Exemplos em modal: categoria de produto, unidade de medida, regra de comissão, condição de pagamento, plano de manutenção, talhão.
+
+---
+
+## Grid por tipo de campo
+
+| Tipo de campo | Classes |
+|---|---|
+| Texto / nome / select | `col-12 col-md-6` |
+| Código / sigla | `col-12 col-md-3` |
+| Data | `col-12 col-md-3` |
+| Quantidade / percentual | `col-12 col-md-2` ou `col-md-3` |
+| Valor monetário | `col-12 col-md-3` |
+| Descrição / observação / textarea | `col-12` |
 
 ---
 
@@ -258,11 +296,27 @@ Diferente de placeholder — helper é instrução, placeholder é exemplo.
 
 ## Seções de formulário longo
 
+Dividir campos em blocos com título — reduz a sensação de formulário infinito:
+
 ```vue
-<section class="form-section">
-  <h3 class="text-h5 q-mb-md">Dados da propriedade</h3>
+<h3 class="meu-formulario__secao-titulo">Dados gerais</h3>
+<div class="row q-col-gutter-md">
   <!-- campos -->
-</section>
+</div>
+
+<h3 class="meu-formulario__secao-titulo">Fiscal</h3>
+<div class="row q-col-gutter-md">
+  <!-- campos -->
+</div>
+```
+
+```scss
+.meu-formulario__secao-titulo {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--spacing-2) 0 0;
+}
 ```
 
 Sticky actions footer em forms > 2 viewport heights (mobile).

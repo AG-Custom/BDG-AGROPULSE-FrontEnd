@@ -40,6 +40,15 @@
             :class="{ 'notificacoes-page__item--lida': item.lida }"
             @click="abrirNotificacao(item)"
           >
+            <q-item-section avatar>
+              <span
+                class="notificacoes-page__icone"
+                :class="`notificacoes-page__icone--${tomIconeDaNotificacao(item.tipo)}`"
+                aria-hidden="true"
+              >
+                <q-icon :name="iconeDaNotificacao(item.tipo)" size="20px" />
+              </span>
+            </q-item-section>
             <q-item-section>
               <q-item-label>
                 {{ item.titulo }}
@@ -51,6 +60,10 @@
               </q-item-label>
               <q-item-label caption>{{ item.mensagem }}</q-item-label>
               <q-item-label caption>{{ formatarDataHora(item.createdAt) }}</q-item-label>
+              <notificacao-item-acoes
+                :notificacao="item"
+                @decidido="aoDecidirPedido(item)"
+              />
             </q-item-section>
             <q-item-section side>
               <agro-btn
@@ -71,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import NotificacaoItemAcoes from 'components/notificacoes/NotificacaoItemAcoes.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -83,6 +97,7 @@ import {
 } from 'constants/enums';
 import type { NotificacaoDto } from 'types/dtos/notificacao.dto';
 import { formatarDataHora } from 'utils/formatters';
+import { iconeDaNotificacao, tomIconeDaNotificacao } from 'utils/notificacao-icone';
 import { rotaDaNotificacao } from 'utils/notificacao-navegacao';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -134,6 +149,14 @@ async function abrirNotificacao(item: NotificacaoDto): Promise<void> {
   }
 }
 
+async function aoDecidirPedido(item: NotificacaoDto): Promise<void> {
+  if (!item.lida) {
+    await marcarComoLida(item.id);
+  }
+
+  await recarregar();
+}
+
 watch(apenasNaoLidas, () => {
   void recarregar();
 });
@@ -155,5 +178,39 @@ onMounted(() => {
 .notificacoes-page__prioridade {
   margin-left: var(--spacing-2);
   vertical-align: middle;
+}
+
+.notificacoes-page__icone {
+  align-items: center;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+.notificacoes-page__icone--neutral {
+  background: var(--color-neutral-100);
+  color: var(--color-text-secondary);
+}
+
+.notificacoes-page__icone--success {
+  background: var(--color-success-50);
+  color: var(--color-success-700);
+}
+
+.notificacoes-page__icone--warning {
+  background: var(--color-warning-50);
+  color: var(--color-warning-700);
+}
+
+.notificacoes-page__icone--error {
+  background: var(--color-error-50);
+  color: var(--color-error-700);
+}
+
+.notificacoes-page__icone--info {
+  background: var(--color-info-50);
+  color: var(--color-info-700);
 }
 </style>

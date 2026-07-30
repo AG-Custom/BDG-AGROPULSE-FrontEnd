@@ -99,7 +99,7 @@ export function useClientes() {
   }
 
   async function solicitarInativacao(cliente: ClienteResumoDto): Promise<boolean> {
-    const justificativa = await messageService.confirmarComJustificativa({
+    const justificativa = await messageService.confirmarDestrutivo({
       titulo: 'Inativar cliente',
       mensagem: `Deseja inativar o cliente ${cliente.nomeRazao}?`,
       textoConfirmar: 'Inativar',

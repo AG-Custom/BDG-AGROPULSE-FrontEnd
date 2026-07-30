@@ -112,6 +112,7 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useProdutos } from 'composables/useProdutos';
 import { useTabelaPrecoItens } from 'composables/useTabelaPrecoItens';
+import { useVerCustos } from 'composables/useVerCustos';
 import type {
   TabelaPrecoItemDto,
   TabelaPrecoItemEdicaoFormModel,
@@ -143,6 +144,7 @@ const {
 } = useTabelaPrecoItens(() => props.tabelaPrecoId);
 
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { verCustos } = useVerCustos();
 
 const dialogAberto = ref(false);
 const modoDialog = ref<'criar' | 'editar'>('criar');
@@ -153,15 +155,21 @@ const formularioRef = ref<InstanceType<typeof ItemTabelaPrecoFormulario> | null>
 
 const colunas = computed(() => {
   const base: QTableColumn<TabelaPrecoItemDto>[] = [
-  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
-  { name: 'preco', label: 'Preço', field: 'preco', align: 'left', sortable: true },
-  { name: 'margemMinimaPercentual', label: 'Margem mín.', field: 'margemMinimaPercentual', align: 'left' },
-  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
-];
-  if (props.somenteLeitura) {
-    return base.filter((coluna) => coluna.name !== 'acoes');
-  }
-  return base;
+    { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
+    { name: 'preco', label: 'Preço', field: 'preco', align: 'left', sortable: true },
+    { name: 'margemMinimaPercentual', label: 'Margem mín.', field: 'margemMinimaPercentual', align: 'left' },
+    { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+  ];
+
+  return base.filter((coluna) => {
+    if (coluna.name === 'margemMinimaPercentual' && !verCustos.value) {
+      return false;
+    }
+    if (coluna.name === 'acoes' && props.somenteLeitura) {
+      return false;
+    }
+    return true;
+  });
 });
 
 watch(

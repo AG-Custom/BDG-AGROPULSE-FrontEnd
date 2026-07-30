@@ -108,12 +108,7 @@ export const MatrizAlertas: Record<NotificacaoTipoValor, PoliticaAlerta> = {
   },
   [NotificacaoTipo.ValidadeProxima]: {
     area: AreaAcesso.Estoque,
-    perfisPermitidos: [
-      PerfilUsuario.Diretor,
-      PerfilUsuario.Administrador,
-      PerfilUsuario.Gerente,
-      PerfilUsuario.Administrativo,
-    ],
+    perfisPermitidos: PERFIS_ESTOQUE,
   },
   [NotificacaoTipo.BoletoCliente]: {
     area: AreaAcesso.Financeiro,
@@ -190,7 +185,31 @@ export const MatrizAlertas: Record<NotificacaoTipoValor, PoliticaAlerta> = {
       PerfilUsuario.Administrador,
       PerfilUsuario.Gerente,
       PerfilUsuario.Operacional,
-      PerfilUsuario.Administrativo,
+    ],
+  },
+  [NotificacaoTipo.RecomendacaoPendente]: {
+    area: AreaAcesso.Safras,
+    perfisPermitidos: [
+      PerfilUsuario.Diretor,
+      PerfilUsuario.Administrador,
+      PerfilUsuario.Gerente,
+      PerfilUsuario.Consultor,
+    ],
+  },
+  [NotificacaoTipo.OsAgricolaAtrasada]: {
+    area: AreaAcesso.Safras,
+    perfisPermitidos: [
+      PerfilUsuario.Diretor,
+      PerfilUsuario.Administrador,
+      PerfilUsuario.Gerente,
+      PerfilUsuario.Consultor,
+    ],
+  },
+  [NotificacaoTipo.SaldoMinimoCaixa]: {
+    area: AreaAcesso.Financeiro,
+    perfisPermitidos: [
+      ...PERFIS_FINANCEIROS,
+      PerfilUsuario.Operacional,
     ],
   },
 };

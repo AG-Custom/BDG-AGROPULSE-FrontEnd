@@ -1,11 +1,12 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Planejamento de cultura, área e época." />
 
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario safra-form" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
+          <h3 class="safra-form__secao-titulo">Dados gerais</h3>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
@@ -51,7 +52,19 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
+              <q-input v-model="formulario.dataInicio" outlined label="Início" type="date"
+                :readonly="somenteLeitura" />
+            </div>
+            <div class="col-12 col-md-3">
+              <q-input v-model="formulario.dataFim" outlined label="Fim" type="date"
+                :readonly="somenteLeitura" />
+            </div>
+          </div>
+
+          <h3 class="safra-form__secao-titulo">Área e produtividade</h3>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.areaPlanejadaHa"
                 outlined
@@ -61,7 +74,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.areaRealizadaHa"
                 outlined
@@ -71,15 +84,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataInicio" outlined label="Início" type="date"
-                :readonly="somenteLeitura" />
-            </div>
-            <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataFim" outlined label="Fim" type="date"
-                :readonly="somenteLeitura" />
-            </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.produtividadePlanejada"
                 outlined
@@ -89,7 +94,7 @@
                 :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.produtividadeRealizada"
                 outlined
@@ -234,3 +239,12 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.safra-form__secao-titulo {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--spacing-2) 0 0;
+}
+</style>

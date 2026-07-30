@@ -101,5 +101,17 @@ export function rotaDaNotificacao(item: NotificacaoDto): RouteLocationRaw | null
     return { name: 'fiscal-contingencia' };
   }
 
+  if (tipo === NotificacaoTipo.RecomendacaoPendente) {
+    return { name: 'safras-recomendacoes' };
+  }
+
+  if (tipo === NotificacaoTipo.OsAgricolaAtrasada) {
+    return { name: 'safras-ordens-servico' };
+  }
+
+  if (tipo === NotificacaoTipo.SaldoMinimoCaixa) {
+    return { name: 'caixas' };
+  }
+
   return null;
 }

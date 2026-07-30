@@ -181,7 +181,7 @@ export function useProdutos() {
   }
 
   async function solicitarInativacao(produto: ProdutoResumoDto): Promise<boolean> {
-    const justificativa = await messageService.confirmarComJustificativa({
+    const justificativa = await messageService.confirmarDestrutivo({
       titulo: 'Inativar produto',
       mensagem: `Deseja inativar o produto ${produto.descricao}?`,
       textoConfirmar: 'Inativar',

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Programação de carga, veículo e paradas." />
 
     <section class="agro-section">

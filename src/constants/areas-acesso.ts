@@ -65,5 +65,6 @@ export const ModulosPorArea: Record<AreaAcessoValor, ModuloPermissao[]> = {
   [AreaAcesso.Configuracoes]: [
     Permissoes.Usuarios,
     Permissoes.PermissoesGranulares,
+    Permissoes.Auditoria,
   ],
 };

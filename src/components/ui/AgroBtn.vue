@@ -1,6 +1,7 @@
 <template>
   <q-btn
     v-bind="attrsSemLabel"
+    no-caps
     :label="textoLabel"
     :type="tipoBotao"
     :aria-label="ariaLabel"

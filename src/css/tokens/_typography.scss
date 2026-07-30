@@ -9,14 +9,17 @@ $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
-$font-size-xs: 0.75rem;    // 12px
-$font-size-sm: 0.875rem;   // 14px
-$font-size-md: 1rem;       // 16px
-$font-size-lg: 1.125rem;   // 18px
-$font-size-xl: 1.25rem;    // 20px
-$font-size-2xl: 1.5rem;    // 24px
-$font-size-3xl: 1.875rem;  // 30px
-$font-size-4xl: 2.25rem;   // 36px
+$font-size-xs: 0.75rem;    // ~10.5px (root 14px)
+$font-size-sm: 0.875rem;   // ~12.25px
+$font-size-md: 1rem;       // 14px — corpo padrão
+$font-size-lg: 1.125rem;   // ~15.75px
+$font-size-xl: 1.25rem;    // ~17.5px
+$font-size-2xl: 1.5rem;    // 21px
+$font-size-3xl: 1.875rem;  // ~26.25px
+$font-size-4xl: 2.25rem;   // ~31.5px
+
+// Base tipográfica do app (browser 16px → 14px). Tudo em rem escala junto.
+$font-size-root: 87.5%;
 
 $line-height-tight: 1.25;
 $line-height-snug: 1.375;
@@ -32,6 +35,8 @@ $letter-spacing-wider: 0.05em;
   --font-family-base: #{$font-family-base};
   --font-family-display: #{$font-family-display};
   --font-family-mono: #{$font-family-mono};
+
+  --font-size-root: #{$font-size-root};
 
   --font-weight-regular: #{$font-weight-regular};
   --font-weight-medium: #{$font-weight-medium};

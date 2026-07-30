@@ -43,6 +43,7 @@ export function usePerfilSafras() {
     isRevenda,
     isIndustria,
     perfilFalhou,
+    perfilCarregado,
     carregandoPerfil,
     carregarPerfil,
   };

@@ -14,7 +14,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div v-if="verCustos" class="col-12 col-md-4">
         <q-input
           v-model="formulario.margemMinimaPercentual"
           outlined
@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QForm } from 'quasar';
 import type { CategoriaProdutoFormModel } from 'types/dtos/categoria-produto.dto';
 import { obrigatorio } from 'utils/validators';
@@ -41,6 +42,7 @@ defineProps<{
 }>();
 
 const formulario = defineModel<CategoriaProdutoFormModel>('formulario', { required: true });
+const { verCustos } = useVerCustos();
 
 const formRef = ref<QForm | null>(null);
 

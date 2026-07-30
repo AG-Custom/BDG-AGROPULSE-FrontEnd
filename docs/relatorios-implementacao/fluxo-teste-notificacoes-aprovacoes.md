@@ -3,7 +3,7 @@
 Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedido, motor operacional).
 
 **Atualizado:** 2026-07-30  
-**Perfis usados:** Vendedor · Gerente (ou Diretor / Administrador) · Administrativo · Operacional
+**Perfis usados:** Vendedor · Gerente (ou Diretor / Administrador) · Administrativo · Operacional · Consultor
 
 ---
 
@@ -30,7 +30,7 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 
 ---
 
-## 2. Retenção por margem / crédito / atraso → aprovar na fila
+## 2. Retenção por margem / crédito / atraso → aprovar na fila ou no alerta
 
 | Campo | Valor |
 |-------|-------|
@@ -39,9 +39,10 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 | **Ação 1** | Vendedor → **Enviar para aprovação** |
 | **Notificação** | `PedidoAguardandoAprovacao` (broadcast; visível a Gerente/Diretor/Admin/Administrativo) |
 | **Clique** | Com `idReferencia` → detalhe do pedido; senão → `/aprovacoes` |
-| **Ação 2** | Gerente em `/aprovacoes` (ou dashboard “Fila de aprovações”) → **Aprovar** |
+| **Ação 2a** | Gerente em `/aprovacoes` (ou dashboard “Fila de aprovações”) → **Aprovar** |
+| **Ação 2b** | Gerente no **sino** ou `/notificacoes` → botões **Aprovar** / **Recusar** no próprio alerta (requer `aprovacoes.aprovar`) |
 | **Notificação** | `PedidoAprovado` ao vendedor; retenção `pedido_aguardando_*` some da lista |
-| **Resultado** | Status `Aprovado`; item some da fila |
+| **Resultado** | Status `Aprovado`; item some da fila; alerta marcado como lido após decisão no sino/página |
 
 ---
 
@@ -51,7 +52,7 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 |-------|-------|
 | **Perfil** | Gerente |
 | **Pré-condição** | Pedido em `Aguardando` na fila |
-| **Ação** | `/aprovacoes` → **Recusar** → informar motivo → confirmar |
+| **Ação** | `/aprovacoes` → **Recusar** → informar motivo → confirmar **ou** recusar pelo alerta (dialog de motivo) |
 | **Notificação** | `PedidoRecusado` ao **vendedor** (mensagem com motivo) |
 | **Clique** | Detalhe do pedido |
 | **Resultado** | Status `Recusado`; reserva de estoque devolvida; some da fila |
@@ -97,11 +98,11 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 
 ---
 
-## 7. Job operacional (estoque, validade, financeiro, CRM, fiscal)
+## 7. Job operacional (estoque, validade, financeiro, CRM, fiscal, safras, caixa)
 
 | Campo | Valor |
 |-------|-------|
-| **Perfil** | Gerente / Administrativo / Operacional (conforme matriz) |
+| **Perfil** | Gerente / Administrativo / Operacional / Consultor (conforme matriz) |
 | **Pré-condição** | Dados que disparem cada alerta (ver tabela abaixo) |
 | **Ação** | `POST /api/notificacoes/gerar` **ou** aguardar `GerarNotificacoesOperacionaisJob` (1h) |
 | **Checagem** | Menu de notificações / página `/notificacoes` |
@@ -109,14 +110,21 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 | Tipo | Como provocar | Quem deve ver | Destino do clique |
 |------|---------------|---------------|-------------------|
 | `EstoqueMinimo` | Produto com saldo ≤ mínimo | Gestão + Operacional + Administrativo | `/estoque/alertas` |
-| `ValidadeProxima` | Lote com validade ≤ 45 dias (ou `diasAlertaValidade`) | Gestão + Administrativo | `/estoque/alertas` |
+| `ValidadeProxima` | Lote com validade ≤ 45 dias (ou `diasAlertaValidade`) | Gestão + Administrativo + **Operacional** | `/estoque/alertas` |
 | `ContasVencidas` / `BoletoCliente` | CR aberta vencida | Financeiros (gestão + administrativo) | Contas a receber |
 | `ContasVencer3Dias` / `7` / `15` | CR com vencimento na janela | Idem | Contas a receber |
 | `BoletoFornecedor` | CP vencendo em ≤ 2 dias ou vencida | Financeiros | Contas a pagar |
 | `AniversarioCliente` | Cliente com aniversário em ≤ 7 dias | CRM comerciais + Consultor | Cliente / carteira |
 | `AniversariantesCarteira` | Idem + `vendedorUsuarioId` no cliente | Vendedor da carteira (+ gestão) | Cliente |
 | `ClienteSemComprar` | Último faturamento além de `prazoRecompra` (default 25d) | CRM comerciais + Consultor (+ cópia ao vendedor) | Cliente |
-| `ContingenciaSefaz` | Contingência fiscal ativa na unidade | Gestão + Operacional + Administrativo | `/fiscal/contingencia` |
+| `ContingenciaSefaz` | Contingência fiscal ativa na unidade | Gestão + Operacional (**sem** Administrativo) | `/fiscal/contingencia` |
+| `RecomendacaoPendente` | Recomendação agronômica com status `Pendente` | Diretor, Admin, Gerente, **Consultor** | `/safras/recomendacoes` |
+| `OsAgricolaAtrasada` | OS agrícola `Aberta`/`EmAndamento` com prazo vencido | Diretor, Admin, Gerente, **Consultor** | `/safras/ordens-servico` |
+| `SaldoMinimoCaixa` | Caixa/conta da unidade com `saldoAtual <= saldoMinimo` | Financeiros + **Operacional** | `/financeiro/caixas` |
+
+### Contrato backend (tipos novos)
+
+O FE já aceita e filtra `RecomendacaoPendente`, `OsAgricolaAtrasada` e `SaldoMinimoCaixa`. O job / `POST /notificacoes/gerar` deve emitir esses tipos com `modeloReferencia`/`idReferencia` coerentes e destinatários alinhados à matriz do FE (`src/constants/matriz-alertas.ts`). Espelhar em `new_agropulse_backend/api-contract/notificacoes.md` quando o BE for atualizado.
 
 ---
 
@@ -124,9 +132,10 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 
 | Perfil | Não deve receber |
 |--------|------------------|
-| **Vendedor** | `EstoqueMinimo`, `ValidadeProxima`, `BoletoFornecedor`, `ContasVencer*`, `ContasVencidas` (broadcast financeiro), `ContingenciaSefaz` |
-| **Administrativo** | `PosVenda`, `ClienteSemComprar`, `AniversarioCliente`, `DataComemorativa` (tipos CRM comerciais) |
-| **Operacional** | Financeiro (`Boleto*`, `Contas*`), CRM comercial (`PosVenda`, aniversário, sem comprar) |
+| **Vendedor** | `EstoqueMinimo`, `ValidadeProxima`, `BoletoFornecedor`, `ContasVencer*`, `ContasVencidas` (broadcast financeiro), `ContingenciaSefaz`, `RecomendacaoPendente`, `OsAgricolaAtrasada`, `SaldoMinimoCaixa` |
+| **Administrativo** | `PosVenda`, `ClienteSemComprar`, `AniversarioCliente`, `DataComemorativa` (tipos CRM comerciais), `ContingenciaSefaz`, tipos de safras |
+| **Operacional** | Financeiro de boletos/contas (`Boleto*`, `Contas*`), CRM comercial (`PosVenda`, aniversário, sem comprar); **pode** ver `SaldoMinimoCaixa`, estoque e SEFAZ |
+| **Consultor** | Financeiro, estoque broadcast, SEFAZ; **pode** ver CRM carteira + `RecomendacaoPendente` / `OsAgricolaAtrasada` |
 
 Validar: logar com cada perfil → `GET /api/notificacoes` / menu → confirmar ausência.
 
@@ -148,17 +157,19 @@ Validar: logar com cada perfil → `GET /api/notificacoes` / menu → confirmar 
 1. [ ] Vendedor cria pedido limpo → auto-aprovado + notificação  
 2. [ ] Vendedor cria pedido com margem baixa → aguardando + notificação gestão  
 3. [ ] Gerente aprova na **fila** → vendedor notificado  
-4. [ ] Gerente recusa na **fila** → estoque devolvido + notificação  
-5. [ ] Pedido só com falta de estoque → `PendenteEstoque` → entrada libera  
-6. [ ] Faturar → `PosVenda`  
-7. [ ] `POST /notificacoes/gerar` gera alertas operacionais  
-8. [ ] Matriz oculta tipos indevidos por perfil  
-9. [ ] Clique na notificação navega para a tela correta  
+4. [ ] Gerente aprova/recusa **no sino ou `/notificacoes`** → vendedor notificado; alerta lido  
+5. [ ] Gerente recusa na **fila** → estoque devolvido + notificação  
+6. [ ] Pedido só com falta de estoque → `PendenteEstoque` → entrada libera  
+7. [ ] Faturar → `PosVenda`  
+8. [ ] `POST /notificacoes/gerar` gera alertas operacionais (incl. safras/caixa quando BE pronto)  
+9. [ ] Matriz oculta tipos indevidos por perfil (Administrativo sem SEFAZ; Operacional vê validade)  
+10. [ ] Clique na notificação navega para a tela correta  
 
 ---
 
 ## Referências
 
 - Contrato: `new_agropulse_backend/api-contract/notificacoes.md`  
+- Matriz FE: `src/constants/matriz-alertas.ts`  
 - Fila: `GET /api/aprovacoes` · decisão: `POST /api/pedidos-venda/{id}/aprovar|recusar`  
 - Relatório módulo: [vendas-pedidos-OK.md](./vendas-pedidos-OK.md)

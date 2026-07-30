@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Lote de entrada, saídas tipadas e confirmação.">
       <agro-btn
         v-if="modo === 'editar' && beneficiamento?.status === BeneficiamentoLoteStatus.Rascunho"

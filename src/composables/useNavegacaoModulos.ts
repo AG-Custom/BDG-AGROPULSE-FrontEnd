@@ -2,8 +2,11 @@ import { useComprasConfig } from 'composables/useComprasConfig';
 import { usePerfilSafras } from 'composables/usePerfilSafras';
 import { usePermissao } from 'composables/usePermissao';
 import {
+  NAVEGACAO_DASHBOARD,
+  NAVEGACAO_GRUPOS,
   NAVEGACAO_MODULOS,
   type FlagNavegacao,
+  type GrupoNavegacao,
   type ItemNavegacao,
   type ModuloNavegacao,
 } from 'constants/navegacao-modulos';
@@ -13,9 +16,16 @@ import { useRoute, useRouter } from 'vue-router';
 
 export interface ModuloNavegacaoVisivel extends ModuloNavegacao {
   filhosVisiveis: ItemNavegacao[];
-  /** Rota do primeiro filho visível (destino ao clicar no módulo). */
   routeNameDestino: string;
 }
+
+export interface GrupoNavegacaoVisivel {
+  id: string;
+  label: string;
+  modulos: ModuloNavegacaoVisivel[];
+}
+
+export type BadgeTipoNegocio = 'revenda' | 'industria' | null;
 
 function pathCorresponde(path: string, prefixo: string): boolean {
   if (prefixo === '/') {
@@ -30,11 +40,25 @@ export function useNavegacaoModulos() {
   const router = useRouter();
   const { possuiPermissao } = usePermissao();
   const { config, carregar: carregarComprasConfig } = useComprasConfig();
-  const { isRevenda, isIndustria, carregarPerfil } = usePerfilSafras();
+  const { isRevenda, isIndustria, carregarPerfil, perfilCarregado } =
+    usePerfilSafras();
 
   const fluxoCompletoHabilitado = computed(
     () => config.value?.fluxoCompletoHabilitado === true,
   );
+
+  const badgeTipoNegocio = computed<BadgeTipoNegocio>(() => {
+    if (!perfilCarregado.value) {
+      return null;
+    }
+    if (isIndustria.value) {
+      return 'industria';
+    }
+    if (isRevenda.value) {
+      return 'revenda';
+    }
+    return null;
+  });
 
   function flagOk(flag: FlagNavegacao | undefined): boolean {
     if (!flag) {
@@ -63,16 +87,49 @@ export function useNavegacaoModulos() {
     return flagOk(item.flag);
   }
 
-  const modulosVisiveis = computed<ModuloNavegacaoVisivel[]>(() =>
-    NAVEGACAO_MODULOS.map((modulo) => {
-      const filhosVisiveis = modulo.filhos.filter(itemVisivel);
-      return {
-        ...modulo,
-        filhosVisiveis,
-        routeNameDestino: filhosVisiveis[0]?.routeName ?? '',
-      };
-    }).filter((modulo) => modulo.filhosVisiveis.length > 0),
+  function moduloParaVisivel(
+    modulo: ModuloNavegacao,
+  ): ModuloNavegacaoVisivel | null {
+    if (!flagOk(modulo.flag)) {
+      return null;
+    }
+
+    const filhosVisiveis = modulo.filhos.filter(itemVisivel);
+    if (filhosVisiveis.length === 0) {
+      return null;
+    }
+
+    return {
+      ...modulo,
+      filhosVisiveis,
+      routeNameDestino: filhosVisiveis[0]?.routeName ?? '',
+    };
+  }
+
+  const dashboardVisivel = computed(() =>
+    moduloParaVisivel(NAVEGACAO_DASHBOARD),
   );
+
+  const gruposVisiveis = computed<GrupoNavegacaoVisivel[]>(() =>
+    NAVEGACAO_GRUPOS.map((grupo: GrupoNavegacao) => ({
+      id: grupo.id,
+      label: grupo.label,
+      modulos: grupo.modulos
+        .map(moduloParaVisivel)
+        .filter((m): m is ModuloNavegacaoVisivel => m !== null),
+    })).filter((grupo) => grupo.modulos.length > 0),
+  );
+
+  const modulosVisiveis = computed<ModuloNavegacaoVisivel[]>(() => {
+    const lista: ModuloNavegacaoVisivel[] = [];
+    if (dashboardVisivel.value) {
+      lista.push(dashboardVisivel.value);
+    }
+    for (const grupo of gruposVisiveis.value) {
+      lista.push(...grupo.modulos);
+    }
+    return lista;
+  });
 
   function filhoAtivo(item: ItemNavegacao): boolean {
     try {
@@ -83,10 +140,6 @@ export function useNavegacaoModulos() {
     }
   }
 
-  /**
-   * Prefixo mais longo vence (ex.: `/financeiro/contas-receber` antes de `/financeiro`).
-   * `/` só casa path exato.
-   */
   const moduloAtivo = computed<ModuloNavegacaoVisivel | null>(() => {
     const candidatos = modulosVisiveis.value.flatMap((modulo) =>
       modulo.pathPrefixes.map((prefixo) => ({ modulo, prefixo })),
@@ -115,10 +168,14 @@ export function useNavegacaoModulos() {
   });
 
   return {
+    badgeTipoNegocio,
+    dashboardVisivel,
+    gruposVisiveis,
     modulosVisiveis,
     moduloAtivo,
     filhosVisiveis,
     mostrarSubnav,
     filhoAtivo,
+    todosModulos: NAVEGACAO_MODULOS,
   };
 }

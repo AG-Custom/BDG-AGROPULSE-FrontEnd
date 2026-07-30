@@ -15,7 +15,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.cpf"
           outlined
@@ -29,7 +29,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.rg"
           outlined
@@ -38,7 +38,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.dataNascimento"
           outlined
@@ -77,7 +77,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <AgroMoneyInput
           v-model="formulario.salarioBase"
           label="Salário base"
@@ -85,7 +85,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.dataAdmissao"
           outlined
@@ -97,7 +97,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.dataDemissao"
           outlined

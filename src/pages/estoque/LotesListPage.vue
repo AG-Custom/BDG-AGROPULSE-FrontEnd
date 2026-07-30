@@ -210,7 +210,7 @@
                   input-class="text-metric"
                 />
               </div>
-              <div class="col-12 col-md-4">
+              <div v-if="verCustos" class="col-12 col-md-4">
                 <q-input
                   :model-value="loteVisualizar ? formatarDecimal(loteVisualizar.custoUnitario) : ''"
                   outlined
@@ -277,6 +277,7 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QTableColumn } from 'quasar';
 import type { LoteDto } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
@@ -289,6 +290,7 @@ const {
   carregando: carregandoProdutos,
   rotuloProduto,
 } = useProdutoOpcoesEstoque();
+const { verCustos } = useVerCustos();
 
 const filtroProduto = ref<string | null>(null);
 const apenasComSaldo = ref(true);
@@ -297,46 +299,52 @@ const loteSelecionado = ref<LoteDto | null>(null);
 const dialogVisualizar = ref(false);
 const loteVisualizar = ref<LoteDto | null>(null);
 
-const colunas: QTableColumn<LoteDto>[] = [
-  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
-  { name: 'numeroLote', label: 'Lote', field: 'numeroLote', align: 'left', sortable: true },
-  { name: 'quantidade', label: 'Quantidade', field: 'quantidade', align: 'right', sortable: true },
-  {
-    name: 'custoUnitario',
-    label: 'Custo unitário',
-    field: 'custoUnitario',
-    align: 'right',
-    sortable: true,
-  },
-  {
-    name: 'dataValidade',
-    label: 'Validade',
-    field: 'dataValidade',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'dataFabricacao',
-    label: 'Fabricação',
-    field: 'dataFabricacao',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'localizacao',
-    label: 'Localização',
-    field: 'deposito',
-    align: 'left',
-  },
-  {
-    name: 'notaFiscalOrigemId',
-    label: 'NF origem',
-    field: 'notaFiscalOrigemId',
-    align: 'left',
-  },
-  { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
-  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
-];
+const colunas = computed(() => {
+  const base: QTableColumn<LoteDto>[] = [
+    { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
+    { name: 'numeroLote', label: 'Lote', field: 'numeroLote', align: 'left', sortable: true },
+    { name: 'quantidade', label: 'Quantidade', field: 'quantidade', align: 'right', sortable: true },
+    {
+      name: 'custoUnitario',
+      label: 'Custo unitário',
+      field: 'custoUnitario',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      name: 'dataValidade',
+      label: 'Validade',
+      field: 'dataValidade',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      name: 'dataFabricacao',
+      label: 'Fabricação',
+      field: 'dataFabricacao',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      name: 'localizacao',
+      label: 'Localização',
+      field: 'deposito',
+      align: 'left',
+    },
+    {
+      name: 'notaFiscalOrigemId',
+      label: 'NF origem',
+      field: 'notaFiscalOrigemId',
+      align: 'left',
+    },
+    { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
+    { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+  ];
+
+  return base.filter(
+    (coluna) => coluna.name !== 'custoUnitario' || verCustos.value,
+  );
+});
 
 const descricaoVazia = computed(() =>
   filtroProduto.value || apenasComSaldo.value

@@ -10,7 +10,7 @@
         icon="add"
         label="Nova regra"
         descricao="Cadastrar regra de comissão"
-        @click="irParaNovo"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -45,7 +45,15 @@
           titulo="Nenhuma regra cadastrada"
           descricao="Cadastre regras por canal para aplicar comissão no pedido."
           icon="percent"
-        />
+        >
+          <agro-btn
+            color="primary"
+            unelevated
+            label="Nova regra"
+            descricao="Cadastrar regra de comissão"
+            @click="abrirDialog()"
+          />
+        </empty-state>
 
         <q-table
           v-else
@@ -83,8 +91,8 @@
               <agro-acoes-menu
                 :mostrar-status="false"
                 mostrar-excluir
-                :visualizar-to="{ name: 'regra-comissao-visualizar', params: { id: props.row.id } }"
-                @editar="irParaEditar(props.row.id)"
+                @editar="abrirDialog(props.row)"
+                @visualizar="abrirDialogVisualizar(props.row)"
                 @excluir="confirmarExclusao(props.row.id)"
               />
             </q-td>
@@ -92,6 +100,73 @@
         </q-table>
       </agro-card>
     </section>
+
+    <q-dialog v-model="dialogAberto" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">{{ tituloDialog }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form
+            greedy
+            class="agro-formulario"
+            :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+            @submit.prevent="salvar"
+          >
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-select
+                  v-model="formulario.canal"
+                  outlined
+                  label="Canal de venda"
+                  hint="Vazio = aplica a todos os canais"
+                  emit-value
+                  map-options
+                  clearable
+                  :options="CanalVendaOpcoes"
+                  :readonly="somenteLeitura"
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  v-model="formulario.percentual"
+                  outlined
+                  label="Comissão %"
+                  class="field-required"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  aria-required="true"
+                  :rules="[obrigatorio, percentualZeroACem]"
+                  :readonly="somenteLeitura"
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="fecharDialog" />
+              </template>
+              <template v-else>
+                <agro-btn
+                  flat
+                  label="Cancelar"
+                  descricao="Fechar sem salvar"
+                  :disable="salvando"
+                  @click="fecharDialog"
+                />
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  :label="editandoId ? 'Salvar' : 'Cadastrar'"
+                  type="submit"
+                  :loading="salvando"
+                />
+              </template>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -101,24 +176,36 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { useRegrasComissao } from 'composables/useRegrasComissao';
+import {
+  formVazioRegraComissao,
+  regraComissaoParaForm,
+  useRegrasComissao,
+} from 'composables/useRegrasComissao';
 import { CanalVendaOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
-import type { RegraComissaoDto } from 'types/dtos/regra-comissao.dto';
+import type { RegraComissaoDto, RegraComissaoFormModel } from 'types/dtos/regra-comissao.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { onMounted, ref, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { obrigatorio, percentualZeroACem } from 'utils/validators';
+import { computed, onMounted, ref, watch } from 'vue';
 
-
-
-const router = useRouter();
-const { regras, carregando, carregar, excluir } = useRegrasComissao();
+const { regras, carregando, salvando, carregar, criar, editar, excluir } = useRegrasComissao();
 const filtroAtivo = ref<boolean | null>(true);
+const dialogAberto = ref(false);
+const somenteLeitura = ref(false);
+const editandoId = ref<string | null>(null);
+const formulario = ref<RegraComissaoFormModel>(formVazioRegraComissao());
 
 const statusOpcoes = [
   { label: 'Ativas', value: true },
   { label: 'Inativas', value: false },
 ];
+
+const tituloDialog = computed(() => {
+  if (somenteLeitura.value) {
+    return 'Visualizar regra de comissão';
+  }
+  return editandoId.value ? 'Editar regra de comissão' : 'Nova regra de comissão';
+});
 
 const colunas: QTableColumn<RegraComissaoDto>[] = [
   { name: 'canal', label: 'Canal', field: 'canal', align: 'left' },
@@ -141,12 +228,35 @@ async function recarregar(): Promise<void> {
   });
 }
 
-function irParaNovo(): void {
-  void router.push({ name: 'regra-comissao-nova' });
+function abrirDialog(item?: RegraComissaoDto): void {
+  somenteLeitura.value = false;
+  editandoId.value = item?.id ?? null;
+  formulario.value = item ? regraComissaoParaForm(item) : formVazioRegraComissao();
+  dialogAberto.value = true;
 }
 
-function irParaEditar(id: string): void {
-  void router.push({ name: 'regra-comissao-editar', params: { id } });
+function abrirDialogVisualizar(item: RegraComissaoDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
+function fecharDialog(): void {
+  dialogAberto.value = false;
+}
+
+async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
+  const ok = editandoId.value
+    ? await editar(editandoId.value, formulario.value)
+    : await criar(formulario.value);
+
+  if (ok) {
+    fecharDialog();
+    await recarregar();
+  }
 }
 
 async function confirmarExclusao(id: string): Promise<void> {
@@ -162,7 +272,6 @@ watch(filtroAtivo, () => {
 onMounted(() => {
   void recarregar();
 });
-
 </script>
 
 <style scoped>
@@ -172,5 +281,16 @@ onMounted(() => {
 
 .acoes {
   white-space: nowrap;
+}
+
+.dialog {
+  min-width: min(480px, 94vw);
+  max-width: 560px;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
 }
 </style>

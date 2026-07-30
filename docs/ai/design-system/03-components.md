@@ -39,6 +39,7 @@ Label + ícone opcional (leading/trailing). Sem gradiente.
 Default, Hover (`color.hover`), Active, Focus (ring), Disabled, Loading (`:loading="true"`).
 
 ### Comportamento
+- **Capitalização:** labels em frase/título (`Criar nova`, `Salvar`) — **nunca** caixa alta automática. Global: `.q-btn { text-transform: none }` + `AgroBtn` com `no-caps`
 - Loading substitui label por spinner — **nunca** spinner + label simultâneos
 - `:disable="loading"` automático
 - Transição: `duration.fast`
@@ -74,7 +75,9 @@ Label flutuante + field + hint/error + ícone opcional.
 - `borderless` — filtros inline, search bars
 
 ### Tamanhos
-MD (40px height) padrão. SM para filtros compactos.
+- **Formulários** (`.agro-formulario`): ~40px — densidade compacta padrão
+- **Filtros / barras**: `dense` explícito
+- Login/auth: altura padrão Quasar (mais respiração)
 
 ### Estados
 Default, Focus (border `color.border.focus`), Error (`error` + `error-message`), Disabled, Readonly.

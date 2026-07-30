@@ -10,7 +10,7 @@
         icon="add"
         label="Novo plano"
         descricao="Criar plano"
-        :to="{ name: 'manutencao-plano-novo' }"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -42,7 +42,7 @@
             unelevated
             label="Novo plano"
             descricao="Criar"
-            :to="{ name: 'manutencao-plano-novo' }"
+            @click="abrirDialog()"
           />
         </empty-state>
         <q-table
@@ -72,10 +72,16 @@
             <q-td :props="props">
               <agro-acoes-menu
                 :mostrar-status="false"
-                :editar-to="{ name: 'manutencao-plano-editar', params: { id: props.row.id } }"
-                :visualizar-to="{ name: 'manutencao-plano-visualizar', params: { id: props.row.id } }"
->
-                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirExecucao(props.row)">
+                @editar="abrirDialog(props.row)"
+                @visualizar="abrirDialogVisualizar(props.row)"
+              >
+                <q-item
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  @click="abrirExecucao(props.row)"
+                >
                   <q-item-section avatar>
                     <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
                       <q-icon name="play_arrow" size="16px" />
@@ -89,6 +95,93 @@
         </q-table>
       </agro-card>
     </section>
+
+    <q-dialog v-model="dialogForm" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">{{ tituloDialog }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form
+            greedy
+            class="agro-formulario"
+            :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+            @submit.prevent="salvarPlano"
+          >
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-select
+                  v-model="formulario.ativoId"
+                  outlined
+                  label="Ativo"
+                  emit-value
+                  map-options
+                  class="field-required"
+                  :options="ativoOpcoes"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  v-model="formulario.descricao"
+                  outlined
+                  label="Descrição"
+                  class="field-required"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-sm-6">
+                <q-select
+                  v-model="formulario.tipoGatilho"
+                  outlined
+                  label="Tipo de gatilho"
+                  emit-value
+                  map-options
+                  class="field-required"
+                  :options="GatilhoPlanoManutencaoOpcoes"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-sm-6">
+                <q-input
+                  v-model="formulario.intervalo"
+                  outlined
+                  label="Intervalo"
+                  type="number"
+                  class="field-required"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogForm = false" />
+              </template>
+              <template v-else>
+                <agro-btn
+                  flat
+                  label="Cancelar"
+                  descricao="Fechar sem salvar"
+                  :disable="salvando"
+                  @click="dialogForm = false"
+                />
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  :label="editandoId ? 'Salvar' : 'Criar'"
+                  type="submit"
+                  :loading="salvando"
+                />
+              </template>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
     <q-dialog v-model="dialogExecucao" persistent>
       <q-card class="dialog">
@@ -120,7 +213,13 @@
             </div>
             <div class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogExecucao = false" />
-              <agro-btn color="primary" unelevated label="Registrar" type="submit" :loading="salvando" />
+              <agro-btn
+                color="primary"
+                unelevated
+                label="Registrar"
+                type="submit"
+                :loading="salvando"
+              />
             </div>
           </q-form>
         </q-card-section>
@@ -135,17 +234,21 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { useManutencao } from 'composables/useManutencao';
-import { StatusPlanoManutencao } from 'constants/enums';
+import {
+  planoDtoParaForm,
+  planoVazio,
+  useManutencao,
+} from 'composables/useManutencao';
+import { GatilhoPlanoManutencaoOpcoes, StatusPlanoManutencao } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type {
   PlanoManutencaoDto,
+  PlanoManutencaoFormModel,
   RegistrarExecucaoPlanoFormModel,
 } from 'types/dtos/manutencao.dto';
 import { formatarDecimal } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
-
 
 const {
   planos,
@@ -156,8 +259,15 @@ const {
   carregarPlanos,
   carregarAlertas,
   carregarAtivos,
+  criarPlano,
+  editarPlano,
   registrarExecucaoPlano,
 } = useManutencao();
+
+const dialogForm = ref(false);
+const somenteLeitura = ref(false);
+const editandoId = ref<string | null>(null);
+const formulario = ref<PlanoManutencaoFormModel>(planoVazio());
 
 const dialogExecucao = ref(false);
 const planoSelecionado = ref<PlanoManutencaoDto | null>(null);
@@ -168,6 +278,17 @@ const formExecucao = ref<RegistrarExecucaoPlanoFormModel>({
 
 const temVencido = computed(() =>
   alertas.value.some((a) => a.status === StatusPlanoManutencao.Vencido),
+);
+
+const tituloDialog = computed(() => {
+  if (somenteLeitura.value) {
+    return 'Visualizar plano';
+  }
+  return editandoId.value ? 'Editar plano' : 'Novo plano';
+});
+
+const ativoOpcoes = computed(() =>
+  ativos.value.map((a) => ({ label: a.nome, value: a.id })),
 );
 
 function nomeAtivo(ativoId: string): string {
@@ -184,6 +305,34 @@ const colunas: QTableColumn<PlanoManutencaoDto>[] = [
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
+function abrirDialog(item?: PlanoManutencaoDto): void {
+  somenteLeitura.value = false;
+  editandoId.value = item?.id ?? null;
+  formulario.value = item ? planoDtoParaForm(item) : planoVazio();
+  dialogForm.value = true;
+}
+
+function abrirDialogVisualizar(item: PlanoManutencaoDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
+async function salvarPlano(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
+  const ok = editandoId.value
+    ? await editarPlano(editandoId.value, formulario.value)
+    : await criarPlano(formulario.value);
+
+  if (ok) {
+    dialogForm.value = false;
+    await carregarPlanos();
+    await carregarAlertas();
+  }
+}
+
 function abrirExecucao(plano: PlanoManutencaoDto): void {
   planoSelecionado.value = plano;
   formExecucao.value = {
@@ -196,7 +345,11 @@ function abrirExecucao(plano: PlanoManutencaoDto): void {
 async function salvarExecucao(): Promise<void> {
   if (!planoSelecionado.value) return;
   const ok = await registrarExecucaoPlano(planoSelecionado.value.id, formExecucao.value);
-  if (ok) dialogExecucao.value = false;
+  if (ok) {
+    dialogExecucao.value = false;
+    await carregarPlanos();
+    await carregarAlertas();
+  }
 }
 
 onMounted(() => {
@@ -204,7 +357,6 @@ onMounted(() => {
   void carregarPlanos();
   void carregarAlertas();
 });
-
 </script>
 
 <style scoped>
@@ -217,11 +369,13 @@ onMounted(() => {
   color: var(--color-error-700);
 }
 .dialog {
-  min-width: min(420px, 92vw);
+  min-width: min(480px, 94vw);
+  max-width: 560px;
   padding: var(--spacing-2);
 }
 .titulo {
   margin: 0;
+  font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
 }
 </style>

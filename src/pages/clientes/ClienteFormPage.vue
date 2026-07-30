@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="tituloPagina" :subtitulo="subtituloPagina" />
 
     <section class="agro-section cliente-form-page">
@@ -22,7 +22,10 @@
           :somente-leitura="somenteLeitura || clienteInativo"
         />
 
-        <div v-if="!carregandoPagina && modo !== 'visualizar' && !clienteInativo" class="agro-form-actions">
+        <div
+          v-if="!carregandoPagina && modo !== 'visualizar' && !clienteInativo && podeEditarCliente"
+          class="agro-form-actions"
+        >
           <agro-btn
             flat
             label="Cancelar"
@@ -40,7 +43,10 @@
           />
         </div>
 
-        <div v-else-if="!carregandoPagina && (modo === 'visualizar' || clienteInativo)" class="agro-form-actions">
+        <div
+          v-else-if="!carregandoPagina && (modo === 'visualizar' || clienteInativo || !podeEditarCliente)"
+          class="agro-form-actions"
+        >
           <agro-btn
             flat
             label="Voltar"
@@ -66,13 +72,13 @@
 
       <cliente-tabelas-preco-section
         v-if="
-          podeGerenciarTabelasPreco
+          podeVerTabelasPreco
           && (modo === 'editar' || modo === 'visualizar')
           && (modo === 'visualizar' || clienteAtivo)
           && clienteCarregado
         "
         :cliente-id="clienteId!"
-        :somente-leitura="somenteLeitura"
+        :somente-leitura="somenteLeitura || !podeEditarTabelasPreco"
       />
 
       <cliente-perfil360-section
@@ -114,8 +120,16 @@ const formulario = ref<ClienteFormModel>(criarClienteFormVazio());
 const clienteCarregado = ref<ClienteDto | null>(null);
 const carregandoPagina = ref(true);
 
-const podeGerenciarTabelasPreco = computed(() =>
+const podeVerTabelasPreco = computed(() =>
   possuiPermissao(Permissoes.TabelasPreco.Visualizar),
+);
+
+const podeEditarTabelasPreco = computed(() =>
+  possuiPermissao(Permissoes.TabelasPreco.Editar),
+);
+
+const podeEditarCliente = computed(() =>
+  possuiPermissao(Permissoes.Clientes.Editar),
 );
 
 const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
@@ -130,7 +144,9 @@ const modoFormulario = computed<'criar' | 'editar'>(() =>
   modo.value === 'criar' ? 'criar' : 'editar',
 );
 
-const somenteLeitura = computed(() => modo.value === 'visualizar');
+const somenteLeitura = computed(
+  () => modo.value === 'visualizar' || !podeEditarCliente.value,
+);
 
 const clienteId = computed(() => route.params.id as string | undefined);
 

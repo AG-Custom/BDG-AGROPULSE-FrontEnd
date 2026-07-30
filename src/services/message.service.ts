@@ -116,6 +116,61 @@ export class MessageService {
 
     return resultado.value.trim();
   }
+
+  async confirmarDestrutivo(opcoes: {
+    titulo: string;
+    mensagem: string;
+    textoConfirmar?: string;
+    textoCancelar?: string;
+    icone?: SweetAlertOptions['icon'];
+    minimoCaracteres?: number;
+    textoDigitacao?: string;
+    placeholderJustificativa?: string;
+  }): Promise<string | null> {
+    const minimo = opcoes.minimoCaracteres ?? 10;
+    const textoDigitacao = opcoes.textoDigitacao ?? 'CONFIRMAR';
+
+    const justificativa = await this.confirmarComJustificativa({
+      titulo: opcoes.titulo,
+      mensagem: opcoes.mensagem,
+      textoConfirmar: opcoes.textoConfirmar ?? 'Continuar',
+      textoCancelar: opcoes.textoCancelar,
+      icone: opcoes.icone ?? 'warning',
+      minimoCaracteres: minimo,
+    });
+
+    if (!justificativa) {
+      return null;
+    }
+
+    const confirmacao = await Swal.fire({
+      ...CONFIG_PADRAO,
+      icon: opcoes.icone ?? 'warning',
+      title: 'Confirmação adicional',
+      text: `Digite ${textoDigitacao} para confirmar esta ação irreversível.`,
+      input: 'text',
+      inputPlaceholder: textoDigitacao,
+      inputAttributes: {
+        autocomplete: 'off',
+      },
+      inputValidator: (valor) => {
+        if (String(valor ?? '').trim() !== textoDigitacao) {
+          return `Digite exatamente ${textoDigitacao}.`;
+        }
+        return undefined;
+      },
+      showCancelButton: true,
+      confirmButtonText: opcoes.textoConfirmar ?? 'Confirmar',
+      cancelButtonText: opcoes.textoCancelar ?? 'Cancelar',
+      reverseButtons: true,
+    });
+
+    if (!confirmacao.isConfirmed) {
+      return null;
+    }
+
+    return justificativa;
+  }
 }
 
 export const messageService = new MessageService();

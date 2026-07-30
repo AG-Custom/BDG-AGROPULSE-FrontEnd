@@ -1,11 +1,12 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header :titulo="titulo" subtitulo="Dados patrimoniais e de depreciação." />
 
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario ativo-form" @submit.prevent="salvar">
+          <h3 class="ativo-form__secao-titulo">Dados gerais</h3>
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
@@ -47,22 +48,29 @@
             <div class="col-12 col-md-4">
               <q-input v-model="formulario.numeroSerie" outlined label="Número de série" />
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-12 col-md-3">
               <q-input v-model="formulario.ano" outlined label="Ano" type="number" />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-6">
+              <q-input v-model="formulario.localizacao" outlined label="Localização" />
+            </div>
+          </div>
+
+          <h3 class="ativo-form__secao-titulo">Aquisição e depreciação</h3>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-3">
               <AgroMoneyInput v-model="formulario.valorAquisicao" label="Valor aquisição" />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <q-input v-model="formulario.dataAquisicao" outlined label="Data aquisição" type="date" />
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-12 col-md-3">
               <q-input v-model="formulario.vidaUtilAnos" outlined label="Vida útil (anos)" type="number" />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <AgroMoneyInput v-model="formulario.valorResidual" label="Valor residual" />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-6">
               <q-select
                 v-model="formulario.metodoDepreciacao"
                 outlined
@@ -72,7 +80,11 @@
                 :options="MetodoDepreciacaoOpcoes"
               />
             </div>
-            <div class="col-6 col-md-3">
+          </div>
+
+          <h3 class="ativo-form__secao-titulo">Medidores</h3>
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-3">
               <q-input
                 v-model="formulario.horimetroAtual"
                 outlined
@@ -81,11 +93,8 @@
                 step="0.1"
               />
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-12 col-md-3">
               <q-input v-model="formulario.kmAtual" outlined label="Km atual" type="number" step="0.1" />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-input v-model="formulario.localizacao" outlined label="Localização" />
             </div>
           </div>
 
@@ -153,3 +162,12 @@ onMounted(async () => {
   carregandoPagina.value = false;
 });
 </script>
+
+<style scoped>
+.ativo-form__secao-titulo {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--spacing-2) 0 0;
+}
+</style>

@@ -23,6 +23,7 @@
     />
 
     <q-input
+      v-if="verCustos"
       v-model="margemMinimaPercentual"
       outlined
       label="Margem mínima (%)"
@@ -37,6 +38,7 @@
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useProdutos } from 'composables/useProdutos';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QForm } from 'quasar';
 import type {
   TabelaPrecoItemEdicaoFormModel,
@@ -49,6 +51,8 @@ import { computed, onMounted, ref } from 'vue';
 const props = defineProps<{
   modo: 'criar' | 'editar';
 }>();
+
+const { verCustos } = useVerCustos();
 
 const formularioCriar = defineModel<TabelaPrecoItemFormModel>('formularioCriar', {
   required: false,

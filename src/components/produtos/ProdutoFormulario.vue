@@ -100,7 +100,7 @@
 
     <h3 class="produto-formulario__secao-titulo">Comercial</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <AgroMoneyInput
           v-model="formulario.precoVenda"
           label="Preço de venda"
@@ -110,7 +110,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.fatorDivisaoNfe"
           outlined
@@ -122,7 +122,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div v-if="verCustos" class="col-12 col-md-3">
         <q-input
           v-model="formulario.margemMinimaPercentual"
           outlined
@@ -133,7 +133,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="formulario.comissaoPercentual"
           outlined
@@ -145,7 +145,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div v-if="modo === 'editar' && custoMedioPonderado != null" class="col-12 col-md-4">
+      <div v-if="verCustos && modo === 'editar' && custoMedioPonderado != null" class="col-12 col-md-3">
         <q-input
           outlined
           label="Custo médio ponderado"
@@ -154,7 +154,7 @@
           class="text-metric"
         />
       </div>
-      <div v-if="modo === 'editar'" class="col-12 col-md-4">
+      <div v-if="verCustos && modo === 'editar'" class="col-12 col-md-3">
         <q-select
           v-model="formulario.metodoCusteio"
           outlined
@@ -166,7 +166,7 @@
           :readonly="somenteLeitura"
         />
       </div>
-      <div v-if="modo === 'editar' && !somenteLeitura" class="col-12 col-md-4">
+      <div v-if="verCustos && modo === 'editar' && !somenteLeitura" class="col-12 col-md-6">
         <q-toggle
           v-model="formulario.recalcularMargemAPartirDoPreco"
           label="Recalcular margem a partir do preço"
@@ -181,6 +181,7 @@
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
+import { useVerCustos } from 'composables/useVerCustos';
 import { MetodoCusteioOpcoes, TipoProdutoOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { ProdutoFormModel } from 'types/dtos/produto.dto';
@@ -195,6 +196,7 @@ defineProps<{
 }>();
 
 const formulario = defineModel<ProdutoFormModel>('formulario', { required: true });
+const { verCustos } = useVerCustos();
 
 const formRef = ref<QForm | null>(null);
 

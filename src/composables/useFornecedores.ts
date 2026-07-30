@@ -99,7 +99,7 @@ export function useFornecedores() {
   }
 
   async function solicitarInativacao(fornecedor: FornecedorResumoDto): Promise<boolean> {
-    const justificativa = await messageService.confirmarComJustificativa({
+    const justificativa = await messageService.confirmarDestrutivo({
       titulo: 'Inativar fornecedor',
       mensagem: `Deseja inativar o fornecedor ${fornecedor.razaoSocial}?`,
       textoConfirmar: 'Inativar',

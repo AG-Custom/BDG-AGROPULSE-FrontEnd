@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form-wide">
     <app-page-header titulo="Nova solicitação" subtitulo="Informe os produtos e quantidades desejadas." />
 
     <section class="agro-section">

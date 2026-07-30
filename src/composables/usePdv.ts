@@ -89,9 +89,9 @@ export function usePdv() {
   }
 
   async function cancelar(vendaId: string): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const confirmou = await messageService.confirmarDestrutivo({
       titulo: 'Cancelar venda PDV',
-      mensagem: 'O estoque será estornado. Deseja cancelar esta venda?',
+      mensagem: 'O estoque será estornado. Informe o motivo e confirme a digitação para cancelar esta venda.',
       textoConfirmar: 'Cancelar venda',
       icone: 'warning',
     });

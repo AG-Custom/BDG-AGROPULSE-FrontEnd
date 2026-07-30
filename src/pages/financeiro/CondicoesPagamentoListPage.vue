@@ -10,7 +10,7 @@
         icon="add"
         label="Nova condição"
         descricao="Cadastrar condição"
-        :to="{ name: 'condicao-pagamento-nova' }"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -28,7 +28,7 @@
             unelevated
             label="Nova condição"
             descricao="Cadastrar condição"
-            :to="{ name: 'condicao-pagamento-nova' }"
+            @click="abrirDialog()"
           />
         </empty-state>
         <q-table
@@ -53,9 +53,10 @@
             <q-td :props="props" class="acoes">
               <agro-acoes-menu
                 :ativo="props.row.ativo"
-                :editar-to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
-                :visualizar-to="{ name: 'condicao-pagamento-visualizar', params: { id: props.row.id } }"
+                :pode-editar="props.row.ativo"
                 :loading-status="salvando"
+                @editar="abrirDialog(props.row)"
+                @visualizar="abrirDialogVisualizar(props.row)"
                 @desabilitar="solicitarInativacao(props.row)"
                 @ativar="solicitarAtivacao(props.row)"
               />
@@ -64,6 +65,78 @@
         </q-table>
       </agro-card>
     </section>
+
+    <q-dialog v-model="dialogAberto" persistent>
+      <q-card class="dialog">
+        <q-card-section>
+          <h4 class="titulo">{{ tituloDialog }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form
+            greedy
+            class="agro-formulario"
+            :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+            @submit.prevent="salvar"
+          >
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-input
+                  v-model="formulario.nome"
+                  outlined
+                  label="Nome"
+                  class="field-required"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-sm-6">
+                <q-input
+                  v-model="formulario.numeroParcelas"
+                  outlined
+                  label="Número de parcelas"
+                  type="number"
+                  class="field-required"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-12 col-sm-6">
+                <q-input
+                  v-model="formulario.intervaloDias"
+                  outlined
+                  label="Intervalo (dias)"
+                  type="number"
+                  class="field-required"
+                  :readonly="somenteLeitura"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="fecharDialog" />
+              </template>
+              <template v-else>
+                <agro-btn
+                  flat
+                  label="Cancelar"
+                  descricao="Fechar sem salvar"
+                  :disable="salvando"
+                  @click="fecharDialog"
+                />
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  :label="editandoId ? 'Salvar' : 'Cadastrar'"
+                  type="submit"
+                  :loading="salvando"
+                />
+              </template>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -75,12 +148,39 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import type { QTableColumn } from 'quasar';
-import type { CondicaoPagamentoDto } from 'types/dtos/financeiro.dto';
-import { onMounted } from 'vue';
+import type {
+  CondicaoPagamentoDto,
+  CondicaoPagamentoFormModel,
+} from 'types/dtos/financeiro.dto';
+import { obrigatorio } from 'utils/validators';
+import { computed, onMounted, ref } from 'vue';
 
+const {
+  condicoes,
+  carregando,
+  salvando,
+  carregar,
+  criar,
+  editar,
+  solicitarInativacao,
+  solicitarAtivacao,
+} = useCondicoesPagamento();
 
-const { condicoes, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
-  useCondicoesPagamento();
+const dialogAberto = ref(false);
+const somenteLeitura = ref(false);
+const editandoId = ref<string | null>(null);
+const formulario = ref<CondicaoPagamentoFormModel>({
+  nome: '',
+  numeroParcelas: '1',
+  intervaloDias: '30',
+});
+
+const tituloDialog = computed(() => {
+  if (somenteLeitura.value) {
+    return 'Visualizar condição de pagamento';
+  }
+  return editandoId.value ? 'Editar condição de pagamento' : 'Nova condição de pagamento';
+});
 
 const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
@@ -90,14 +190,71 @@ const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
+function formVazio(): CondicaoPagamentoFormModel {
+  return {
+    nome: '',
+    numeroParcelas: '1',
+    intervaloDias: '30',
+  };
+}
+
+function dtoParaForm(item: CondicaoPagamentoDto): CondicaoPagamentoFormModel {
+  return {
+    nome: item.nome,
+    numeroParcelas: String(item.numeroParcelas),
+    intervaloDias: String(item.intervaloDias),
+  };
+}
+
+function abrirDialog(item?: CondicaoPagamentoDto): void {
+  somenteLeitura.value = false;
+  editandoId.value = item?.id ?? null;
+  formulario.value = item ? dtoParaForm(item) : formVazio();
+  dialogAberto.value = true;
+}
+
+function abrirDialogVisualizar(item: CondicaoPagamentoDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
+function fecharDialog(): void {
+  dialogAberto.value = false;
+}
+
+async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
+  const ok = editandoId.value
+    ? await editar(editandoId.value, formulario.value)
+    : await criar(formulario.value);
+
+  if (ok) {
+    fecharDialog();
+    await carregar();
+  }
+}
+
 onMounted(() => {
   void carregar();
 });
-
 </script>
 
 <style scoped>
 .acoes {
   white-space: nowrap;
+}
+
+.dialog {
+  min-width: min(480px, 94vw);
+  max-width: 560px;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
 }
 </style>

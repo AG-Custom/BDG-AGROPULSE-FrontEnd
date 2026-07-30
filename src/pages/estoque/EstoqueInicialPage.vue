@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page">
+  <q-page class="agro-page agro-page--form">
     <app-page-header
       titulo="Estoque inicial"
       subtitulo="Lance o estoque inicial da unidade operacional uma única vez."

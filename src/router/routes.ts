@@ -291,71 +291,11 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'categorias-produto/novo',
-        name: 'categoria-produto-novo',
-        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.categoriaProdutoNovo',
-          breadcrumbPais: ['navegacao.categoriasProduto'],
-          permissao: Permissoes.CategoriasProduto.Visualizar,
-        },
-      },
-      {
-        path: 'categorias-produto/:id/editar',
-        name: 'categoria-produto-editar',
-        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.categoriaProdutoEditar',
-          breadcrumbPais: ['navegacao.categoriasProduto'],
-          permissao: Permissoes.CategoriasProduto.Visualizar,
-        },
-      },
-      {
-        path: 'categorias-produto/:id',
-        name: 'categoria-produto-visualizar',
-        component: () => import('pages/categorias-produto/CategoriaProdutoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.categoriaProdutoVisualizar',
-          breadcrumbPais: ['navegacao.categoriasProduto'],
-          permissao: Permissoes.CategoriasProduto.Visualizar,
-        },
-      },
-      {
         path: 'unidades-medida',
         name: 'unidades-medida',
         component: () => import('pages/unidades-medida/UnidadesMedidaListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.unidadesMedida',
-          permissao: Permissoes.UnidadesMedida.Visualizar,
-        },
-      },
-      {
-        path: 'unidades-medida/novo',
-        name: 'unidade-medida-novo',
-        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.unidadeMedidaNovo',
-          breadcrumbPais: ['navegacao.unidadesMedida'],
-          permissao: Permissoes.UnidadesMedida.Visualizar,
-        },
-      },
-      {
-        path: 'unidades-medida/:id/editar',
-        name: 'unidade-medida-editar',
-        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.unidadeMedidaEditar',
-          breadcrumbPais: ['navegacao.unidadesMedida'],
-          permissao: Permissoes.UnidadesMedida.Visualizar,
-        },
-      },
-      {
-        path: 'unidades-medida/:id',
-        name: 'unidade-medida-visualizar',
-        component: () => import('pages/unidades-medida/UnidadeMedidaFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.unidadeMedidaVisualizar',
-          breadcrumbPais: ['navegacao.unidadesMedida'],
           permissao: Permissoes.UnidadesMedida.Visualizar,
         },
       },
@@ -602,36 +542,6 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/financeiro/CondicoesPagamentoListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.condicoesPagamento',
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
-        path: 'financeiro/condicoes-pagamento/nova',
-        name: 'condicao-pagamento-nova',
-        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.condicaoPagamentoNova',
-          breadcrumbPais: ['navegacao.condicoesPagamento'],
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
-        path: 'financeiro/condicoes-pagamento/:id/editar',
-        name: 'condicao-pagamento-editar',
-        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.condicaoPagamentoEditar',
-          breadcrumbPais: ['navegacao.condicoesPagamento'],
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
-        path: 'financeiro/condicoes-pagamento/:id',
-        name: 'condicao-pagamento-visualizar',
-        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.condicaoPagamentoVisualizar',
-          breadcrumbPais: ['navegacao.condicoesPagamento'],
           permissao: Permissoes.Financeiro.Visualizar,
         },
       },
@@ -1493,36 +1403,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'manutencao/planos/novo',
-        name: 'manutencao-plano-novo',
-        component: () => import('pages/manutencao/PlanoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.manutencaoPlanoNovo',
-          breadcrumbPais: ['navegacao.manutencaoPlanos'],
-          permissao: Permissoes.Manutencao.Visualizar,
-        },
-      },
-      {
-        path: 'manutencao/planos/:id/editar',
-        name: 'manutencao-plano-editar',
-        component: () => import('pages/manutencao/PlanoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.manutencaoPlanoEditar',
-          breadcrumbPais: ['navegacao.manutencaoPlanos'],
-          permissao: Permissoes.Manutencao.Visualizar,
-        },
-      },
-      {
-        path: 'manutencao/planos/:id',
-        name: 'manutencao-plano-visualizar',
-        component: () => import('pages/manutencao/PlanoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.manutencaoPlanoVisualizar',
-          breadcrumbPais: ['navegacao.manutencaoPlanos'],
-          permissao: Permissoes.Manutencao.Visualizar,
-        },
-      },
-      {
         path: 'manutencao/ordens',
         name: 'manutencao-ordens',
         component: () => import('pages/manutencao/OrdensServicoListPage.vue'),
@@ -1875,36 +1755,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'rastreabilidade/talhoes/novo',
-        name: 'talhao-novo',
-        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.talhaoNovo',
-          breadcrumbPais: ['navegacao.talhoes'],
-          permissao: Permissoes.Rastreabilidade.Visualizar,
-        },
-      },
-      {
-        path: 'rastreabilidade/talhoes/:id/editar',
-        name: 'talhao-editar',
-        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.talhaoEditar',
-          breadcrumbPais: ['navegacao.talhoes'],
-          permissao: Permissoes.Rastreabilidade.Visualizar,
-        },
-      },
-      {
-        path: 'rastreabilidade/talhoes/:id',
-        name: 'talhao-visualizar',
-        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.talhaoVisualizar',
-          breadcrumbPais: ['navegacao.talhoes'],
-          permissao: Permissoes.Rastreabilidade.Visualizar,
-        },
-      },
-      {
         path: 'rastreabilidade/aplicacoes',
         name: 'aplicacoes',
         component: () => import('pages/rastreabilidade/AplicacoesListPage.vue'),
@@ -2123,36 +1973,6 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/regras-comissao/RegrasComissaoListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.regrasComissao',
-          permissao: Permissoes.RegrasComissao.Visualizar,
-        },
-      },
-      {
-        path: 'regras-comissao/nova',
-        name: 'regra-comissao-nova',
-        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.regraComissaoNova',
-          breadcrumbPais: ['navegacao.regrasComissao'],
-          permissao: Permissoes.RegrasComissao.Visualizar,
-        },
-      },
-      {
-        path: 'regras-comissao/:id/editar',
-        name: 'regra-comissao-editar',
-        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.regraComissaoEditar',
-          breadcrumbPais: ['navegacao.regrasComissao'],
-          permissao: Permissoes.RegrasComissao.Visualizar,
-        },
-      },
-      {
-        path: 'regras-comissao/:id',
-        name: 'regra-comissao-visualizar',
-        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.regraComissaoVisualizar',
-          breadcrumbPais: ['navegacao.regrasComissao'],
           permissao: Permissoes.RegrasComissao.Visualizar,
         },
       },

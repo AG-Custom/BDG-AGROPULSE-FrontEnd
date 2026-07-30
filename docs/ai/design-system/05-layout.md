@@ -29,10 +29,28 @@ Implementação: `MainLayout.vue` com `q-layout`, `q-header`, `q-drawer`, `q-pag
 | `container.max-width` | 1440px | Max-width do conteúdo — evita linhas longas em ultrawide |
 | `container.narrow` | 640px | Detalhe, wizard |
 | `container.form` | 480px | Login, recuperação senha |
+| `container.form-page` | 920px | Páginas de cadastro padrão (`.agro-page--form`) |
+| `container.form-page-wide` | 1200px | Cadastros com tabelas de itens / muitas colunas (`.agro-page--form-wide`) |
 
 Conteúdo principal usa `.agro-page` com `padding: var(--page-padding)`.
 
 **Por quê 1440px:** dashboards agro exibem tabelas largas; 1200px é restritivo. 1440px equilibra densidade e legibilidade.
+
+### Páginas de formulário
+
+Cadastros autenticados **não** usam a página full-bleed. Aplicar sempre:
+
+```vue
+<!-- Padrão (~920px) -->
+<q-page class="agro-page agro-page--form">
+
+<!-- Wide (~1200px) — produto, pedido, ordem de produção, tabela de preço, etc. -->
+<q-page class="agro-page agro-page--form-wide">
+```
+
+As classes limitam `.app-page-header` e `.agro-section` via `--page-form-width` (centralizados). Opt-out pontual: `.agro-section--wide` (`max-width: none`) quando uma section específica precisar estourar o container.
+
+Modais de formulário: `min-width: 400px; max-width: 560px` (ver [03-components.md](./03-components.md) e [10-forms.md](./10-forms.md)).
 
 ---
 
@@ -71,7 +89,10 @@ Shell **verde-floresta escuro** — assinatura visual brand-forward do AgroPulse
 **Seções do drawer:**
 1. Brand block (logo `inverse` + nome do usuário em `color.sidebar.text`) — **sem email**; divisor `color.sidebar.border`
 2. `UnidadeSwitcher` compacto — `q-select` adaptado ao fundo escuro (ícone storefront); oculto no collapse
-3. Navegação de **módulos** — `AppSidebar.vue` (fonte: `constants/navegacao-modulos.ts`)
+3. Navegação de **módulos agrupados** (estrutura do legado) — `AppSidebar.vue` / `constants/navegacao-modulos.ts`
+   - Badge Revenda/Indústria
+   - Dashboard
+   - Grupos: Operacional, Produção, Financeiro, Relacionamento, Gestão, Base
 4. Botão collapse no rodapé
 
 **Área de conteúdo:** `AppModuleSubnav` (filhos do módulo ativo) acima do `<router-view>` — ver [13-navigation.md](./13-navigation.md).
@@ -124,7 +145,7 @@ Telas públicas (login): footer mínimo opcional com copyright.
 }
 ```
 
-### Formulário two-column (desktop)
+### Formulário — grid por tipo de campo
 
 ```html
 <div class="row q-col-gutter-md">
@@ -132,6 +153,15 @@ Telas públicas (login): footer mínimo opcional com copyright.
   <div class="col-12 col-md-6">...</div>
 </div>
 ```
+
+| Tipo de campo | Classes |
+|---|---|
+| Texto / nome / select | `col-12 col-md-6` |
+| Código / sigla | `col-12 col-md-3` |
+| Data | `col-12 col-md-3` |
+| Quantidade / percentual | `col-12 col-md-2` ou `col-md-3` |
+| Valor monetário | `col-12 col-md-3` |
+| Descrição / observação / textarea | `col-12` |
 
 ### Tabela + filtros
 
