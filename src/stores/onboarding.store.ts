@@ -73,6 +73,7 @@ export const useOnboardingStore = defineStore('onboarding', {
 
       const authStore = useAuthStore();
       await authStore.renovarTokens();
+      await authStore.verificar();
 
       return resposta;
     },

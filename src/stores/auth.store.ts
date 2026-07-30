@@ -69,10 +69,7 @@ export const useAuthStore = defineStore('auth', {
 
       const novaSessao = refreshParaSessao(resposta, sessaoAtual);
       salvarSessao(novaSessao);
-      this.empresaId = novaSessao.empresaId;
-      this.unidadeId = novaSessao.unidadeId;
-      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
-      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
+      this.aplicarSessao(novaSessao);
     },
 
     async verificar() {
@@ -139,10 +136,7 @@ export const useAuthStore = defineStore('auth', {
       const resposta = await authService.refresh();
       const novaSessao = refreshParaSessao(resposta, sessaoAtual);
       salvarSessao(novaSessao);
-      this.empresaId = novaSessao.empresaId;
-      this.unidadeId = novaSessao.unidadeId;
-      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
-      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
+      this.aplicarSessao(novaSessao);
     },
 
     possuiPermissao(permissao: string): boolean {
