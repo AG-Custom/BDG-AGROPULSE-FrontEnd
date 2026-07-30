@@ -41,8 +41,15 @@ const { modulosVisiveis, moduloAtivo } = useNavegacaoModulos();
   flex: 1;
   flex-direction: column;
   gap: var(--spacing-1);
+  min-height: 0;
   overflow-y: auto;
   padding: var(--spacing-2);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.app-sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .app-sidebar__item {

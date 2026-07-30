@@ -200,6 +200,16 @@ onUnmounted(() => {
   background: var(--color-sidebar-bg);
 }
 
+.main-layout__drawer :deep(.q-drawer__content) {
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-layout__drawer :deep(.q-drawer__content::-webkit-scrollbar) {
+  display: none;
+}
+
 .main-layout__drawer-inner {
   display: flex;
   flex-direction: column;
