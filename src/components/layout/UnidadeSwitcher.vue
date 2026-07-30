@@ -1,6 +1,10 @@
 <template>
-  <div v-if="unidades.length > 1" class="unidade-switcher">
-    <div class="unidade-switcher__label text-overline">Unidade ativa</div>
+  <div
+    v-if="unidades.length > 1"
+    class="unidade-switcher"
+    :class="{ 'unidade-switcher--compact': compact }"
+  >
+    <div v-if="!compact" class="unidade-switcher__label text-overline">Unidade ativa</div>
     <q-select
       v-model="unidadeAtivaId"
       outlined
@@ -26,6 +30,13 @@ import { useAuth } from 'composables/useAuth';
 import { useContextoUnidade } from 'composables/useContextoUnidade';
 import type { UnidadeDisponivelDto } from 'types/dtos/auth.dto';
 import { computed, onMounted, ref, watch } from 'vue';
+
+withDefaults(
+  defineProps<{
+    compact?: boolean;
+  }>(),
+  { compact: false },
+);
 
 const { unidadeId } = useAuth();
 const { carregando, listarUnidades, trocarUnidade } = useContextoUnidade();
@@ -79,7 +90,11 @@ async function onTrocar(novoId: string | null): Promise<void> {
 .unidade-switcher {
   display: grid;
   gap: var(--spacing-1);
-  margin-top: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.unidade-switcher--compact {
+  margin-top: 0;
 }
 
 .unidade-switcher__label {

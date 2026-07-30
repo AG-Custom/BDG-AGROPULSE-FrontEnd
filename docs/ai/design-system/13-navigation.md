@@ -2,55 +2,92 @@
 
 ---
 
+## Modelo híbrido
+
+Sidebar lista **módulos** (~15 itens). Telas-folha ficam na **subnav horizontal** (`AppModuleSubnav`) acima do conteúdo.
+
+Fonte única: `constants/navegacao-modulos.ts` + `composables/useNavegacaoModulos.ts`.
+
+```
+┌──────────────┐  ┌────────────────────────────────────────┐
+│ AgroPulse    │  │ Header                                 │
+│ Nome         │  ├────────────────────────────────────────┤
+│ [Unidade ▾]  │  │ Saldos | Lotes | Movimentações | …     │  ← AppModuleSubnav
+├──────────────┤  ├────────────────────────────────────────┤
+│ ▣ Dashboard  │  │ Page (router-view)                     │
+│ ▣ Estoque    │  │                                        │
+│ ▣ Financeiro │  │                                        │
+│ …            │  │                                        │
+│ [⟨] collapse │  │                                        │
+└──────────────┘  └────────────────────────────────────────┘
+```
+
+---
+
 ## Sidebar (`AppSidebar.vue`)
 
-Shell **verde-floresta escuro** (`color.sidebar.bg` = forest.900) — todos os elementos usam tokens `color.sidebar.*`.
+Shell **verde-floresta escuro** (`color.sidebar.bg` = forest.900) — tokens `color.sidebar.*`.
 
-### Estrutura
+### Estrutura (MainLayout brand block)
 
-```
-┌─────────────────────┐
-│ 🌿 AgroPulse        │  ← brand block (MainLayout): logo inverse,
-│ Nome do usuário     │     nome em sidebar.text, email em
-│ email@empresa.com   │     sidebar.text.secondary
-│ [Unidade ativa ▾]   │  ← UnidadeSwitcher
-├─────────────────────┤
-│ PRINCIPAL           │  ← label overline (sidebar.text.muted)
-│ ▣ Dashboard         │  ← nav items
-│ CADASTROS           │
-│ ○ Unidades          │
-│ ○ Fornecedores      │
-└─────────────────────┘
-```
+1. Logo `inverse` (sem texto no modo collapsed 72px)
+2. Nome do usuário (`color.sidebar.text`) — **sem email** na sidebar
+3. `UnidadeSwitcher` compacto (oculto quando collapsed)
+4. Lista de módulos (`AppSidebar`)
+5. Botão collapse no rodapé do drawer
 
-### Item de navegação
+Email do usuário fica no menu de conta do **header**.
+
+### Item de módulo
 
 ```vue
 <q-item
   clickable
-  :to="{ name: 'dashboard' }"
-  exact
-  active-class="app-sidebar__item--active"
+  :to="{ name: modulo.routeNameDestino }"
   class="app-sidebar__item"
+  :class="{ 'app-sidebar__item--active': moduloAtivo?.id === modulo.id }"
 >
   <q-item-section avatar>
-    <q-icon name="dashboard" size="20px" />
+    <q-icon :name="modulo.icon" size="20px" />
   </q-item-section>
-  <q-item-section>Dashboard</q-item-section>
+  <q-item-section v-if="!collapsed">{{ modulo.label }}</q-item-section>
 </q-item>
 ```
+
+Clique no módulo navega para o **primeiro filho visível**.
 
 ### Estados
 - Default: texto `color.sidebar.text.secondary`, radius `radius.md`
 - Hover: background `color.sidebar.item.hover` (branco 6%), texto `color.sidebar.text`
-- Ativo: background `color.sidebar.item.active.bg` (rgba verde 18%), border-left `border.width.accent` `color.sidebar.accent` (accent.400), texto branco (`color.sidebar.item.active.text`), ícone `color.sidebar.accent`, weight medium
+- Ativo: background `color.sidebar.item.active.bg`, border-left `border.width.accent` `color.sidebar.accent`, texto branco, ícone accent, weight medium
+- Collapsed (72px): só ícone + tooltip com o label
+
+### Collapse
+
+Larguras: `260px` expandido / `72px` collapsed (`--sidebar-width` / `--sidebar-width-collapsed`). Estado persistido em `localStorage` (`agropulse.sidebar.collapsed`).
 
 ### UnidadeSwitcher
 
-Troca de unidade operacional no brand block: label overline "Unidade ativa" (`color.sidebar.text.muted`) + `q-select` outlined dense adaptado ao fundo escuro — fundo `color.sidebar.item.hover`, bordas `color.sidebar.border`, focus `color.primary.300`, ícone `storefront` no prepend.
+Modo compacto: só o `q-select` (sem label overline). Adaptado ao fundo escuro — fundo `color.sidebar.item.hover`, bordas `color.sidebar.border`, focus `color.primary.300`.
 
-### Permissões
-Itens filtrados por `usePermissao()` — ocultar módulos sem acesso, não mostrar disabled.
+### Permissões e flags
+
+Filhos filtrados por `possuiPermissao` + flags (`fluxoCompleto`, `revenda`, `industria`, `industriaProducao`). Módulo oculto se nenhum filho visível.
+
+### Deduplicação
+
+Contas a receber / Régua / Renegociações / CRM Crédito aparecem **somente** em Cobrança e Crédito (não no Financeiro nem no CRM).
+
+---
+
+## Subnav de módulo (`AppModuleSubnav.vue`)
+
+Barra horizontal acima do `<router-view>` no `MainLayout`.
+
+- Visível apenas se o módulo ativo tiver **mais de 1** filho
+- Links com underline accent no item ativo
+- Scroll horizontal em viewports estreitas
+- Permanece em rotas de detalhe/form do módulo (prefixo de path)
 
 ---
 
@@ -62,7 +99,7 @@ Itens filtrados por `usePermissao()` — ocultar módulos sem acesso, não mostr
 |---|---|
 | Left | Menu toggle + logo compacto (mobile) |
 | Center | — (vazio, reservado para breadcrumb futuro) |
-| Right | `EmpresaHeaderLink` + logout |
+| Right | Notificações + `EmpresaHeaderLink` + menu conta (nome + email) + logout |
 
 Altura: 56px. Flat, border-bottom — permanece **claro** (contraste intencional com a sidebar escura).
 
@@ -115,7 +152,7 @@ Ações destrutivas: separador + cor negative + último item.
 
 ## Tabs
 
-Para sub-navegação dentro de módulo:
+Para sub-navegação **dentro de uma página** (não confundir com `AppModuleSubnav`):
 
 ```vue
 <q-tabs v-model="aba" align="left" active-color="primary" indicator-color="primary">
@@ -123,15 +160,9 @@ Para sub-navegação dentro de módulo:
   <q-tab name="talhoes" label="Talhões" />
   <q-tab name="historico" label="Histórico" />
 </q-tabs>
-<q-separator />
-<q-tab-panels v-model="aba" animated keep-alive>
-  <q-tab-panel name="dados">...</q-tab-panel>
-</q-tab-panels>
 ```
 
-**Regra:** tabs para ≤ 6 seções. Mais que isso → sidebar secundária ou accordion.
-
-`keep-alive` para preservar estado ao trocar aba.
+**Regra:** tabs de página para ≤ 6 seções. Navegação entre telas do módulo → `AppModuleSubnav`.
 
 ---
 
@@ -165,8 +196,9 @@ Estado de filtros em query params quando compartilhável: `/clientes?busca=joao&
 
 ## Anti-patterns
 
-- Sidebar com 20+ itens sem agrupamento
+- Sidebar listando dezenas de telas-folha (usar módulos + subnav)
 - Nav item disabled visível (ocultar via permissão)
+- Duplicar o mesmo destino em dois módulos sem necessidade
 - Breadcrumb com 6+ níveis
 - Tabs com scroll horizontal sem indicador visual
 - Logout sem confirmação em sessões com operação pendente (futuro)

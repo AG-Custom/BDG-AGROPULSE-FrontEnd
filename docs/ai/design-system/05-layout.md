@@ -8,16 +8,12 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Header (56px) — logo, menu toggle, ações globais, perfil   │
+│ Header (56px) — menu, ações, conta (email), logout          │
 ├──────────┬──────────────────────────────────────────────────┤
-│          │                                                  │
-│ Sidebar  │  Área de conteúdo                               │
-│ (260px)  │  ┌────────────────────────────────────────────┐  │
-│          │  │ Page Header (título + ações)               │  │
-│          │  ├────────────────────────────────────────────┤  │
-│          │  │ Seções / Cards / Tabelas                   │  │
-│          │  │                                            │  │
-│          │  └────────────────────────────────────────────┘  │
+│          │  Module subnav (telas do módulo)                 │
+│ Sidebar  ├──────────────────────────────────────────────────┤
+│ módulos  │  Page Header (título + ações)                    │
+│ 260/72px │  Seções / Cards / Tabelas                        │
 │          │                                                  │
 └──────────┴──────────────────────────────────────────────────┘
 ```
@@ -66,18 +62,21 @@ Shell **verde-floresta escuro** — assinatura visual brand-forward do AgroPulse
 
 | Propriedade | Valor |
 |---|---|
-| Largura expandida | `260px` |
-| Largura collapsed | `72px` (futuro) |
+| Largura expandida | `260px` (`--sidebar-width`) |
+| Largura collapsed | `72px` (`--sidebar-width-collapsed`) — ícones + tooltip |
 | Background | `color.sidebar.bg` (forest.900) |
 | Borda | sem border-right — contraste com o conteúdo é suficiente |
 | z-index | `z.sidebar` |
 
-**Seções:**
-1. Brand block (logo `inverse` + nome do usuário em `color.sidebar.text` + email em `color.sidebar.text.secondary`) — divisor `color.sidebar.border`
-2. `UnidadeSwitcher` — label overline "Unidade ativa" + `q-select` adaptado ao fundo escuro (ícone storefront no prepend)
-3. Navegação principal — `AppSidebar.vue`, labels de seção overline em `color.sidebar.text.muted`
+**Seções do drawer:**
+1. Brand block (logo `inverse` + nome do usuário em `color.sidebar.text`) — **sem email**; divisor `color.sidebar.border`
+2. `UnidadeSwitcher` compacto — `q-select` adaptado ao fundo escuro (ícone storefront); oculto no collapse
+3. Navegação de **módulos** — `AppSidebar.vue` (fonte: `constants/navegacao-modulos.ts`)
+4. Botão collapse no rodapé
 
-**Item de nav:**
+**Área de conteúdo:** `AppModuleSubnav` (filhos do módulo ativo) acima do `<router-view>` — ver [13-navigation.md](./13-navigation.md).
+
+**Item de nav (módulo):**
 - Altura: 40px
 - Radius: `radius.md`
 - Default: texto `color.sidebar.text.secondary`
