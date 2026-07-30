@@ -89,11 +89,11 @@ export function useTabelasPreco() {
     }
   }
 
-  async function inativar(tabelaId: string): Promise<boolean> {
+  async function inativar(tabelaId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await tabelaPrecoService.inativar(tabelaId);
+      await tabelaPrecoService.inativar(tabelaId, justificativa);
       sucesso('Tabela de preço inativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -122,18 +122,18 @@ export function useTabelasPreco() {
   }
 
   async function solicitarInativacao(tabela: TabelaPrecoResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar tabela de preço',
       mensagem: `Deseja inativar a tabela ${tabela.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(tabela.id);
+    return inativar(tabela.id, justificativa);
   }
 
   async function solicitarAtivacao(tabela: TabelaPrecoResumoDto): Promise<boolean> {

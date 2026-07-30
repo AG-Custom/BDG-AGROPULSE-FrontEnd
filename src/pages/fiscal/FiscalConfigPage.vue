@@ -216,7 +216,10 @@ watch(
 );
 
 async function salvar(): Promise<void> {
-  await salvarConfiguracao(formulario.value);
+  const ok = await salvarConfiguracao(formulario.value);
+  if (ok) {
+    formulario.value.focusNfeToken = '';
+  }
 }
 
 async function importar(): Promise<void> {

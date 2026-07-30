@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Contas bancárias" subtitulo="Contas por CNPJ com saldo e alerta mínimo.">
       <agro-btn
@@ -48,25 +48,13 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar"
-                :loading="salvando"
-                @click="solicitarInativacao(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :loading-status="salvando || ativando"
+                @editar="abrirDialog(props.row)"
+                @desabilitar="solicitarInativacao(props.row)"
+                @ativar="solicitarAtivacao(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -168,10 +156,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -187,7 +183,22 @@ import { formatarCnpj, formatarMoeda, formatarMoedaParaInput } from 'utils/forma
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
-const { contas, carregando, salvando, carregar, criar, editar, solicitarInativacao } =
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Contas bancárias');
+
+const {
+  contas,
+  carregando,
+  salvando,
+  ativando,
+  carregar,
+  criar,
+  editar,
+  solicitarInativacao,
+  solicitarAtivacao,
+} =
   useContasBancarias();
 const { cnpjs, carregando: carregandoCnpjs, carregar: carregarCnpjs } = useCnpjs();
 const {
@@ -266,6 +277,11 @@ onMounted(() => {
   void carregarCnpjs();
   void carregarUnidades();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

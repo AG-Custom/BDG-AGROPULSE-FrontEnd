@@ -24,7 +24,11 @@ export const colaboradorService = {
     return api.put<ColaboradorDto>(`/colaboradores/${colaboradorId}`, payload).then((r) => r.data);
   },
 
-  inativar(colaboradorId: string): Promise<void> {
-    return api.patch(`/colaboradores/${colaboradorId}/inativar`);
+  inativar(colaboradorId: string, justificativa: string): Promise<void> {
+    return api.patch(`/colaboradores/${colaboradorId}/inativar`, { justificativa });
+  },
+
+  ativar(colaboradorId: string): Promise<void> {
+    return api.patch(`/colaboradores/${colaboradorId}/ativar`);
   },
 };

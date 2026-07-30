@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Recomendações"
@@ -46,37 +46,32 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusRecomendacao.Pendente"
-                flat
-                round
-                dense
-                icon="done"
-                color="positive"
-                descricao="Aplicar"
-                :loading="salvando"
-                @click="aplicar(props.row.id)"
-              />
-              <agro-btn
-                v-if="props.row.status === StatusRecomendacao.Pendente"
-                flat
-                round
-                dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
-                @click="cancelar(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-status="false"
+                @editar="abrirDialog(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-if="props.row.status === StatusRecomendacao.Pendente"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="aplicar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="done" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Aplicar</q-item-section>
+                </q-item>
+                <q-item
+                  v-if="props.row.status === StatusRecomendacao.Pendente"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="cancelar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="cancel" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -180,10 +175,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -199,6 +202,11 @@ import type { RecomendacaoDto, RecomendacaoFormModel } from 'types/dtos/safras.d
 import { formatarData } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Recomendações');
 
 const { recomendacoes, carregando, salvando, carregar, criar, editar, aplicar, cancelar } =
   useRecomendacoes();
@@ -301,6 +309,11 @@ onMounted(() => {
   void carregarTalhoes();
   void carregarProdutos();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

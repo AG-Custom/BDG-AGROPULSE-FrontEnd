@@ -18,11 +18,12 @@ export function useProdutoDocumentos(produtoId: () => string | undefined) {
   const documentos = ref<ProdutoDocumentoListaItem[]>([]);
   const enviando = ref(false);
   const removendo = ref(false);
+  const removendoId = ref<string | null>(null);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
   function definirDocumentos(lista: ProdutoDocumentoListaItem[]): void {
-    documentos.value = lista;
+    documentos.value = Array.isArray(lista) ? [...lista] : [];
   }
 
   async function recarregar(): Promise<void> {
@@ -59,6 +60,7 @@ export function useProdutoDocumentos(produtoId: () => string | undefined) {
 
   async function remover(documentoId: string): Promise<boolean> {
     removendo.value = true;
+    removendoId.value = documentoId;
 
     try {
       const id = produtoId();
@@ -70,7 +72,7 @@ export function useProdutoDocumentos(produtoId: () => string | undefined) {
       }
 
       await produtoService.removerDocumento(id, documentoId);
-      documentos.value = documentos.value.filter((doc) => doc.id !== documentoId);
+      await recarregar();
       sucesso('Documento removido com sucesso.');
       return true;
     } catch (e) {
@@ -78,6 +80,7 @@ export function useProdutoDocumentos(produtoId: () => string | undefined) {
       return false;
     } finally {
       removendo.value = false;
+      removendoId.value = null;
     }
   }
 
@@ -100,6 +103,7 @@ export function useProdutoDocumentos(produtoId: () => string | undefined) {
     documentos,
     enviando,
     removendo,
+    removendoId,
     definirDocumentos,
     enviar,
     solicitarRemocao,

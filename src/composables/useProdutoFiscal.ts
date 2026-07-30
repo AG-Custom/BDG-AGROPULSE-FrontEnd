@@ -14,15 +14,16 @@ export function useProdutoFiscal(produtoId: () => string | undefined) {
     const id = produtoId();
 
     if (!id) {
-      return true;
+      erro('Salve o produto antes de configurar o fiscal.');
+      return false;
     }
 
     salvando.value = true;
 
     try {
-      await produtoService.salvarFiscal(id, formParaFiscalPayload(form));
+      const fiscal = await produtoService.salvarFiscal(id, formParaFiscalPayload(form));
       sucesso('Configuração fiscal salva com sucesso.');
-      return true;
+      return Boolean(fiscal);
     } catch (e) {
       erro(mensagem(e));
       return false;

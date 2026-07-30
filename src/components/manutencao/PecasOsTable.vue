@@ -23,16 +23,15 @@
       </template>
       <template v-if="editavel" #body-cell-acoes="props">
         <q-td :props="props">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover peça"
-            :loading="salvando"
-            :disable="props.row.baixaEstoqueRealizada"
-            @click="emit('remover', props.row.id)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-editar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="salvando"
+            :pode-excluir="!props.row.baixaEstoqueRealizada"
+            excluir-label="Remover peça"
+            @excluir="emit('remover', props.row.id)"
           />
         </q-td>
       </template>
@@ -48,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import type { QTableColumn } from 'quasar';
 import type { PecaOrdemServicoDto } from 'types/dtos/manutencao.dto';

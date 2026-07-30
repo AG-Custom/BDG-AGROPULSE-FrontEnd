@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Contratos de fornecimento"
@@ -88,36 +88,48 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar contrato"
-                :to="{ name: 'contrato-fornecimento-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.status !== 'Cancelado'"
-                flat
-                round
-                dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar contrato"
-                :loading="salvando"
-                @click="cancelar(props.row.id)"
-              />
+              <agro-acoes-menu
+                :mostrar-status="false"
+                :editar-to="{ name: 'contrato-fornecimento-editar', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-if="props.row.status !== 'Cancelado'"
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
+                  @click="cancelar(props.row.id)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger">
+                      <q-icon name="cancel" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Cancelar contrato</q-item-section>
+                  <q-item-section v-if="salvando" side>
+                    <q-spinner size="16px" color="primary" />
+                  </q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AlertasContratosFornecimentoPanel from 'components/compras/AlertasContratosFornecimentoPanel.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -131,6 +143,11 @@ import type {
 } from 'types/dtos/compras.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Contratos de fornecimento');
 
 const { contratos, alertas, carregando, salvando, carregar, cancelar, carregarAlertas } =
   useContratosFornecimento();
@@ -182,4 +199,9 @@ onMounted(async () => {
   void carregarFornecedores();
   await Promise.all([carregar(), atualizarAlertas()]);
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

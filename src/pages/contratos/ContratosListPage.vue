@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Contratos" subtitulo="CPR, Barter e Termo com cotação de mercado.">
       <agro-btn
@@ -111,26 +111,30 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver contrato"
-                :to="{ name: 'contrato-detalhe', params: { id: props.row.id }, query: { tipo } }"
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AlertasContratosPanel from 'components/contratos/AlertasContratosPanel.vue';
 import CotacaoMercadoCard from 'components/contratos/CotacaoMercadoCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -155,6 +159,11 @@ import type { ContratoDto, CotacaoMercadoDto } from 'types/dtos/contrato.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Contratos');
 
 const route = useRoute();
 const router = useRouter();
@@ -250,4 +259,9 @@ onMounted(() => {
   void carregarCotacaoMercado();
   void carregarAlertas();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

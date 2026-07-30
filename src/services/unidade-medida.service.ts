@@ -26,8 +26,8 @@ export const unidadeMedidaService = {
       .then((r) => r.data);
   },
 
-  inativar(unidadeMedidaId: string): Promise<void> {
-    return api.patch(`/unidades-medida/${unidadeMedidaId}/inativar`);
+  inativar(unidadeMedidaId: string, justificativa: string): Promise<void> {
+    return api.patch(`/unidades-medida/${unidadeMedidaId}/inativar`, { justificativa });
   },
 
   ativar(unidadeMedidaId: string): Promise<void> {

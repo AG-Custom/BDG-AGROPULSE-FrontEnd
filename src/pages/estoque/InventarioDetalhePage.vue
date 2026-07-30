@@ -90,14 +90,12 @@
 
             <template v-if="inventarioAberto" #body-cell-acoes="props">
               <q-td :props="props" class="estoque-inventario-detalhe__acoes">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Registrar contagem"
-                  @click="abrirContagem(props.row)"
+                <agro-acoes-menu
+                  :mostrar-visualizar="false"
+                  :mostrar-status="false"
+                  :mostrar-excluir="false"
+                  editar-label="Registrar contagem"
+                  @editar="abrirContagem(props.row)"
                 />
               </q-td>
             </template>
@@ -155,6 +153,7 @@
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

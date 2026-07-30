@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Fornecedores"
@@ -119,44 +119,31 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="fornecedores-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar fornecedor"
-                :to="{ name: 'fornecedor-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar fornecedor"
-                :to="{ name: 'fornecedor-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar fornecedor"
-                :loading="inativando"
-                @click="inativarFornecedor(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{ name: 'fornecedor-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarFornecedor(props.row)"
+                @ativar="ativarFornecedor(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -171,13 +158,20 @@ import type { FornecedorResumoDto, ListarFornecedoresParams } from 'types/dtos/f
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
 
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhar fornecedor');
+
 const {
   fornecedores,
   carregando,
   inativando,
+  ativando,
   exportando,
   carregar,
   solicitarInativacao,
+  solicitarAtivacao,
   exportar,
   rotuloDocumento,
 } = useFornecedores();
@@ -241,6 +235,14 @@ async function inativarFornecedor(fornecedor: FornecedorResumoDto): Promise<void
   }
 }
 
+async function ativarFornecedor(fornecedor: FornecedorResumoDto): Promise<void> {
+  const sucesso = await solicitarAtivacao(fornecedor);
+
+  if (sucesso) {
+    await recarregar();
+  }
+}
+
 async function exportarLista(formato: ExportacaoFormatoValor): Promise<void> {
   await exportar(formato, montarParams());
 }
@@ -257,6 +259,11 @@ watch([busca, filtroAtivo], () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

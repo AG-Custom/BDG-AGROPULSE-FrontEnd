@@ -32,9 +32,11 @@
           <agro-btn
             color="primary"
             unelevated
-            :label="modo === 'criar' ? 'Cadastrar' : 'Salvar'"
-            :descricao="modo === 'criar' ? 'Cadastrar nova categoria' : 'Salvar alterações da categoria'"
+            no-caps
+            :label="rotuloSalvar"
+            :descricao="descricaoSalvar"
             :loading="salvando"
+            :disable="salvando"
             @click="salvar"
           />
         </div>
@@ -118,6 +120,12 @@ const subtituloPagina = computed(() => {
 
 const categoriaInativa = computed(
   () => modo.value === 'editar' && categoriaCarregada.value?.ativo === false,
+);
+
+const rotuloSalvar = computed(() => (modo.value === 'criar' ? 'Cadastrar' : 'Salvar'));
+
+const descricaoSalvar = computed(() =>
+  modo.value === 'criar' ? 'Cadastrar nova categoria' : 'Salvar alterações da categoria',
 );
 
 async function carregarCategoria(): Promise<void> {

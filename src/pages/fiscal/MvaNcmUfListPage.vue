@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="MVA NCM/UF" subtitulo="Margem de valor agregado para ICMS ST.">
       <agro-btn color="primary" unelevated icon="add" label="Nova MVA" descricao="Cadastrar MVA" @click="abrirDialog()" />
@@ -28,7 +28,11 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn flat round dense icon="edit" color="primary" descricao="Editar" @click="abrirDialog(props.row)" />
+              <agro-acoes-menu
+                :mostrar-status="false"
+                @editar="abrirDialog(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
+              />
             </q-td>
           </template>
         </q-table>
@@ -79,10 +83,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -90,7 +102,12 @@ import { useMvaNcmUf } from 'composables/useMvaNcmUf';
 import type { QTableColumn } from 'quasar';
 import type { MvaNcmUfDto, MvaNcmUfFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de MVA NCM/UF');
 
 const { itens, carregando, salvando, carregar, criar, editar } = useMvaNcmUf();
 const dialog = ref(false);
@@ -143,6 +160,11 @@ async function salvar(): Promise<void> {
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

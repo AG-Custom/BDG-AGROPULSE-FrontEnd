@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Receitas / BOM" subtitulo="Fórmulas de produção com tolerâncias.">
       <agro-btn
@@ -51,47 +51,35 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="edit"
-                  color="primary"
-                  descricao="Editar"
-                  :to="{ name: 'receita-producao-editar', params: { id: props.row.id } }"
-                />
-                <agro-btn
-                  v-if="!props.row.ativa"
-                  flat
-                  round
-                  dense
-                  icon="check_circle"
-                  color="positive"
-                  descricao="Ativar"
-                  :loading="salvando"
-                  @click="ativar(props.row.id)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover"
-                  :loading="salvando"
-                  @click="onRemover(props.row.id)"
-                />
-              </div>
+              <agro-acoes-menu
+                :ativo="props.row.ativa"
+                :mostrar-status="!props.row.ativa"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'receita-producao-editar', params: { id: props.row.id } }"
+                :loading-status="salvando"
+                :loading-excluir="salvando"
+                @ativar="ativar(props.row.id)"
+                @excluir="onRemover(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
+              />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -100,7 +88,12 @@ import { useProdutos } from 'composables/useProdutos';
 import { useReceitasProducao } from 'composables/useReceitasProducao';
 import type { QTableColumn } from 'quasar';
 import type { ReceitaProducaoDto } from 'types/dtos/producao.dto';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Receitas / BOM');
 
 const { receitas, carregando, salvando, carregar, ativar, remover } = useReceitasProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
@@ -130,6 +123,11 @@ onMounted(() => {
   void carregarProdutos();
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>
