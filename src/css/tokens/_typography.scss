@@ -1,7 +1,7 @@
 // AgroPulse Design Tokens — Tipografia
 
-$font-family-base: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-$font-family-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+$font-family-base: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-family-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
 $font-family-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
 $font-weight-regular: 400;
@@ -113,7 +113,7 @@ $letter-spacing-wider: 0.05em;
   --typography-overline-transform: uppercase;
 
   // Valores numéricos de dados (KPIs, tabelas, moedas)
-  --typography-metric-family: #{$font-family-mono};
+  --typography-metric-family: #{$font-family-base};
   --typography-metric-weight: #{$font-weight-semibold};
-  --typography-metric-letter-spacing: #{$letter-spacing-tight};
+  --typography-metric-letter-spacing: #{$letter-spacing-normal};
 }
