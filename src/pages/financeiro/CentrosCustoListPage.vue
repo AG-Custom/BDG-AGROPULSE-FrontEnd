@@ -54,10 +54,10 @@
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
         <q-card-section>
-          <h4 class="titulo">{{ editandoId ? 'Editar centro' : 'Novo centro de custo' }}</h4>
+          <h4 class="titulo">{{ somenteLeitura ? 'Visualizar centro' : editandoId ? 'Editar centro' : 'Novo centro de custo' }}</h4>
         </q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
                 <q-input
@@ -65,8 +65,7 @@
                   outlined
                   label="Nome"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
                 <q-select
@@ -78,30 +77,28 @@
                   map-options
                   :options="unidadeOpcoes"
                   :loading="carregandoUnidades"
-                  :readonly="!!editandoId"
+                  :readonly="!!editandoId || somenteLeitura"
                 />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
-              <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -115,10 +112,6 @@ import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Centros de custo');
-
 const { centros, carregando, salvando, carregar, criar, editar } = useCentrosCusto();
 const {
   unidades,
@@ -126,6 +119,7 @@ const {
   carregar: carregarUnidades,
 } = useUnidades();
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<CentroCustoFormModel>({ nome: '', unidadeId: '' });
 
@@ -142,6 +136,7 @@ const colunas: QTableColumn<CentroCustoDto>[] = [
 ];
 
 function abrirDialog(item?: CentroCustoDto): void {
+  somenteLeitura.value = false;
   editandoId.value = item?.id ?? null;
   formulario.value = {
     nome: item?.nome ?? '',
@@ -157,15 +152,15 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
+function abrirDialogVisualizar(item: CentroCustoDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
 onMounted(() => {
   void carregar();
   void carregarUnidades();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

@@ -155,6 +155,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'cnpjs/:id',
+        name: 'cnpj-visualizar',
+        component: () => import('pages/cnpjs/CnpjFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cnpjVisualizar',
+          breadcrumbPais: ['navegacao.empresa'],
+          permissao: Permissoes.Cnpjs.Visualizar,
+        },
+      },
+      {
         path: 'fornecedores',
         name: 'fornecedores',
         component: () => import('pages/fornecedores/FornecedoresListPage.vue'),
@@ -559,6 +569,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'formas-pagamento-config/:id',
+        name: 'forma-pagamento-config-visualizar',
+        component: () => import('pages/financeiro/FormaPagamentoConfigFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.formaPagamentoConfigVisualizar',
+          breadcrumbPais: ['navegacao.formasPagamentoConfig'],
+          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+        },
+      },
+      {
         path: 'financeiro/contas-receber',
         name: 'contas-receber',
         component: () => import('pages/financeiro/ContasReceberListPage.vue'),
@@ -601,6 +621,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.condicaoPagamentoEditar',
+          breadcrumbPais: ['navegacao.condicoesPagamento'],
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/condicoes-pagamento/:id',
+        name: 'condicao-pagamento-visualizar',
+        component: () => import('pages/financeiro/CondicaoPagamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.condicaoPagamentoVisualizar',
           breadcrumbPais: ['navegacao.condicoesPagamento'],
           permissao: Permissoes.Financeiro.Visualizar,
         },
@@ -882,6 +912,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/compras/ContratoFornecimentoFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.contratoFornecimentoEditar',
+          breadcrumbPais: ['navegacao.contratosFornecimento'],
+          permissao: Permissoes.Compras.Visualizar,
+        },
+      },
+      {
+        path: 'compras/contratos-fornecimento/:id',
+        name: 'contrato-fornecimento-visualizar',
+        component: () => import('pages/compras/ContratoFornecimentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.contratoFornecimentoVisualizar',
           breadcrumbPais: ['navegacao.contratosFornecimento'],
           permissao: Permissoes.Compras.Visualizar,
         },
@@ -1247,6 +1287,17 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'producao/beneficiamentos/:id',
+        name: 'beneficiamento-visualizar',
+        component: () => import('pages/producao/BeneficiamentoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.beneficiamentoVisualizar',
+          breadcrumbPais: ['navegacao.beneficiamentos'],
+          permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
+        },
+      },
+      {
         path: 'producao/receitas',
         name: 'receitas-producao',
         component: () => import('pages/producao/ReceitasListPage.vue'),
@@ -1273,6 +1324,17 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/producao/ReceitaFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.receitaProducaoEditar',
+          breadcrumbPais: ['navegacao.receitasProducao'],
+          permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
+        },
+      },
+      {
+        path: 'producao/receitas/:id',
+        name: 'receita-producao-visualizar',
+        component: () => import('pages/producao/ReceitaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.receitaProducaoVisualizar',
           breadcrumbPais: ['navegacao.receitasProducao'],
           permissao: Permissoes.Producao.Visualizar,
           requerIndustria: true,
@@ -1337,6 +1399,17 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/producao/FichaTecnicaFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.fichaTecnicaEditar',
+          breadcrumbPais: ['navegacao.fichasTecnicas'],
+          permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
+        },
+      },
+      {
+        path: 'producao/fichas-tecnicas/:id',
+        name: 'ficha-tecnica-visualizar',
+        component: () => import('pages/producao/FichaTecnicaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.fichaTecnicaVisualizar',
           breadcrumbPais: ['navegacao.fichasTecnicas'],
           permissao: Permissoes.Producao.Visualizar,
           requerIndustria: true,
@@ -1440,6 +1513,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'manutencao/planos/:id',
+        name: 'manutencao-plano-visualizar',
+        component: () => import('pages/manutencao/PlanoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.manutencaoPlanoVisualizar',
+          breadcrumbPais: ['navegacao.manutencaoPlanos'],
+          permissao: Permissoes.Manutencao.Visualizar,
+        },
+      },
+      {
         path: 'manutencao/ordens',
         name: 'manutencao-ordens',
         component: () => import('pages/manutencao/OrdensServicoListPage.vue'),
@@ -1530,6 +1613,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/logistica/VeiculoFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.logisticaVeiculoEditar',
+          breadcrumbPais: ['navegacao.logisticaVeiculos'],
+          permissao: Permissoes.Logistica.Visualizar,
+        },
+      },
+      {
+        path: 'logistica/veiculos/:id',
+        name: 'logistica-veiculo-visualizar',
+        component: () => import('pages/logistica/VeiculoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.logisticaVeiculoVisualizar',
           breadcrumbPais: ['navegacao.logisticaVeiculos'],
           permissao: Permissoes.Logistica.Visualizar,
         },
@@ -1686,6 +1779,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'crm/oportunidades/:id',
+        name: 'crm-oportunidade-visualizar',
+        component: () => import('pages/crm/OportunidadeFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmOportunidadeVisualizar',
+          breadcrumbPais: ['navegacao.crmOportunidades'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
         path: 'crm/amostras',
         name: 'crm-amostras',
         component: () => import('pages/crm/AmostrasListPage.vue'),
@@ -1710,6 +1813,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/crm/AmostraFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.crmAmostraEditar',
+          breadcrumbPais: ['navegacao.crmAmostras'],
+          permissao: Permissoes.Crm.Visualizar,
+        },
+      },
+      {
+        path: 'crm/amostras/:id',
+        name: 'crm-amostra-visualizar',
+        component: () => import('pages/crm/AmostraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.crmAmostraVisualizar',
           breadcrumbPais: ['navegacao.crmAmostras'],
           permissao: Permissoes.Crm.Visualizar,
         },
@@ -1782,6 +1895,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'rastreabilidade/talhoes/:id',
+        name: 'talhao-visualizar',
+        component: () => import('pages/rastreabilidade/TalhaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.talhaoVisualizar',
+          breadcrumbPais: ['navegacao.talhoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
         path: 'rastreabilidade/aplicacoes',
         name: 'aplicacoes',
         component: () => import('pages/rastreabilidade/AplicacoesListPage.vue'),
@@ -1806,6 +1929,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/rastreabilidade/AplicacaoFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.aplicacaoEditar',
+          breadcrumbPais: ['navegacao.aplicacoes'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
+        path: 'rastreabilidade/aplicacoes/:id',
+        name: 'aplicacao-visualizar',
+        component: () => import('pages/rastreabilidade/AplicacaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.aplicacaoVisualizar',
           breadcrumbPais: ['navegacao.aplicacoes'],
           permissao: Permissoes.Rastreabilidade.Visualizar,
         },
@@ -1912,6 +2045,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'safras/planejamento/:id',
+        name: 'safra-visualizar',
+        component: () => import('pages/safras/SafraFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.safraVisualizar',
+          breadcrumbPais: ['navegacao.planejamentoSafras'],
+          permissao: Permissoes.Rastreabilidade.Visualizar,
+        },
+      },
+      {
         path: 'safras/ordens-servico',
         name: 'safras-ordens-servico',
         component: () => import('pages/safras/OrdensServicoAgricolaListPage.vue'),
@@ -1999,6 +2142,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
         meta: {
           breadcrumb: 'navegacao.regraComissaoEditar',
+          breadcrumbPais: ['navegacao.regrasComissao'],
+          permissao: Permissoes.RegrasComissao.Visualizar,
+        },
+      },
+      {
+        path: 'regras-comissao/:id',
+        name: 'regra-comissao-visualizar',
+        component: () => import('pages/regras-comissao/RegraComissaoFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.regraComissaoVisualizar',
           breadcrumbPais: ['navegacao.regrasComissao'],
           permissao: Permissoes.RegrasComissao.Visualizar,
         },

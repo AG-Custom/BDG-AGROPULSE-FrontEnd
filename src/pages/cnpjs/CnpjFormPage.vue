@@ -12,9 +12,10 @@
           v-model:formulario="formulario"
           :modo="modo"
           :desabilitar-principal="desabilitarPrincipal"
+          :somente-leitura="somenteLeitura"
         />
 
-        <div v-if="!carregandoPagina" class="agro-form-actions">
+        <div v-if="!carregandoPagina && modo !== 'visualizar'" class="agro-form-actions">
           <agro-btn
             flat
             label="Cancelar"
@@ -29,6 +30,15 @@
             :descricao="modo === 'criar' ? 'Cadastrar novo CNPJ na empresa' : 'Salvar alterações do CNPJ'"
             :loading="salvando"
             @click="salvar"
+          />
+        </div>
+
+        <div v-else-if="!carregandoPagina && modo === 'visualizar'" class="agro-form-actions">
+          <agro-btn
+            flat
+            label="Voltar"
+            descricao="Retornar para a listagem de CNPJs"
+            @click="voltar"
           />
         </div>
       </agro-card>
@@ -48,26 +58,50 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const { cnpjs, carregando, salvando, carregar, criar, editar } = useCnpjs();
+const { cnpjs, salvando, carregar, criar, editar } = useCnpjs();
 
 const formularioRef = ref<InstanceType<typeof CnpjFormulario> | null>(null);
 const formulario = ref<CnpjFormModel>(criarCnpjFormVazia());
 const carregandoPagina = ref(true);
 
-const modo = computed<'criar' | 'editar'>(() => (route.name === 'cnpj-editar' ? 'editar' : 'criar'));
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'cnpj-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'cnpj-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 
 const cnpjId = computed(() => route.params.id as string | undefined);
 
-const tituloPagina = computed(() => (modo.value === 'criar' ? 'Novo CNPJ' : 'Editar CNPJ'));
+const tituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Novo CNPJ';
+  }
 
-const subtituloPagina = computed(() =>
-  modo.value === 'criar'
-    ? 'Cadastre um novo CNPJ vinculado à sua empresa.'
-    : 'Atualize os dados do CNPJ selecionado. O número não pode ser alterado.',
-);
+  if (modo.value === 'visualizar') {
+    return 'Visualizar CNPJ';
+  }
+
+  return 'Editar CNPJ';
+});
+
+const subtituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Cadastre um novo CNPJ vinculado à sua empresa.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte os dados do CNPJ selecionado.';
+  }
+
+  return 'Atualize os dados do CNPJ selecionado. O número não pode ser alterado.';
+});
 
 const desabilitarPrincipal = computed(() => {
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     return false;
   }
 
@@ -79,7 +113,7 @@ async function inicializar(): Promise<void> {
 
   await carregar();
 
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     const cnpj = cnpjs.value.find((item) => item.id === cnpjId.value);
 
     if (!cnpj) {
@@ -122,4 +156,3 @@ onMounted(() => {
   void inicializar();
 });
 </script>
-

@@ -5,7 +5,7 @@
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="12" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -17,6 +17,7 @@
                 map-options
                 :options="talhaoOpcoes"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -30,6 +31,7 @@
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
                 @update:model-value="onProdutoChange"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -40,6 +42,7 @@
                 type="number"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -49,6 +52,7 @@
                 label="Unidade"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -59,6 +63,7 @@
                 type="date"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -72,6 +77,7 @@
                 :options="loteOpcoes"
                 :loading="carregandoLotes"
                 :disable="!formulario.produtoId"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -83,10 +89,12 @@
                 emit-value
                 map-options
                 :options="safraOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.cultura" outlined label="Cultura" />
+              <q-input v-model="formulario.cultura" outlined label="Cultura"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-6 col-md-3">
               <q-input
@@ -95,6 +103,7 @@
                 label="Dose / ha"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -104,13 +113,16 @@
                 label="Área aplicada (ha)"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.equipamento" outlined label="Equipamento" />
+              <q-input v-model="formulario.equipamento" outlined label="Equipamento"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.operadorNome" outlined label="Operador" />
+              <q-input v-model="formulario.operadorNome" outlined label="Operador"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-4 col-md-2">
               <q-input
@@ -118,6 +130,7 @@
                 outlined
                 label="Temp. (°C)"
                 type="number"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-4 col-md-2">
@@ -126,6 +139,7 @@
                 outlined
                 label="Umidade (%)"
                 type="number"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-4 col-md-2">
@@ -134,13 +148,16 @@
                 outlined
                 label="Vento (km/h)"
                 type="number"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.numeroReceita" outlined label="Nº receita" />
+              <q-input v-model="formulario.numeroReceita" outlined label="Nº receita"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.crea" outlined label="CREA" />
+              <q-input v-model="formulario.crea" outlined label="CREA"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-12">
               <q-input
@@ -149,11 +166,12 @@
                 label="Observações"
                 type="textarea"
                 autogrow
+                :readonly="somenteLeitura"
               />
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'aplicacoes' }" />
             <agro-btn
               color="primary"
@@ -163,6 +181,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'aplicacoes' }" />
           </div>
         </q-form>
       </agro-card>
@@ -201,11 +222,27 @@ const {
   carregar: carregarLotes,
 } = useEstoqueLotes();
 
-const modo = computed(() => (route.name === 'aplicacao-editar' ? 'editar' : 'criar'));
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'aplicacao-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'aplicacao-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 const aplicacaoId = computed(() => route.params.id as string | undefined);
-const titulo = computed(() =>
-  modo.value === 'criar' ? 'Nova aplicação' : 'Editar aplicação',
-);
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova aplicação';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar aplicação';
+  }
+
+  return 'Editar aplicação';
+});
 
 const carregandoPagina = ref(false);
 const formulario = ref<AplicacaoInsumoFormModel>({
@@ -270,7 +307,7 @@ onMounted(async () => {
   void carregarProdutos();
   void carregarSafras();
 
-  if (modo.value === 'editar' && aplicacaoId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && aplicacaoId.value) {
     carregandoPagina.value = true;
     const ok = await obterAplicacao(aplicacaoId.value);
     if (!ok || !aplicacao.value) {

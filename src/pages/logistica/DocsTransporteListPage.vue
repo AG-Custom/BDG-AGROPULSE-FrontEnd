@@ -118,10 +118,10 @@
     <q-dialog v-model="dialogCriar" persistent>
       <q-card class="dialog-card">
         <q-card-section>
-          <div class="text-h6">Novo documento</div>
+          <div class="text-h6">{{ somenteLeitura ? 'Visualizar documento' : 'Novo documento' }}</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-form greedy @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-6">
                 <q-select
@@ -132,8 +132,7 @@
                   map-options
                   class="field-required"
                   :options="TipoDocTransporteLogisticaOpcoes"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <q-input
@@ -141,8 +140,7 @@
                   outlined
                   label="Número"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <q-input
@@ -150,8 +148,7 @@
                   outlined
                   label="Série"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
                 <q-input
@@ -159,8 +156,7 @@
                   outlined
                   label="Tomador"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <q-input
@@ -169,8 +165,7 @@
                   label="UF ini"
                   maxlength="2"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <q-input
@@ -179,16 +174,14 @@
                   label="UF fim"
                   maxlength="2"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <AgroMoneyInput
                   v-model="formulario.valor"
                   label="Valor"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-3">
                 <q-input
@@ -197,44 +190,34 @@
                   label="Emissão"
                   type="date"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-8">
-                <q-input v-model="formulario.chave" outlined label="Chave" />
+                <q-input v-model="formulario.chave" outlined label="Chave" :readonly="somenteLeitura" />
               </div>
               <div class="col-4">
-                <q-input v-model="formulario.pesoKg" outlined label="Peso (kg)" type="number" />
+                <q-input v-model="formulario.pesoKg" outlined label="Peso (kg)" type="number" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCriar = false" />
-              <agro-btn
-                color="primary"
-                unelevated
-                label="Criar"
-                descricao="Salvar documento"
-                type="submit"
-                :loading="salvando"
-              />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogCriar = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCriar = false" />
+                <agro-btn color="primary" unelevated label="Criar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -250,14 +233,10 @@ import type {
   DocTransporteLogisticaDto,
   DocTransporteLogisticaFormModel,
 } from 'types/dtos/logistica.dto';
-import { formatarData, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Documentos de transporte');
 
 const {
   docsTransporte,
@@ -272,6 +251,7 @@ const {
 const filtroTipo = ref<string | null>(null);
 const filtroStatus = ref<string | null>(null);
 const dialogCriar = ref(false);
+const somenteLeitura = ref(false);
 const formulario = ref<DocTransporteLogisticaFormModel>(docTransporteVazio());
 
 const colunas: QTableColumn<DocTransporteLogisticaDto>[] = [
@@ -299,7 +279,26 @@ function aplicar(): void {
 }
 
 function abrirCriar(): void {
+  somenteLeitura.value = false;
   formulario.value = docTransporteVazio();
+  dialogCriar.value = true;
+}
+
+function abrirDialogVisualizar(item: DocTransporteLogisticaDto): void {
+  somenteLeitura.value = true;
+  formulario.value = {
+    tipo: item.tipo,
+    numero: item.numero,
+    serie: item.serie,
+    tomador: item.tomador,
+    ufIni: item.ufIni,
+    ufFim: item.ufFim,
+    valor: formatarMoedaParaInput(item.valor),
+    dataEmissao: item.dataEmissao.slice(0, 10),
+    chave: item.chave ?? '',
+    pesoKg: item.pesoKg != null ? String(item.pesoKg) : '',
+    cargaId: item.cargaId ?? '',
+  };
   dialogCriar.value = true;
 }
 
@@ -312,11 +311,6 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(aplicar);
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

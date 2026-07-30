@@ -88,9 +88,9 @@
                 :mostrar-excluir="true"
                 excluir-label="Remover"
                 :editar-to="{ name: 'crm-oportunidade-editar', params: { id: props.row.id } }"
+                :visualizar-to="{ name: 'crm-oportunidade-visualizar', params: { id: props.row.id } }"
                 :loading-excluir="salvando"
-                @excluir="removerOportunidade(props.row.id)"
-               @visualizar="abrirDialogVisualizar(props.row)">
+                @excluir="removerOportunidade(props.row.id)">
                 <q-item v-close-popup clickable class="agro-acoes-menu__item" @click="abrirEtapa(props.row)">
                   <q-item-section avatar><q-icon name="swap_horiz" class="agro-acoes-menu__icon" /></q-item-section>
                   <q-item-section>Alterar etapa</q-item-section>
@@ -130,18 +130,11 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -153,10 +146,6 @@ import type { OportunidadeDto } from 'types/dtos/crm.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Oportunidades');
 
 const {
   oportunidades,
@@ -219,10 +208,6 @@ async function confirmarEtapa(): Promise<void> {
 onMounted(() => {
   void carregarOportunidades();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

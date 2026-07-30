@@ -76,12 +76,12 @@ const produtoId = computed({
   set(valor: string) {
     if (formularioCriar.value) {
       formularioCriar.value.produtoId = valor;
-      preencherPrecoCadastro(valor);
+      preencherDadosCadastroProduto(valor);
     }
   },
 });
 
-function preencherPrecoCadastro(produtoSelecionadoId: string): void {
+function preencherDadosCadastroProduto(produtoSelecionadoId: string): void {
   if (!formularioCriar.value || !produtoSelecionadoId) {
     return;
   }
@@ -93,6 +93,8 @@ function preencherPrecoCadastro(produtoSelecionadoId: string): void {
   }
 
   formularioCriar.value.preco = formatarMoedaParaInput(produto.precoVenda);
+  formularioCriar.value.margemMinimaPercentual =
+    produto.margemMinimaPercentual !== null ? String(produto.margemMinimaPercentual) : '';
 }
 
 const preco = computed({

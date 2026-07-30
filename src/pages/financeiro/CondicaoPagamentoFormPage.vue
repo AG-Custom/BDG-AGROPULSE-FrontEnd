@@ -6,7 +6,12 @@
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="4" />
         <template v-else>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form
+            greedy
+            class="agro-formulario"
+            :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+            @submit.prevent="salvar"
+          >
             <div class="row q-col-gutter-md">
               <div class="col-12">
                 <q-input
@@ -14,6 +19,7 @@
                   outlined
                   label="Nome"
                   class="field-required"
+                  :readonly="somenteLeitura"
                   :rules="[obrigatorio]"
                 />
               </div>
@@ -24,6 +30,7 @@
                   label="Número de parcelas"
                   type="number"
                   class="field-required"
+                  :readonly="somenteLeitura"
                   :rules="[obrigatorio]"
                 />
               </div>
@@ -34,11 +41,12 @@
                   label="Intervalo (dias)"
                   type="number"
                   class="field-required"
+                  :readonly="somenteLeitura"
                   :rules="[obrigatorio]"
                 />
               </div>
             </div>
-            <div class="agro-form-actions">
+            <div v-if="!somenteLeitura" class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Voltar" @click="voltar" />
               <agro-btn
                 color="primary"
@@ -47,6 +55,9 @@
                 type="submit"
                 :loading="salvando"
               />
+            </div>
+            <div v-else class="agro-form-actions">
+              <agro-btn flat label="Voltar" descricao="Retornar para a listagem" @click="voltar" />
             </div>
           </q-form>
         </template>
@@ -68,16 +79,43 @@ const route = useRoute();
 const router = useRouter();
 const { condicao, carregando, salvando, obter, criar, editar } = useCondicoesPagamento();
 
-const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
-const titulo = computed(() =>
-  modo.value === 'criar' ? 'Nova condição de pagamento' : 'Editar condição de pagamento',
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'condicao-pagamento-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'condicao-pagamento-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
+
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova condição de pagamento';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar condição de pagamento';
+  }
+
+  return 'Editar condição de pagamento';
+});
+
+const subtitulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Defina nome, parcelas e intervalo.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte os dados da condição selecionada.';
+  }
+
+  return 'Atualize os dados da condição.';
+});
+
+const carregandoPagina = computed(
+  () => (modo.value === 'editar' || modo.value === 'visualizar') && carregando.value,
 );
-const subtitulo = computed(() =>
-  modo.value === 'criar'
-    ? 'Defina nome, parcelas e intervalo.'
-    : 'Atualize os dados da condição.',
-);
-const carregandoPagina = computed(() => modo.value === 'editar' && carregando.value);
 
 const formulario = ref<CondicaoPagamentoFormModel>({
   nome: '',
@@ -90,6 +128,10 @@ function voltar(): void {
 }
 
 async function salvar(): Promise<void> {
+  if (modo.value === 'visualizar') {
+    return;
+  }
+
   if (modo.value === 'criar') {
     const criado = await criar(formulario.value);
     if (criado) {
@@ -106,7 +148,7 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
-  if (modo.value !== 'editar') return;
+  if (modo.value !== 'editar' && modo.value !== 'visualizar') return;
   const id = String(route.params.id);
   const ok = await obter(id);
   if (!ok || !condicao.value) {

@@ -73,9 +73,11 @@
 
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
-        <q-card-section><h4 class="titulo">Registrar parada</h4></q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <h4 class="titulo">{{ somenteLeitura ? 'Visualizar parada' : 'Registrar parada' }}</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
                 <q-select
@@ -86,8 +88,7 @@
                   emit-value
                   map-options
                   :options="ordemOpcoes"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
                 <q-input
@@ -95,8 +96,7 @@
                   outlined
                   label="Causa"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6">
                 <q-input
@@ -105,48 +105,37 @@
                   label="Início"
                   type="datetime-local"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6">
-                <q-input v-model="formulario.equipamento" outlined label="Equipamento" />
+                <q-input v-model="formulario.equipamento" outlined label="Equipamento" :readonly="somenteLeitura" />
               </div>
               <div class="col-6">
                 <q-input
                   v-model="formulario.impactoUnidades"
                   outlined
                   label="Impacto (unidades)"
-                  type="number"
-                />
+                  type="number" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
-              <agro-btn
-                color="primary"
-                unelevated
-                label="Salvar"
-                descricao="Salvar parada"
-                type="submit"
-                :loading="salvando"
-              />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -161,15 +150,12 @@ import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Paradas de linha');
-
 const { paradas, carregando, salvando, carregar, criar, resolver, remover } = useParadas();
 const { ordens, carregarOrdens } = useProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const formulario = ref<ParadaLinhaFormModel>({
   ordemProducaoId: '',
   causa: '',
@@ -203,6 +189,7 @@ const colunas: QTableColumn<ParadaLinhaDto>[] = [
 ];
 
 function abrirDialog(): void {
+  somenteLeitura.value = false;
   formulario.value = {
     ordemProducaoId: '',
     causa: '',
@@ -233,16 +220,24 @@ async function onRemover(id: string): Promise<void> {
   if (await remover(id)) await carregar();
 }
 
+function abrirDialogVisualizar(item: ParadaLinhaDto): void {
+  somenteLeitura.value = true;
+  formulario.value = {
+    ordemProducaoId: item.ordemProducaoId,
+    causa: item.causa,
+    inicio: item.inicio.slice(0, 16),
+    fim: item.fim ? item.fim.slice(0, 16) : '',
+    impactoUnidades: item.impactoUnidades != null ? String(item.impactoUnidades) : '',
+    equipamento: item.equipamento ?? '',
+  };
+  dialog.value = true;
+}
+
 onMounted(() => {
   void carregarProdutos();
   void carregarOrdens();
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

@@ -35,7 +35,7 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-               @visualizar="abrirDialogVisualizar(props.row)"
+                @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -43,17 +43,52 @@
       </agro-card>
     </section>
 
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
+    <q-dialog v-model="dialogVisualizar">
+      <q-card class="dialog-visualizar">
+        <q-card-section>
+          <h4 class="titulo">Visualizar pedido de expedição</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="agro-formulario agro-formulario--bloqueado">
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-input
+                  :model-value="pedidoVisualizar ? rotuloCliente(pedidoVisualizar.clienteId) : ''"
+                  outlined
+                  label="Cliente"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="pedidoVisualizar ? formatarMoeda(pedidoVisualizar.valorTotal) : ''"
+                  outlined
+                  label="Valor total"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="pedidoVisualizar?.status ?? ''"
+                  outlined
+                  label="Status"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -65,13 +100,11 @@ import type { ExpedicaoPedidoDto } from 'types/dtos/expedicao.dto';
 import { formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Expedição');
-
 const { pedidos, carregando, carregar } = useExpedicao();
 const { clientes, carregar: carregarClientes } = useClientes();
+
+const dialogVisualizar = ref(false);
+const pedidoVisualizar = ref<ExpedicaoPedidoDto | null>(null);
 
 const mapa = computed(() => {
   const m = new Map<string, string>();
@@ -90,13 +123,24 @@ function rotuloCliente(id: string): string {
   return mapa.value.get(id) ?? id;
 }
 
+function abrirDialogVisualizar(item: ExpedicaoPedidoDto): void {
+  pedidoVisualizar.value = item;
+  dialogVisualizar.value = true;
+}
+
 onMounted(() => {
   void carregarClientes();
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
+
+<style scoped>
+.dialog-visualizar {
+  min-width: min(480px, 94vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+}
+</style>

@@ -83,27 +83,20 @@
               <agro-acoes-menu
                 :mostrar-status="false"
                 mostrar-excluir
+                :visualizar-to="{ name: 'regra-comissao-visualizar', params: { id: props.row.id } }"
                 @editar="irParaEditar(props.row.id)"
                 @excluir="confirmarExclusao(props.row.id)"
-               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -117,9 +110,6 @@ import { onMounted, ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Regras de comissão');
 
 const router = useRouter();
 const { regras, carregando, carregar, excluir } = useRegrasComissao();
@@ -172,10 +162,6 @@ watch(filtroAtivo, () => {
 onMounted(() => {
   void recarregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

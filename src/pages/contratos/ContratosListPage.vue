@@ -114,19 +114,13 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-               @visualizar="abrirDialogVisualizar(props.row)"
+               :visualizar-to="{ name: 'contrato-detalhe', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
@@ -134,7 +128,6 @@
 import AlertasContratosPanel from 'components/contratos/AlertasContratosPanel.vue';
 import CotacaoMercadoCard from 'components/contratos/CotacaoMercadoCard.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -161,9 +154,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Contratos');
 
 const route = useRoute();
 const router = useRouter();
@@ -259,9 +249,5 @@ onMounted(() => {
   void carregarCotacaoMercado();
   void carregarAlertas();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>

@@ -130,11 +130,71 @@
       @confirmar="onBaixar"
     />
 
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
+    <q-dialog v-model="dialogVisualizar">
+      <q-card class="dialog-visualizar">
+        <q-card-section>
+          <h4 class="titulo">Visualizar conta a receber</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="agro-formulario agro-formulario--bloqueado">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="contaVisualizar ? rotuloCliente(contaVisualizar.clienteId) : ''"
+                  outlined
+                  label="Cliente"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input
+                  :model-value="contaVisualizar ? String(contaVisualizar.parcela) : ''"
+                  outlined
+                  label="Parcela"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input
+                  :model-value="contaVisualizar ? formatarData(contaVisualizar.vencimento) : ''"
+                  outlined
+                  label="Vencimento"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="contaVisualizar ? formatarMoeda(contaVisualizar.valor) : ''"
+                  outlined
+                  label="Valor"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="contaVisualizar?.formaPagamento ?? ''"
+                  outlined
+                  label="Forma de pagamento"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="contaVisualizar ? rotuloStatus(contaVisualizar.status) : ''"
+                  outlined
+                  label="Status"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -142,7 +202,6 @@
 import BaixaContaReceberDialog from 'components/financeiro/BaixaContaReceberDialog.vue';
 import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -163,11 +222,6 @@ import type { BaixarContaReceberPayload, ContaReceberDto } from 'types/dtos/fina
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Contas a receber');
-
 const { contas, carregando, salvando, carregar, baixar, cancelar } = useContasReceber();
 const { clientes, carregar: carregarClientes } = useClientes();
 const { contaOpcoes, carregar: carregarContasBancarias } = useContasBancarias();
@@ -178,6 +232,8 @@ const filtroStatus = ref<ContaReceberStatusValor | null>(null);
 const filtroEscopo = ref<EscopoFinanceiroValor | null>(EscopoFinanceiro.Unidade);
 const dialogBaixa = ref(false);
 const contaSelecionada = ref<ContaReceberDto | null>(null);
+const dialogVisualizar = ref(false);
+const contaVisualizar = ref<ContaReceberDto | null>(null);
 
 const clienteOpcoes = computed(() =>
   clientes.value.map((c) => ({
@@ -265,9 +321,20 @@ onMounted(() => {
   void carregarContasBancarias();
   void carregar(paramsFiltro());
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
+function abrirDialogVisualizar(item: ContaReceberDto): void {
+  contaVisualizar.value = item;
   dialogVisualizar.value = true;
 }
 
 </script>
+
+<style scoped>
+.dialog-visualizar {
+  min-width: min(560px, 94vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+}
+</style>

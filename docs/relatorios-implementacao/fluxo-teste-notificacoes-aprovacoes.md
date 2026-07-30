@@ -35,7 +35,7 @@ Roteiro QA para validar o pacote de gaps (fila de vendas, ciclo de vida do pedid
 | Campo | Valor |
 |-------|-------|
 | **Perfil (ação)** | Vendedor envia; **Gerente** decide |
-| **Pré-condição** | Forçar trava: preço abaixo da margem (OK) **ou** limite excedido **ou** atraso acima do limiar |
+| **Pré-condição** | Forçar trava: preço abaixo da margem (OK) **ou** limite excedido (OK ) **ou** atraso acima do limiar |
 | **Ação 1** | Vendedor → **Enviar para aprovação** |
 | **Notificação** | `PedidoAguardandoAprovacao` (broadcast; visível a Gerente/Diretor/Admin/Administrativo) |
 | **Clique** | Com `idReferencia` → detalhe do pedido; senão → `/aprovacoes` |

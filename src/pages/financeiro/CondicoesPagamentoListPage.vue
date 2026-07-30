@@ -54,28 +54,21 @@
               <agro-acoes-menu
                 :ativo="props.row.ativo"
                 :editar-to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
+                :visualizar-to="{ name: 'condicao-pagamento-visualizar', params: { id: props.row.id } }"
                 :loading-status="salvando"
                 @desabilitar="solicitarInativacao(props.row)"
                 @ativar="solicitarAtivacao(props.row)"
-               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -83,12 +76,8 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import type { QTableColumn } from 'quasar';
 import type { CondicaoPagamentoDto } from 'types/dtos/financeiro.dto';
-import { onMounted, computed, ref } from 'vue';
+import { onMounted } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Condições de pagamento');
 
 const { condicoes, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
   useCondicoesPagamento();
@@ -104,10 +93,6 @@ const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
 onMounted(() => {
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

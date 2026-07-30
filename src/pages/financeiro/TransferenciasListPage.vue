@@ -10,7 +10,7 @@
         icon="add"
         label="Nova transferência"
         descricao="Criar transferência"
-        @click="dialog = true"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -85,9 +85,9 @@
 
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
-        <q-card-section><h4 class="titulo">Nova transferência</h4></q-card-section>
+        <q-card-section><h4 class="titulo">{{ somenteLeitura ? 'Visualizar transferência' : 'Nova transferência' }}</h4></q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-select
@@ -97,8 +97,7 @@
                   emit-value
                   map-options
                   label="Conta origem"
-                  :options="contaOpcoes"
-                />
+                  :options="contaOpcoes" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -108,8 +107,7 @@
                   emit-value
                   map-options
                   label="Caixa origem"
-                  :options="caixaOpcoes"
-                />
+                  :options="caixaOpcoes" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -119,8 +117,7 @@
                   emit-value
                   map-options
                   label="Conta destino"
-                  :options="contaOpcoes"
-                />
+                  :options="contaOpcoes" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -130,16 +127,14 @@
                   emit-value
                   map-options
                   label="Caixa destino"
-                  :options="caixaOpcoes"
-                />
+                  :options="caixaOpcoes" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <AgroMoneyInput
                   v-model="formulario.valor"
                   label="Valor"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
@@ -148,33 +143,30 @@
                   type="date"
                   label="Data"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
-                <q-input v-model="formulario.observacao" outlined label="Observação" />
+                <q-input v-model="formulario.observacao" outlined label="Observação" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
-              <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -189,14 +181,10 @@ import type {
   TransferenciaFinanceiraDto,
   TransferenciaFormModel,
 } from 'types/dtos/financeiro-gestao.dto';
-import { formatarData, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Transferências financeiras');
 
 const { transferencias, carregando, salvando, carregar, criar, confirmar, cancelar } =
   useTransferenciasFinanceiras();
@@ -204,15 +192,8 @@ const { contaOpcoes, carregar: carregarContas } = useContasBancarias();
 const { caixaOpcoes, carregar: carregarCaixas } = useCaixas();
 
 const dialog = ref(false);
-const formulario = ref<TransferenciaFormModel>({
-  origemContaBancariaId: '',
-  origemCaixaId: '',
-  destinoContaBancariaId: '',
-  destinoCaixaId: '',
-  valor: '',
-  data: new Date().toISOString().slice(0, 10),
-  observacao: '',
-});
+const somenteLeitura = ref(false);
+const formulario = ref<TransferenciaFormModel>(formVazio());
 
 const colunas: QTableColumn<TransferenciaFinanceiraDto>[] = [
   { name: 'data', label: 'Data', field: 'data', align: 'left', sortable: true },
@@ -234,16 +215,43 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
+function formVazio(): TransferenciaFormModel {
+  return {
+    origemContaBancariaId: '',
+    origemCaixaId: '',
+    destinoContaBancariaId: '',
+    destinoCaixaId: '',
+    valor: '',
+    data: new Date().toISOString().slice(0, 10),
+    observacao: '',
+  };
+}
+
+function abrirDialog(): void {
+  somenteLeitura.value = false;
+  formulario.value = formVazio();
+  dialog.value = true;
+}
+
+function abrirDialogVisualizar(item: TransferenciaFinanceiraDto): void {
+  somenteLeitura.value = true;
+  formulario.value = {
+    origemContaBancariaId: item.origemContaBancariaId ?? '',
+    origemCaixaId: item.origemCaixaId ?? '',
+    destinoContaBancariaId: item.destinoContaBancariaId ?? '',
+    destinoCaixaId: item.destinoCaixaId ?? '',
+    valor: formatarMoedaParaInput(item.valor),
+    data: item.data.slice(0, 10),
+    observacao: item.observacao ?? '',
+  };
+  dialog.value = true;
+}
+
 onMounted(() => {
   void carregar();
   void carregarContas();
   void carregarCaixas();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

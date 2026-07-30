@@ -7,7 +7,7 @@
         icon="add"
         label="Novo cheque"
         descricao="Registrar cheque"
-        @click="dialog = true"
+        @click="abrirDialog()"
       />
     </app-page-header>
 
@@ -108,9 +108,9 @@
 
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
-        <q-card-section><h4 class="titulo">Novo cheque</h4></q-card-section>
+        <q-card-section><h4 class="titulo">{{ somenteLeitura ? 'Visualizar cheque' : 'Novo cheque' }}</h4></q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-4">
                 <q-select
@@ -121,8 +121,7 @@
                   label="Tipo"
                   class="field-required"
                   :options="TipoChequeOpcoes"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -130,22 +129,20 @@
                   outlined
                   label="Número"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <AgroMoneyInput
                   v-model="formulario.valor"
                   label="Valor"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
-                <q-input v-model="formulario.banco" outlined label="Banco" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="formulario.banco" outlined label="Banco" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
-                <q-input v-model="formulario.agencia" outlined label="Agência" />
+                <q-input v-model="formulario.agencia" outlined label="Agência" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -154,11 +151,10 @@
                   type="date"
                   label="Bom para"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="formulario.emitente" outlined label="Emitente" />
+                <q-input v-model="formulario.emitente" outlined label="Emitente" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -168,33 +164,30 @@
                   emit-value
                   map-options
                   label="Conta bancária"
-                  :options="contaOpcoes"
-                />
+                  :options="contaOpcoes" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
-                <q-input v-model="formulario.observacao" outlined label="Observação" />
+                <q-input v-model="formulario.observacao" outlined label="Observação" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
-              <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -211,33 +204,20 @@ import {
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { ChequeDto, ChequeFormModel } from 'types/dtos/financeiro-gestao.dto';
-import { formatarData, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Cheques');
 
 const { cheques, carregando, salvando, carregar, criar, depositar, compensar, devolver } =
   useCheques();
 const { contaOpcoes, carregar: carregarContas } = useContasBancarias();
 
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const filtroTipo = ref<TipoChequeValor | null>(null);
 const filtroStatus = ref<StatusChequeValor | null>(null);
-const formulario = ref<ChequeFormModel>({
-  tipo: '',
-  numero: '',
-  banco: '',
-  agencia: '',
-  valor: '',
-  bomPara: '',
-  emitente: '',
-  contaBancariaId: '',
-  observacao: '',
-});
+const formulario = ref<ChequeFormModel>(formVazio());
 
 const colunas: QTableColumn<ChequeDto>[] = [
   { name: 'tipo', label: 'Tipo', field: 'tipo', align: 'left' },
@@ -264,15 +244,46 @@ async function salvar(): Promise<void> {
   }
 }
 
+function formVazio(): ChequeFormModel {
+  return {
+    tipo: '',
+    numero: '',
+    banco: '',
+    agencia: '',
+    valor: '',
+    bomPara: '',
+    emitente: '',
+    contaBancariaId: '',
+    observacao: '',
+  };
+}
+
+function abrirDialog(): void {
+  somenteLeitura.value = false;
+  formulario.value = formVazio();
+  dialog.value = true;
+}
+
+function abrirDialogVisualizar(item: ChequeDto): void {
+  somenteLeitura.value = true;
+  formulario.value = {
+    tipo: item.tipo,
+    numero: item.numero,
+    banco: item.banco,
+    agencia: item.agencia ?? '',
+    valor: formatarMoedaParaInput(item.valor),
+    bomPara: item.bomPara.slice(0, 10),
+    emitente: item.emitente ?? '',
+    contaBancariaId: item.contaBancariaId ?? '',
+    observacao: item.observacao ?? '',
+  };
+  dialog.value = true;
+}
+
 onMounted(() => {
   void carregarContas();
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

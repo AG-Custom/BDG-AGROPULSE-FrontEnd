@@ -1,11 +1,17 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header :titulo="titulo" subtitulo="Dados do veículo, capacidade e documentos." />
+    <app-page-header :titulo="titulo" :subtitulo="subtitulo" />
 
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form
+          v-else
+          greedy
+          class="agro-formulario"
+          :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+          @submit.prevent="salvar"
+        >
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-3">
               <q-input
@@ -13,6 +19,7 @@
                 outlined
                 label="Placa"
                 class="field-required"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -25,6 +32,7 @@
                 map-options
                 class="field-required"
                 :options="TipoVeiculoLogisticaOpcoes"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -36,19 +44,38 @@
                 emit-value
                 map-options
                 :options="StatusVeiculoLogisticaOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-3">
-              <q-input v-model="formulario.ano" outlined label="Ano" type="number" />
+              <q-input
+                v-model="formulario.ano"
+                outlined
+                label="Ano"
+                type="number"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.marca" outlined label="Marca" />
+              <q-input v-model="formulario.marca" outlined label="Marca" :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.modelo" outlined label="Modelo" />
+              <q-input
+                v-model="formulario.modelo"
+                outlined
+                label="Modelo"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.kmAtual" outlined label="Km atual" type="number" step="0.1" />
+              <q-input
+                v-model="formulario.kmAtual"
+                outlined
+                label="Km atual"
+                type="number"
+                step="0.1"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-6 col-md-3">
               <q-input
@@ -57,6 +84,7 @@
                 label="Capacidade (kg)"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -66,10 +94,17 @@
                 label="Capacidade (m³)"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.vencimentoCrlv" outlined label="Venc. CRLV" type="date" />
+              <q-input
+                v-model="formulario.vencimentoCrlv"
+                outlined
+                label="Venc. CRLV"
+                type="date"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-6 col-md-3">
               <q-input
@@ -77,23 +112,46 @@
                 outlined
                 label="Venc. tacógrafo"
                 type="date"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.motoristaNome" outlined label="Motorista" />
+              <q-input
+                v-model="formulario.motoristaNome"
+                outlined
+                label="Motorista"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-6 col-md-4">
-              <q-input v-model="formulario.motoristaCnh" outlined label="CNH" />
+              <q-input
+                v-model="formulario.motoristaCnh"
+                outlined
+                label="CNH"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-6 col-md-4">
-              <q-input v-model="formulario.motoristaCategoria" outlined label="Categoria CNH" />
+              <q-input
+                v-model="formulario.motoristaCategoria"
+                outlined
+                label="Categoria CNH"
+                :readonly="somenteLeitura"
+              />
             </div>
             <div class="col-12">
-              <q-input v-model="formulario.descricao" outlined label="Descrição" type="textarea" autogrow />
+              <q-input
+                v-model="formulario.descricao"
+                outlined
+                label="Descrição"
+                type="textarea"
+                autogrow
+                :readonly="somenteLeitura"
+              />
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'logistica-veiculos' }" />
             <agro-btn
               color="primary"
@@ -103,6 +161,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'logistica-veiculos' }" />
           </div>
         </q-form>
       </agro-card>
@@ -124,12 +185,44 @@ const route = useRoute();
 const router = useRouter();
 const { criarVeiculo, editarVeiculo, obterVeiculo, veiculo, salvando } = useLogistica();
 
-const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
-const titulo = computed(() => (modo.value === 'criar' ? 'Novo veículo' : 'Editar veículo'));
-const carregandoPagina = ref(modo.value === 'editar');
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'logistica-veiculo-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'logistica-veiculo-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
+
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Novo veículo';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar veículo';
+  }
+
+  return 'Editar veículo';
+});
+
+const subtitulo = computed(() => {
+  if (modo.value === 'visualizar') {
+    return 'Consulte dados do veículo, capacidade e documentos.';
+  }
+
+  return 'Dados do veículo, capacidade e documentos.';
+});
+
+const carregandoPagina = ref(modo.value === 'editar' || modo.value === 'visualizar');
 const formulario = ref<VeiculoLogisticaFormModel>(veiculoVazio());
 
 async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
   if (modo.value === 'criar') {
     const criado = await criarVeiculo(formulario.value);
     if (criado) await router.push({ name: 'logistica-veiculos' });
@@ -141,7 +234,7 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     const ok = await obterVeiculo(String(route.params.id));
     if (ok && veiculo.value) formulario.value = veiculoDtoParaForm(veiculo.value);
   }

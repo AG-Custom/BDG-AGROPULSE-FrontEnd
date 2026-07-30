@@ -65,10 +65,10 @@
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
         <q-card-section>
-          <h4 class="titulo">{{ editandoId ? 'Editar conta' : 'Nova conta bancária' }}</h4>
+          <h4 class="titulo">{{ somenteLeitura ? 'Visualizar conta bancária' : editandoId ? 'Editar conta bancária' : 'Nova conta bancária' }}</h4>
         </q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-select
@@ -81,7 +81,7 @@
                   :options="cnpjOpcoes"
                   :loading="carregandoCnpjs"
                   :rules="[obrigatorio]"
-                  :readonly="!!editandoId"
+                  :readonly="!!editandoId || somenteLeitura"
                 />
               </div>
               <div class="col-12 col-md-6">
@@ -93,8 +93,7 @@
                   emit-value
                   map-options
                   :options="unidadeOpcoes"
-                  :loading="carregandoUnidades"
-                />
+                  :loading="carregandoUnidades" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -102,8 +101,7 @@
                   outlined
                   label="Banco"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -111,8 +109,7 @@
                   outlined
                   label="Agência"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -120,8 +117,7 @@
                   outlined
                   label="Número"
                   class="field-required"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -132,42 +128,33 @@
                   label="Tipo"
                   class="field-required"
                   :options="TipoContaBancariaOpcoes"
-                  :rules="[obrigatorio]"
-                />
+                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <AgroMoneyInput v-model="formulario.saldoMinimo" label="Saldo mínimo" />
+                <AgroMoneyInput v-model="formulario.saldoMinimo" label="Saldo mínimo" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
-                <q-input v-model="formulario.descricao" outlined label="Descrição" />
+                <q-input v-model="formulario.descricao" outlined label="Descrição" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
-              <agro-btn
-                color="primary"
-                unelevated
-                label="Salvar"
-                type="submit"
-                :loading="salvando"
-              />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
@@ -183,10 +170,6 @@ import { formatarCnpj, formatarMoeda, formatarMoedaParaInput } from 'utils/forma
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Contas bancárias');
 
 const {
   contas,
@@ -208,6 +191,7 @@ const {
 } = useUnidades();
 
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const editandoId = ref<string | null>(null);
 const formulario = ref<ContaBancariaFormModel>(formVazio());
 
@@ -249,6 +233,7 @@ function formVazio(): ContaBancariaFormModel {
 }
 
 function abrirDialog(item?: ContaBancariaDto): void {
+  somenteLeitura.value = false;
   editandoId.value = item?.id ?? null;
   formulario.value = item
     ? {
@@ -272,16 +257,16 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
+function abrirDialogVisualizar(item: ContaBancariaDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
 onMounted(() => {
   void carregar();
   void carregarCnpjs();
   void carregarUnidades();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

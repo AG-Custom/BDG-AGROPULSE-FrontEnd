@@ -1,11 +1,17 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header :titulo="titulo" subtitulo="Defina insumos, quantidades e tolerâncias." />
+    <app-page-header :titulo="titulo" :subtitulo="subtitulo" />
 
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="5" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form
+          v-else
+          greedy
+          class="agro-formulario"
+          :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+          @submit.prevent="salvar"
+        >
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -16,6 +22,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -26,6 +33,7 @@
                 label="Versão"
                 type="number"
                 class="field-required"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -36,13 +44,21 @@
                 label="Observação"
                 type="textarea"
                 autogrow
+                :readonly="somenteLeitura"
               />
             </div>
           </div>
 
           <div class="header">
             <h3 class="titulo-sec">Insumos (BOM)</h3>
-            <agro-btn flat icon="add" label="Insumo" descricao="Adicionar insumo" @click="adicionar" />
+            <agro-btn
+              v-if="!somenteLeitura"
+              flat
+              icon="add"
+              label="Insumo"
+              descricao="Adicionar insumo"
+              @click="adicionar"
+            />
           </div>
 
           <div
@@ -59,6 +75,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -69,6 +86,7 @@
                 dense
                 label="Qtd"
                 type="number"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -79,9 +97,10 @@
                 dense
                 label="Tolerância %"
                 type="number"
+                :readonly="somenteLeitura"
               />
             </div>
-            <div class="col-12 col-md-2">
+            <div v-if="!somenteLeitura" class="col-12 col-md-2">
               <agro-btn
                 flat
                 round
@@ -95,7 +114,7 @@
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'receitas-producao' }" />
             <agro-btn
               color="primary"
@@ -105,6 +124,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'receitas-producao' }" />
           </div>
         </q-form>
       </agro-card>
@@ -136,9 +158,36 @@ const router = useRouter();
 const { receita, salvando, obter, criar, editar } = useReceitasProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
-const modo = computed(() => (route.name === 'receita-producao-editar' ? 'editar' : 'criar'));
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'receita-producao-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'receita-producao-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 const receitaId = computed(() => route.params.id as string | undefined);
-const titulo = computed(() => (modo.value === 'criar' ? 'Nova receita' : 'Editar receita'));
+
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova receita';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar receita';
+  }
+
+  return 'Editar receita';
+});
+
+const subtitulo = computed(() => {
+  if (modo.value === 'visualizar') {
+    return 'Consulte insumos, quantidades e tolerâncias.';
+  }
+
+  return 'Defina insumos, quantidades e tolerâncias.';
+});
 
 const carregandoPagina = ref(false);
 const formulario = ref<ReceitaProducaoFormModel>({
@@ -157,6 +206,10 @@ function adicionar(): void {
 }
 
 async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
   if (modo.value === 'criar') {
     const criada = await criar(formulario.value);
     if (criada) await router.push({ name: 'receitas-producao' });
@@ -169,7 +222,7 @@ async function salvar(): Promise<void> {
 
 onMounted(async () => {
   void carregarProdutos();
-  if (modo.value === 'editar' && receitaId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && receitaId.value) {
     carregandoPagina.value = true;
     const ok = await obter(receitaId.value);
     if (!ok || !receita.value) {

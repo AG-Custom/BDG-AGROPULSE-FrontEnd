@@ -68,7 +68,8 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-               @visualizar="abrirDialogVisualizar(props.row)">
+                @visualizar="abrirDialogVisualizar(props.row)"
+              >
                 <q-item
                   v-if="!props.row.sincronizado"
                   v-close-popup
@@ -84,7 +85,9 @@
                     </span>
                   </q-item-section>
                   <q-item-section>Sincronizar</q-item-section>
-                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                  <q-item-section v-if="salvando" side>
+                    <q-spinner size="16px" color="primary" />
+                  </q-item-section>
                 </q-item>
               </agro-acoes-menu>
             </q-td>
@@ -93,18 +96,96 @@
       </agro-card>
     </section>
 
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
+    <q-dialog v-model="dialogVisualizar">
+      <q-card class="dialog-visualizar">
+        <q-card-section>
+          <h4 class="titulo">Visualizar checklist</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="agro-formulario agro-formulario--bloqueado">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="checklistVisualizar ? nomeAtivo(checklistVisualizar.ativoId) : ''"
+                  outlined
+                  label="Ativo"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="checklistVisualizar ? formatarData(checklistVisualizar.data) : ''"
+                  outlined
+                  label="Data"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="checklistVisualizar?.operadorNome ?? ''"
+                  outlined
+                  label="Operador"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="
+                    checklistVisualizar ? formatarDecimal(checklistVisualizar.horimetro) : ''
+                  "
+                  outlined
+                  label="Horímetro"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="checklistVisualizar?.status ?? ''"
+                  outlined
+                  label="Status"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="
+                    checklistVisualizar
+                      ? checklistVisualizar.sincronizado
+                        ? 'Sincronizado'
+                        : 'Pendente'
+                      : ''
+                  "
+                  outlined
+                  label="Sincronização"
+                  readonly
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  :model-value="
+                    checklistVisualizar ? String(checklistVisualizar.itens.length) : ''
+                  "
+                  outlined
+                  label="Quantidade de itens"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -113,12 +194,7 @@ import { useManutencao } from 'composables/useManutencao';
 import type { QTableColumn } from 'quasar';
 import type { ChecklistManutencaoDto } from 'types/dtos/manutencao.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
-import { onMounted, computed, ref } from 'vue';
-
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Checklists de inspeção');
+import { onMounted, ref } from 'vue';
 
 const {
   checklists,
@@ -129,6 +205,9 @@ const {
   carregarAtivos,
   sincronizarChecklist,
 } = useManutencao();
+
+const dialogVisualizar = ref(false);
+const checklistVisualizar = ref<ChecklistManutencaoDto | null>(null);
 
 function nomeAtivo(ativoId: string): string {
   return ativos.value.find((a) => a.id === ativoId)?.nome ?? ativoId;
@@ -145,13 +224,24 @@ const colunas: QTableColumn<ChecklistManutencaoDto>[] = [
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
+function abrirDialogVisualizar(item: ChecklistManutencaoDto): void {
+  checklistVisualizar.value = item;
+  dialogVisualizar.value = true;
+}
+
 onMounted(() => {
   void carregarAtivos();
   void carregarChecklists();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
+
+<style scoped>
+.dialog-visualizar {
+  min-width: min(520px, 94vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+}
+</style>

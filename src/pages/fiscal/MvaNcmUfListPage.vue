@@ -42,59 +42,57 @@
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
         <q-card-section>
-          <h4 class="titulo">{{ editandoId ? 'Editar MVA' : 'Nova MVA NCM/UF' }}</h4>
+          <h4 class="titulo">{{ somenteLeitura ? 'Visualizar MVA' : editandoId ? 'Editar MVA' : 'Novo MVA' }}</h4>
         </q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-4">
-                <q-input v-model="form.ncm" outlined label="NCM" class="field-required" :readonly="!!editandoId" :rules="[obrigatorio]" />
+                <q-input v-model="form.ncm" outlined label="NCM" class="field-required" :readonly="!!editandoId || somenteLeitura" :rules="[obrigatorio]" />
               </div>
               <div class="col-6 col-md-4">
-                <q-input v-model="form.ufOrigem" outlined label="UF origem" maxlength="2" class="field-required" :readonly="!!editandoId" :rules="[obrigatorio]" />
+                <q-input v-model="form.ufOrigem" outlined label="UF origem" maxlength="2" class="field-required" :readonly="!!editandoId || somenteLeitura" :rules="[obrigatorio]" />
               </div>
               <div class="col-6 col-md-4">
-                <q-input v-model="form.ufDestino" outlined label="UF destino" maxlength="2" class="field-required" :readonly="!!editandoId" :rules="[obrigatorio]" />
+                <q-input v-model="form.ufDestino" outlined label="UF destino" maxlength="2" class="field-required" :readonly="!!editandoId || somenteLeitura" :rules="[obrigatorio]" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.mva" outlined label="MVA %" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.mva" outlined label="MVA %" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.aliquotaInterna" outlined label="Alíq. interna" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.aliquotaInterna" outlined label="Alíq. interna" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.aliquotaInterestadual" outlined label="Alíq. interestadual" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.aliquotaInterestadual" outlined label="Alíq. interestadual" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.aliquotaFcp" outlined label="Alíq. FCP" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.aliquotaFcp" outlined label="Alíq. FCP" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-6">
-                <q-input v-model="form.vigenciaInicio" outlined type="date" label="Vigência início" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.vigenciaInicio" outlined type="date" label="Vigência início" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-6">
-                <q-input v-model="form.vigenciaFim" outlined type="date" label="Vigência fim" />
+                <q-input v-model="form.vigenciaFim" outlined type="date" label="Vigência fim" :readonly="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" @click="dialog = false" />
-              <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -102,15 +100,12 @@ import { useMvaNcmUf } from 'composables/useMvaNcmUf';
 import type { QTableColumn } from 'quasar';
 import type { MvaNcmUfDto, MvaNcmUfFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de MVA NCM/UF');
 
 const { itens, carregando, salvando, carregar, criar, editar } = useMvaNcmUf();
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const editandoId = ref<string | null>(null);
 const form = ref<MvaNcmUfFormModel>({
   ncm: '',
@@ -135,6 +130,7 @@ const colunas: QTableColumn<MvaNcmUfDto>[] = [
 ];
 
 function abrirDialog(item?: MvaNcmUfDto): void {
+  somenteLeitura.value = false;
   editandoId.value = item?.id ?? null;
   form.value = {
     ncm: item?.ncm ?? '',
@@ -157,14 +153,14 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
+function abrirDialogVisualizar(item: MvaNcmUfDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
 onMounted(() => {
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

@@ -55,25 +55,18 @@
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
-               @visualizar="abrirDialogVisualizar(props.row)"
+               :visualizar-to="{ name: 'pedido-compra-detalhe', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -86,9 +79,6 @@ import { formatarDataHora, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Pedidos de compra');
 
 const { pedidos, carregando, carregarPedidos } = useCompras();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
@@ -115,9 +105,5 @@ onMounted(() => {
   void carregarFornecedores();
   void carregarPedidos();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>

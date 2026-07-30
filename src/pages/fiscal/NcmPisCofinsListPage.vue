@@ -53,56 +53,54 @@
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
         <q-card-section>
-          <h4 class="titulo">{{ editandoId ? 'Editar regra' : 'Nova regra PIS/COFINS' }}</h4>
+          <h4 class="titulo">{{ somenteLeitura ? 'Visualizar regra' : editandoId ? 'Editar regra' : 'Nova regra PIS/COFINS' }}</h4>
         </q-card-section>
         <q-card-section>
-          <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-4">
-                <q-input v-model="form.ncm" outlined label="NCM" class="field-required" :readonly="!!editandoId" :rules="[obrigatorio]" />
+                <q-input v-model="form.ncm" outlined label="NCM" class="field-required" :readonly="!!editandoId || somenteLeitura" :rules="[obrigatorio]" />
               </div>
               <div class="col-6 col-md-4">
-                <q-input v-model="form.cstPis" outlined label="CST PIS" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.cstPis" outlined label="CST PIS" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-4">
-                <q-input v-model="form.cstCofins" outlined label="CST COFINS" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.cstCofins" outlined label="CST COFINS" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.aliquotaPis" outlined label="Alíquota PIS" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.aliquotaPis" outlined label="Alíquota PIS" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.aliquotaCofins" outlined label="Alíquota COFINS" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.aliquotaCofins" outlined label="Alíquota COFINS" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.vigenciaInicio" outlined type="date" label="Vigência início" class="field-required" :rules="[obrigatorio]" />
+                <q-input v-model="form.vigenciaInicio" outlined type="date" label="Vigência início" class="field-required" :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
               <div class="col-6 col-md-3">
-                <q-input v-model="form.vigenciaFim" outlined type="date" label="Vigência fim" />
+                <q-input v-model="form.vigenciaFim" outlined type="date" label="Vigência fim" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
-                <q-toggle v-model="form.suspenso" label="Suspenso" />
+                <q-toggle v-model="form.suspenso" label="Suspenso" :disable="somenteLeitura" />
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" @click="dialog = false" />
-              <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialog = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+                <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -111,15 +109,12 @@ import { useNcmPisCofins } from 'composables/useNcmPisCofins';
 import type { QTableColumn } from 'quasar';
 import type { NcmPisCofinsDto, NcmPisCofinsFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de PIS/COFINS por NCM');
 
 const { itens, carregando, salvando, carregar, criar, editar } = useNcmPisCofins();
 const dialog = ref(false);
+const somenteLeitura = ref(false);
 const editandoId = ref<string | null>(null);
 const form = ref<NcmPisCofinsFormModel>({
   ncm: '',
@@ -143,6 +138,7 @@ const colunas: QTableColumn<NcmPisCofinsDto>[] = [
 ];
 
 function abrirDialog(item?: NcmPisCofinsDto): void {
+  somenteLeitura.value = false;
   editandoId.value = item?.id ?? null;
   form.value = {
     ncm: item?.ncm ?? '',
@@ -164,14 +160,14 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
+function abrirDialogVisualizar(item: NcmPisCofinsDto): void {
+  abrirDialog(item);
+  somenteLeitura.value = true;
+}
+
 onMounted(() => {
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

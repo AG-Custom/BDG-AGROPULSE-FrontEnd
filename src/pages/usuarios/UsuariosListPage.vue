@@ -87,13 +87,13 @@
               <agro-acoes-menu
                 :ativo="podeInativar(props.row.status)"
                 :editar-to="{ name: 'usuario-editar', params: { id: props.row.id } }"
+                :visualizar-to="{ name: 'usuario-visualizar', params: { id: props.row.id } }"
                 :mostrar-status="
                   podeInativar(props.row.status) || props.row.status === UsuarioStatus.Inativo
                 "
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarUsuario(props.row)"
-                @ativar="ativarUsuario(props.row)"
-               @visualizar="abrirDialogVisualizar(props.row)">
+                @ativar="ativarUsuario(props.row)">
                 <q-item
                   v-close-popup
                   clickable
@@ -114,18 +114,12 @@
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
+
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -137,9 +131,6 @@ import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhar usuário');
 
 const {
   usuarios,
@@ -208,10 +199,6 @@ async function ativarUsuario(usuario: UsuarioResumoDto): Promise<void> {
 onMounted(() => {
   void carregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

@@ -5,7 +5,7 @@
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -18,6 +18,7 @@
                 :options="clienteOpcoes"
                 :loading="carregandoClientes"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -30,6 +31,7 @@
                 map-options
                 :options="vendedorOpcoes"
                 :loading="carregandoUsuarios"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -40,6 +42,7 @@
                 emit-value
                 map-options
                 :options="EtapaOportunidadeOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-4">
@@ -48,6 +51,7 @@
                 label="Valor estimado"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-4">
@@ -58,13 +62,16 @@
                 type="number"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.cultura" outlined label="Cultura" />
+              <q-input v-model="formulario.cultura" outlined label="Cultura"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.safraRef" outlined label="Safra (ref.)" />
+              <q-input v-model="formulario.safraRef" outlined label="Safra (ref.)"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-4">
               <q-input
@@ -72,6 +79,7 @@
                 outlined
                 label="Data prevista"
                 type="date"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -85,6 +93,7 @@
                 :options="produtoOpcoes"
                 :loading="carregandoProdutos"
                 @update:model-value="onProdutoChange"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12">
@@ -94,11 +103,12 @@
                 label="Observações"
                 type="textarea"
                 autogrow
+                :readonly="somenteLeitura"
               />
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn
               flat
               label="Cancelar"
@@ -113,6 +123,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'crm-oportunidades' }" />
           </div>
         </q-form>
       </agro-card>
@@ -163,11 +176,27 @@ const {
   carregar: carregarProdutos,
 } = useProdutos();
 
-const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
-const titulo = computed(() =>
-  modo.value === 'criar' ? 'Nova oportunidade' : 'Editar oportunidade',
-);
-const carregandoPagina = ref(modo.value === 'editar');
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'crm-oportunidade-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'crm-oportunidade-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova oportunidade';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar oportunidade';
+  }
+
+  return 'Editar oportunidade';
+});
+const carregandoPagina = ref(modo.value === 'editar' || modo.value === 'visualizar');
 const formulario = ref<OportunidadeFormModel>(oportunidadeVazia());
 
 const clienteOpcoes = computed(() =>
@@ -216,7 +245,7 @@ onMounted(async () => {
   void carregarClientes();
   void carregarUsuarios();
   void carregarProdutos();
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     const ok = await obterOportunidade(String(route.params.id));
     if (ok && oportunidade.value) {
       formulario.value = oportunidadeDtoParaForm(oportunidade.value);

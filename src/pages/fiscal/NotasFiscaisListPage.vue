@@ -140,11 +140,97 @@
       @nfpr="onEmitirNfpr"
     />
 
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
+    <q-dialog v-model="dialogVisualizar">
+      <q-card class="dialog-visualizar">
+        <q-card-section>
+          <h4 class="titulo">Visualizar nota fiscal</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="agro-formulario agro-formulario--bloqueado">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="notaVisualizar ? String(notaVisualizar.modeloDocumento) : ''"
+                  outlined
+                  label="Modelo"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="notaVisualizar?.numero ?? ''"
+                  outlined
+                  label="Número"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="notaVisualizar?.serie ?? ''"
+                  outlined
+                  label="Série"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="notaVisualizar ? String(notaVisualizar.status) : ''"
+                  outlined
+                  label="Status"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="notaVisualizar ? formatarMoeda(notaVisualizar.valorTotal) : ''"
+                  outlined
+                  label="Valor total"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="
+                    notaVisualizar?.emitidaEm ? formatarData(notaVisualizar.emitidaEm) : '—'
+                  "
+                  outlined
+                  label="Emitida em"
+                  readonly
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  :model-value="notaVisualizar?.chaveAcesso ?? ''"
+                  outlined
+                  label="Chave de acesso"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="notaVisualizar?.naturezaOperacao ?? ''"
+                  outlined
+                  label="Natureza da operação"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="notaVisualizar?.cfop ?? ''"
+                  outlined
+                  label="CFOP"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -154,7 +240,6 @@ import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
 import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
 import EmitirDocumentosDialog from 'components/fiscal/EmitirDocumentosDialog.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -176,12 +261,7 @@ import type {
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
-import { onMounted, reactive, ref, computed } from 'vue';
-
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Notas fiscais');
+import { onMounted, reactive, ref } from 'vue';
 
 const {
   notas,
@@ -212,7 +292,9 @@ const dialogCancelar = ref(false);
 const dialogCce = ref(false);
 const dialogComplementar = ref(false);
 const dialogEmitir = ref(false);
+const dialogVisualizar = ref(false);
 const notaSelecionada = ref<NotaFiscalGestaoDto | null>(null);
+const notaVisualizar = ref<NotaFiscalGestaoDto | null>(null);
 
 const colunas: QTableColumn<NotaFiscalGestaoDto>[] = [
   { name: 'modeloDocumento', label: 'Modelo', field: 'modeloDocumento', align: 'left' },
@@ -299,9 +381,20 @@ async function onEmitirNfpr(form: EmitirNfprFormModel): Promise<void> {
 onMounted(() => {
   void aplicarFiltro();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
+function abrirDialogVisualizar(item: NotaFiscalGestaoDto): void {
+  notaVisualizar.value = item;
   dialogVisualizar.value = true;
 }
 
 </script>
+
+<style scoped>
+.dialog-visualizar {
+  min-width: min(560px, 94vw);
+}
+.titulo {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+}
+</style>

@@ -122,28 +122,22 @@
               <agro-acoes-menu
                 :ativo="props.row.ativo"
                 :editar-to="{ name: 'fornecedor-editar', params: { id: props.row.id } }"
+                :visualizar-to="{ name: 'fornecedor-visualizar', params: { id: props.row.id } }"
                 :loading-status="inativando || ativando"
                 @desabilitar="inativarFornecedor(props.row)"
                 @ativar="ativarFornecedor(props.row)"
-               @visualizar="abrirDialogVisualizar(props.row)"
-              />
+/>
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
+
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -159,9 +153,6 @@ import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhar fornecedor');
 
 const {
   fornecedores,
@@ -259,10 +250,6 @@ watch([busca, filtroAtivo], () => {
 onMounted(() => {
   void recarregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

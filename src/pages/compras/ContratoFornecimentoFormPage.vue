@@ -1,11 +1,16 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header :titulo="titulo" subtitulo="Vigência, fornecedor e itens contratados." />
+    <app-page-header :titulo="titulo" :subtitulo="subtitulo" />
 
     <section class="agro-section">
-      <agro-form-skeleton v-if="carregando && editando" :campos="6" />
+      <agro-form-skeleton v-if="carregando && (modo === 'editar' || modo === 'visualizar')" :campos="6" />
       <agro-card v-else>
-        <q-form greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form
+          greedy
+          class="agro-formulario"
+          :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+          @submit.prevent="salvar"
+        >
           <div class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-4">
               <q-input
@@ -13,6 +18,7 @@
                 outlined
                 label="Número"
                 class="field-required"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -25,7 +31,8 @@
                 emit-value
                 map-options
                 :options="fornecedorOpcoes"
-                :disable="editando"
+                :disable="modo === 'editar' || modo === 'visualizar'"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -36,6 +43,7 @@
                 label="Vigência início"
                 type="date"
                 class="field-required"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -46,20 +54,33 @@
                 label="Vigência fim"
                 type="date"
                 class="field-required"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
             <div class="col-12 col-md-4">
-              <AgroMoneyInput v-model="valorTotal" label="Valor total" />
+              <AgroMoneyInput v-model="valorTotal" label="Valor total" :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-8">
-              <q-input v-model="observacao" outlined label="Observação" />
+              <q-input
+                v-model="observacao"
+                outlined
+                label="Observação"
+                :readonly="somenteLeitura"
+              />
             </div>
           </div>
 
           <div class="header">
             <h3 class="titulo-secao">Itens</h3>
-            <agro-btn flat icon="add" label="Item" descricao="Adicionar item" @click="adicionar" />
+            <agro-btn
+              v-if="!somenteLeitura"
+              flat
+              icon="add"
+              label="Item"
+              descricao="Adicionar item"
+              @click="adicionar"
+            />
           </div>
 
           <div v-for="(item, index) in itens" :key="item.chave" class="row q-col-gutter-md q-mb-sm">
@@ -72,6 +93,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -82,13 +104,20 @@
                 dense
                 label="Qtd"
                 type="number"
+                :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
               />
             </div>
             <div class="col-6 col-md-3">
-              <AgroMoneyInput v-model="item.precoUnitario" dense label="Preço" :rules="[obrigatorio]" />
+              <AgroMoneyInput
+                v-model="item.precoUnitario"
+                dense
+                label="Preço"
+                :readonly="somenteLeitura"
+                :rules="[obrigatorio]"
+              />
             </div>
-            <div class="col-2 col-md-2">
+            <div v-if="!somenteLeitura" class="col-2 col-md-2">
               <agro-btn
                 flat
                 round
@@ -102,7 +131,7 @@
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn
               flat
               label="Cancelar"
@@ -112,10 +141,18 @@
             <agro-btn
               color="primary"
               unelevated
-              :label="editando ? 'Salvar' : 'Criar'"
+              :label="modo === 'editar' ? 'Salvar' : 'Criar'"
               descricao="Salvar contrato"
               type="submit"
               :loading="salvando"
+            />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn
+              flat
+              label="Voltar"
+              descricao="Retornar para a listagem"
+              :to="{ name: 'contratos-fornecimento' }"
             />
           </div>
         </q-form>
@@ -150,10 +187,36 @@ const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const id = computed(() => route.params.id as string | undefined);
-const editando = computed(() => Boolean(id.value));
-const titulo = computed(() =>
-  editando.value ? 'Editar contrato de fornecimento' : 'Novo contrato de fornecimento',
-);
+
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'contrato-fornecimento-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'contrato-fornecimento-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
+
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Novo contrato de fornecimento';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar contrato de fornecimento';
+  }
+
+  return 'Editar contrato de fornecimento';
+});
+
+const subtitulo = computed(() => {
+  if (modo.value === 'visualizar') {
+    return 'Consulte vigência, fornecedor e itens contratados.';
+  }
+
+  return 'Vigência, fornecedor e itens contratados.';
+});
 
 const numero = ref('');
 const fornecedorId = ref('');
@@ -190,8 +253,12 @@ function montarItens() {
 }
 
 async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
   const valor = parseMascaraMoeda(valorTotal.value);
-  if (editando.value && id.value) {
+  if (modo.value === 'editar' && id.value) {
     const ok = await atualizar(id.value, {
       numero: numero.value.trim(),
       vigenciaInicio: vigenciaInicio.value,
@@ -219,6 +286,7 @@ async function salvar(): Promise<void> {
 onMounted(async () => {
   void carregarFornecedores();
   void carregarProdutos();
+  if (modo.value !== 'editar' && modo.value !== 'visualizar') return;
   if (!id.value) return;
   const ok = await obter(id.value);
   if (!ok || !contrato.value) {

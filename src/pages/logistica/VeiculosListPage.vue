@@ -77,26 +77,19 @@
               <agro-acoes-menu
                 :mostrar-status="false"
                 :editar-to="{ name: 'logistica-veiculo-editar', params: { id: props.row.id } }"
-               @visualizar="abrirDialogVisualizar(props.row)"
+                :visualizar-to="{ name: 'logistica-veiculo-visualizar', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -107,10 +100,6 @@ import type { VeiculoLogisticaDto } from 'types/dtos/logistica.dto';
 import { formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Frota');
 
 const { veiculos, alertasDocs, carregando, carregarVeiculos, carregarAlertasDocs } = useLogistica();
 const busca = ref('');
@@ -145,10 +134,6 @@ onMounted(() => {
   void carregarVeiculos();
   void carregarAlertasDocs();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

@@ -91,7 +91,8 @@
               <agro-acoes-menu
                 :mostrar-status="false"
                 :editar-to="{ name: 'contrato-fornecimento-editar', params: { id: props.row.id } }"
-               @visualizar="abrirDialogVisualizar(props.row)">
+                :visualizar-to="{ name: 'contrato-fornecimento-visualizar', params: { id: props.row.id } }"
+>
                 <q-item
                   v-if="props.row.status !== 'Cancelado'"
                   v-close-popup
@@ -117,19 +118,12 @@
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AlertasContratosFornecimentoPanel from 'components/compras/AlertasContratosFornecimentoPanel.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -144,10 +138,6 @@ import type {
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Contratos de fornecimento');
 
 const { contratos, alertas, carregando, salvando, carregar, cancelar, carregarAlertas } =
   useContratosFornecimento();
@@ -199,9 +189,5 @@ onMounted(async () => {
   void carregarFornecedores();
   await Promise.all([carregar(), atualizarAlertas()]);
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>

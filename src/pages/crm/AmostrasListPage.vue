@@ -89,27 +89,20 @@
                 :mostrar-excluir="true"
                 excluir-label="Remover"
                 :editar-to="{ name: 'crm-amostra-editar', params: { id: props.row.id } }"
+                :visualizar-to="{ name: 'crm-amostra-visualizar', params: { id: props.row.id } }"
                 :loading-excluir="salvando"
                 @excluir="removerAmostra(props.row.id)"
-               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -120,10 +113,6 @@ import type { AmostraCampoDto } from 'types/dtos/crm.dto';
 import { formatarData } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Amostras de campo');
 
 const { amostras, carregando, salvando, carregarAmostras, removerAmostra } = useCrm();
 const busca = ref('');
@@ -163,10 +152,6 @@ function rotuloStatus(status: string): string {
 onMounted(() => {
   void carregarAmostras();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

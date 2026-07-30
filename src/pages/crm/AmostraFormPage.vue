@@ -5,7 +5,7 @@
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -18,6 +18,7 @@
                 :options="clienteOpcoes"
                 :loading="carregandoClientes"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -30,6 +31,7 @@
                 map-options
                 :options="vendedorOpcoes"
                 :loading="carregandoUsuarios"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -40,6 +42,7 @@
                 emit-value
                 map-options
                 :options="StatusAmostraCampoOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-4">
@@ -51,10 +54,12 @@
                 step="0.01"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-4">
-              <q-input v-model="formulario.unidade" outlined label="Unidade" />
+              <q-input v-model="formulario.unidade" outlined label="Unidade"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-4">
               <q-input
@@ -64,6 +69,7 @@
                 type="date"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -72,10 +78,12 @@
                 outlined
                 label="Data retorno"
                 type="date"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-input v-model="formulario.cultura" outlined label="Cultura" />
+              <q-input v-model="formulario.cultura" outlined label="Cultura"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -88,6 +96,7 @@
                 :options="produtoOpcoes"
                 :loading="carregandoProdutos"
                 @update:model-value="onProdutoChange"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -100,14 +109,16 @@
                 map-options
                 :options="pedidoOpcoes"
                 :loading="carregandoPedidos"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-input v-model="formulario.resultado" outlined label="Resultado" />
+              <q-input v-model="formulario.resultado" outlined label="Resultado"
+                :readonly="somenteLeitura" />
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'crm-amostras' }" />
             <agro-btn
               color="primary"
@@ -117,6 +128,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'crm-amostras' }" />
           </div>
         </q-form>
       </agro-card>
@@ -168,9 +182,27 @@ const {
   carregar: carregarPedidos,
 } = usePedidosVenda();
 
-const modo = computed(() => (route.params.id ? 'editar' : 'criar'));
-const titulo = computed(() => (modo.value === 'criar' ? 'Nova amostra' : 'Editar amostra'));
-const carregandoPagina = ref(modo.value === 'editar');
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'crm-amostra-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'crm-amostra-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova amostra';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar amostra';
+  }
+
+  return 'Editar amostra';
+});
+const carregandoPagina = ref(modo.value === 'editar' || modo.value === 'visualizar');
 const formulario = ref<AmostraCampoFormModel>(amostraVazia());
 
 const clienteOpcoes = computed(() =>
@@ -227,7 +259,7 @@ onMounted(async () => {
   void carregarUsuarios();
   void carregarProdutos();
   void carregarPedidos();
-  if (modo.value === 'editar') {
+  if (modo.value === 'editar' || modo.value === 'visualizar') {
     const ok = await obterAmostra(String(route.params.id));
     if (ok && amostra.value) formulario.value = amostraDtoParaForm(amostra.value);
   }

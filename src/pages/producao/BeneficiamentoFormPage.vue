@@ -19,6 +19,7 @@
           v-else
           greedy
           class="agro-formulario"
+          :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
           :disable="somenteLeitura"
           @submit.prevent="salvar"
         >
@@ -133,7 +134,12 @@
           </div>
 
           <div class="agro-form-actions">
-            <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'beneficiamentos' }" />
+            <agro-btn
+              flat
+              :label="somenteLeitura ? 'Voltar' : 'Cancelar'"
+              descricao="Voltar"
+              :to="{ name: 'beneficiamentos' }"
+            />
             <agro-btn
               v-if="!somenteLeitura"
               color="primary"
@@ -193,11 +199,25 @@ const {
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { lotes, carregar: carregarLotes } = useEstoqueLotes();
 
-const modo = computed(() => (route.name === 'beneficiamento-editar' ? 'editar' : 'criar'));
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'beneficiamento-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'beneficiamento-editar' ? 'editar' : 'criar';
+});
 const beneficiamentoId = computed(() => route.params.id as string | undefined);
-const titulo = computed(() =>
-  modo.value === 'criar' ? 'Novo beneficiamento' : 'Editar beneficiamento',
-);
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Novo beneficiamento';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar beneficiamento';
+  }
+
+  return 'Editar beneficiamento';
+});
 
 const carregandoPagina = ref(false);
 const formulario = ref<BeneficiamentoLoteFormModel>({
@@ -211,7 +231,9 @@ const formulario = ref<BeneficiamentoLoteFormModel>({
 });
 
 const somenteLeitura = computed(
-  () => beneficiamento.value?.status === BeneficiamentoLoteStatus.Confirmado,
+  () =>
+    modo.value === 'visualizar' ||
+    beneficiamento.value?.status === BeneficiamentoLoteStatus.Confirmado,
 );
 
 const produtoOpcoes = computed(() =>
@@ -258,7 +280,7 @@ async function onConfirmar(): Promise<void> {
 
 onMounted(async () => {
   void carregarProdutos();
-  if (modo.value === 'editar' && beneficiamentoId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && beneficiamentoId.value) {
     carregandoPagina.value = true;
     const ok = await obterBeneficiamento(beneficiamentoId.value);
     if (!ok || !beneficiamento.value) {

@@ -177,17 +177,99 @@
       </q-card>
     </q-dialog>
 
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
+    <q-dialog v-model="dialogVisualizar">
+      <q-card class="dialog-visualizar">
+        <q-card-section>
+          <h4 class="titulo">Visualizar lote</h4>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="agro-formulario agro-formulario--bloqueado">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="loteVisualizar ? rotuloProduto(loteVisualizar.produtoId) : ''"
+                  outlined
+                  label="Produto"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="loteVisualizar?.numeroLote ?? ''"
+                  outlined
+                  label="Número do lote"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="loteVisualizar ? formatarDecimal(loteVisualizar.quantidade) : ''"
+                  outlined
+                  label="Quantidade"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="loteVisualizar ? formatarDecimal(loteVisualizar.custoUnitario) : ''"
+                  outlined
+                  label="Custo unitário"
+                  readonly
+                  input-class="text-metric"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  :model-value="loteVisualizar?.ativo ? 'Ativo' : 'Inativo'"
+                  outlined
+                  label="Status"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="
+                    loteVisualizar?.dataValidade ? formatarData(loteVisualizar.dataValidade) : '—'
+                  "
+                  outlined
+                  label="Validade"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="
+                    loteVisualizar?.dataFabricacao
+                      ? formatarData(loteVisualizar.dataFabricacao)
+                      : '—'
+                  "
+                  outlined
+                  label="Fabricação"
+                  readonly
+                />
+              </div>
+              <div class="col-12">
+                <q-input
+                  :model-value="loteVisualizar ? formatarLocalizacao(loteVisualizar) : ''"
+                  outlined
+                  label="Localização"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="agro-form-actions">
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -199,11 +281,6 @@ import type { QTableColumn } from 'quasar';
 import type { LoteDto } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
-
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Lotes');
 
 const { lotes, genealogia, carregando, carregandoGenealogia, carregar, obterGenealogia } =
   useEstoqueLotes();
@@ -217,6 +294,8 @@ const filtroProduto = ref<string | null>(null);
 const apenasComSaldo = ref(true);
 const dialogGenealogia = ref(false);
 const loteSelecionado = ref<LoteDto | null>(null);
+const dialogVisualizar = ref(false);
+const loteVisualizar = ref<LoteDto | null>(null);
 
 const colunas: QTableColumn<LoteDto>[] = [
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
@@ -292,8 +371,8 @@ watch([filtroProduto, apenasComSaldo], () => {
 onMounted(() => {
   void recarregar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
+function abrirDialogVisualizar(item: LoteDto): void {
+  loteVisualizar.value = item;
   dialogVisualizar.value = true;
 }
 
@@ -305,6 +384,9 @@ function abrirDialogVisualizar(registro: Record<string, unknown> | object): void
 }
 .dialog-genealogia {
   min-width: min(440px, 92vw);
+}
+.dialog-visualizar {
+  min-width: min(560px, 94vw);
 }
 .titulo {
   margin: 0;

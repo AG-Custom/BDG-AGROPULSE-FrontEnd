@@ -6,7 +6,7 @@
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="2" />
 
-        <q-form v-else ref="formRef" greedy class="agro-formulario">
+        <q-form v-else ref="formRef" greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-select
@@ -18,6 +18,7 @@
                 map-options
                 clearable
                 :options="CanalVendaOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -31,11 +32,12 @@
                 step="0.01"
                 aria-required="true"
                 :rules="[obrigatorio, percentualZeroACem]"
+                :readonly="somenteLeitura"
               />
             </div>
           </div>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn
               flat
               label="Cancelar"
@@ -53,6 +55,9 @@
               :loading="salvando"
               @click="salvar"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'regras-comissao' }" />
           </div>
         </q-form>
       </agro-card>
@@ -83,21 +88,41 @@ const formRef = ref<QForm | null>(null);
 const formulario = ref<RegraComissaoFormModel>(formVazioRegraComissao());
 const carregandoPagina = ref(true);
 
-const modo = computed<'criar' | 'editar'>(() =>
-  route.name === 'regra-comissao-editar' ? 'editar' : 'criar',
-);
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'regra-comissao-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'regra-comissao-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 
 const regraId = computed(() => route.params.id as string | undefined);
 
-const tituloPagina = computed(() =>
-  modo.value === 'criar' ? 'Nova regra de comissão' : 'Editar regra de comissão',
-);
+const tituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova regra de comissão';
+  }
 
-const subtituloPagina = computed(() =>
-  modo.value === 'criar'
-    ? 'Defina canal e percentual de comissão.'
-    : 'Atualize a regra de comissão selecionada.',
-);
+  if (modo.value === 'visualizar') {
+    return 'Visualizar regra de comissão';
+  }
+
+  return 'Editar regra de comissão';
+});
+
+const subtituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Defina canal e percentual de comissão.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte a regra de comissão selecionada.';
+  }
+
+  return 'Atualize a regra de comissão selecionada.';
+});
 
 function voltar(): void {
   void router.push({ name: 'regras-comissao' });
@@ -130,7 +155,7 @@ async function salvar(): Promise<void> {
 onMounted(async () => {
   carregandoPagina.value = true;
 
-  if (modo.value === 'editar' && regraId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && regraId.value) {
     const ok = await obter(regraId.value);
     if (!ok || !regra.value) {
       await router.replace({ name: 'regras-comissao' });

@@ -5,7 +5,7 @@
     <section class="agro-section">
       <agro-card>
         <agro-form-skeleton v-if="carregandoPagina" :campos="8" />
-        <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
+        <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <q-input
@@ -14,6 +14,7 @@
                 label="Nome"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -23,6 +24,7 @@
                 label="Cultura"
                 class="field-required"
                 :rules="[obrigatorio]"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -34,6 +36,7 @@
                 emit-value
                 map-options
                 :options="fazendaOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -45,6 +48,7 @@
                 emit-value
                 map-options
                 :options="talhaoOpcoes"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -54,6 +58,7 @@
                 label="Área planejada (ha)"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -63,13 +68,16 @@
                 label="Área realizada (ha)"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataInicio" outlined label="Início" type="date" />
+              <q-input v-model="formulario.dataInicio" outlined label="Início" type="date"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-6 col-md-3">
-              <q-input v-model="formulario.dataFim" outlined label="Fim" type="date" />
+              <q-input v-model="formulario.dataFim" outlined label="Fim" type="date"
+                :readonly="somenteLeitura" />
             </div>
             <div class="col-6 col-md-3">
               <q-input
@@ -78,6 +86,7 @@
                 label="Prod. planejada"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -87,6 +96,7 @@
                 label="Prod. realizada"
                 type="number"
                 step="0.01"
+                :readonly="somenteLeitura"
               />
             </div>
             <div class="col-12">
@@ -96,10 +106,11 @@
                 label="Observações"
                 type="textarea"
                 autogrow
+                :readonly="somenteLeitura"
               />
             </div>
           </div>
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Voltar" :to="{ name: 'safras-planejamento' }" />
             <agro-btn
               color="primary"
@@ -108,6 +119,9 @@
               type="submit"
               :loading="salvando"
             />
+          </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar" :to="{ name: 'safras-planejamento' }" />
           </div>
         </q-form>
       </agro-card>
@@ -132,11 +146,27 @@ const { safra, salvando, obter, criar, editar } = useSafras();
 const { fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
 
-const modo = computed(() => (route.name === 'safra-editar' ? 'editar' : 'criar'));
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'safra-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'safra-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 const safraId = computed(() => route.params.id as string | undefined);
-const titulo = computed(() =>
-  modo.value === 'criar' ? 'Nova safra' : 'Editar safra',
-);
+const titulo = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova safra';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Visualizar safra';
+  }
+
+  return 'Editar safra';
+});
 
 const carregandoPagina = ref(false);
 const formulario = ref<SafraFormModel>({
@@ -172,7 +202,7 @@ onMounted(async () => {
   void carregarFazendas();
   void carregarTalhoes();
 
-  if (modo.value === 'editar' && safraId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && safraId.value) {
     carregandoPagina.value = true;
     const ok = await obter(safraId.value);
     if (!ok || !safra.value) {

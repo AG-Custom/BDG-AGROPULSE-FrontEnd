@@ -85,10 +85,10 @@
     <q-dialog v-model="dialogCriar" persistent>
       <q-card class="dialog-card">
         <q-card-section>
-          <div class="text-h6">Registrar abastecimento</div>
+          <div class="text-h6">{{ somenteLeitura ? 'Visualizar abastecimento' : 'Registrar abastecimento' }}</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-form greedy @submit.prevent="salvar">
+          <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <q-select
               v-model="formulario.veiculoId"
               outlined
@@ -97,24 +97,21 @@
               map-options
               class="field-required q-mb-md"
               :options="veiculoOpcoes"
-              :rules="[obrigatorio]"
-            />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
             <q-input
               v-model="formulario.data"
               outlined
               label="Data"
               type="date"
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
-            />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
             <q-input
               v-model="formulario.kmHodometro"
               outlined
               label="Km hodômetro"
               type="number"
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
-            />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
             <q-input
               v-model="formulario.litros"
               outlined
@@ -122,14 +119,12 @@
               type="number"
               step="0.01"
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
-            />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
             <AgroMoneyInput
               v-model="formulario.precoLitro"
               label="Preço/litro"
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
-            />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
             <q-select
               v-model="formulario.combustivel"
               outlined
@@ -138,37 +133,27 @@
               map-options
               class="field-required q-mb-md"
               :options="TipoCombustivelLogisticaOpcoes"
-              :rules="[obrigatorio]"
-            />
-            <q-input v-model="formulario.posto" outlined label="Posto" class="q-mb-md" />
-            <q-input v-model="formulario.motoristaNome" outlined label="Motorista" class="q-mb-md" />
+              :rules="[obrigatorio]" :readonly="somenteLeitura" />
+            <q-input v-model="formulario.posto" outlined label="Posto" class="q-mb-md" :readonly="somenteLeitura" />
+            <q-input v-model="formulario.motoristaNome" outlined label="Motorista" class="q-mb-md" :readonly="somenteLeitura" />
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCriar = false" />
-              <agro-btn
-                color="primary"
-                unelevated
-                label="Registrar"
-                descricao="Salvar"
-                type="submit"
-                :loading="salvando"
-              />
+              <template v-if="somenteLeitura">
+                <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogCriar = false" />
+              </template>
+              <template v-else>
+                <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCriar = false" />
+                <agro-btn color="primary" unelevated label="Registrar" type="submit" :loading="salvando" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -180,14 +165,10 @@ import type {
   AbastecimentoLogisticaDto,
   AbastecimentoLogisticaFormModel,
 } from 'types/dtos/logistica.dto';
-import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarDecimal, formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
-
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Abastecimentos');
 
 const {
   abastecimentos,
@@ -202,6 +183,7 @@ const {
 
 const filtroVeiculoId = ref<string | null>(null);
 const dialogCriar = ref(false);
+const somenteLeitura = ref(false);
 const formulario = ref<AbastecimentoLogisticaFormModel>(abastecimentoVazio());
 
 const veiculoOpcoes = computed(() =>
@@ -229,7 +211,23 @@ function aplicar(): void {
 }
 
 function abrirCriar(): void {
+  somenteLeitura.value = false;
   formulario.value = abastecimentoVazio();
+  dialogCriar.value = true;
+}
+
+function abrirDialogVisualizar(item: AbastecimentoLogisticaDto): void {
+  somenteLeitura.value = true;
+  formulario.value = {
+    veiculoId: item.veiculoId,
+    data: item.data.slice(0, 10),
+    kmHodometro: String(item.kmHodometro),
+    litros: String(item.litros),
+    precoLitro: formatarMoedaParaInput(item.precoLitro),
+    combustivel: item.combustivel,
+    posto: item.posto ?? '',
+    motoristaNome: item.motoristaNome ?? '',
+  };
   dialogCriar.value = true;
 }
 
@@ -249,11 +247,6 @@ onMounted(async () => {
   await carregarVeiculos();
   aplicar();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
-
 </script>
 
 <style scoped>

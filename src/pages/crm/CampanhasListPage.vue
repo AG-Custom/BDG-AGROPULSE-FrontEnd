@@ -60,7 +60,7 @@
                 :loading-excluir="salvando"
                 @editar="abrirDialog(props.row)"
                 @excluir="removerCampanha(props.row.id)"
-               @visualizar="abrirDialogVisualizar(props.row)"
+               :visualizar-to="{ name: 'crm-campanha-detalhe', params: { id: props.row.id } }"
               />
             </q-td>
           </template>
@@ -134,18 +134,11 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <agro-entity-details-dialog
-      v-model="dialogVisualizar"
-      :titulo="tituloDetalhe"
-      :registro="registroSelecionado"
-    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -161,9 +154,6 @@ import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
 
-const dialogVisualizar = ref(false);
-const registroSelecionado = ref<Record<string, unknown> | null>(null);
-const tituloDetalhe = computed(() => 'Detalhes de Campanhas');
 
 const {
   campanhas,
@@ -226,10 +216,6 @@ async function salvar(): Promise<void> {
 onMounted(() => {
   void carregarCampanhas();
 });
-function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
-  registroSelecionado.value = registro as Record<string, unknown>;
-  dialogVisualizar.value = true;
-}
 
 </script>
 

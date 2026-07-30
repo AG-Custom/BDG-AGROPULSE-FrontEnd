@@ -7,7 +7,12 @@
         <agro-form-skeleton v-if="carregandoPagina" :campos="4" />
 
         <template v-else>
-          <q-form ref="formRef" greedy class="agro-formulario">
+          <q-form
+            ref="formRef"
+            greedy
+            class="agro-formulario"
+            :class="{ 'agro-formulario--bloqueado': somenteLeitura }"
+          >
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-select
@@ -20,19 +25,20 @@
                   aria-required="true"
                   :options="FormaPagamentoOpcoes"
                   :rules="[obrigatorio]"
-                  :readonly="modo === 'editar'"
+                  :readonly="modo === 'editar' || somenteLeitura"
                 />
               </div>
               <div class="col-12 col-md-6 formas-pagamento-form__toggle">
                 <q-toggle
                   v-model="formulario.repassarTaxaCliente"
                   label="Repassar taxa ao cliente"
+                  :disable="somenteLeitura"
                 />
               </div>
             </div>
           </q-form>
 
-          <div class="agro-form-actions">
+          <div v-if="!somenteLeitura" class="agro-form-actions">
             <agro-btn
               flat
               label="Cancelar"
@@ -48,14 +54,18 @@
               @click="salvar"
             />
           </div>
+          <div v-else class="agro-form-actions">
+            <agro-btn flat label="Voltar" descricao="Retornar para a listagem" @click="voltar" />
+          </div>
         </template>
       </agro-card>
 
-      <agro-card v-if="modo === 'editar' && config">
+      <agro-card v-if="(modo === 'editar' || modo === 'visualizar') && config">
         <template #header>
           <div class="formas-pagamento-form__taxas-header">
             <h3 class="formas-pagamento-form__titulo">Taxas por parcelas</h3>
             <agro-btn
+              v-if="!somenteLeitura"
               color="primary"
               unelevated
               icon="add"
@@ -80,7 +90,7 @@
           row-key="id"
           hide-pagination
           :rows="config.taxas"
-          :columns="colunasTaxas"
+          :columns="somenteLeitura ? colunasTaxasSemAcoes : colunasTaxas"
           :pagination="{ rowsPerPage: 0 }"
         >
           <template #body-cell-taxaPercentual="props">
@@ -95,7 +105,7 @@
             </q-td>
           </template>
 
-          <template #body-cell-acoes="props">
+          <template v-if="!somenteLeitura" #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu
                 :mostrar-visualizar="false"
@@ -213,27 +223,53 @@ const taxaForm = ref<TaxaFormaPagamentoFormModel>(criarTaxaFormVazia());
 const dialogTaxaAberto = ref(false);
 const carregandoPagina = ref(true);
 
-const modo = computed<'criar' | 'editar'>(() =>
-  route.name === 'forma-pagamento-config-editar' ? 'editar' : 'criar',
-);
+const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
+  if (route.name === 'forma-pagamento-config-visualizar') {
+    return 'visualizar';
+  }
+
+  return route.name === 'forma-pagamento-config-editar' ? 'editar' : 'criar';
+});
+
+const somenteLeitura = computed(() => modo.value === 'visualizar');
 
 const configId = computed(() => route.params.id as string | undefined);
 
-const tituloPagina = computed(() =>
-  modo.value === 'criar' ? 'Nova forma de pagamento' : 'Editar forma de pagamento',
-);
+const tituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Nova forma de pagamento';
+  }
 
-const subtituloPagina = computed(() =>
-  modo.value === 'criar'
-    ? 'Cadastre a forma e defina se a taxa será repassada ao cliente.'
-    : 'Atualize o repasse e gerencie as taxas por parcelas.',
-);
+  if (modo.value === 'visualizar') {
+    return 'Visualizar forma de pagamento';
+  }
+
+  return 'Editar forma de pagamento';
+});
+
+const subtituloPagina = computed(() => {
+  if (modo.value === 'criar') {
+    return 'Cadastre a forma e defina se a taxa será repassada ao cliente.';
+  }
+
+  if (modo.value === 'visualizar') {
+    return 'Consulte a forma de pagamento e as taxas por parcelas.';
+  }
+
+  return 'Atualize o repasse e gerencie as taxas por parcelas.';
+});
 
 const colunasTaxas: QTableColumn<TaxaFormaPagamentoDto>[] = [
   { name: 'parcelas', label: 'Parcelas', field: 'parcelas', align: 'left' },
   { name: 'taxaPercentual', label: 'Taxa %', field: 'taxaPercentual', align: 'right' },
   { name: 'taxaFixa', label: 'Taxa fixa', field: 'taxaFixa', align: 'right' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+];
+
+const colunasTaxasSemAcoes: QTableColumn<TaxaFormaPagamentoDto>[] = [
+  { name: 'parcelas', label: 'Parcelas', field: 'parcelas', align: 'left' },
+  { name: 'taxaPercentual', label: 'Taxa %', field: 'taxaPercentual', align: 'right' },
+  { name: 'taxaFixa', label: 'Taxa fixa', field: 'taxaFixa', align: 'right' },
 ];
 
 function voltar(): void {
@@ -255,6 +291,10 @@ function abrirTaxa(taxa?: TaxaFormaPagamentoDto): void {
 }
 
 async function salvar(): Promise<void> {
+  if (somenteLeitura.value) {
+    return;
+  }
+
   const valido = (await formRef.value?.validate()) ?? false;
 
   if (!valido) {
@@ -296,7 +336,7 @@ async function salvarTaxaDialog(): Promise<void> {
 onMounted(async () => {
   carregandoPagina.value = true;
 
-  if (modo.value === 'editar' && configId.value) {
+  if ((modo.value === 'editar' || modo.value === 'visualizar') && configId.value) {
     const ok = await obter(configId.value);
 
     if (!ok || !config.value) {
