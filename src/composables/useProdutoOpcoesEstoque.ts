@@ -10,14 +10,14 @@ export function useProdutoOpcoesEstoque() {
 
   const produtoOpcoes = computed(() =>
     produtos.value.map((produto) => ({
-      label: `${produto.codigo} — ${produto.descricao}`,
+      label: `${produto.descricao}`,
       value: produto.id,
     })),
   );
 
   function rotuloProduto(produtoId: string): string {
     const produto = produtos.value.find((item) => item.id === produtoId);
-    return produto ? `${produto.codigo} — ${produto.descricao}` : produtoId;
+    return produto ? `${produto.descricao}` : produtoId;
   }
 
   function obterResumo(produtoId: string): ProdutoResumoDto | undefined {

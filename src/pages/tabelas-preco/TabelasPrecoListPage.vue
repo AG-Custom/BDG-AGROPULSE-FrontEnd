@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Tabelas de preço"
@@ -43,7 +43,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && tabelas.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && tabelas.length === 0" :colunas="4" />
 
         <empty-state
           v-else-if="!carregando && tabelas.length === 0"
@@ -96,66 +96,50 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="tabelas-preco-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar tabela de preço"
-                :to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar tabela de preço"
-                :to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo && !props.row.ehPadrao"
-                flat
-                round
-                dense
-                icon="star"
-                color="primary"
-                descricao="Definir como tabela padrão"
-                :loading="salvando"
-                @click="definirComoPadrao(props.row)"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar tabela de preço"
-                :loading="inativando"
-                @click="inativarTabela(props.row)"
-              />
-              <agro-btn
-                v-else
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar tabela de preço"
-                :loading="ativando"
-                @click="ativarTabela(props.row)"
-              />
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{ name: 'tabela-preco-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @desabilitar="inativarTabela(props.row)"
+                @ativar="ativarTabela(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-if="props.row.ativo && !props.row.ehPadrao"
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
+                  @click="definirComoPadrao(props.row)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit">
+                      <q-icon name="star" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Definir como padrão</q-item-section>
+                  <q-item-section v-if="salvando" side>
+                    <q-spinner size="16px" color="primary" />
+                  </q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -164,6 +148,11 @@ import { useTabelasPreco } from 'composables/useTabelasPreco';
 import type { ListarTabelasPrecoParams, TabelaPrecoResumoDto } from 'types/dtos/tabela-preco.dto';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Tabelas de preço');
 
 const {
   tabelas,
@@ -187,7 +176,6 @@ const opcoesStatus = [
 ];
 
 const colunas: QTableColumn<TabelaPrecoResumoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'vigencia', label: 'Vigência', field: 'vigenciaInicio', align: 'left' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
@@ -255,6 +243,11 @@ watch([busca, filtroAtivo], () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

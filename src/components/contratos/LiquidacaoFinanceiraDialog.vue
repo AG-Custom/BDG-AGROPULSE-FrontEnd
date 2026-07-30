@@ -26,13 +26,10 @@
         <q-form greedy class="agro-formulario" @submit.prevent="confirmar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-input
+              <AgroMoneyInput
                 v-model="form.precoLiquidacao"
-                outlined
                 label="Preço de liquidação"
                 class="field-required"
-                type="number"
-                step="0.0001"
                 :rules="[obrigatorio]"
               />
             </div>
@@ -72,13 +69,14 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { FontePrecoOpcoes, type FontePrecoValor } from 'constants/enums';
 import type {
   CotacaoMercadoDto,
   LiquidacaoFormModel,
   LiquidarContratoPayload,
 } from 'types/dtos/contrato.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, reactive, watch } from 'vue';
 
@@ -103,17 +101,17 @@ const form = reactive<LiquidacaoFormModel>({
 });
 
 const valorEstimado = computed(() => {
-  const preco = Number(form.precoLiquidacao);
-  if (!Number.isFinite(preco) || props.saldoPendente == null) return null;
+  const preco = parseMascaraMoeda(form.precoLiquidacao);
+  if (preco === null || props.saldoPendente == null) return null;
   return preco * props.saldoPendente;
 });
 
 function reset(): void {
   form.precoLiquidacao =
     props.precoSugerido != null
-      ? String(props.precoSugerido)
+      ? formatarMoedaParaInput(props.precoSugerido)
       : props.cotacao
-        ? String(props.cotacao.preco)
+        ? formatarMoedaParaInput(props.cotacao.preco)
         : '';
   form.fontePreco = props.fonteSugerida ?? props.cotacao?.fonte ?? '';
   form.observacao = '';
@@ -121,7 +119,7 @@ function reset(): void {
 
 function usarCotacao(): void {
   if (!props.cotacao) return;
-  form.precoLiquidacao = String(props.cotacao.preco);
+  form.precoLiquidacao = formatarMoedaParaInput(props.cotacao.preco);
   form.fontePreco = props.cotacao.fonte;
 }
 
@@ -133,9 +131,9 @@ watch(
 );
 
 function confirmar(): void {
-  const preco = Number(form.precoLiquidacao);
+  const preco = parseMascaraMoeda(form.precoLiquidacao);
   emit('confirmar', {
-    precoLiquidacaoManual: Number.isFinite(preco) && preco > 0 ? preco : null,
+    precoLiquidacaoManual: preco !== null && preco > 0 ? preco : null,
   });
 }
 </script>

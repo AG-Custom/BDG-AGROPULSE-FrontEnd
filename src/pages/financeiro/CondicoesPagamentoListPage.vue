@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Condições de pagamento"
@@ -16,7 +16,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && condicoes.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && condicoes.length === 0" :colunas="4" />
         <empty-state
           v-else-if="!carregando && condicoes.length === 0"
           titulo="Nenhuma condição"
@@ -51,35 +51,31 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar"
-                :loading="salvando"
-                @click="solicitarInativacao(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{ name: 'condicao-pagamento-editar', params: { id: props.row.id } }"
+                :loading-status="salvando"
+                @desabilitar="solicitarInativacao(props.row)"
+                @ativar="solicitarAtivacao(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -87,13 +83,17 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import type { QTableColumn } from 'quasar';
 import type { CondicaoPagamentoDto } from 'types/dtos/financeiro.dto';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 
-const { condicoes, carregando, salvando, carregar, solicitarInativacao } =
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Condições de pagamento');
+
+const { condicoes, carregando, salvando, carregar, solicitarInativacao, solicitarAtivacao } =
   useCondicoesPagamento();
 
 const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'numeroParcelas', label: 'Parcelas', field: 'numeroParcelas', align: 'right' },
   { name: 'intervaloDias', label: 'Intervalo (dias)', field: 'intervaloDias', align: 'right' },
@@ -104,6 +104,11 @@ const colunas: QTableColumn<CondicaoPagamentoDto>[] = [
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

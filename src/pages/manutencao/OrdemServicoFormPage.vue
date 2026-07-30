@@ -64,13 +64,7 @@
               <q-input v-model="formulario.dataPrevisao" outlined label="Data previsão" type="date" />
             </div>
             <div class="col-12 col-md-4">
-              <q-input
-                v-model="formulario.custoMaoObra"
-                outlined
-                label="Custo mão de obra"
-                type="number"
-                step="0.01"
-              />
+              <AgroMoneyInput v-model="formulario.custoMaoObra" label="Custo mão de obra" />
             </div>
             <div class="col-12 col-md-6">
               <q-input v-model="formulario.responsavelNome" outlined label="Responsável" />
@@ -137,6 +131,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useColaboradores } from 'composables/useColaboradores';
 import { osVazia, useManutencao } from 'composables/useManutencao';
 import {

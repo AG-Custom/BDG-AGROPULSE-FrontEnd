@@ -50,8 +50,12 @@ export const fornecedorService = {
     return api.put<FornecedorDto>(`/fornecedores/${fornecedorId}`, payload).then((r) => r.data);
   },
 
-  inativar(fornecedorId: string): Promise<void> {
-    return api.post(`/fornecedores/${fornecedorId}/inativar`);
+  inativar(fornecedorId: string, justificativa: string): Promise<void> {
+    return api.post(`/fornecedores/${fornecedorId}/inativar`, { justificativa });
+  },
+
+  ativar(fornecedorId: string): Promise<void> {
+    return api.post(`/fornecedores/${fornecedorId}/ativar`);
   },
 
   adicionarContato(

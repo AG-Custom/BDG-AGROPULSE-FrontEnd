@@ -48,8 +48,8 @@ export const clienteService = {
     return api.put<ClienteDto>(`/clientes/${clienteId}`, payload).then((r) => r.data);
   },
 
-  inativar(clienteId: string): Promise<void> {
-    return api.patch(`/clientes/${clienteId}/inativar`);
+  inativar(clienteId: string, justificativa: string): Promise<void> {
+    return api.patch(`/clientes/${clienteId}/inativar`, { justificativa });
   },
 
   ativar(clienteId: string): Promise<void> {

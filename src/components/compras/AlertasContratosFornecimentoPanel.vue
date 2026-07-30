@@ -48,14 +48,11 @@
       </template>
       <template #body-cell-acoes="props">
         <q-td :props="props">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar contrato"
-            :to="{
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            editar-label="Editar contrato"
+            :editar-to="{
               name: 'contrato-fornecimento-editar',
               params: { id: props.row.contratoId },
             }"
@@ -68,6 +65,7 @@
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

@@ -14,14 +14,10 @@
       :rules="[obrigatorio]"
     />
 
-    <q-input
+    <AgroMoneyInput
       v-model="preco"
-      outlined
       label="Preço"
       class="field-required"
-      type="number"
-      min="0"
-      step="0.01"
       aria-required="true"
       :rules="[obrigatorio]"
     />
@@ -39,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useProdutos } from 'composables/useProdutos';
 import type { QForm } from 'quasar';
 import type {
@@ -66,7 +63,7 @@ const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } =
 
 const produtoOpcoes = computed(() =>
   produtos.value.map((produto) => ({
-    label: `${produto.codigo} — ${produto.descricao}`,
+    label: `${produto.descricao}`,
     value: produto.id,
   })),
 );

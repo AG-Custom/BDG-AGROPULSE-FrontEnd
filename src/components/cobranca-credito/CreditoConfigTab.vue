@@ -24,23 +24,13 @@
             />
           </div>
           <div class="col-12 col-md-4">
-            <q-input
-              v-model="form.limiteGerente"
-              outlined
-              label="Alçada gerente (R$)"
-              type="number"
-            />
+            <AgroMoneyInput v-model="form.limiteGerente" label="Alçada gerente" />
           </div>
           <div class="col-12 col-md-4">
-            <q-input
-              v-model="form.limiteDiretor"
-              outlined
-              label="Alçada diretor (R$)"
-              type="number"
-            />
+            <AgroMoneyInput v-model="form.limiteDiretor" label="Alçada diretor" />
           </div>
           <div class="col-12 col-md-4">
-            <q-input v-model="form.limiteCeo" outlined label="Alçada CEO (R$)" type="number" />
+            <AgroMoneyInput v-model="form.limiteCeo" label="Alçada CEO" />
           </div>
           <div class="col-12">
             <q-input
@@ -256,7 +246,7 @@
             <q-input v-model="bancoTipoOperacao" outlined label="Tipo operação" />
           </div>
           <div class="col-12 col-md-2">
-            <q-input v-model="bancoValor" outlined label="Valor (R$)" type="number" />
+            <AgroMoneyInput v-model="bancoValor" label="Valor" />
           </div>
           <div class="col-12 col-md-2">
             <agro-btn
@@ -287,6 +277,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
 import {
   configDtoParaForm,
@@ -302,7 +293,7 @@ import {
 import type { BureauCreditoValor, InstituicaoCreditoBancarioValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { RevisaoLimiteItemDto } from 'types/dtos/cobranca-credito.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const {
@@ -383,7 +374,7 @@ async function onBanco(): Promise<void> {
     id,
     bancoInstituicao.value,
     bancoTipoOperacao.value.trim() || 'Custeio',
-    Number(bancoValor.value) || 0,
+    parseMascaraMoeda(bancoValor.value) ?? 0,
   );
 }
 

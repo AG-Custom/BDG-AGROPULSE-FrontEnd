@@ -7,6 +7,7 @@ import type {
   RenegociacaoDto,
   RenegociacaoFormModel,
 } from 'types/dtos/financeiro-gestao.dto';
+import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 export function useRenegociacoes() {
@@ -34,8 +35,8 @@ export function useRenegociacoes() {
       await financeiroGestaoService.criarRenegociacao({
         clienteId: form.clienteId,
         contasReceberIds: form.contasReceberIds,
-        valorMora: form.valorMora ? Number(form.valorMora.replace(',', '.')) : null,
-        valorMulta: form.valorMulta ? Number(form.valorMulta.replace(',', '.')) : null,
+        valorMora: parseMascaraMoeda(form.valorMora),
+        valorMulta: parseMascaraMoeda(form.valorMulta),
         numeroParcelas: Number(form.numeroParcelas),
         observacao: form.observacao.trim() || null,
       });

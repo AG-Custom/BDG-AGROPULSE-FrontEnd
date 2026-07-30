@@ -13,5 +13,6 @@ declare module 'vue-router' {
     breadcrumb?: string;
     breadcrumbPais?: string[];
     permissao?: string;
+    requerIndustria?: boolean;
   }
 }

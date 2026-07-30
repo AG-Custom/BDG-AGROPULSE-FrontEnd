@@ -43,12 +43,9 @@
               />
             </div>
             <div class="col-6 col-md-4">
-              <q-input
+              <AgroMoneyInput
                 v-model="formulario.valorEstimado"
-                outlined
                 label="Valor estimado"
-                type="number"
-                step="0.01"
                 class="field-required"
                 :rules="[obrigatorio]"
               />
@@ -126,6 +123,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
 import {
   oportunidadeDtoParaForm,
@@ -185,6 +183,7 @@ const vendedorOpcoes = computed(() =>
       (u) =>
         u.status === UsuarioStatus.Ativo &&
         (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Consultor ||
           u.perfil === PerfilUsuario.Gerente ||
           u.perfil === PerfilUsuario.Diretor ||
           u.id === formulario.value.vendedorUsuarioId),
@@ -193,7 +192,7 @@ const vendedorOpcoes = computed(() =>
 );
 
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 function onProdutoChange(produtoId: string | null): void {

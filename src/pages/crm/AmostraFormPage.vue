@@ -186,6 +186,7 @@ const vendedorOpcoes = computed(() =>
       (u) =>
         u.status === UsuarioStatus.Ativo &&
         (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Consultor ||
           u.perfil === PerfilUsuario.Gerente ||
           u.perfil === PerfilUsuario.Diretor ||
           u.id === formulario.value.vendedorUsuarioId),
@@ -194,7 +195,7 @@ const vendedorOpcoes = computed(() =>
 );
 
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 const pedidoOpcoes = computed(() =>

@@ -62,24 +62,22 @@
       </div>
       <div class="col-12 col-md-4">
         <q-input
-          v-model="formulario.aliquotaIcms"
+          :model-value="formulario.aliquotaIcms"
           outlined
           label="Alíquota ICMS (%)"
-          type="number"
-          min="0"
-          step="0.01"
+          inputmode="decimal"
           :readonly="somenteLeitura"
+          @update:model-value="onNumero('aliquotaIcms', $event)"
         />
       </div>
       <div class="col-12 col-md-4">
         <q-input
-          v-model="formulario.mva"
+          :model-value="formulario.mva"
           outlined
           label="MVA (%)"
-          type="number"
-          min="0"
-          step="0.01"
+          inputmode="decimal"
           :readonly="somenteLeitura"
+          @update:model-value="onNumero('mva', $event)"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -90,6 +88,7 @@
           maxlength="4"
           hint="4 dígitos"
           inputmode="numeric"
+          :rules="somenteLeitura ? undefined : [cfopValidator]"
           :readonly="somenteLeitura"
         />
       </div>
@@ -101,6 +100,7 @@
           maxlength="4"
           hint="4 dígitos"
           inputmode="numeric"
+          :rules="somenteLeitura ? undefined : [cfopValidator]"
           :readonly="somenteLeitura"
         />
       </div>
@@ -124,7 +124,7 @@
 import { OrigemMercadoriaOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { ProdutoFiscalFormModel } from 'types/dtos/produto.dto';
-import { cest, ncm, obrigatorio } from 'utils/validators';
+import { cest, cfop, ncm, obrigatorio } from 'utils/validators';
 import { ref } from 'vue';
 
 defineProps<{
@@ -137,6 +137,11 @@ const formRef = ref<QForm | null>(null);
 
 const ncmValidator = ncm;
 const cestValidator = cest;
+const cfopValidator = cfop;
+
+function onNumero(campo: 'aliquotaIcms' | 'mva', valor: string | number | null): void {
+  formulario.value[campo] = valor === null || valor === undefined ? '' : String(valor);
+}
 
 async function validar(): Promise<boolean> {
   return (await formRef.value?.validate()) ?? false;

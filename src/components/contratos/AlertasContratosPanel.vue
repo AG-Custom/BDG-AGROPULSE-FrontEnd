@@ -49,14 +49,11 @@
       </template>
       <template #body-cell-acoes="props">
         <q-td :props="props">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="visibility"
-            color="primary"
-            descricao="Ver contrato"
-            :to="{
+          <agro-acoes-menu
+            :mostrar-editar="false"
+            :mostrar-status="false"
+            visualizar-label="Ver contrato"
+            :visualizar-to="{
               name: 'contrato-detalhe',
               params: { id: props.row.contratoId },
               query: { tipo: props.row.tipoContrato },
@@ -70,6 +67,7 @@
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';

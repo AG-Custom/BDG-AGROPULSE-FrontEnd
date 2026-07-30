@@ -207,7 +207,7 @@ const mapaVendedores = computed(() => {
 const mapaProdutos = computed(() => {
   const mapa = new Map<string, string>();
   for (const produto of produtos.value) {
-    mapa.set(produto.id, `${produto.codigo} — ${produto.descricao}`);
+    mapa.set(produto.id, `${produto.descricao}`);
   }
   return mapa;
 });

@@ -47,7 +47,7 @@
 
       <template #body-cell-precoUnitario="props">
         <q-td :props="props" class="text-metric">
-          {{ formatarMoeda(Number(props.row.precoUnitario.replace(',', '.')) || 0) }}
+          {{ formatarMoeda(parseMascaraMoeda(props.row.precoUnitario) ?? 0) }}
         </q-td>
       </template>
 
@@ -65,23 +65,14 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="props">
         <q-td :props="props" class="pedido-venda-itens__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar item"
-            @click="abrirDialogEditar(props.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover item"
-            @click="removerItem(props.row.chave)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            editar-label="Editar item"
+            excluir-label="Remover item"
+            @editar="abrirDialogEditar(props.row)"
+            @excluir="removerItem(props.row.chave)"
           />
         </q-td>
       </template>
@@ -113,7 +104,7 @@
                   map-options
                   aria-required="true"
                   :options="produtoOpcoes"
-                  :loading="carregandoProdutos"
+                  :loading="carregandoProdutos || carregandoItensTabela"
                   :rules="[obrigatorio]"
                   @update:model-value="onProdutoSelecionado"
                 />
@@ -132,14 +123,10 @@
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-input
+                <AgroMoneyInput
                   v-model="itemForm.precoUnitario"
-                  outlined
                   label="Preço unitário"
                   hint="Preço da tabela — sem fallback para preço de venda do produto"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
                   :loading="resolvendoPreco"
                   :rules="[quantidadePositiva]"
                 />
@@ -178,12 +165,15 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
+import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import type { QForm, QTableColumn } from 'quasar';
 import type { PedidoVendaItemFormModel } from 'types/dtos/pedido-venda.dto';
-import { formatarDecimal, formatarMoeda } from 'utils/formatters';
+import { formatarDecimal, formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import {
   criarChaveItem,
   criarItemFormVazio,
@@ -191,7 +181,7 @@ import {
   totalPedidoPreview,
 } from 'utils/mappers/pedido-venda.mapper';
 import { obrigatorio, percentualZeroACem, quantidadePositiva } from 'utils/validators';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   somenteLeitura?: boolean;
@@ -209,23 +199,26 @@ const {
 
 const { resolvendoPreco, resolverPreco } = usePrecificacao();
 
+const {
+  produtoOpcoes,
+  carregandoItensTabela,
+  produtoIdsPermitidos,
+} = useProdutosPorTabelaPreco(
+  () => props.tabelaPrecoId,
+  () => produtos.value,
+);
+
+const reResolverPrecosPendente = ref(false);
 const dialogAberto = ref(false);
 const indiceEdicao = ref<number | null>(null);
 const itemForm = ref<PedidoVendaItemFormModel>(criarItemFormVazio());
 const formRef = ref<QForm | null>(null);
 
-const produtoOpcoes = computed(() =>
-  produtos.value.map((produto) => ({
-    label: `${produto.codigo} — ${produto.descricao}`,
-    value: produto.id,
-  })),
-);
-
 const mapaProdutos = computed(() => {
   const mapa = new Map<string, string>();
 
   for (const produto of produtos.value) {
-    mapa.set(produto.id, `${produto.codigo} — ${produto.descricao}`);
+    mapa.set(produto.id, `${produto.descricao}`);
   }
 
   return mapa;
@@ -273,8 +266,63 @@ async function onProdutoSelecionado(produtoId: string): Promise<void> {
   });
 
   if (resolvido) {
-    itemForm.value.precoUnitario = String(resolvido.preco);
+    itemForm.value.precoUnitario = formatarMoedaParaInput(resolvido.preco);
   }
+}
+
+async function sincronizarItensComTabela(): Promise<void> {
+  if (carregandoItensTabela.value || props.somenteLeitura) {
+    return;
+  }
+
+  const deveReResolver = reResolverPrecosPendente.value;
+  reResolverPrecosPendente.value = false;
+
+  const ids = produtoIdsPermitidos.value;
+  const atualizados: PedidoVendaItemFormModel[] = [];
+  const tarefas: Promise<void>[] = [];
+
+  for (const item of itens.value) {
+    if (!item.produtoId) {
+      atualizados.push(item);
+      continue;
+    }
+
+    if (ids && !ids.has(item.produtoId)) {
+      continue;
+    }
+
+    atualizados.push(item);
+
+    if (deveReResolver) {
+      tarefas.push(
+        (async () => {
+          const resolvido = await resolverPreco({
+            produtoId: item.produtoId,
+            clienteId: props.clienteId || null,
+            tabelaPrecoId: props.tabelaPrecoId || null,
+          });
+
+          if (resolvido) {
+            item.precoUnitario = formatarMoedaParaInput(resolvido.preco);
+          }
+        })(),
+      );
+    }
+  }
+
+  itens.value = atualizados;
+
+  if (dialogAberto.value && itemForm.value.produtoId) {
+    if (ids && !ids.has(itemForm.value.produtoId)) {
+      itemForm.value.produtoId = '';
+      itemForm.value.precoUnitario = '';
+    } else if (deveReResolver) {
+      await onProdutoSelecionado(itemForm.value.produtoId);
+    }
+  }
+
+  await Promise.all(tarefas);
 }
 
 function abrirDialog(): void {
@@ -321,6 +369,20 @@ async function salvarItem(): Promise<void> {
 
   fecharDialog();
 }
+
+watch(
+  [() => props.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
+  (atual, anterior) => {
+    const tabelaAtual = String(atual[0] ?? '');
+    const tabelaAnterior = String(anterior?.[0] ?? '');
+
+    if (anterior != null && tabelaAtual !== tabelaAnterior) {
+      reResolverPrecosPendente.value = true;
+    }
+
+    void sincronizarItensComTabela();
+  },
+);
 
 onMounted(() => {
   void carregarProdutos({ ativo: true });

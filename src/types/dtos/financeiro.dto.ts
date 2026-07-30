@@ -17,21 +17,18 @@ export interface CondicaoPagamentoDto {
 }
 
 export interface CriarCondicaoPagamentoPayload {
-  codigo: string;
   nome: string;
   numeroParcelas: number;
   intervaloDias: number;
 }
 
 export interface EditarCondicaoPagamentoPayload {
-  codigo: string;
   nome: string;
   numeroParcelas: number;
   intervaloDias: number;
 }
 
 export interface CondicaoPagamentoFormModel {
-  codigo: string;
   nome: string;
   numeroParcelas: string;
   intervaloDias: string;

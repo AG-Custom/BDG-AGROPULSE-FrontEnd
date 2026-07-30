@@ -78,6 +78,15 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'notificacoes',
+        name: 'notificacoes',
+        component: () => import('pages/notificacoes/NotificacoesPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.notificacoes',
+          permissao: Permissoes.Notificacoes.Visualizar,
+        },
+      },
+      {
         path: 'unidades',
         name: 'unidades',
         component: () => import('pages/unidades/UnidadesListPage.vue'),
@@ -536,7 +545,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.formaPagamentoConfigNova',
           breadcrumbPais: ['navegacao.formasPagamentoConfig'],
-          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+          permissao: Permissoes.FormasPagamentoConfig.Editar,
         },
       },
       {
@@ -546,7 +555,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.formaPagamentoConfigEditar',
           breadcrumbPais: ['navegacao.formasPagamentoConfig'],
-          permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+          permissao: Permissoes.FormasPagamentoConfig.Editar,
         },
       },
       {
@@ -1169,6 +1178,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.ordensProducao',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1179,6 +1189,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoNova',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1189,6 +1200,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoEditar',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1199,6 +1211,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.ordemProducaoDetalhe',
           breadcrumbPais: ['navegacao.ordensProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1208,6 +1221,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.beneficiamentos',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1218,6 +1232,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.beneficiamentoNovo',
           breadcrumbPais: ['navegacao.beneficiamentos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1228,6 +1243,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.beneficiamentoEditar',
           breadcrumbPais: ['navegacao.beneficiamentos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1237,6 +1253,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.receitasProducao',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1247,6 +1264,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.receitaProducaoNova',
           breadcrumbPais: ['navegacao.receitasProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1257,6 +1275,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.receitaProducaoEditar',
           breadcrumbPais: ['navegacao.receitasProducao'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1266,6 +1285,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.laudos',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1276,6 +1296,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.laudoNovo',
           breadcrumbPais: ['navegacao.laudos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1286,6 +1307,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.laudoDetalhe',
           breadcrumbPais: ['navegacao.laudos'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1295,6 +1317,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.fichasTecnicas',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1305,6 +1328,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.fichaTecnicaNova',
           breadcrumbPais: ['navegacao.fichasTecnicas'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1315,6 +1339,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.fichaTecnicaEditar',
           breadcrumbPais: ['navegacao.fichasTecnicas'],
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1324,6 +1349,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.paradasLinha',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1333,6 +1359,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.oee',
           permissao: Permissoes.Producao.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1983,7 +2010,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.permissoesGranulares',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.PermissoesGranulares.Visualizar,
+          permissao: Permissoes.PermissoesGranulares.Configurar,
         },
       },
       {
@@ -1992,7 +2019,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/usuarios/UsuariosListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.usuarios',
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2002,7 +2029,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioNovo',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2012,7 +2039,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioEditar',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {
@@ -2022,7 +2049,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.usuarioVisualizar',
           breadcrumbPais: ['navegacao.usuarios'],
-          permissao: Permissoes.Usuarios.Visualizar,
+          permissao: Permissoes.Usuarios.Configurar,
         },
       },
       {

@@ -16,7 +16,7 @@
     </template>
 
     <empty-state
-      v-if="codigos.length === 0"
+      v-if="codigosInternos.length === 0"
       titulo="Nenhum código cadastrado"
       descricao="Adicione códigos SKU, EAN ou alternativos."
       icon="qr_code"
@@ -29,7 +29,7 @@
       row-key="id"
       hide-pagination
       class="produto-codigos__tabela"
-      :rows="codigos"
+      :rows="codigosInternos"
       :columns="colunas"
       :pagination="{ rowsPerPage: 0 }"
     >
@@ -48,24 +48,16 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="cell">
         <q-td :props="cell" class="produto-codigos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="edit"
-            color="primary"
-            descricao="Editar código"
-            @click="abrirDialogEditar(cell.row)"
-          />
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover código"
-            :loading="removendo"
-            @click="aoRemover(cell.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendoId === cell.row.id"
+            :disable="removendo"
+            editar-label="Editar código"
+            excluir-label="Remover código"
+            @editar="abrirDialogEditar(cell.row)"
+            @excluir="aoRemover(cell.row)"
           />
         </q-td>
       </template>
@@ -100,6 +92,7 @@
 
 <script setup lang="ts">
 import CodigoProdutoFormulario from 'components/produtos/CodigoProdutoFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -109,7 +102,7 @@ import { useProdutoCodigos } from 'composables/useProdutoCodigos';
 import type { ProdutoCodigoDto } from 'types/dtos/produto.dto';
 import { codigoDtoParaForm, criarCodigoFormVazio } from 'utils/mappers/produto.mapper';
 import type { QTableColumn } from 'quasar';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   produtoId?: string;
@@ -121,6 +114,7 @@ const codigos = defineModel<ProdutoCodigoDto[]>('codigos', { required: true });
 const {
   salvando,
   removendo,
+  removendoId,
   definirCodigos,
   adicionar,
   editar,
@@ -157,17 +151,17 @@ watch(
 
     definirCodigos(lista);
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 watch(
   codigosInternos,
-  (lista) => {
+  async (lista) => {
     sincronizando.value = true;
     codigos.value = [...lista];
+    await nextTick();
     sincronizando.value = false;
   },
-  { deep: true },
 );
 
 function rotuloTipo(tipo: TipoCodigoProdutoValor): string {

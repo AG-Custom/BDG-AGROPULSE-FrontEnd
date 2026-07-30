@@ -11,4 +11,6 @@
   --z-index-popover: 600;
   --z-index-toast: 700;
   --z-index-tooltip: 800;
+  /* Acima do q-dialog do Quasar (~6000) para confirmações sobre modais */
+  --z-index-swal: 7000;
 }

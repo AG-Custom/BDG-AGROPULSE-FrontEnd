@@ -8,14 +8,14 @@ import type {
   TabelaPrecoItemFormModel,
   TabelaPrecoItemPayload,
 } from 'types/dtos/tabela-preco.dto';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 
-export function criarTabelaPrecoFormVazia(): TabelaPrecoFormModel {
+export function criarTabelaPrecoFormVazia(clienteId: string | null = null): TabelaPrecoFormModel {
   return {
-    codigo: '',
     nome: '',
     vigenciaInicio: '',
     vigenciaFim: '',
-    clienteId: null,
+    clienteId,
     grupoComercial: null,
     canalVenda: null,
     regiao: '',
@@ -24,7 +24,6 @@ export function criarTabelaPrecoFormVazia(): TabelaPrecoFormModel {
 
 export function tabelaPrecoDtoParaForm(dto: TabelaPrecoDto): TabelaPrecoFormModel {
   return {
-    codigo: dto.codigo,
     nome: dto.nome,
     vigenciaInicio: dto.vigenciaInicio,
     vigenciaFim: dto.vigenciaFim ?? '',
@@ -47,7 +46,6 @@ function parseNumeroOpcional(valor: string): number | null {
 
 export function formParaSalvarTabelaPrecoPayload(form: TabelaPrecoFormModel): SalvarTabelaPrecoPayload {
   return {
-    codigo: form.codigo.trim(),
     nome: form.nome.trim(),
     vigenciaInicio: form.vigenciaInicio.trim(),
     vigenciaFim: form.vigenciaFim.trim() || null,
@@ -69,7 +67,7 @@ export function criarItemFormVazio(): TabelaPrecoItemFormModel {
 export function itemDtoParaForm(dto: TabelaPrecoItemDto): TabelaPrecoItemFormModel {
   return {
     produtoId: dto.produtoId,
-    preco: String(dto.preco),
+    preco: formatarMoedaParaInput(dto.preco),
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
   };
@@ -77,7 +75,7 @@ export function itemDtoParaForm(dto: TabelaPrecoItemDto): TabelaPrecoItemFormMod
 
 export function itemDtoParaEdicaoForm(dto: TabelaPrecoItemDto): TabelaPrecoItemEdicaoFormModel {
   return {
-    preco: String(dto.preco),
+    preco: formatarMoedaParaInput(dto.preco),
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
   };
@@ -86,7 +84,7 @@ export function itemDtoParaEdicaoForm(dto: TabelaPrecoItemDto): TabelaPrecoItemE
 export function formParaItemPayload(form: TabelaPrecoItemFormModel): TabelaPrecoItemPayload {
   return {
     produtoId: form.produtoId!,
-    preco: Number(form.preco.replace(',', '.')),
+    preco: parseMascaraMoeda(form.preco) ?? 0,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
   };
 }
@@ -95,7 +93,7 @@ export function formParaEditarItemPayload(
   form: TabelaPrecoItemEdicaoFormModel,
 ): EditarTabelaPrecoItemPayload {
   return {
-    preco: Number(form.preco.replace(',', '.')),
+    preco: parseMascaraMoeda(form.preco) ?? 0,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
   };
 }

@@ -1,4 +1,5 @@
 import { OrigemMovimentacaoEstoque } from 'constants/enums';
+import { parseMascaraMoeda } from 'utils/formatters';
 import type {
   AjusteEstoqueFormModel,
   AjusteEstoquePayload,
@@ -39,7 +40,6 @@ export function criarEntradaFormVazia(): EntradaEstoqueFormModel {
     galpao: '',
     corredor: '',
     prateleira: '',
-    codigoBarras: '',
   };
 }
 
@@ -49,7 +49,7 @@ export function formParaEntradaPayload(form: EntradaEstoqueFormModel): EntradaEs
     numeroLote: form.numeroLote.trim() || null,
     dataValidade: form.dataValidade || null,
     dataFabricacao: form.dataFabricacao || null,
-    custoUnitario: parseNumeroOpcional(form.custoUnitario),
+    custoUnitario: parseMascaraMoeda(form.custoUnitario),
     quantidade: parseNumeroObrigatorio(form.quantidade),
     deposito: form.deposito.trim() || null,
     galpao: form.galpao.trim() || null,
@@ -66,7 +66,6 @@ export function criarSaidaFormVazia(): SaidaEstoqueFormModel {
     usarFefo: true,
     motivo: OrigemMovimentacaoEstoque.Manual,
     justificativa: '',
-    codigoBarras: '',
   };
 }
 

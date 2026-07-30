@@ -54,22 +54,68 @@ import NotificacoesMenu from 'components/layout/NotificacoesMenu.vue';
 import UnidadeSwitcher from 'components/layout/UnidadeSwitcher.vue';
 import AgroLogo from 'components/shared/AgroLogo.vue';
 import { useAuth } from 'composables/useAuth';
+import { useNotificacoes } from 'composables/useNotificacoes';
 import { Permissoes } from 'constants/permissoes';
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+
+const INTERVALO_POLLING_MS = 60_000;
 
 const drawer = ref(true);
 const router = useRouter();
 const { sair: sairAuth, usuario, unidadeId, possuiPermissao } = useAuth();
+const { carregar: carregarNotificacoes } = useNotificacoes();
 
 const nomeUsuario = computed(() => usuario.value?.nome ?? '');
 const podeVerNotificacoes = computed(() =>
   possuiPermissao(Permissoes.Notificacoes.Visualizar),
 );
+
+let pollingTimer: ReturnType<typeof setInterval> | undefined;
+
+function iniciarPolling(): void {
+  pararPolling();
+
+  if (!podeVerNotificacoes.value) {
+    return;
+  }
+
+  void carregarNotificacoes({ apenasNaoLidas: true });
+  pollingTimer = setInterval(() => {
+    void carregarNotificacoes({ apenasNaoLidas: true });
+  }, INTERVALO_POLLING_MS);
+}
+
+function pararPolling(): void {
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = undefined;
+  }
+}
+
 async function sair(): Promise<void> {
+  pararPolling();
   await sairAuth();
   await router.push({ name: 'login' });
 }
+
+watch(podeVerNotificacoes, (pode) => {
+  if (pode) {
+    iniciarPolling();
+  } else {
+    pararPolling();
+  }
+});
+
+onMounted(() => {
+  if (podeVerNotificacoes.value) {
+    iniciarPolling();
+  }
+});
+
+onUnmounted(() => {
+  pararPolling();
+});
 </script>
 
 <style scoped>

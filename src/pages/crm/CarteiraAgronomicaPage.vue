@@ -89,14 +89,11 @@
             </template>
             <template #body-cell-acoes="props">
               <q-td :props="props">
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="person"
-                  color="primary"
-                  descricao="Ver cliente"
-                  :to="{ name: 'cliente-editar', params: { id: props.row.clienteId } }"
+                <agro-acoes-menu
+                  :mostrar-editar="false"
+                  :mostrar-status="false"
+                  :visualizar-to="{ name: 'cliente-editar', params: { id: props.row.clienteId } }"
+                  visualizar-label="Ver cliente"
                 />
               </q-td>
             </template>
@@ -115,6 +112,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';
@@ -156,6 +154,7 @@ const vendedorOpcoes = computed(() =>
       (u) =>
         u.status === UsuarioStatus.Ativo &&
         (u.perfil === PerfilUsuario.Vendedor ||
+          u.perfil === PerfilUsuario.Consultor ||
           u.perfil === PerfilUsuario.Gerente ||
           u.perfil === PerfilUsuario.Diretor),
     )

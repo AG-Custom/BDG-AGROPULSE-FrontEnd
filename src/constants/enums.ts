@@ -70,6 +70,7 @@ export const PerfilUsuario = {
   Diretor: 'Diretor',
   Gerente: 'Gerente',
   Vendedor: 'Vendedor',
+  Consultor: 'Consultor',
   Administrativo: 'Administrativo',
   Operacional: 'Operacional',
   Rh: 'Rh',
@@ -79,11 +80,12 @@ export const PerfilUsuario = {
 export type PerfilUsuarioValor = (typeof PerfilUsuario)[keyof typeof PerfilUsuario];
 
 export const PerfilUsuarioOpcoes = [
-  { label: 'Diretor', value: PerfilUsuario.Diretor },
+  { label: 'Diretor (CEO)', value: PerfilUsuario.Diretor },
   { label: 'Gerente', value: PerfilUsuario.Gerente },
-  { label: 'Vendedor', value: PerfilUsuario.Vendedor },
-  { label: 'Administrativo', value: PerfilUsuario.Administrativo },
-  { label: 'Operacional', value: PerfilUsuario.Operacional },
+  { label: 'Vendedor externo', value: PerfilUsuario.Vendedor },
+  { label: 'Consultor técnico', value: PerfilUsuario.Consultor },
+  { label: 'Administrativo (Financeiro)', value: PerfilUsuario.Administrativo },
+  { label: 'Operacional (Loja)', value: PerfilUsuario.Operacional },
   { label: 'RH', value: PerfilUsuario.Rh },
   { label: 'Administrador (legado)', value: PerfilUsuario.Administrador },
 ];
@@ -93,7 +95,9 @@ export const PerfilUsuarioCadastroOpcoes = PerfilUsuarioOpcoes.filter(
 );
 
 export function isPerfilUsuarioGlobal(perfil: PerfilUsuarioValor): boolean {
-  return perfil === PerfilUsuario.Administrador;
+  return (
+    perfil === PerfilUsuario.Administrador || perfil === PerfilUsuario.Diretor
+  );
 }
 
 export const ColaboradorStatus = {
@@ -112,6 +116,7 @@ export const CargoColaborador = {
   Diretor: 'Diretor',
   Gerente: 'Gerente',
   Vendedor: 'Vendedor',
+  Consultor: 'Consultor',
   Administrativo: 'Administrativo',
   Operacional: 'Operacional',
   Rh: 'Rh',
@@ -124,6 +129,7 @@ export const CargoColaboradorOpcoes = [
   { label: 'Diretor', value: CargoColaborador.Diretor },
   { label: 'Gerente', value: CargoColaborador.Gerente },
   { label: 'Vendedor', value: CargoColaborador.Vendedor },
+  { label: 'Consultor técnico', value: CargoColaborador.Consultor },
   { label: 'Administrativo', value: CargoColaborador.Administrativo },
   { label: 'Operacional', value: CargoColaborador.Operacional },
   { label: 'RH', value: CargoColaborador.Rh },
@@ -310,22 +316,16 @@ export const MetodoCusteioOpcoes = [
 
 export const CanalVenda = {
   Balcao: 'Balcao',
-  Varejo: 'Varejo',
-  Atacado: 'Atacado',
-  Ecommerce: 'Ecommerce',
   Representante: 'Representante',
-  Outro: 'Outro',
+  Varejo: 'Varejo',
 } as const;
 
 export type CanalVendaValor = (typeof CanalVenda)[keyof typeof CanalVenda];
 
 export const CanalVendaOpcoes = [
   { label: 'Balcão', value: CanalVenda.Balcao },
-  { label: 'Varejo', value: CanalVenda.Varejo },
-  { label: 'Atacado', value: CanalVenda.Atacado },
-  { label: 'E-commerce', value: CanalVenda.Ecommerce },
   { label: 'Representante', value: CanalVenda.Representante },
-  { label: 'Outro', value: CanalVenda.Outro },
+  { label: 'Varejo', value: CanalVenda.Varejo },
 ];
 
 export const TipoMovimentacaoEstoque = {
@@ -782,6 +782,23 @@ export const NotificacaoTipo = {
   PedidoAprovado: 'PedidoAprovado',
   PedidoRecusado: 'PedidoRecusado',
   PedidoExpirado: 'PedidoExpirado',
+  RevisaoLimiteCredito: 'RevisaoLimiteCredito',
+  PosVenda: 'PosVenda',
+  AniversarioCliente: 'AniversarioCliente',
+  DataComemorativa: 'DataComemorativa',
+  ClienteSemComprar: 'ClienteSemComprar',
+  AniversariantesCarteira: 'AniversariantesCarteira',
+  ComissoesMes: 'ComissoesMes',
+  EstoqueMinimo: 'EstoqueMinimo',
+  ValidadeProxima: 'ValidadeProxima',
+  BoletoCliente: 'BoletoCliente',
+  BoletoFornecedor: 'BoletoFornecedor',
+  ContasVencer3Dias: 'ContasVencer3Dias',
+  ContasVencer7Dias: 'ContasVencer7Dias',
+  ContasVencer15Dias: 'ContasVencer15Dias',
+  ContasVencidas: 'ContasVencidas',
+  MetasLoja: 'MetasLoja',
+  PedidoAguardandoAprovacao: 'PedidoAguardandoAprovacao',
 } as const;
 
 export type NotificacaoTipoValor =
@@ -792,6 +809,23 @@ export const NotificacaoTipoOpcoes = [
   { label: 'Pedido aprovado', value: NotificacaoTipo.PedidoAprovado },
   { label: 'Pedido recusado', value: NotificacaoTipo.PedidoRecusado },
   { label: 'Pedido expirado', value: NotificacaoTipo.PedidoExpirado },
+  { label: 'Revisão de limite de crédito', value: NotificacaoTipo.RevisaoLimiteCredito },
+  { label: 'Pós-venda', value: NotificacaoTipo.PosVenda },
+  { label: 'Aniversário de cliente', value: NotificacaoTipo.AniversarioCliente },
+  { label: 'Data comemorativa', value: NotificacaoTipo.DataComemorativa },
+  { label: 'Cliente sem comprar', value: NotificacaoTipo.ClienteSemComprar },
+  { label: 'Aniversariantes da carteira', value: NotificacaoTipo.AniversariantesCarteira },
+  { label: 'Comissões do mês', value: NotificacaoTipo.ComissoesMes },
+  { label: 'Estoque mínimo', value: NotificacaoTipo.EstoqueMinimo },
+  { label: 'Validade próxima', value: NotificacaoTipo.ValidadeProxima },
+  { label: 'Boleto de cliente', value: NotificacaoTipo.BoletoCliente },
+  { label: 'Boleto de fornecedor', value: NotificacaoTipo.BoletoFornecedor },
+  { label: 'Contas a vencer em 3 dias', value: NotificacaoTipo.ContasVencer3Dias },
+  { label: 'Contas a vencer em 7 dias', value: NotificacaoTipo.ContasVencer7Dias },
+  { label: 'Contas a vencer em 15 dias', value: NotificacaoTipo.ContasVencer15Dias },
+  { label: 'Contas vencidas', value: NotificacaoTipo.ContasVencidas },
+  { label: 'Metas da loja', value: NotificacaoTipo.MetasLoja },
+  { label: 'Pedido aguardando aprovação', value: NotificacaoTipo.PedidoAguardandoAprovacao },
 ];
 
 export const NotificacaoPrioridade = {
@@ -1195,6 +1229,19 @@ export const OrigemGenealogiaLote = {
 
 export type OrigemGenealogiaLoteValor =
   (typeof OrigemGenealogiaLote)[keyof typeof OrigemGenealogiaLote];
+
+export const TipoOperacaoEmpresa = {
+  Revenda: 'Revenda',
+  Industria: 'Industria',
+} as const;
+
+export type TipoOperacaoEmpresaValor =
+  (typeof TipoOperacaoEmpresa)[keyof typeof TipoOperacaoEmpresa];
+
+export const TipoOperacaoEmpresaOpcoes = [
+  { label: 'Revenda', value: TipoOperacaoEmpresa.Revenda },
+  { label: 'Indústria', value: TipoOperacaoEmpresa.Industria },
+];
 
 export const TipoOperacaoSafras = {
   Revenda: 'Revenda',

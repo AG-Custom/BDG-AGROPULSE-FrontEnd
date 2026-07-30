@@ -3,6 +3,7 @@ import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import type { TipoDestinatarioFiscalValor } from 'constants/enums';
 import { fiscalGestaoService } from 'services/fiscal-gestao.service';
 import type { CalculoImpostosDto } from 'types/dtos/fiscal-gestao.dto';
+import { parseMascaraMoedaObrigatorio } from 'utils/formatters';
 import { ref } from 'vue';
 
 function toNumber(value: string): number {
@@ -32,7 +33,7 @@ export function useCalculoImpostos() {
         itens: [
           {
             produtoId: params.produtoId.trim(),
-            valor: toNumber(params.valor),
+            valor: parseMascaraMoedaObrigatorio(params.valor),
             quantidade: toNumber(params.quantidade),
           },
         ],

@@ -4,11 +4,26 @@ import { messageService } from 'services/message.service';
 import { tabelaPrecoService } from 'services/tabela-preco.service';
 import type {
   ListarTabelasPrecoParams,
+  TabelaPrecoDto,
   TabelaPrecoFormModel,
   TabelaPrecoResumoDto,
 } from 'types/dtos/tabela-preco.dto';
 import { formParaSalvarTabelaPrecoPayload } from 'utils/mappers/tabela-preco.mapper';
 import { ref } from 'vue';
+
+function tabelaDtoParaResumo(dto: TabelaPrecoDto): TabelaPrecoResumoDto {
+  return {
+    id: dto.id,
+    empresaId: dto.empresaId,
+    codigo: dto.codigo,
+    nome: dto.nome,
+    vigenciaInicio: dto.vigenciaInicio,
+    vigenciaFim: dto.vigenciaFim,
+    ativo: dto.ativo,
+    ehPadrao: dto.ehPadrao,
+    clienteId: dto.clienteId,
+  };
+}
 
 export function useTabelasPreco() {
   const tabelas = ref<TabelaPrecoResumoDto[]>([]);
@@ -37,8 +52,19 @@ export function useTabelasPreco() {
     salvando.value = true;
 
     try {
-      await tabelaPrecoService.criar(formParaSalvarTabelaPrecoPayload(form));
+      const criada = await tabelaPrecoService.criar(formParaSalvarTabelaPrecoPayload(form));
       sucesso('Tabela de preço cadastrada com sucesso.');
+      await carregar(ultimosParams.value);
+
+      const resumo = tabelaDtoParaResumo(criada);
+      const indice = tabelas.value.findIndex((tabela) => tabela.id === criada.id);
+
+      if (indice >= 0) {
+        tabelas.value[indice] = { ...tabelas.value[indice], ...resumo };
+      } else {
+        tabelas.value = [resumo, ...tabelas.value];
+      }
+
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -63,11 +89,11 @@ export function useTabelasPreco() {
     }
   }
 
-  async function inativar(tabelaId: string): Promise<boolean> {
+  async function inativar(tabelaId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await tabelaPrecoService.inativar(tabelaId);
+      await tabelaPrecoService.inativar(tabelaId, justificativa);
       sucesso('Tabela de preço inativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -96,18 +122,18 @@ export function useTabelasPreco() {
   }
 
   async function solicitarInativacao(tabela: TabelaPrecoResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar tabela de preço',
       mensagem: `Deseja inativar a tabela ${tabela.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(tabela.id);
+    return inativar(tabela.id, justificativa);
   }
 
   async function solicitarAtivacao(tabela: TabelaPrecoResumoDto): Promise<boolean> {

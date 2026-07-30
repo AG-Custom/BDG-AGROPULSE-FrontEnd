@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Planejamento de safras"
@@ -60,46 +60,49 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'safra-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="podeEncerrar(props.row.status)"
-                flat
-                round
-                dense
-                icon="flag"
-                color="positive"
-                descricao="Encerrar"
-                :loading="salvando"
-                @click="encerrar(props.row.id)"
-              />
-              <agro-btn
-                v-if="podeCancelar(props.row.status)"
-                flat
-                round
-                dense
-                icon="cancel"
-                color="negative"
-                descricao="Cancelar"
-                :loading="salvando"
-                @click="cancelar(props.row.id)"
-              />
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-status="false"
+                :editar-to="{ name: 'safra-editar', params: { id: props.row.id } }"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-if="podeEncerrar(props.row.status)"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="encerrar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="flag" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Encerrar</q-item-section>
+                </q-item>
+                <q-item
+                  v-if="podeCancelar(props.row.status)"
+                  v-close-popup
+                  clickable
+                  class="agro-acoes-menu__item"
+                  @click="cancelar(props.row.id)"
+                >
+                  <q-item-section avatar><q-icon name="cancel" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -109,7 +112,12 @@ import { StatusSafra, StatusSafraOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { SafraDto } from 'types/dtos/safras.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Planejamento de safras');
 
 const { safras, carregando, salvando, carregar, encerrar, cancelar } = useSafras();
 
@@ -150,6 +158,11 @@ function podeCancelar(status: string): boolean {
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

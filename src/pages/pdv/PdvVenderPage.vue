@@ -62,26 +62,6 @@
             <div class="col-12 col-md-4">
               <q-toggle v-model="formulario.aPrazo" label="Venda a prazo" />
             </div>
-            <div class="col-12">
-              <q-input
-                v-model="formulario.codigoBarras"
-                outlined
-                label="Código de barras / SKU"
-                hint="Pressione Enter para adicionar"
-                @keyup.enter="adicionarPorCodigo"
-              >
-                <template #append>
-                  <agro-btn
-                    flat
-                    dense
-                    icon="qr_code_scanner"
-                    descricao="Buscar produto por código"
-                    :loading="buscandoCodigo"
-                    @click="adicionarPorCodigo"
-                  />
-                </template>
-              </q-input>
-            </div>
           </div>
 
           <div class="pdv-vender__itens-header">
@@ -103,6 +83,7 @@
                 emit-value
                 map-options
                 :options="produtoOpcoes"
+                :loading="carregandoItensTabela"
                 :rules="[obrigatorio]"
                 @update:model-value="(id: string) => void onProdutoItem(index, id)"
               />
@@ -111,13 +92,10 @@
               <q-input v-model="item.quantidade" outlined dense label="Qtd" type="number" :rules="[obrigatorio]" />
             </div>
             <div class="col-6 col-md-2">
-              <q-input
+              <AgroMoneyInput
                 v-model="item.precoUnitario"
-                outlined
                 dense
                 label="Preço"
-                type="number"
-                step="0.01"
                 :loading="resolvendoPreco"
                 :rules="[obrigatorio]"
               />
@@ -174,15 +152,7 @@
                 />
               </div>
               <div class="col-8 col-md-5">
-                <q-input
-                  v-model="pagamento.valor"
-                  outlined
-                  dense
-                  label="Valor"
-                  type="number"
-                  step="0.01"
-                  :rules="[obrigatorio]"
-                />
+                <AgroMoneyInput v-model="pagamento.valor" dense label="Valor" :rules="[obrigatorio]" />
               </div>
               <div class="col-4 col-md-2">
                 <agro-btn
@@ -227,19 +197,20 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useClientes } from 'composables/useClientes';
-import { useEstoqueDispositivos } from 'composables/useEstoqueDispositivos';
 import { useNotificacao } from 'composables/useNotificacao';
 import { usePdv } from 'composables/usePdv';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
+import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import { FormaPagamento, FormaPagamentoPdvOpcoes } from 'constants/enums';
 import type {
   PdvItemFormModel,
   PdvPagamentoFormModel,
   PdvVendaFormModel,
 } from 'types/dtos/pdv.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -267,7 +238,6 @@ const router = useRouter();
 const { salvando, vender } = usePdv();
 const { clientes, carregando: carregandoClientes, carregar: carregarClientes } = useClientes();
 const { produtos, carregar: carregarProdutos } = useProdutos();
-const { buscandoCodigo, buscarProdutoPorCodigo } = useEstoqueDispositivos();
 const {
   tabelaOpcoes,
   tabelaPadraoId,
@@ -285,11 +255,20 @@ const formulario = ref<PdvVendaFormModel>({
   clienteDocumentoAvulso: '',
   tabelaPrecoId: '',
   aPrazo: false,
-  codigoBarras: '',
   itens: [novoItem()],
   pagamentos: [novoPagamento()],
 });
 
+const {
+  produtoOpcoes,
+  carregandoItensTabela,
+  produtoIdsPermitidos,
+} = useProdutosPorTabelaPreco(
+  () => formulario.value.tabelaPrecoId,
+  () => produtos.value,
+);
+
+const reResolverPrecosPendente = ref(false);
 const filtroCliente = ref('');
 
 const clienteOpcoes = computed(() =>
@@ -307,21 +286,17 @@ const clienteOpcoesFiltradas = computed(() => {
   return clienteOpcoes.value.filter((opcao) => opcao.label.toLowerCase().includes(termo));
 });
 
-const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
-);
-
 const totalItens = computed(() =>
   formulario.value.itens.reduce((acc, item) => {
     const qtd = Number(item.quantidade) || 0;
-    const preco = Number(item.precoUnitario) || 0;
+    const preco = parseMascaraMoeda(item.precoUnitario) ?? 0;
     return acc + qtd * preco;
   }, 0),
 );
 
 const totalPago = computed(() =>
   formulario.value.pagamentos.reduce(
-    (acc, pagamento) => acc + (Number(pagamento.valor.replace(',', '.')) || 0),
+    (acc, pagamento) => acc + (parseMascaraMoeda(pagamento.valor) ?? 0),
     0,
   ),
 );
@@ -376,26 +351,40 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
   });
 
   if (resolvido) {
-    formulario.value.itens[index].precoUnitario = String(resolvido.preco);
+    formulario.value.itens[index].precoUnitario = formatarMoedaParaInput(resolvido.preco);
   }
 }
 
-async function adicionarPorCodigo(): Promise<void> {
-  const produto = await buscarProdutoPorCodigo(formulario.value.codigoBarras);
-  if (!produto) {
+async function sincronizarItensComTabela(): Promise<void> {
+  if (carregandoItensTabela.value) {
     return;
   }
 
-  let alvo = formulario.value.itens.find((item) => !item.produtoId);
-  if (!alvo) {
-    formulario.value.itens.push(novoItem());
-    alvo = formulario.value.itens[formulario.value.itens.length - 1];
+  const deveReResolver = reResolverPrecosPendente.value;
+  reResolverPrecosPendente.value = false;
+
+  const ids = produtoIdsPermitidos.value;
+  const tarefas: Promise<void>[] = [];
+
+  for (let index = 0; index < formulario.value.itens.length; index++) {
+    const item = formulario.value.itens[index];
+
+    if (!item.produtoId) {
+      continue;
+    }
+
+    if (ids && !ids.has(item.produtoId)) {
+      item.produtoId = '';
+      item.precoUnitario = '';
+      continue;
+    }
+
+    if (deveReResolver) {
+      tarefas.push(onProdutoItem(index, item.produtoId));
+    }
   }
 
-  alvo.produtoId = produto.id;
-  const indice = formulario.value.itens.findIndex((item) => item.chave === alvo!.chave);
-  await onProdutoItem(indice, produto.id);
-  formulario.value.codigoBarras = '';
+  await Promise.all(tarefas);
 }
 
 async function salvar(): Promise<void> {
@@ -415,6 +404,20 @@ watch(tabelaPadraoId, (id) => {
     formulario.value.tabelaPrecoId = id;
   }
 });
+
+watch(
+  [() => formulario.value.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
+  (atual, anterior) => {
+    const tabelaAtual = String(atual[0] ?? '');
+    const tabelaAnterior = String(anterior?.[0] ?? '');
+
+    if (anterior != null && tabelaAtual !== tabelaAnterior) {
+      reResolverPrecosPendente.value = true;
+    }
+
+    void sincronizarItensComTabela();
+  },
+);
 
 onMounted(async () => {
   void carregarClientes({ ativo: true });

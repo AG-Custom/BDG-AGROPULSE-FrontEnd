@@ -4,6 +4,7 @@ import { onboardingService } from 'services/onboarding.service';
 import { useAuthStore } from 'stores/auth.store';
 import type { CriarEmpresaPayload, EmpresaFormModel, UnidadeFormModel } from 'types/dtos/onboarding.dto';
 import { criarUnidadeVazia } from 'types/dtos/onboarding.dto';
+import { TipoOperacaoEmpresa } from 'constants/enums';
 import { apenasDigitos } from 'utils/formatters';
 
 interface OnboardingState {
@@ -17,6 +18,7 @@ export const useOnboardingStore = defineStore('onboarding', {
       razaoSocial: '',
       nomeFantasia: '',
       cnpj: '',
+      tipoOperacao: TipoOperacaoEmpresa.Revenda,
     },
     unidades: [criarUnidadeVazia(true)],
   }),
@@ -53,6 +55,7 @@ export const useOnboardingStore = defineStore('onboarding', {
         razaoSocial: this.empresa.razaoSocial.trim(),
         nomeFantasia: this.empresa.nomeFantasia.trim(),
         cnpj: apenasDigitos(this.empresa.cnpj),
+        tipoOperacao: this.empresa.tipoOperacao,
         unidades: this.unidades.map(({ id: _id, ...unidade }) => ({
           ...unidade,
           telefone: apenasDigitos(unidade.telefone),
@@ -70,6 +73,7 @@ export const useOnboardingStore = defineStore('onboarding', {
 
       const authStore = useAuthStore();
       await authStore.renovarTokens();
+      await authStore.verificar();
 
       return resposta;
     },

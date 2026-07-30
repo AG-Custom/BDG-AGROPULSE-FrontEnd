@@ -21,6 +21,7 @@ export function useFornecedores() {
   const carregando = ref(false);
   const salvando = ref(false);
   const inativando = ref(false);
+  const ativando = ref(false);
   const exportando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
@@ -67,11 +68,11 @@ export function useFornecedores() {
     }
   }
 
-  async function inativar(fornecedorId: string): Promise<boolean> {
+  async function inativar(fornecedorId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await fornecedorService.inativar(fornecedorId);
+      await fornecedorService.inativar(fornecedorId, justificativa);
       sucesso('Fornecedor inativado com sucesso.');
       return true;
     } catch (e) {
@@ -82,20 +83,45 @@ export function useFornecedores() {
     }
   }
 
+  async function ativar(fornecedorId: string): Promise<boolean> {
+    ativando.value = true;
+
+    try {
+      await fornecedorService.ativar(fornecedorId);
+      sucesso('Fornecedor ativado com sucesso.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      ativando.value = false;
+    }
+  }
+
   async function solicitarInativacao(fornecedor: FornecedorResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar fornecedor',
       mensagem: `Deseja inativar o fornecedor ${fornecedor.razaoSocial}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    const sucessoInativacao = await inativar(fornecedor.id);
-    return sucessoInativacao;
+    return inativar(fornecedor.id, justificativa);
+  }
+
+  async function solicitarAtivacao(fornecedor: FornecedorResumoDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Ativar fornecedor',
+      mensagem: `Deseja reativar o fornecedor ${fornecedor.razaoSocial}?`,
+      textoConfirmar: 'Ativar',
+      icone: 'info',
+    });
+
+    return confirmou ? ativar(fornecedor.id) : false;
   }
 
   async function exportar(
@@ -127,11 +153,13 @@ export function useFornecedores() {
     carregando,
     salvando,
     inativando,
+    ativando,
     exportando,
     carregar,
     criar,
     editar,
     solicitarInativacao,
+    solicitarAtivacao,
     exportar,
     rotuloDocumento,
   };

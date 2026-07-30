@@ -2,18 +2,6 @@
   <q-form ref="formRef" class="categoria-produto-formulario agro-formulario" greedy :class="{ 'agro-formulario--bloqueado': somenteLeitura }">
     <fieldset class="agro-formulario__fieldset">
 <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.codigo"
-          outlined
-          label="Código"
-          class="field-required"
-          maxlength="30"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
-      </div>
       <div class="col-12 col-md-8">
         <q-input
           v-model="formulario.nome"

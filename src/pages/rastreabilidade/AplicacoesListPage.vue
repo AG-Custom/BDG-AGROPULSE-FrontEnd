@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Aplicações de insumos" subtitulo="Registro de aplicações por talhão.">
       <agro-btn
@@ -106,34 +106,33 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'aplicacao-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="onRemover(props.row.id)"
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'aplicacao-editar', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -143,7 +142,12 @@ import { useSafras } from 'composables/useSafras';
 import type { QTableColumn } from 'quasar';
 import type { AplicacaoInsumoDto } from 'types/dtos/rastreabilidade.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Aplicações de insumos');
 
 const {
   aplicacoes,
@@ -175,7 +179,7 @@ const mapaTalhoes = computed(() => {
 });
 const mapaProdutos = computed(() => {
   const m = new Map<string, string>();
-  for (const p of produtos.value) m.set(p.id, `${p.codigo} — ${p.descricao}`);
+  for (const p of produtos.value) m.set(p.id, `${p.descricao}`);
   return m;
 });
 
@@ -215,6 +219,11 @@ onMounted(() => {
   void carregarSafras();
   void carregarAplicacoes();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

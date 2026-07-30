@@ -8,9 +8,8 @@
         <q-form greedy class="agro-formulario" @submit.prevent="confirmar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <q-input
+              <AgroMoneyInput
                 v-model="form.valorAdicional"
-                outlined
                 label="Valor adicional"
                 class="field-required"
                 :rules="[obrigatorio]"
@@ -37,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import type { ComplementarFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { obrigatorio } from 'utils/validators';
 import { reactive, watch } from 'vue';

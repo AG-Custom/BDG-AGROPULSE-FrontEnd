@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+import { usePerfilSafras } from 'composables/usePerfilSafras';
 import { useAuthStore } from 'stores/auth.store';
 
 import { routes } from './routes';
@@ -61,6 +62,14 @@ router.beforeEach(async (to) => {
   const permissao = to.meta.permissao;
   if (typeof permissao === 'string' && !authStore.possuiPermissao(permissao)) {
     return { name: 'dashboard' };
+  }
+
+  if (to.meta.requerIndustria && temEmpresa) {
+    const { isIndustria, carregarPerfil } = usePerfilSafras();
+    await carregarPerfil();
+    if (!isIndustria.value) {
+      return { name: 'dashboard' };
+    }
   }
 
   return true;

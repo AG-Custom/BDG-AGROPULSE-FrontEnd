@@ -3,23 +3,11 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="produto-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.codigo"
-          outlined
-          label="Código"
-          class="field-required"
-          maxlength="50"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-8">
+      <div class="col-12">
         <q-input
           v-model="formulario.descricao"
           outlined
-          label="Descrição"
+          label="Nome"
           class="field-required"
           maxlength="300"
           aria-required="true"
@@ -113,14 +101,10 @@
     <h3 class="produto-formulario__secao-titulo">Comercial</h3>
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-4">
-        <q-input
+        <AgroMoneyInput
           v-model="formulario.precoVenda"
-          outlined
           label="Preço de venda"
           class="field-required"
-          type="number"
-          min="0"
-          step="0.01"
           aria-required="true"
           :rules="[obrigatorio]"
           :readonly="somenteLeitura"
@@ -194,6 +178,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
 import { MetodoCusteioOpcoes, TipoProdutoOpcoes } from 'constants/enums';

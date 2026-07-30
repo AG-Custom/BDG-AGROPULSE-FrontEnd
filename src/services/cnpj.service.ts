@@ -15,7 +15,11 @@ export const cnpjService = {
     return api.put<CnpjEmpresaDto>(`/empresas/cnpjs/${cnpjId}`, payload).then((r) => r.data);
   },
 
-  inativar(cnpjId: string): Promise<void> {
-    return api.post(`/empresas/cnpjs/${cnpjId}/inativar`);
+  inativar(cnpjId: string, justificativa: string): Promise<void> {
+    return api.post(`/empresas/cnpjs/${cnpjId}/inativar`, { justificativa });
+  },
+
+  ativar(cnpjId: string): Promise<void> {
+    return api.post(`/empresas/cnpjs/${cnpjId}/ativar`);
   },
 };

@@ -84,7 +84,6 @@ export interface PdvVendaFormModel {
   clienteDocumentoAvulso: string;
   tabelaPrecoId: string;
   aPrazo: boolean;
-  codigoBarras: string;
   itens: PdvItemFormModel[];
   pagamentos: PdvPagamentoFormModel[];
 }

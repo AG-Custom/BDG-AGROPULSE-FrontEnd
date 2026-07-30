@@ -23,7 +23,16 @@
       @show="aoAbrir"
     >
       <q-list class="notificacoes-menu__lista" bordered>
-        <q-item-label header>Notificações</q-item-label>
+        <q-item-label header class="notificacoes-menu__header">
+          <span>Notificações</span>
+          <router-link
+            :to="{ name: 'notificacoes' }"
+            class="notificacoes-menu__ver-todas"
+            @click.stop
+          >
+            Ver todas
+          </router-link>
+        </q-item-label>
 
         <q-item v-if="carregando">
           <q-item-section>
@@ -75,6 +84,7 @@ import {
 } from 'constants/enums';
 import type { NotificacaoDto } from 'types/dtos/notificacao.dto';
 import { formatarDataHora } from 'utils/formatters';
+import { rotaDaNotificacao } from 'utils/notificacao-navegacao';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -117,11 +127,9 @@ async function abrirNotificacao(item: NotificacaoDto): Promise<void> {
     await marcarComoLida(item.id);
   }
 
-  if (item.idReferencia && item.modeloReferencia.toLowerCase().includes('pedido')) {
-    await router.push({
-      name: 'pedido-venda-detalhe',
-      params: { id: item.idReferencia },
-    });
+  const destino = rotaDaNotificacao(item);
+  if (destino) {
+    await router.push(destino);
   }
 }
 
@@ -136,6 +144,19 @@ onMounted(() => {
   max-width: min(360px, 90vw);
   overflow-y: auto;
   width: 360px;
+}
+
+.notificacoes-menu__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.notificacoes-menu__ver-todas {
+  color: var(--color-primary-500);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
 }
 
 .notificacoes-menu__item--lida {

@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Regras de comissão"
-      subtitulo="Percentual por canal de venda e faixa de desconto."
+      subtitulo="Percentual por canal de venda."
     >
       <agro-btn
         color="primary"
@@ -38,12 +38,12 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && regras.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && regras.length === 0" :colunas="4" />
 
         <empty-state
           v-else-if="!carregando && regras.length === 0"
           titulo="Nenhuma regra cadastrada"
-          descricao="Cadastre regras por canal e faixa de desconto para aplicar comissão no pedido."
+          descricao="Cadastre regras por canal para aplicar comissão no pedido."
           icon="percent"
         />
 
@@ -60,13 +60,6 @@
           <template #body-cell-canal="props">
             <q-td :props="props">
               {{ rotuloCanal(props.row.canal) }}
-            </q-td>
-          </template>
-
-          <template #body-cell-faixa="props">
-            <q-td :props="props" class="text-metric">
-              {{ formatarDecimal(props.row.descontoDe) }}% —
-              {{ formatarDecimal(props.row.descontoAte) }}%
             </q-td>
           </template>
 
@@ -87,33 +80,30 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar regra"
-                @click="irParaEditar(props.row.id)"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Excluir regra"
-                @click="confirmarExclusao(props.row.id)"
+              <agro-acoes-menu
+                :mostrar-status="false"
+                mostrar-excluir
+                @editar="irParaEditar(props.row.id)"
+                @excluir="confirmarExclusao(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -123,8 +113,13 @@ import { CanalVendaOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { RegraComissaoDto } from 'types/dtos/regra-comissao.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Regras de comissão');
 
 const router = useRouter();
 const { regras, carregando, carregar, excluir } = useRegrasComissao();
@@ -137,7 +132,6 @@ const statusOpcoes = [
 
 const colunas: QTableColumn<RegraComissaoDto>[] = [
   { name: 'canal', label: 'Canal', field: 'canal', align: 'left' },
-  { name: 'faixa', label: 'Faixa desconto', field: 'descontoDe', align: 'right' },
   { name: 'percentual', label: 'Comissão %', field: 'percentual', align: 'right' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
@@ -178,6 +172,11 @@ watch(filtroAtivo, () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

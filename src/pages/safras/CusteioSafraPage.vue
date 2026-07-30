@@ -115,15 +115,14 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="onRemover(props.row.id)"
+              <agro-acoes-menu
+                :mostrar-visualizar="false"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                mostrar-excluir
+                :loading-excluir="salvando"
+                excluir-label="Remover"
+                @excluir="onRemover(props.row.id)"
               />
             </q-td>
           </template>
@@ -171,12 +170,9 @@
                 />
               </div>
               <div class="col-6 col-md-4">
-                <q-input
+                <AgroMoneyInput
                   v-model="formulario.valor"
-                  outlined
                   label="Valor"
-                  type="number"
-                  step="0.01"
                   class="field-required"
                   :rules="[obrigatorio]"
                 />
@@ -215,6 +211,8 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCusteioSafra } from 'composables/useCusteioSafra';

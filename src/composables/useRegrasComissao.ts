@@ -13,8 +13,6 @@ import { ref } from 'vue';
 function formParaPayload(form: RegraComissaoFormModel) {
   return {
     canal: (form.canal || null) as CanalVendaValor | null,
-    descontoDe: Number(form.descontoDe.replace(',', '.')),
-    descontoAte: Number(form.descontoAte.replace(',', '.')),
     percentual: Number(form.percentual.replace(',', '.')),
   };
 }
@@ -22,8 +20,6 @@ function formParaPayload(form: RegraComissaoFormModel) {
 export function formVazioRegraComissao(): RegraComissaoFormModel {
   return {
     canal: '',
-    descontoDe: '0',
-    descontoAte: '100',
     percentual: '',
   };
 }
@@ -31,8 +27,6 @@ export function formVazioRegraComissao(): RegraComissaoFormModel {
 export function regraComissaoParaForm(dto: RegraComissaoDto): RegraComissaoFormModel {
   return {
     canal: dto.canal ?? '',
-    descontoDe: String(dto.descontoDe),
-    descontoAte: String(dto.descontoAte),
     percentual: String(dto.percentual),
   };
 }

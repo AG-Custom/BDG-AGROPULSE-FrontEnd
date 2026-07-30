@@ -186,7 +186,9 @@ export const estoqueService = {
 
   lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto> {
     return api
-      .post<LeituraPesoDto>('/estoque/dispositivos/leitura-peso', { dispositivoId })
+      .post<LeituraPesoDto>('/estoque/dispositivos/leitura-peso', {
+        dispositivoId: dispositivoId ?? null,
+      })
       .then((r) => r.data);
   },
 };

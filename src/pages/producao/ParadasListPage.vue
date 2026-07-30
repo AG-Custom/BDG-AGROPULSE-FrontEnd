@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Paradas de linha" subtitulo="Causa, duração e impacto na produção.">
       <agro-btn
@@ -51,29 +51,20 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes">
-                <agro-btn
-                  v-if="!props.row.resolvida"
-                  flat
-                  round
-                  dense
-                  icon="done"
-                  color="positive"
-                  descricao="Resolver"
-                  :loading="salvando"
-                  @click="onResolver(props.row.id)"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="delete"
-                  color="negative"
-                  descricao="Remover"
-                  :loading="salvando"
-                  @click="onRemover(props.row.id)"
-                />
-              </div>
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :loading-excluir="salvando"
+                @excluir="onRemover(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item v-if="!props.row.resolvida" v-close-popup clickable class="agro-acoes-menu__item" @click="onResolver(props.row.id)">
+                  <q-item-section avatar><q-icon name="done" class="agro-acoes-menu__icon" /></q-item-section>
+                  <q-item-section>Resolver</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -144,10 +135,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -160,6 +159,11 @@ import type { ParadaLinhaDto, ParadaLinhaFormModel } from 'types/dtos/producao.d
 import { formatarDataHora } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Paradas de linha');
 
 const { paradas, carregando, salvando, carregar, criar, resolver, remover } = useParadas();
 const { ordens, carregarOrdens } = useProducao();
@@ -177,7 +181,7 @@ const formulario = ref<ParadaLinhaFormModel>({
 
 const mapa = computed(() => {
   const m = new Map<string, string>();
-  for (const p of produtos.value) m.set(p.id, `${p.codigo} — ${p.descricao}`);
+  for (const p of produtos.value) m.set(p.id, `${p.descricao}`);
   return m;
 });
 
@@ -234,6 +238,11 @@ onMounted(() => {
   void carregarOrdens();
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

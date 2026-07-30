@@ -14,11 +14,11 @@ export function usePerfilSafras() {
   );
 
   const isRevenda = computed(
-    () => perfilFalhou.value || tipoOperacao.value === TipoOperacaoSafras.Revenda,
+    () => tipoOperacao.value === TipoOperacaoSafras.Revenda,
   );
 
   const isIndustria = computed(
-    () => perfilFalhou.value || tipoOperacao.value === TipoOperacaoSafras.Industria,
+    () => tipoOperacao.value === TipoOperacaoSafras.Industria,
   );
 
   async function carregarPerfil(forcar = false): Promise<void> {

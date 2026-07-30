@@ -41,7 +41,7 @@
     </div>
 
     <empty-state
-      v-if="documentos.length === 0"
+      v-if="documentosInternos.length === 0"
       titulo="Nenhum documento cadastrado"
       descricao="Envie FISPQ, ficha técnica ou outros documentos."
       icon="description"
@@ -54,7 +54,7 @@
       row-key="id"
       hide-pagination
       class="produto-documentos__tabela"
-      :rows="documentos"
+      :rows="documentosInternos"
       :columns="colunas"
       :pagination="{ rowsPerPage: 0 }"
     >
@@ -87,15 +87,15 @@
 
       <template v-if="!somenteLeitura" #body-cell-acoes="cell">
         <q-td :props="cell" class="produto-documentos__acoes">
-          <agro-btn
-            flat
-            round
-            dense
-            icon="delete"
-            color="negative"
-            descricao="Remover documento"
-            :loading="removendo"
-            @click="solicitarRemocao(cell.row)"
+          <agro-acoes-menu
+            :mostrar-visualizar="false"
+            :mostrar-editar="false"
+            :mostrar-status="false"
+            mostrar-excluir
+            :loading-excluir="removendoId === cell.row.id"
+            :disable="removendo"
+            excluir-label="Remover documento"
+            @excluir="solicitarRemocao(cell.row)"
           />
         </q-td>
       </template>
@@ -105,6 +105,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { TipoDocumentoProduto, TipoDocumentoProdutoOpcoes } from 'constants/enums';
 import type { TipoDocumentoProdutoValor } from 'constants/enums';
@@ -112,7 +113,7 @@ import { useProdutoDocumentos } from 'composables/useProdutoDocumentos';
 import type { ProdutoDocumentoListaItem } from 'types/dtos/produto.dto';
 import { formatarTamanhoArquivo } from 'utils/mappers/produto.mapper';
 import type { QTableColumn } from 'quasar';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   produtoId?: string;
@@ -124,6 +125,7 @@ const documentos = defineModel<ProdutoDocumentoListaItem[]>('documentos', { requ
 const {
   enviando,
   removendo,
+  removendoId,
   definirDocumentos,
   enviar,
   solicitarRemocao,
@@ -157,17 +159,17 @@ watch(
 
     definirDocumentos(lista);
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 watch(
   documentosInternos,
-  (lista) => {
+  async (lista) => {
     sincronizando.value = true;
     documentos.value = [...lista];
+    await nextTick();
     sincronizando.value = false;
   },
-  { deep: true },
 );
 
 function rotuloTipo(tipo: TipoDocumentoProdutoValor): string {

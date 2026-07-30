@@ -40,37 +40,43 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <div class="acoes-linha">
-                <agro-btn
-                  flat
-                  round
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+                :visualizar-to="{ name: 'pedido-compra-detalhe', params: { id: props.row.id } }"
+                visualizar-label="Ver pedido"
+              >
+                <q-item
+                  v-close-popup
+                  clickable
                   dense
-                  icon="visibility"
-                  color="primary"
-                  descricao="Ver pedido"
-                  :to="{ name: 'pedido-compra-detalhe', params: { id: props.row.id } }"
-                />
-                <agro-btn
-                  flat
-                  round
-                  dense
-                  icon="check"
-                  color="positive"
-                  descricao="Aprovar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="aprovar(props.row.id)"
-                />
-                <agro-btn
-                  flat
-                  round
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
+                      <q-icon name="check" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Aprovar</q-item-section>
+                </q-item>
+                <q-item
+                  v-close-popup
+                  clickable
                   dense
-                  icon="close"
-                  color="negative"
-                  descricao="Rejeitar"
-                  :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                   @click="rejeitar(props.row.id)"
-                />
-              </div>
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger">
+                      <q-icon name="close" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Rejeitar</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -81,6 +87,7 @@
 
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -122,11 +129,3 @@ onMounted(() => {
   void carregarAprovacoes();
 });
 </script>
-
-<style scoped>
-.acoes-linha {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-1);
-}
-</style>

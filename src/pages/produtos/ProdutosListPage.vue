@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Produtos"
@@ -74,7 +74,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="6" />
+        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="5" />
 
         <empty-state
           v-else-if="!carregando && produtos.length === 0"
@@ -132,55 +132,31 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props" class="produtos-list__acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Visualizar produto"
-                :to="{ name: 'produto-visualizar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar produto"
-                :to="{ name: 'produto-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                v-if="props.row.ativo"
-                flat
-                round
-                dense
-                icon="block"
-                color="negative"
-                descricao="Inativar produto"
-                :loading="inativando"
-                @click="inativarProduto(props.row)"
-              />
-              <agro-btn
-                v-else
-                flat
-                round
-                dense
-                icon="check_circle"
-                color="positive"
-                descricao="Reativar produto"
-                :loading="ativando"
-                @click="ativarProduto(props.row)"
+              <agro-acoes-menu
+                :ativo="props.row.ativo"
+                :editar-to="{ name: 'produto-editar', params: { id: props.row.id } }"
+                :loading-status="inativando || ativando"
+                @visualizar="abrirDialogVisualizar(props.row)"
+                @desabilitar="inativarProduto(props.row)"
+                @ativar="ativarProduto(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -193,6 +169,11 @@ import type { ListarProdutosParams, ProdutoResumoDto } from 'types/dtos/produto.
 import { formatarMoeda } from 'utils/formatters';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhar produto');
 
 const {
   produtos,
@@ -231,8 +212,7 @@ const categoriaOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<ProdutoResumoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
-  { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left', sortable: true },
+  { name: 'descricao', label: 'Nome', field: 'descricao', align: 'left', sortable: true },
   { name: 'tipoProduto', label: 'Tipo', field: 'tipoProduto', align: 'left', sortable: true },
   { name: 'categoriaProdutoId', label: 'Categoria', field: 'categoriaProdutoId', align: 'left' },
   { name: 'precoVenda', label: 'Preço', field: 'precoVenda', align: 'right', sortable: true },
@@ -307,6 +287,11 @@ onMounted(() => {
   void carregarCategorias({ ativo: true });
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

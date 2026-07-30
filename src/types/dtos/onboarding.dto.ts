@@ -1,4 +1,4 @@
-import type { TipoUnidadeValor } from 'constants/enums';
+import type { TipoOperacaoEmpresaValor, TipoUnidadeValor } from 'constants/enums';
 
 export interface UnidadeOnboardingPayload {
   nome: string;
@@ -20,6 +20,7 @@ export interface CriarEmpresaPayload {
   razaoSocial: string;
   nomeFantasia: string;
   cnpj: string;
+  tipoOperacao: TipoOperacaoEmpresaValor;
   unidades: UnidadeOnboardingPayload[];
 }
 
@@ -62,6 +63,7 @@ export interface EmpresaFormModel {
   razaoSocial: string;
   nomeFantasia: string;
   cnpj: string;
+  tipoOperacao: TipoOperacaoEmpresaValor;
 }
 
 export function criarUnidadeVazia(matriz = false): UnidadeFormModel {

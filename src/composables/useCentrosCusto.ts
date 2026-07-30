@@ -18,7 +18,7 @@ export function useCentrosCusto() {
   const centroOpcoes = computed(() =>
     centros.value
       .filter((c) => c.ativo)
-      .map((c) => ({ label: `${c.codigo} — ${c.nome}`, value: c.id })),
+      .map((c) => ({ label: `${c.nome}`, value: c.id })),
   );
 
   async function carregar(params?: EscopoListagemParams): Promise<void> {
@@ -37,7 +37,6 @@ export function useCentrosCusto() {
     salvando.value = true;
     try {
       await financeiroGestaoService.criarCentroCusto({
-        codigo: form.codigo.trim(),
         nome: form.nome.trim(),
         unidadeId: form.unidadeId || null,
       });
@@ -60,7 +59,6 @@ export function useCentrosCusto() {
     salvando.value = true;
     try {
       await financeiroGestaoService.editarCentroCusto(id, {
-        codigo: form.codigo.trim(),
         nome: form.nome.trim(),
         ativo,
       });

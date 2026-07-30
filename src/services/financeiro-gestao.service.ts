@@ -65,8 +65,12 @@ export const financeiroGestaoService = {
     return api.put<ContaBancariaDto>(`/contas-bancarias/${id}`, payload).then((r) => r.data);
   },
 
-  inativarContaBancaria(id: string): Promise<void> {
-    return api.patch(`/contas-bancarias/${id}/inativar`).then(() => undefined);
+  inativarContaBancaria(id: string, justificativa: string): Promise<void> {
+    return api.patch(`/contas-bancarias/${id}/inativar`, { justificativa }).then(() => undefined);
+  },
+
+  ativarContaBancaria(id: string): Promise<void> {
+    return api.patch(`/contas-bancarias/${id}/ativar`).then(() => undefined);
   },
 
   listarCaixas(params?: EscopoListagemParams): Promise<CaixaDto[]> {

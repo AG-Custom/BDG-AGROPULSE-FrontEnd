@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Amostras de campo"
@@ -83,34 +83,33 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props" class="acoes">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                :to="{ name: 'crm-amostra-editar', params: { id: props.row.id } }"
-              />
-              <agro-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                descricao="Remover"
-                :loading="salvando"
-                @click="removerAmostra(props.row.id)"
+              <agro-acoes-menu
+                :ativo="true"
+                :mostrar-status="false"
+                :mostrar-excluir="true"
+                excluir-label="Remover"
+                :editar-to="{ name: 'crm-amostra-editar', params: { id: props.row.id } }"
+                :loading-excluir="salvando"
+                @excluir="removerAmostra(props.row.id)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -120,6 +119,11 @@ import type { QTableColumn } from 'quasar';
 import type { AmostraCampoDto } from 'types/dtos/crm.dto';
 import { formatarData } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Amostras de campo');
 
 const { amostras, carregando, salvando, carregarAmostras, removerAmostra } = useCrm();
 const busca = ref('');
@@ -159,6 +163,11 @@ function rotuloStatus(status: string): string {
 onMounted(() => {
   void carregarAmostras();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

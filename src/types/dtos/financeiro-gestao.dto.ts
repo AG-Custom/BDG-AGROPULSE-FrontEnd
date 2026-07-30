@@ -95,19 +95,16 @@ export interface CentroCustoDto {
 }
 
 export interface CentroCustoFormModel {
-  codigo: string;
   nome: string;
   unidadeId: string;
 }
 
 export interface CriarCentroCustoPayload {
-  codigo: string;
   nome: string;
   unidadeId?: string | null;
 }
 
 export interface EditarCentroCustoPayload {
-  codigo: string;
   nome: string;
   ativo: boolean;
 }

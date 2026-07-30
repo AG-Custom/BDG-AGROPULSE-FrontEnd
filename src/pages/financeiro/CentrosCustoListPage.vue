@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Centros de custo" subtitulo="Classificação de títulos e lançamentos.">
       <agro-btn
@@ -13,7 +13,7 @@
 
     <section class="agro-section">
       <agro-card>
-        <agro-table-skeleton v-if="carregando && centros.length === 0" :colunas="4" />
+        <agro-table-skeleton v-if="carregando && centros.length === 0" :colunas="3" />
         <empty-state
           v-else-if="!carregando && centros.length === 0"
           titulo="Nenhum centro de custo"
@@ -40,14 +40,10 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                descricao="Editar"
-                @click="abrirDialog(props.row)"
+              <agro-acoes-menu
+                :mostrar-status="false"
+                @editar="abrirDialog(props.row)"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
@@ -63,16 +59,7 @@
         <q-card-section>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="formulario.codigo"
-                  outlined
-                  label="Código"
-                  class="field-required"
-                  :rules="[obrigatorio]"
-                />
-              </div>
-              <div class="col-12 col-md-8">
+              <div class="col-12">
                 <q-input
                   v-model="formulario.nome"
                   outlined
@@ -103,10 +90,18 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -119,6 +114,11 @@ import type { CentroCustoDto, CentroCustoFormModel } from 'types/dtos/financeiro
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Centros de custo');
+
 const { centros, carregando, salvando, carregar, criar, editar } = useCentrosCusto();
 const {
   unidades,
@@ -127,7 +127,7 @@ const {
 } = useUnidades();
 const dialog = ref(false);
 const editandoId = ref<string | null>(null);
-const formulario = ref<CentroCustoFormModel>({ codigo: '', nome: '', unidadeId: '' });
+const formulario = ref<CentroCustoFormModel>({ nome: '', unidadeId: '' });
 
 const unidadeOpcoes = computed(() =>
   unidades.value
@@ -136,7 +136,6 @@ const unidadeOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<CentroCustoDto>[] = [
-  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
@@ -145,7 +144,6 @@ const colunas: QTableColumn<CentroCustoDto>[] = [
 function abrirDialog(item?: CentroCustoDto): void {
   editandoId.value = item?.id ?? null;
   formulario.value = {
-    codigo: item?.codigo ?? '',
     nome: item?.nome ?? '',
     unidadeId: item?.unidadeId ?? '',
   };
@@ -163,6 +161,11 @@ onMounted(() => {
   void carregar();
   void carregarUnidades();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

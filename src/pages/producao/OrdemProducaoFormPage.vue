@@ -142,7 +142,7 @@ const formulario = ref<OrdemProducaoFormModel>({
 });
 
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.codigo} — ${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
 const receitaOpcoes = computed(() =>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Lotes"
@@ -101,15 +101,25 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="account_tree"
-                color="primary"
-                descricao="Genealogia do lote"
-                @click="abrirGenealogia(props.row)"
-              />
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+               @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
+                  v-close-popup
+                  clickable
+                  dense
+                  class="agro-acoes-menu__item"
+                  @click="abrirGenealogia(props.row)"
+                >
+                  <q-item-section avatar>
+                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--view">
+                      <q-icon name="account_tree" size="16px" />
+                    </span>
+                  </q-item-section>
+                  <q-item-section>Genealogia do lote</q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -166,10 +176,18 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -181,6 +199,11 @@ import type { QTableColumn } from 'quasar';
 import type { LoteDto } from 'types/dtos/estoque.dto';
 import { formatarData, formatarDecimal } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Lotes');
 
 const { lotes, genealogia, carregando, carregandoGenealogia, carregar, obterGenealogia } =
   useEstoqueLotes();
@@ -269,6 +292,11 @@ watch([filtroProduto, apenasComSaldo], () => {
 onMounted(() => {
   void recarregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

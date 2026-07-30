@@ -14,6 +14,7 @@ export const TAMANHO_FORMATADO = {
   TELEFONE_FIXO: 14,
   TELEFONE_CELULAR: 15,
   NUMERO_ENDERECO: 10,
+  MOEDA: 22,
 } as const;
 
 export const DIGITOS = {
@@ -23,14 +24,14 @@ export const DIGITOS = {
   TELEFONE_MIN: 10,
   TELEFONE_MAX: 11,
   NUMERO_ENDERECO: 10,
+  MOEDA_MAX: 15,
 } as const;
 
 export function mascaraTelefone(valor: string): string {
   const digitos = valor.replace(/\D/g, '');
-  return digitos.length > 10 ? MASCARAS.TELEFONE_CELULAR : MASCARAS.TELEFONE_FIXO;
+  return digitos.length >= 10 ? MASCARAS.TELEFONE_CELULAR : MASCARAS.TELEFONE_FIXO;
 }
 
-export function tamanhoFormatadoTelefone(valor: string): number {
-  const digitos = valor.replace(/\D/g, '');
-  return digitos.length > 10 ? TAMANHO_FORMATADO.TELEFONE_CELULAR : TAMANHO_FORMATADO.TELEFONE_FIXO;
+export function tamanhoFormatadoTelefone(_valor?: string): number {
+  return TAMANHO_FORMATADO.TELEFONE_CELULAR;
 }

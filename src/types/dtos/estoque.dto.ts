@@ -108,18 +108,6 @@ export interface TransferenciaEstoqueDto {
   itens: TransferenciaEstoqueItemDto[];
 }
 
-export interface ProdutoPorCodigoDto {
-  id: string;
-  codigo: string;
-  descricao: string;
-}
-
-export interface LeituraPesoDto {
-  peso: number;
-  unidade: string;
-  dispositivoId: string | null;
-}
-
 export interface ReservaStatusDto {
   pedidoId: string;
   estoqueBaixado: boolean;
@@ -248,7 +236,6 @@ export interface EntradaEstoqueFormModel {
   galpao: string;
   corredor: string;
   prateleira: string;
-  codigoBarras: string;
 }
 
 export interface SaidaEstoqueFormModel {
@@ -258,7 +245,6 @@ export interface SaidaEstoqueFormModel {
   usarFefo: boolean;
   motivo: OrigemMovimentacaoEstoqueValor;
   justificativa: string;
-  codigoBarras: string;
 }
 
 export interface AjusteEstoqueFormModel {
@@ -269,4 +255,16 @@ export interface AjusteEstoqueFormModel {
 
 export interface ContagemInventarioFormModel {
   quantidadeContada: string;
+}
+
+export interface ProdutoPorCodigoDto {
+  id: string;
+  codigo: string;
+  descricao: string;
+}
+
+export interface LeituraPesoDto {
+  peso: number;
+  unidade: string;
+  dispositivoId: string | null;
 }

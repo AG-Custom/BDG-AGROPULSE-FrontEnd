@@ -5,7 +5,8 @@ import type {
   SessaoPersistida,
 } from 'types/dtos/auth.dto';
 import type { UsuarioLogado } from 'types/entidades/usuario';
-import { Permissoes } from 'constants/permissoes';
+import { PerfilUsuario } from 'constants/enums';
+import { resolverPermissoesPorPerfil } from 'utils/permissoes-por-perfil';
 
 export function loginParaSessao(resposta: AuthSessionDto): SessaoPersistida {
   return {
@@ -36,12 +37,24 @@ export function mesclarSessaoRemotaComLocal(
   remota: SessaoPersistida,
   local: SessaoPersistida | null,
 ): SessaoPersistida {
+  const usuario =
+    remota.usuario.perfil != null
+      ? remota.usuario
+      : {
+          ...remota.usuario,
+          perfil: local?.usuario.perfil ?? remota.usuario.perfil,
+        };
+
   if (!local?.unidadeId || local.requiresUnidadeSelection || remota.unidadeId) {
-    return remota;
+    return {
+      ...remota,
+      usuario,
+    };
   }
 
   return {
     ...remota,
+    usuario,
     unidadeId: local.unidadeId,
     requiresUnidadeSelection: false,
     unidadesDisponiveis: null,
@@ -62,48 +75,19 @@ export function selecionarUnidadeParaSessao(
   };
 }
 
-export function usuarioDtoParaLogado(usuario: AuthSessionDto['usuario']): UsuarioLogado {
+export function usuarioDtoParaLogado(
+  usuario: AuthSessionDto['usuario'],
+  empresaId?: string | null,
+): UsuarioLogado {
+  const perfil =
+    usuario.perfil ??
+    (empresaId ? PerfilUsuario.Administrador : null);
+
   return {
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
-    perfil: usuario.perfil ?? null,
-    permissoes: [
-      Permissoes.Dashboard.Visualizar,
-      Permissoes.Unidades.Visualizar,
-      Permissoes.Cnpjs.Visualizar,
-      Permissoes.Fornecedores.Visualizar,
-      Permissoes.Usuarios.Visualizar,
-      Permissoes.Colaboradores.Visualizar,
-      Permissoes.Clientes.Visualizar,
-      Permissoes.Produtos.Visualizar,
-      Permissoes.CategoriasProduto.Visualizar,
-      Permissoes.UnidadesMedida.Visualizar,
-      Permissoes.TabelasPreco.Visualizar,
-      Permissoes.Estoque.Visualizar,
-      Permissoes.PedidosVenda.Visualizar,
-      Permissoes.Aprovacoes.Visualizar,
-      Permissoes.Notificacoes.Visualizar,
-      Permissoes.FormasPagamentoConfig.Visualizar,
-      Permissoes.Financeiro.Visualizar,
-      Permissoes.Orcamentos.Visualizar,
-      Permissoes.Pdv.Visualizar,
-      Permissoes.Compras.Visualizar,
-      Permissoes.DevolucoesVenda.Visualizar,
-      Permissoes.Expedicao.Visualizar,
-      Permissoes.Fiscal.Visualizar,
-      Permissoes.Contratos.Visualizar,
-      Permissoes.Producao.Visualizar,
-      Permissoes.Rastreabilidade.Visualizar,
-      Permissoes.Relatorios.Visualizar,
-      Permissoes.Manutencao.Visualizar,
-      Permissoes.Logistica.Visualizar,
-      Permissoes.Crm.Visualizar,
-      Permissoes.CobrancaCredito.Visualizar,
-      Permissoes.MetasVendedor.Visualizar,
-      Permissoes.Representantes.Visualizar,
-      Permissoes.RegrasComissao.Visualizar,
-      Permissoes.PermissoesGranulares.Visualizar,
-    ],
+    perfil,
+    permissoes: resolverPermissoesPorPerfil(perfil),
   };
 }

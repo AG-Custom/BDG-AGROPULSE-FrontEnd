@@ -62,7 +62,7 @@
         <h3 class="titulo">Calcular</h3>
         <div class="row q-col-gutter-md items-end">
           <div class="col-12 col-md-4">
-            <q-input v-model="baseCalculo" outlined label="Base de cálculo" />
+            <AgroMoneyInput v-model="baseCalculo" label="Base de cálculo" />
           </div>
           <div class="col-12 col-md-4">
             <q-toggle v-model="isProdutorRural" label="Produtor rural" />
@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import { useFunrural } from 'composables/useFunrural';
 import type { ConfigFunruralFormModel } from 'types/dtos/fiscal-gestao.dto';
 import { formatarMoeda } from 'utils/formatters';

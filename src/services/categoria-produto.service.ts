@@ -33,8 +33,8 @@ export const categoriaProdutoService = {
       .then((r) => r.data);
   },
 
-  inativar(categoriaProdutoId: string): Promise<void> {
-    return api.patch(`/categorias-produto/${categoriaProdutoId}/inativar`);
+  inativar(categoriaProdutoId: string, justificativa: string): Promise<void> {
+    return api.patch(`/categorias-produto/${categoriaProdutoId}/inativar`, { justificativa });
   },
 
   ativar(categoriaProdutoId: string): Promise<void> {

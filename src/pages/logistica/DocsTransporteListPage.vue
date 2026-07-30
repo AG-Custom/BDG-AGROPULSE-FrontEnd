@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header
       titulo="Documentos de transporte"
@@ -81,26 +81,34 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
+              <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item
                 v-if="props.row.status === StatusDocTransporteLogistica.Rascunho"
-                flat
+                  v-close-popup
+                  clickable
                 dense
-                label="Autorizar"
-                descricao="Autorizar documento"
-                color="primary"
-                :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="autorizarDocTransporte(props.row.id)"
-              />
-              <agro-btn
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
+                  <q-item-section>Autorizar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+                <q-item
                 v-if="props.row.status !== StatusDocTransporteLogistica.Cancelado"
-                flat
+                  v-close-popup
+                  clickable
                 dense
-                label="Cancelar"
-                descricao="Cancelar documento"
-                color="negative"
-                :loading="salvando"
+                  class="agro-acoes-menu__item"
+                  :disable="salvando"
                 @click="cancelarDocTransporte(props.row.id)"
-              />
+                >
+                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
+                  <q-item-section>Cancelar</q-item-section>
+                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
+                </q-item>
+              </agro-acoes-menu>
             </q-td>
           </template>
         </q-table>
@@ -175,12 +183,9 @@
                 />
               </div>
               <div class="col-3">
-                <q-input
+                <AgroMoneyInput
                   v-model="formulario.valor"
-                  outlined
                   label="Valor"
-                  type="number"
-                  step="0.01"
                   class="field-required"
                   :rules="[obrigatorio]"
                 />
@@ -217,12 +222,21 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import LogisticaStatusBadge from 'components/logistica/LogisticaStatusBadge.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { docTransporteVazio, useLogistica } from 'composables/useLogistica';
@@ -238,7 +252,12 @@ import type {
 } from 'types/dtos/logistica.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Documentos de transporte');
 
 const {
   docsTransporte,
@@ -293,6 +312,11 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(aplicar);
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>
 
 <style scoped>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Devoluções de venda" subtitulo="Registre e processe devoluções.">
       <agro-btn
@@ -49,24 +49,28 @@
           </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="primary"
-                descricao="Ver devolução"
-                :to="{ name: 'devolucao-venda-detalhe', params: { id: props.row.id } }"
+              <agro-acoes-menu
+                :mostrar-editar="false"
+                :mostrar-status="false"
+               @visualizar="abrirDialogVisualizar(props.row)"
               />
             </q-td>
           </template>
         </q-table>
       </agro-card>
     </section>
+
+    <agro-entity-details-dialog
+      v-model="dialogVisualizar"
+      :titulo="tituloDetalhe"
+      :registro="registroSelecionado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroEntityDetailsDialog from 'components/ui/AgroEntityDetailsDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
@@ -75,7 +79,12 @@ import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
 import type { QTableColumn } from 'quasar';
 import type { DevolucaoVendaDto } from 'types/dtos/devolucao-venda.dto';
 import { formatarDataHora } from 'utils/formatters';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
+
+
+const dialogVisualizar = ref(false);
+const registroSelecionado = ref<Record<string, unknown> | null>(null);
+const tituloDetalhe = computed(() => 'Detalhes de Devoluções de venda');
 
 const { devolucoes, carregando, carregar } = useDevolucoesVenda();
 
@@ -90,4 +99,9 @@ const colunas: QTableColumn<DevolucaoVendaDto>[] = [
 onMounted(() => {
   void carregar();
 });
+function abrirDialogVisualizar(registro: Record<string, unknown> | object): void {
+  registroSelecionado.value = registro as Record<string, unknown>;
+  dialogVisualizar.value = true;
+}
+
 </script>

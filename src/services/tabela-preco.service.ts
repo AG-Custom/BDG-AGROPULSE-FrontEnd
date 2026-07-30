@@ -27,8 +27,8 @@ export const tabelaPrecoService = {
     return api.put<TabelaPrecoDto>(`/tabelas-preco/${tabelaPrecoId}`, payload).then((r) => r.data);
   },
 
-  inativar(tabelaPrecoId: string): Promise<void> {
-    return api.patch(`/tabelas-preco/${tabelaPrecoId}/inativar`);
+  inativar(tabelaPrecoId: string, justificativa: string): Promise<void> {
+    return api.patch(`/tabelas-preco/${tabelaPrecoId}/inativar`, { justificativa });
   },
 
   ativar(tabelaPrecoId: string): Promise<void> {

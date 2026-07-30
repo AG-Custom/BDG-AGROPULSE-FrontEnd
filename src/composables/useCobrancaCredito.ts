@@ -8,6 +8,7 @@ import type {
 } from 'constants/enums';
 import { cobrancaCreditoService } from 'services/cobranca-credito.service';
 import { baixarArquivo } from 'utils/download';
+import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import type {
   AcordoJudicialDto,
   AcordoJudicialFormModel,
@@ -67,9 +68,9 @@ export function configVazia(): CobrancaCreditoConfigFormModel {
     pddFaixaAcima180: '100',
     diasAtrasoBloqueioPorPerfil: '{"Gerente":60,"Diretor":90,"Ceo":120}',
     bloqueioEfetivo: false,
-    limiteGerente: '10000',
-    limiteDiretor: '100000',
-    limiteCeo: '500000',
+    limiteGerente: formatarMoedaParaInput(10000),
+    limiteDiretor: formatarMoedaParaInput(100000),
+    limiteCeo: formatarMoedaParaInput(500000),
     scoreMinimoRevisao: '400',
   };
 }
@@ -89,9 +90,9 @@ export function configDtoParaForm(dto: CobrancaCreditoConfigDto): CobrancaCredit
     pddFaixaAcima180: String(dto.pddFaixaAcima180),
     diasAtrasoBloqueioPorPerfil: dto.diasAtrasoBloqueioPorPerfil ?? '',
     bloqueioEfetivo: dto.bloqueioEfetivo,
-    limiteGerente: String(dto.limiteGerente),
-    limiteDiretor: String(dto.limiteDiretor),
-    limiteCeo: String(dto.limiteCeo),
+    limiteGerente: formatarMoedaParaInput(dto.limiteGerente),
+    limiteDiretor: formatarMoedaParaInput(dto.limiteDiretor),
+    limiteCeo: formatarMoedaParaInput(dto.limiteCeo),
     scoreMinimoRevisao: String(dto.scoreMinimoRevisao),
   };
 }
@@ -111,9 +112,9 @@ function configFormParaPayload(form: CobrancaCreditoConfigFormModel): CobrancaCr
     pddFaixaAcima180: numOuZero(form.pddFaixaAcima180),
     diasAtrasoBloqueioPorPerfil: form.diasAtrasoBloqueioPorPerfil.trim() || null,
     bloqueioEfetivo: form.bloqueioEfetivo,
-    limiteGerente: numOuZero(form.limiteGerente),
-    limiteDiretor: numOuZero(form.limiteDiretor),
-    limiteCeo: numOuZero(form.limiteCeo),
+    limiteGerente: parseMascaraMoeda(form.limiteGerente) ?? 0,
+    limiteDiretor: parseMascaraMoeda(form.limiteDiretor) ?? 0,
+    limiteCeo: parseMascaraMoeda(form.limiteCeo) ?? 0,
     scoreMinimoRevisao: numOuZero(form.scoreMinimoRevisao),
   };
 }
@@ -138,8 +139,8 @@ function fichaFormParaPayload(form: FichaCreditoRuralFormModel): CriarFichaCredi
     areaPlantadaHa: numOuNulo(form.areaPlantadaHa),
     culturaPrincipal: form.culturaPrincipal.trim() || null,
     produtividadeEsperada: numOuNulo(form.produtividadeEsperada),
-    rendaEstimada: numOuNulo(form.rendaEstimada),
-    endividamentoTotal: numOuNulo(form.endividamentoTotal),
+    rendaEstimada: parseMascaraMoeda(form.rendaEstimada),
+    endividamentoTotal: parseMascaraMoeda(form.endividamentoTotal),
     observacoesGarantias: form.observacoesGarantias.trim() || null,
   };
 }
@@ -458,8 +459,8 @@ export function useCobrancaCredito() {
     try {
       const payload: CriarAcordoJudicialPayload = {
         clienteId: form.clienteId.trim(),
-        valorOriginal: numOuZero(form.valorOriginal),
-        valorAcordado: numOuZero(form.valorAcordado),
+        valorOriginal: parseMascaraMoeda(form.valorOriginal) ?? 0,
+        valorAcordado: parseMascaraMoeda(form.valorAcordado) ?? 0,
         parcelas: numOuZero(form.parcelas) || 1,
         inicio: form.inicio,
         observacoes: form.observacoes.trim() || null,

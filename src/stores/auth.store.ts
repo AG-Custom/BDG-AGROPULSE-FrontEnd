@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     aplicarSessao(sessao: SessaoPersistida) {
-      this.usuario = usuarioDtoParaLogado(sessao.usuario);
+      this.usuario = usuarioDtoParaLogado(sessao.usuario, sessao.empresaId);
       this.empresaId = sessao.empresaId;
       this.unidadeId = sessao.unidadeId;
       this.requiresUnidadeSelection = sessao.requiresUnidadeSelection;
@@ -69,10 +69,7 @@ export const useAuthStore = defineStore('auth', {
 
       const novaSessao = refreshParaSessao(resposta, sessaoAtual);
       salvarSessao(novaSessao);
-      this.empresaId = novaSessao.empresaId;
-      this.unidadeId = novaSessao.unidadeId;
-      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
-      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
+      this.aplicarSessao(novaSessao);
     },
 
     async verificar() {
@@ -139,10 +136,7 @@ export const useAuthStore = defineStore('auth', {
       const resposta = await authService.refresh();
       const novaSessao = refreshParaSessao(resposta, sessaoAtual);
       salvarSessao(novaSessao);
-      this.empresaId = novaSessao.empresaId;
-      this.unidadeId = novaSessao.unidadeId;
-      this.requiresUnidadeSelection = novaSessao.requiresUnidadeSelection;
-      this.unidadesDisponiveis = novaSessao.unidadesDisponiveis;
+      this.aplicarSessao(novaSessao);
     },
 
     possuiPermissao(permissao: string): boolean {

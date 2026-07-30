@@ -63,11 +63,11 @@ export function useCategoriasProduto() {
     }
   }
 
-  async function inativar(categoriaId: string): Promise<boolean> {
+  async function inativar(categoriaId: string, justificativa: string): Promise<boolean> {
     inativando.value = true;
 
     try {
-      await categoriaProdutoService.inativar(categoriaId);
+      await categoriaProdutoService.inativar(categoriaId, justificativa);
       sucesso('Categoria inativada com sucesso.');
       await carregar(ultimosParams.value);
       return true;
@@ -96,18 +96,18 @@ export function useCategoriasProduto() {
   }
 
   async function solicitarInativacao(categoria: CategoriaProdutoResumoDto): Promise<boolean> {
-    const confirmou = await messageService.confirmar({
+    const justificativa = await messageService.confirmarComJustificativa({
       titulo: 'Inativar categoria',
       mensagem: `Deseja inativar a categoria ${categoria.nome}?`,
       textoConfirmar: 'Inativar',
       icone: 'warning',
     });
 
-    if (!confirmou) {
+    if (!justificativa) {
       return false;
     }
 
-    return inativar(categoria.id);
+    return inativar(categoria.id, justificativa);
   }
 
   async function solicitarAtivacao(categoria: CategoriaProdutoResumoDto): Promise<boolean> {
@@ -126,7 +126,7 @@ export function useCategoriasProduto() {
   }
 
   function rotuloCategoria(categoria: CategoriaProdutoResumoDto): string {
-    return `${categoria.codigo} — ${categoria.nome}`;
+    return `${categoria.nome}`;
   }
 
   return {
