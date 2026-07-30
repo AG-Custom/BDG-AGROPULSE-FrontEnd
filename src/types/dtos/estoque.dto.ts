@@ -256,3 +256,15 @@ export interface AjusteEstoqueFormModel {
 export interface ContagemInventarioFormModel {
   quantidadeContada: string;
 }
+
+export interface ProdutoPorCodigoDto {
+  id: string;
+  codigo: string;
+  descricao: string;
+}
+
+export interface LeituraPesoDto {
+  peso: number;
+  unidade: string;
+  dispositivoId: string | null;
+}

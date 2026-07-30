@@ -140,6 +140,7 @@
                 @desabilitar="inativarProduto(props.row)"
                 @ativar="ativarProduto(props.row)"
               />
+            </q-td>
           </template>
         </q-table>
       </agro-card>

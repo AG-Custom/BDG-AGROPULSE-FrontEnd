@@ -11,12 +11,14 @@ import type {
   IniciarInventarioPayload,
   InventarioDto,
   LancarEstoqueInicialPayload,
+  LeituraPesoDto,
   ListarAlertasValidadeParams,
   ListarLotesParams,
   ListarMovimentacoesParams,
   ListarSaldosParams,
   LoteDto,
   MovimentacaoEstoqueDto,
+  ProdutoPorCodigoDto,
   RegistrarContagemInventarioPayload,
   ReservaStatusDto,
   ReservarEstoquePedidoPayload,
@@ -173,6 +175,20 @@ export const estoqueService = {
   cancelarTransferencia(id: string): Promise<TransferenciaEstoqueDto> {
     return api
       .post<TransferenciaEstoqueDto>(`/estoque/transferencias/${id}/cancelar`)
+      .then((r) => r.data);
+  },
+
+  obterProdutoPorCodigo(valor: string): Promise<ProdutoPorCodigoDto> {
+    return api
+      .get<ProdutoPorCodigoDto>('/estoque/produtos/por-codigo', { params: { valor } })
+      .then((r) => r.data);
+  },
+
+  lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto> {
+    return api
+      .post<LeituraPesoDto>('/estoque/dispositivos/leitura-peso', {
+        dispositivoId: dispositivoId ?? null,
+      })
       .then((r) => r.data);
   },
 };
