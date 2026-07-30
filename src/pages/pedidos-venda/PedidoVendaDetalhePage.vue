@@ -20,7 +20,7 @@
           @click="enviar"
         />
         <agro-btn
-          v-if="ehAguardando"
+          v-if="ehAguardando && podeDecidirAprovacao"
           color="primary"
           unelevated
           label="Aprovar"
@@ -29,7 +29,7 @@
           @click="aprovarPedido"
         />
         <agro-btn
-          v-if="ehAguardando"
+          v-if="ehAguardando && podeDecidirAprovacao"
           color="negative"
           unelevated
           label="Recusar"
@@ -38,7 +38,7 @@
           @click="abrirRecusa"
         />
         <agro-btn
-          v-if="ehAguardando"
+          v-if="ehAguardando && podeDecidirAprovacao"
           flat
           label="Expirar"
           descricao="Expirar pedido e devolver estoque"
@@ -75,6 +75,7 @@
           :rotulo-cliente="rotuloCliente(pedido.clienteId)"
           :rotulo-vendedor="rotuloVendedor(pedido.vendedorUsuarioId)"
           :rotulo-condicao="rotuloCondicao(pedido.condicaoPagamentoId)"
+          :rotulo-recusado-por="rotuloRecusadoPor(pedido.recusadoPorUsuarioId)"
         />
 
         <pedido-venda-travas-card
@@ -120,6 +121,7 @@ import PedidoVendaRecusarDialog from 'components/pedidos-venda/PedidoVendaRecusa
 import PedidoVendaResumoCard from 'components/pedidos-venda/PedidoVendaResumoCard.vue';
 import PedidoVendaTravasCard from 'components/pedidos-venda/PedidoVendaTravasCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import { useAuth } from 'composables/useAuth';
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import { useContasReceber } from 'composables/useContasReceber';
@@ -127,12 +129,18 @@ import { usePedidoVenda } from 'composables/usePedidoVenda';
 import { useProdutos } from 'composables/useProdutos';
 import { useUsuarios } from 'composables/useUsuarios';
 import { PedidoVendaStatus } from 'constants/enums';
+import { Permissoes } from 'constants/permissoes';
 import { rotuloPedidoVendaStatus } from 'utils/pedido-venda.helpers';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
+const { possuiPermissao } = useAuth();
+
+const podeDecidirAprovacao = computed(() =>
+  possuiPermissao(Permissoes.Aprovacoes.Aprovar),
+);
 
 const {
   pedido,
@@ -218,6 +226,14 @@ function rotuloCliente(clienteId: string): string {
 
 function rotuloVendedor(vendedorId: string): string {
   return mapaVendedores.value.get(vendedorId) ?? vendedorId;
+}
+
+function rotuloRecusadoPor(usuarioId: string | null | undefined): string {
+  if (!usuarioId) {
+    return '';
+  }
+
+  return mapaVendedores.value.get(usuarioId) ?? usuarioId;
 }
 
 function rotuloProduto(produtoId: string): string {

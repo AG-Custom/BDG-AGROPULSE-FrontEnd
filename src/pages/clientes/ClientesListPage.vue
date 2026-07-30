@@ -173,7 +173,7 @@ import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   GrupoComercialOpcoes,
-  PerfilUsuario,
+  isPerfilCarteiraVendedor,
   TipoClienteOpcoes,
   UsuarioStatus,
   type ExportacaoFormatoValor,
@@ -225,10 +225,7 @@ const vendedorOpcoes = computed(() =>
     .filter(
       (usuario) =>
         usuario.status === UsuarioStatus.Ativo &&
-        (usuario.perfil === PerfilUsuario.Vendedor ||
-          usuario.perfil === PerfilUsuario.Consultor ||
-          usuario.perfil === PerfilUsuario.Gerente ||
-          usuario.perfil === PerfilUsuario.Diretor),
+        isPerfilCarteiraVendedor(usuario.perfil),
     )
     .map((usuario) => ({
       label: nomeCompleto(usuario),

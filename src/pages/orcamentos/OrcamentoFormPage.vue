@@ -153,7 +153,7 @@ import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import { useUsuarios } from 'composables/useUsuarios';
-import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
+import { isPerfilCarteiraVendedor, UsuarioStatus } from 'constants/enums';
 import type { OrcamentoFormModel, OrcamentoItemFormModel } from 'types/dtos/orcamento.dto';
 import { formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
@@ -224,10 +224,7 @@ const vendedorOpcoes = computed(() =>
   usuarios.value
     .filter(
       (u) =>
-        u.status === UsuarioStatus.Ativo &&
-        (u.perfil === PerfilUsuario.Vendedor ||
-          u.perfil === PerfilUsuario.Gerente ||
-          u.perfil === PerfilUsuario.Diretor),
+        u.status === UsuarioStatus.Ativo && isPerfilCarteiraVendedor(u.perfil),
     )
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),
 );

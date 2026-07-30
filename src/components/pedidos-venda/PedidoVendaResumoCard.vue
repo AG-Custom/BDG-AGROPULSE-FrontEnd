@@ -14,6 +14,7 @@
       </span>
       <span v-if="pedido.recusadoEm">
         · Recusado em {{ formatarDataHora(pedido.recusadoEm) }}
+        <template v-if="rotuloRecusadoPor"> por {{ rotuloRecusadoPor }}</template>
       </span>
       <span v-if="pedido.expiradoEm">
         · Expirado em {{ formatarDataHora(pedido.expiradoEm) }}
@@ -61,11 +62,17 @@
     </div>
 
     <q-banner
-      v-if="pedido.motivoRecusa"
+      v-if="pedido.motivoRecusa || rotuloRecusadoPor"
       rounded
       class="pedido-venda-resumo__motivo"
     >
-      Motivo da recusa: {{ pedido.motivoRecusa }}
+      <template v-if="rotuloRecusadoPor">
+        Recusado por {{ rotuloRecusadoPor }}
+        <template v-if="pedido.motivoRecusa"> — </template>
+      </template>
+      <template v-if="pedido.motivoRecusa">
+        Motivo: {{ pedido.motivoRecusa }}
+      </template>
     </q-banner>
   </agro-card>
 </template>
@@ -86,6 +93,7 @@ defineProps<{
   rotuloCliente: string;
   rotuloVendedor: string;
   rotuloCondicao: string;
+  rotuloRecusadoPor?: string;
 }>();
 </script>
 

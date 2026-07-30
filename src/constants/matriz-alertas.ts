@@ -183,6 +183,16 @@ export const MatrizAlertas: Record<NotificacaoTipoValor, PoliticaAlerta> = {
     area: AreaAcesso.Financeiro,
     perfisPermitidos: PERFIS_FINANCEIROS,
   },
+  [NotificacaoTipo.ContingenciaSefaz]: {
+    area: AreaAcesso.Fiscal,
+    perfisPermitidos: [
+      PerfilUsuario.Diretor,
+      PerfilUsuario.Administrador,
+      PerfilUsuario.Gerente,
+      PerfilUsuario.Operacional,
+      PerfilUsuario.Administrativo,
+    ],
+  },
 };
 
 export function politicaDoAlerta(

@@ -118,7 +118,7 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';
 import { useCrm } from 'composables/useCrm';
 import { useUsuarios } from 'composables/useUsuarios';
-import { PerfilUsuario, UsuarioStatus } from 'constants/enums';
+import { isPerfilCarteiraVendedor, UsuarioStatus } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { CarteiraClienteItemDto } from 'types/dtos/crm.dto';
 import { formatarDecimal } from 'utils/formatters';
@@ -152,11 +152,7 @@ const vendedorOpcoes = computed(() =>
   usuarios.value
     .filter(
       (u) =>
-        u.status === UsuarioStatus.Ativo &&
-        (u.perfil === PerfilUsuario.Vendedor ||
-          u.perfil === PerfilUsuario.Consultor ||
-          u.perfil === PerfilUsuario.Gerente ||
-          u.perfil === PerfilUsuario.Diretor),
+        u.status === UsuarioStatus.Ativo && isPerfilCarteiraVendedor(u.perfil),
     )
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),
 );

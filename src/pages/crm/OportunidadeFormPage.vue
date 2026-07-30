@@ -134,7 +134,7 @@ import { useProdutos } from 'composables/useProdutos';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   EtapaOportunidadeOpcoes,
-  PerfilUsuario,
+  isPerfilCarteiraVendedor,
   UsuarioStatus,
 } from 'constants/enums';
 import type { OportunidadeFormModel } from 'types/dtos/crm.dto';
@@ -182,10 +182,7 @@ const vendedorOpcoes = computed(() =>
     .filter(
       (u) =>
         u.status === UsuarioStatus.Ativo &&
-        (u.perfil === PerfilUsuario.Vendedor ||
-          u.perfil === PerfilUsuario.Consultor ||
-          u.perfil === PerfilUsuario.Gerente ||
-          u.perfil === PerfilUsuario.Diretor ||
+        (isPerfilCarteiraVendedor(u.perfil) ||
           u.id === formulario.value.vendedorUsuarioId),
     )
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),

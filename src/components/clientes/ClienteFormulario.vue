@@ -178,7 +178,7 @@ import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   GrupoComercialOpcoes,
-  PerfilUsuario,
+  isPerfilCarteiraVendedor,
   TipoClienteOpcoes,
   TipoPessoaCliente,
   TipoPessoaClienteOpcoes,
@@ -261,10 +261,7 @@ const vendedorOpcoes = computed(() => {
     .filter(
       (item) =>
         item.status === UsuarioStatus.Ativo &&
-        (item.perfil === PerfilUsuario.Vendedor ||
-          item.perfil === PerfilUsuario.Consultor ||
-          item.perfil === PerfilUsuario.Gerente ||
-          item.perfil === PerfilUsuario.Diretor ||
+        (isPerfilCarteiraVendedor(item.perfil) ||
           item.id === formulario.value.vendedorUsuarioId),
     )
     .map((item) => ({

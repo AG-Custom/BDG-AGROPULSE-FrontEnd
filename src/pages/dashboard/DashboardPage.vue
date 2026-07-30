@@ -40,6 +40,33 @@
           </div>
         </div>
 
+        <div
+          v-if="podeVerAprovacoes"
+          class="row q-col-gutter-md q-mb-md"
+        >
+          <div class="col-12 col-md-6 col-lg-4">
+            <agro-card>
+              <div class="secao-header">
+                <div class="text-subtitle1">Fila de aprovações</div>
+                <agro-btn
+                  flat
+                  dense
+                  color="primary"
+                  label="Ver fila"
+                  descricao="Ir para fila de aprovações"
+                  :to="{ name: 'aprovacoes' }"
+                />
+              </div>
+              <metric-tile
+                label="Pedidos aguardando"
+                :value="String(filaAprovacoes.length)"
+                icon="rule"
+                :accent="filaAprovacoes.length > 0"
+              />
+            </agro-card>
+          </div>
+        </div>
+
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <agro-card>
@@ -155,18 +182,25 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import MetricTile from 'components/ui/MetricTile.vue';
+import { useAprovacoes } from 'composables/useAprovacoes';
 import { useAuth } from 'composables/useAuth';
 import { useDashboard } from 'composables/useDashboard';
 import { useVerCustos } from 'composables/useVerCustos';
+import { Permissoes } from 'constants/permissoes';
 import type { QTableColumn } from 'quasar';
 import { filtrarAlertasGerenciaisPorPolitica } from 'utils/alerta-politica';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-const { usuario } = useAuth();
+const { usuario, possuiPermissao } = useAuth();
 const { kpis, ranking, alertas, carregando, carregar } = useDashboard();
+const { fila: filaAprovacoes, carregar: carregarAprovacoes } = useAprovacoes();
 const { verCustos } = useVerCustos();
 const dias = ref('30');
+
+const podeVerAprovacoes = computed(() =>
+  possuiPermissao(Permissoes.Aprovacoes.Visualizar),
+);
 
 const alertasResumo = computed(() =>
   filtrarAlertasGerenciaisPorPolitica(
@@ -259,6 +293,9 @@ function variantSeveridade(severidade: string): 'error' | 'warning' | 'default' 
 
 async function atualizar(): Promise<void> {
   await carregar({ dias: Number(dias.value) || 30 });
+  if (podeVerAprovacoes.value) {
+    void carregarAprovacoes();
+  }
 }
 
 onMounted(() => {

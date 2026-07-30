@@ -34,6 +34,7 @@ export interface PedidoVendaResumoDto {
 
 export interface PedidoVendaDto extends PedidoVendaResumoDto {
   motivoRecusa: string | null;
+  recusadoPorUsuarioId: string | null;
   aprovadoEm: string | null;
   recusadoEm: string | null;
   expiradoEm: string | null;

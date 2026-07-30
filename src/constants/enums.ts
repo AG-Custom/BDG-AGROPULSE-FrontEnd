@@ -85,7 +85,7 @@ export const PerfilUsuarioOpcoes = [
   { label: 'Vendedor externo', value: PerfilUsuario.Vendedor },
   { label: 'Consultor técnico', value: PerfilUsuario.Consultor },
   { label: 'Administrativo (Financeiro)', value: PerfilUsuario.Administrativo },
-  { label: 'Operacional (Loja)', value: PerfilUsuario.Operacional },
+  { label: 'Operacional / Vendedor interno (Loja)', value: PerfilUsuario.Operacional },
   { label: 'RH', value: PerfilUsuario.Rh },
   { label: 'Administrador (legado)', value: PerfilUsuario.Administrador },
 ];
@@ -97,6 +97,15 @@ export const PerfilUsuarioCadastroOpcoes = PerfilUsuarioOpcoes.filter(
 export function isPerfilUsuarioGlobal(perfil: PerfilUsuarioValor): boolean {
   return (
     perfil === PerfilUsuario.Administrador || perfil === PerfilUsuario.Diretor
+  );
+}
+
+/** Perfis elegíveis como vendedor/carteira: externo, consultor técnico e operacional (balcão). */
+export function isPerfilCarteiraVendedor(perfil: PerfilUsuarioValor): boolean {
+  return (
+    perfil === PerfilUsuario.Vendedor ||
+    perfil === PerfilUsuario.Consultor ||
+    perfil === PerfilUsuario.Operacional
   );
 }
 
@@ -777,6 +786,23 @@ export const TravaAprovacaoTipoOpcoes = [
   { label: 'Atraso do cliente', value: TravaAprovacaoTipo.AtrasoCliente },
 ];
 
+export const TravaAprovacaoTipoExplicacoes: Record<TravaAprovacaoTipoValor, string> = {
+  [TravaAprovacaoTipo.MargemMinima]:
+    'O preço efetivo do item (preço unitário após o desconto) ficou abaixo do preço mínimo exigido. ' +
+    'O mínimo é calculado pelo custo médio dos lotes com saldo, acrescido da margem mínima (%) do produto ' +
+    '(ou da categoria, se for maior). Vendas abaixo dessa margem precisam de aprovação de gerente ou diretor.',
+  [TravaAprovacaoTipo.LimiteCredito]:
+    'O valor deste pedido, somado aos títulos em aberto do cliente, ultrapassa o limite de crédito cadastrado. ' +
+    'A exposição total (aberto + pedido) precisa caber no limite, ou um gerente/diretor deve aprovar a exceção.',
+  [TravaAprovacaoTipo.EstoqueInsuficiente]:
+    'A quantidade pedida é maior que o saldo disponível nos lotes da unidade. ' +
+    'Sem outras travas, o pedido fica pendente de estoque e pode liberar automaticamente após uma entrada. ' +
+    'Com outras travas, segue para a fila de aprovação após haver saldo.',
+  [TravaAprovacaoTipo.AtrasoCliente]:
+    'O cliente possui atraso em contas a receber acima do limiar configurado na empresa ' +
+    '(ou bloqueio efetivo por perfil). Novas vendas ficam retidas até regularização ou aprovação gerencial.',
+};
+
 export const NotificacaoTipo = {
   PedidoRetido: 'PedidoRetido',
   PedidoAprovado: 'PedidoAprovado',
@@ -799,6 +825,7 @@ export const NotificacaoTipo = {
   ContasVencidas: 'ContasVencidas',
   MetasLoja: 'MetasLoja',
   PedidoAguardandoAprovacao: 'PedidoAguardandoAprovacao',
+  ContingenciaSefaz: 'ContingenciaSefaz',
 } as const;
 
 export type NotificacaoTipoValor =
@@ -826,6 +853,7 @@ export const NotificacaoTipoOpcoes = [
   { label: 'Contas vencidas', value: NotificacaoTipo.ContasVencidas },
   { label: 'Metas da loja', value: NotificacaoTipo.MetasLoja },
   { label: 'Pedido aguardando aprovação', value: NotificacaoTipo.PedidoAguardandoAprovacao },
+  { label: 'Contingência SEFAZ', value: NotificacaoTipo.ContingenciaSefaz },
 ];
 
 export const NotificacaoPrioridade = {

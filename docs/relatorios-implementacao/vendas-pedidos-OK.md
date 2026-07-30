@@ -153,8 +153,10 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 | NFC-e / NF-e automática | ⚠️ stub | ✅ stub UI |
 | Contingência SEFAZ | ❌ | ❌ |
 | **Bloqueios unificados** | | |
-| Fila gerente (margem/crédito/inadimplência) | ⚠️ | ✅ fila + detalhe |
-| Estoque zerado → libera ao entrar | ⚠️ `PendenteEstoque` | ✅ status UI |
+| Fila gerente (margem/crédito/inadimplência) | ✅ | ✅ fila + **aprovar/recusar** + detalhe |
+| Estoque zerado → libera ao entrar | ✅ `PendenteEstoque` | ✅ status UI |
+| Notificação pós-decisão / PosVenda | ✅ | ✅ menu + navegação |
+| Motor notificações operacionais | ✅ job 1h + `POST /notificacoes/gerar` | ✅ matriz + deep-link |
 | **Devoluções** | | |
 | Busca NF-e original | ⚠️ | ✅ |
 | Total / parcial | ⚠️ | ⚠️ parcial |
@@ -185,3 +187,5 @@ Enum FE sincronizado com BE atual: status de espera continua `Aguardando` (não 
 | Fora de escopo | App mobile vendedor / consultor |
 
 **Status:** domínio e emissão Focus NFC-e/devolução cobertos; contingência com fila + job de retransmissão.
+
+**QA:** roteiro completo de notificações/aprovações/travas em [fluxo-teste-notificacoes-aprovacoes.md](./fluxo-teste-notificacoes-aprovacoes.md) (2026-07-30).

@@ -133,7 +133,7 @@ import { usePedidosVenda } from 'composables/usePedidosVenda';
 import { useProdutos } from 'composables/useProdutos';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
-  PerfilUsuario,
+  isPerfilCarteiraVendedor,
   StatusAmostraCampoOpcoes,
   UsuarioStatus,
 } from 'constants/enums';
@@ -185,10 +185,7 @@ const vendedorOpcoes = computed(() =>
     .filter(
       (u) =>
         u.status === UsuarioStatus.Ativo &&
-        (u.perfil === PerfilUsuario.Vendedor ||
-          u.perfil === PerfilUsuario.Consultor ||
-          u.perfil === PerfilUsuario.Gerente ||
-          u.perfil === PerfilUsuario.Diretor ||
+        (isPerfilCarteiraVendedor(u.perfil) ||
           u.id === formulario.value.vendedorUsuarioId),
     )
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),

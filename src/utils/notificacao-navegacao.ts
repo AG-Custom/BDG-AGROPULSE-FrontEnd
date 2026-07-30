@@ -10,6 +10,13 @@ export function rotaDaNotificacao(item: NotificacaoDto): RouteLocationRaw | null
     tipo === NotificacaoTipo.PedidoAguardandoAprovacao ||
     tipo === NotificacaoTipo.PedidoRetido
   ) {
+    if (item.idReferencia) {
+      return {
+        name: 'pedido-venda-detalhe',
+        params: { id: item.idReferencia },
+      };
+    }
+
     return { name: 'aprovacoes' };
   }
 
@@ -88,6 +95,10 @@ export function rotaDaNotificacao(item: NotificacaoDto): RouteLocationRaw | null
 
   if (tipo === NotificacaoTipo.ComissoesMes || tipo === NotificacaoTipo.MetasLoja) {
     return { name: 'metas-vendedor' };
+  }
+
+  if (tipo === NotificacaoTipo.ContingenciaSefaz) {
+    return { name: 'fiscal-contingencia' };
   }
 
   return null;

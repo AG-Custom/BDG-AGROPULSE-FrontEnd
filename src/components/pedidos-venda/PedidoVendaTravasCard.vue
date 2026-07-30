@@ -26,7 +26,19 @@
         :key="`${trava.tipo}-${trava.motivo}`"
         class="pedido-venda-travas__item"
       >
-        <agro-badge :label="rotuloTrava(trava.tipo)" variant="warning" />
+        <div class="pedido-venda-travas__item-topo">
+          <agro-badge :label="rotuloTrava(trava.tipo)" variant="warning" />
+          <q-icon
+            name="info"
+            size="18px"
+            class="pedido-venda-travas__info text-tertiary"
+            :aria-label="`Explicação: ${rotuloTrava(trava.tipo)}`"
+          >
+            <q-tooltip max-width="320px" anchor="top middle" self="bottom middle">
+              {{ explicacaoTrava(trava.tipo) }}
+            </q-tooltip>
+          </q-icon>
+        </div>
         <p class="pedido-venda-travas__motivo">{{ trava.motivo }}</p>
       </div>
     </div>
@@ -39,6 +51,7 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import {
+  TravaAprovacaoTipoExplicacoes,
   TravaAprovacaoTipoOpcoes,
   type TravaAprovacaoTipoValor,
 } from 'constants/enums';
@@ -53,6 +66,14 @@ function rotuloTrava(tipo: TravaAprovacaoTipoValor | string): string {
   return (
     TravaAprovacaoTipoOpcoes.find((item) => item.value === tipo)?.label ?? tipo
   );
+}
+
+function explicacaoTrava(tipo: TravaAprovacaoTipoValor | string): string {
+  if (tipo in TravaAprovacaoTipoExplicacoes) {
+    return TravaAprovacaoTipoExplicacoes[tipo as TravaAprovacaoTipoValor];
+  }
+
+  return 'Esta trava impede a auto-aprovação do pedido e exige decisão de um aprovador.';
 }
 </script>
 
@@ -80,6 +101,17 @@ function rotuloTrava(tipo: TravaAprovacaoTipoValor | string): string {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
   padding: var(--spacing-3);
+}
+
+.pedido-venda-travas__item-topo {
+  align-items: center;
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.pedido-venda-travas__info {
+  cursor: help;
+  flex-shrink: 0;
 }
 
 .pedido-venda-travas__motivo {

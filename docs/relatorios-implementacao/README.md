@@ -44,6 +44,7 @@ Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Fr
 | Cobrança e Crédito Rural | [cobranca-credito-rural-OK.md](./cobranca-credito-rural-OK.md) | Domínio OK |
 | Contratos Agrícolas | [contratos-agricolas-OK.md](./contratos-agricolas-OK.md) | Domínio OK |
 | RH e Folha | — | **Fora de escopo** |
+| QA — Notificações / aprovações / travas | [fluxo-teste-notificacoes-aprovacoes.md](./fluxo-teste-notificacoes-aprovacoes.md) | Roteiro de teste |
 | Legado React — mocks / sem integração real | [legado-stub-integracoes.md](./legado-stub-integracoes.md) | Documento para cliente |
 
 ---

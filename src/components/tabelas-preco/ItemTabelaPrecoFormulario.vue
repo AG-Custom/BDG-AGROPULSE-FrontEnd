@@ -42,6 +42,7 @@ import type {
   TabelaPrecoItemEdicaoFormModel,
   TabelaPrecoItemFormModel,
 } from 'types/dtos/tabela-preco.dto';
+import { formatarMoedaParaInput } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
@@ -75,9 +76,24 @@ const produtoId = computed({
   set(valor: string) {
     if (formularioCriar.value) {
       formularioCriar.value.produtoId = valor;
+      preencherPrecoCadastro(valor);
     }
   },
 });
+
+function preencherPrecoCadastro(produtoSelecionadoId: string): void {
+  if (!formularioCriar.value || !produtoSelecionadoId) {
+    return;
+  }
+
+  const produto = produtos.value.find((item) => item.id === produtoSelecionadoId);
+
+  if (!produto) {
+    return;
+  }
+
+  formularioCriar.value.preco = formatarMoedaParaInput(produto.precoVenda);
+}
 
 const preco = computed({
   get() {

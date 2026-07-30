@@ -124,7 +124,7 @@ import { usePrecificacao } from 'composables/usePrecificacao';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
   FormaPagamentoOpcoes,
-  PerfilUsuario,
+  isPerfilCarteiraVendedor,
   UsuarioStatus,
 } from 'constants/enums';
 import type { QForm } from 'quasar';
@@ -183,9 +183,7 @@ const vendedorOpcoes = computed(() =>
     .filter(
       (usuario) =>
         usuario.status === UsuarioStatus.Ativo &&
-        (usuario.perfil === PerfilUsuario.Vendedor ||
-          usuario.perfil === PerfilUsuario.Gerente ||
-          usuario.perfil === PerfilUsuario.Diretor ||
+        (isPerfilCarteiraVendedor(usuario.perfil) ||
           usuario.id === formulario.value.vendedorUsuarioId),
     )
     .map((usuario) => ({
