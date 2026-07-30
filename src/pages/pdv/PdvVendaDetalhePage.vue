@@ -1,15 +1,15 @@
 <template>
   <q-page class="agro-page">
     <app-page-header :titulo="'Venda PDV'" :subtitulo="subtitulo">
-      <agro-btn
-        v-if="podeEmitirNfce"
-        color="primary"
-        unelevated
-        label="Emitir NFC-e"
-        descricao="Emitir NFC-e (stub fiscal)"
-        :loading="emitindoNfce"
-        @click="emitir"
-      />
+        <agro-btn
+          v-if="podeEmitirNfce"
+          color="primary"
+          unelevated
+          label="Emitir NFC-e"
+          descricao="Emitir NFC-e via Focus NFe"
+          :loading="emitindoNfce"
+          @click="emitir"
+        />
       <agro-btn
         v-if="podeCancelar"
         color="negative"

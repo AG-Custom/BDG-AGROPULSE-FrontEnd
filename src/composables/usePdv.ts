@@ -119,7 +119,8 @@ export function usePdv() {
 
     try {
       const resultado = await pdvService.emitirNfce(vendaId);
-      sucesso(resultado.mensagem ?? `NFC-e: ${resultado.status}`);
+      const detalhe = [resultado.status, resultado.chaveAcesso].filter(Boolean).join(' · ');
+      sucesso(resultado.mensagem ?? (detalhe ? `NFC-e: ${detalhe}` : 'NFC-e processada'));
       await obterVenda(vendaId);
       return true;
     } catch (e) {

@@ -31,6 +31,13 @@
                 :hint="configuracao?.possuiTokenFocus ? 'Token já cadastrado — informe para substituir' : undefined"
               />
             </div>
+            <div class="col-12 col-md-6">
+              <q-toggle
+                v-model="formulario.focusNfeHomologacao"
+                label="Ambiente de homologação Focus"
+                color="primary"
+              />
+            </div>
           </div>
           <div class="agro-form-actions">
             <agro-btn
@@ -197,6 +204,7 @@ const {
 const formulario = ref<ConfiguracaoFiscalFormModel>({
   regimeTributario: '',
   focusNfeToken: '',
+  focusNfeHomologacao: true,
 });
 const xmlConteudo = ref('');
 const manifestacao = reactive({
@@ -210,6 +218,7 @@ watch(
   (cfg) => {
     if (cfg) {
       formulario.value.regimeTributario = cfg.regimeTributario;
+      formulario.value.focusNfeHomologacao = cfg.focusNfeHomologacao ?? true;
     }
   },
   { immediate: true },
