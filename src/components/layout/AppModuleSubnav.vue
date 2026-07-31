@@ -3,8 +3,8 @@
     <div class="app-module-subnav__scroll">
       <router-link
         v-for="item in filhosVisiveis"
-        :key="item.routeName"
-        :to="{ name: item.routeName }"
+        :key="chaveItem(item)"
+        :to="destinoItem(item)"
         class="app-module-subnav__link"
         :class="{ 'app-module-subnav__link--active': filhoAtivo(item) }"
       >
@@ -16,8 +16,23 @@
 
 <script setup lang="ts">
 import { useNavegacaoModulos } from 'composables/useNavegacaoModulos';
+import type { ItemNavegacao } from 'constants/navegacao-modulos';
+import type { RouteLocationRaw } from 'vue-router';
 
 const { filhosVisiveis, mostrarSubnav, filhoAtivo } = useNavegacaoModulos();
+
+function chaveItem(item: ItemNavegacao): string {
+  if (!item.query) {
+    return item.routeName;
+  }
+  return `${item.routeName}?${new URLSearchParams(item.query).toString()}`;
+}
+
+function destinoItem(item: ItemNavegacao): RouteLocationRaw {
+  return item.query
+    ? { name: item.routeName, query: item.query }
+    : { name: item.routeName };
+}
 </script>
 
 <style scoped>

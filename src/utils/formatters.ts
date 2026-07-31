@@ -48,6 +48,21 @@ export function formatarTelefone(valor: string): string {
   return digits.replace(/^(\d{2})(\d{5})(\d)/, '($1) $2-$3');
 }
 
+export function apenasAlfanumericos(valor: string): string {
+  return valor.replace(/[^A-Za-z0-9]/g, '');
+}
+
+export function formatarPlaca(valor: string): string {
+  const limpo = apenasAlfanumericos(valor).toUpperCase().slice(0, 7);
+  if (limpo.length <= 3) {
+    return limpo;
+  }
+  if (limpo.length >= 5 && /[A-Z]/.test(limpo[4] ?? '')) {
+    return limpo;
+  }
+  return `${limpo.slice(0, 3)}-${limpo.slice(3)}`;
+}
+
 export function slugify(valor: string): string {
   return valor
     .replace(/([a-z])([A-Z])/g, '$1-$2')

@@ -75,11 +75,42 @@
               outlined
               label="CNPJ"
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
+              hint="14 dígitos"
+              :mask="MASCARAS.CNPJ"
+              :maxlength="TAMANHO_FORMATADO.CNPJ"
+              inputmode="numeric"
+              :rules="[obrigatorio, cnpjValidator]"
             />
-            <q-input v-model="formulario.rntrc" outlined label="RNTRC" class="q-mb-md" />
-            <q-input v-model="formulario.telefone" outlined label="Telefone" class="q-mb-md" />
-            <q-input v-model="formulario.email" outlined label="E-mail" class="q-mb-md" />
+            <q-input
+              v-model="formulario.rntrc"
+              outlined
+              label="RNTRC"
+              class="q-mb-md"
+              hint="8 ou 9 dígitos"
+              :mask="MASCARAS.RNTRC"
+              :maxlength="TAMANHO_FORMATADO.RNTRC"
+              inputmode="numeric"
+              :rules="[rntrcValidator]"
+            />
+            <q-input
+              v-model="formulario.telefone"
+              outlined
+              label="Telefone"
+              class="q-mb-md"
+              hint="10 ou 11 dígitos"
+              :mask="mascaraTelefoneAtual"
+              :maxlength="TAMANHO_FORMATADO.TELEFONE_CELULAR"
+              inputmode="numeric"
+              :rules="[telefoneValidator]"
+            />
+            <q-input
+              v-model="formulario.email"
+              outlined
+              label="E-mail"
+              class="q-mb-md"
+              type="email"
+              :rules="[emailValidator]"
+            />
             <div class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogCriar = false" />
               <agro-btn
@@ -104,16 +135,16 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { transportadoraVazia, useLogistica } from 'composables/useLogistica';
+import { MASCARAS, TAMANHO_FORMATADO, mascaraTelefone } from 'constants/masks';
 import type { QTableColumn } from 'quasar';
 import type {
   TransportadoraLogisticaDto,
   TransportadoraLogisticaFormModel,
 } from 'types/dtos/logistica.dto';
-import { obrigatorio } from 'utils/validators';
+import { formatarCnpj, formatarTelefone } from 'utils/formatters';
+import { cnpj, email, obrigatorio, rntrc, telefone } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-
 
 const router = useRouter();
 const { transportadoras, carregando, salvando, carregarTransportadoras, criarTransportadora } =
@@ -121,6 +152,12 @@ const { transportadoras, carregando, salvando, carregarTransportadoras, criarTra
 const busca = ref('');
 const dialogCriar = ref(false);
 const formulario = ref<TransportadoraLogisticaFormModel>(transportadoraVazia());
+
+const cnpjValidator = cnpj;
+const telefoneValidator = telefone;
+const emailValidator = email;
+const rntrcValidator = rntrc;
+const mascaraTelefoneAtual = computed(() => mascaraTelefone(formulario.value.telefone));
 
 const filtrados = computed(() => {
   const termo = busca.value.trim().toLowerCase();
@@ -134,9 +171,19 @@ const filtrados = computed(() => {
 
 const colunas: QTableColumn<TransportadoraLogisticaDto>[] = [
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
-  { name: 'cnpj', label: 'CNPJ', field: 'cnpj', align: 'left' },
+  {
+    name: 'cnpj',
+    label: 'CNPJ',
+    field: (r) => formatarCnpj(r.cnpj),
+    align: 'left',
+  },
   { name: 'rntrc', label: 'RNTRC', field: 'rntrc', align: 'left' },
-  { name: 'telefone', label: 'Telefone', field: 'telefone', align: 'left' },
+  {
+    name: 'telefone',
+    label: 'Telefone',
+    field: (r) => (r.telefone ? formatarTelefone(r.telefone) : '—'),
+    align: 'left',
+  },
   { name: 'fretes', label: 'Fretes', field: (r) => r.fretes?.length ?? 0, align: 'right' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];

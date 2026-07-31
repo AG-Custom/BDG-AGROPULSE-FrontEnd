@@ -19,8 +19,11 @@
                 outlined
                 label="Placa"
                 class="field-required"
+                hint="ABC-1234 ou ABC1D23"
+                :mask="mascaraPlacaAtual"
+                :maxlength="tamanhoPlacaAtual"
                 :readonly="somenteLeitura"
-                :rules="[obrigatorio]"
+                :rules="somenteLeitura ? undefined : [obrigatorio, placaValidator]"
               />
             </div>
             <div class="col-12 col-md-3">
@@ -128,7 +131,12 @@
                 v-model="formulario.motoristaCnh"
                 outlined
                 label="CNH"
+                hint="11 dígitos"
+                :mask="MASCARAS.CNH"
+                :maxlength="TAMANHO_FORMATADO.CNH"
+                inputmode="numeric"
                 :readonly="somenteLeitura"
+                :rules="somenteLeitura ? undefined : [cnhValidator]"
               />
             </div>
             <div class="col-6 col-md-4">
@@ -176,8 +184,15 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useLogistica, veiculoDtoParaForm, veiculoVazio } from 'composables/useLogistica';
 import { StatusVeiculoLogisticaOpcoes, TipoVeiculoLogisticaOpcoes } from 'constants/enums';
+import {
+  MASCARAS,
+  TAMANHO_FORMATADO,
+  mascaraPlaca,
+  tamanhoFormatadoPlaca,
+} from 'constants/masks';
 import type { VeiculoLogisticaFormModel } from 'types/dtos/logistica.dto';
-import { obrigatorio } from 'utils/validators';
+import { formatarPlaca } from 'utils/formatters';
+import { cnh, obrigatorio, placa } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -218,6 +233,11 @@ const subtitulo = computed(() => {
 const carregandoPagina = ref(modo.value === 'editar' || modo.value === 'visualizar');
 const formulario = ref<VeiculoLogisticaFormModel>(veiculoVazio());
 
+const placaValidator = placa;
+const cnhValidator = cnh;
+const mascaraPlacaAtual = computed(() => mascaraPlaca(formulario.value.placa));
+const tamanhoPlacaAtual = computed(() => tamanhoFormatadoPlaca(formulario.value.placa));
+
 async function salvar(): Promise<void> {
   if (somenteLeitura.value) {
     return;
@@ -236,7 +256,10 @@ async function salvar(): Promise<void> {
 onMounted(async () => {
   if (modo.value === 'editar' || modo.value === 'visualizar') {
     const ok = await obterVeiculo(String(route.params.id));
-    if (ok && veiculo.value) formulario.value = veiculoDtoParaForm(veiculo.value);
+    if (ok && veiculo.value) {
+      formulario.value = veiculoDtoParaForm(veiculo.value);
+      formulario.value.placa = formatarPlaca(formulario.value.placa);
+    }
   }
   carregandoPagina.value = false;
 });

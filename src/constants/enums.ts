@@ -1094,10 +1094,23 @@ export const TipoManifestacaoSefazOpcoes = [
   { label: 'Não realizada', value: TipoManifestacaoSefaz.NaoRealizada },
 ];
 
+export const TipoNotaFiscal = {
+  Entrada: 'Entrada',
+  Saida: 'Saida',
+} as const;
+
+export type TipoNotaFiscalValor = (typeof TipoNotaFiscal)[keyof typeof TipoNotaFiscal];
+
+export const TipoNotaFiscalOpcoes = [
+  { label: 'Entrada', value: TipoNotaFiscal.Entrada },
+  { label: 'Saída', value: TipoNotaFiscal.Saida },
+];
+
 export const TipoSpedFiscal = {
   EfdIcmsIpi: 'EfdIcmsIpi',
   EfdContribuicoes: 'EfdContribuicoes',
   Contabil: 'Contabil',
+  EfdReinf: 'EfdReinf',
 } as const;
 
 export type TipoSpedFiscalValor = (typeof TipoSpedFiscal)[keyof typeof TipoSpedFiscal];
@@ -1106,6 +1119,7 @@ export const TipoSpedFiscalOpcoes = [
   { label: 'EFD ICMS/IPI', value: TipoSpedFiscal.EfdIcmsIpi },
   { label: 'EFD Contribuições', value: TipoSpedFiscal.EfdContribuicoes },
   { label: 'SPED Contábil', value: TipoSpedFiscal.Contabil },
+  { label: 'EFD-Reinf (R-1000 / Funrural)', value: TipoSpedFiscal.EfdReinf },
 ];
 
 export const FontePreco = {

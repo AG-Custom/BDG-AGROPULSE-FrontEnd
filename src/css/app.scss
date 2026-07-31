@@ -259,7 +259,17 @@ body {
   }
 
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height).q-field--float .q-field__label {
-    transform: translateY(-27%) scale(0.75);
+    transform: translateY(-40%) scale(0.75);
+  }
+
+  .q-field--outlined:not(.q-textarea):not(.q-field--auto-height).q-field--float {
+    .q-field__native,
+    .q-field__input,
+    .q-field__prefix,
+    .q-field__suffix {
+      padding-top: 12px;
+      padding-bottom: 0;
+    }
   }
 
   .q-field--with-bottom {

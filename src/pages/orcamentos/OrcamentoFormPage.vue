@@ -9,16 +9,15 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.clienteId"
-                outlined
+                entidade="cliente"
                 label="Cliente"
                 class="field-required"
-                emit-value
-                map-options
                 :options="clienteOpcoes"
                 :rules="[obrigatorio]"
                 :loading="carregandoClientes"
+                @atualizar="carregarClientes()"
                 @update:model-value="onClienteChange"
               />
             </div>
@@ -74,17 +73,16 @@
             class="row q-col-gutter-md orcamento-form__item"
           >
             <div class="col-12 col-md-5">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :loading="carregandoItensTabela"
                 :rules="[obrigatorio]"
-                @update:model-value="(id: string) => void onProdutoItem(index, id)"
+                @atualizar="carregarProdutos()"
+                @update:model-value="(id: unknown) => void onProdutoItem(index, String(id ?? ''))"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -146,6 +144,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { useOrcamento } from 'composables/useOrcamento';
 import { useOrcamentos } from 'composables/useOrcamentos';
@@ -229,8 +228,9 @@ const vendedorOpcoes = computed(() =>
     .map((u) => ({ label: nomeCompleto(u), value: u.id })),
 );
 
-async function onClienteChange(clienteId: string): Promise<void> {
-  await carregarTabelasPermitidas({ clienteId: clienteId || null });
+async function onClienteChange(clienteId: unknown): Promise<void> {
+  const id = typeof clienteId === 'string' ? clienteId : '';
+  await carregarTabelasPermitidas({ clienteId: id || null });
   if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }

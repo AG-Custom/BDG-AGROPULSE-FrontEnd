@@ -118,6 +118,53 @@ export function documentoFornecedor(tipoPessoa: string) {
   };
 }
 
+export function documentoCpfCnpj(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  if (digits.length === 11) {
+    return cpf(val);
+  }
+  if (digits.length === 14) {
+    return cnpj(val);
+  }
+  return 'Informe um CPF (11) ou CNPJ (14) válido';
+}
+
+export function placa(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const limpo = val.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  const antiga = /^[A-Z]{3}\d{4}$/.test(limpo);
+  const mercosul = /^[A-Z]{3}\d[A-Z]\d{2}$/.test(limpo);
+  return antiga || mercosul || 'Informe uma placa válida (ABC-1234 ou ABC1D23)';
+}
+
+export function rntrc(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  return (
+    (digits.length === 8 || digits.length === 9) ||
+    'Informe um RNTRC com 8 ou 9 dígitos'
+  );
+}
+
+export function cnh(val: string): true | string {
+  if (!val) {
+    return true;
+  }
+
+  const digits = val.replace(/\D/g, '');
+  return digits.length === 11 || 'Informe uma CNH com 11 dígitos';
+}
+
 export function ncm(val: string): true | string {
   if (!val) {
     return true;

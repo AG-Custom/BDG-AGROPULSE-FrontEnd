@@ -1,16 +1,15 @@
 <template>
   <q-form ref="formRef" class="saida-estoque-formulario" greedy>
-    <q-select
+    <agro-select-cadastro
       v-model="formulario.produtoId"
-      outlined
+      entidade="produto"
       label="Produto"
       class="field-required"
-      emit-value
-      map-options
       aria-required="true"
       :options="produtoOpcoes"
       :loading="carregandoProdutos"
       :rules="[obrigatorio]"
+      @atualizar="carregarProdutos()"
       @update:model-value="onProdutoAlterado"
     />
 
@@ -31,18 +30,18 @@
       label="Usar FEFO (primeiro a vencer)"
     />
 
-    <q-select
+    <agro-select-cadastro
       v-if="!formulario.usarFefo"
       v-model="formulario.loteId"
-      outlined
+      entidade="lote"
       label="Lote"
       class="field-required"
-      emit-value
-      map-options
       aria-required="true"
       :options="loteOpcoes"
       :loading="carregandoLotes"
       :rules="[obrigatorio]"
+      :desabilitar-cadastro="!formulario.produtoId"
+      @atualizar="atualizarLotes()"
     />
 
     <q-input
@@ -72,6 +71,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import { MotivoSaidaEstoqueOpcoes, OrigemMovimentacaoEstoque } from 'constants/enums';
@@ -86,7 +86,11 @@ const formulario = defineModel<SaidaEstoqueFormModel>('formulario', { required: 
 const formRef = ref<QForm | null>(null);
 const quantidadePositivaValidator = quantidadePositiva;
 
-const { produtoOpcoes, carregando: carregandoProdutos } = useProdutoOpcoesEstoque();
+const {
+  produtoOpcoes,
+  carregando: carregandoProdutos,
+  carregar: carregarProdutos,
+} = useProdutoOpcoesEstoque();
 const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
 
 const exigeJustificativa = computed(
@@ -106,14 +110,22 @@ function justificativaMinima(valor: string): true | string {
   return valor.trim().length >= 10 || 'Informe ao menos 10 caracteres.';
 }
 
-async function onProdutoAlterado(produtoId: string | null): Promise<void> {
+async function onProdutoAlterado(produtoId: unknown): Promise<void> {
+  const id = typeof produtoId === 'string' ? produtoId : '';
   formulario.value.loteId = '';
 
-  if (!produtoId) {
+  if (!id) {
     return;
   }
 
-  await carregarLotes({ produtoId, apenasComSaldo: true });
+  await carregarLotes({ produtoId: id, apenasComSaldo: true });
+}
+
+async function atualizarLotes(): Promise<void> {
+  if (!formulario.value.produtoId) {
+    return;
+  }
+  await carregarLotes({ produtoId: formulario.value.produtoId, apenasComSaldo: true });
 }
 
 watch(

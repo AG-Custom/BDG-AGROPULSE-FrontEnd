@@ -7,15 +7,14 @@
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="fornecedorId"
-                outlined
+                entidade="fornecedor"
                 label="Fornecedor"
                 class="field-required"
-                emit-value
-                map-options
                 :options="fornecedorOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarFornecedores()"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -30,15 +29,14 @@
 
           <div v-for="(item, index) in itens" :key="item.chave" class="row q-col-gutter-md q-mb-sm">
             <div class="col-12 col-md-5">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-4 col-md-2">
@@ -74,6 +72,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';

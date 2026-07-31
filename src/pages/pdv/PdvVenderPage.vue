@@ -47,8 +47,11 @@
                 v-model="formulario.clienteDocumentoAvulso"
                 outlined
                 label="CPF/CNPJ avulso"
-                hint="Consumidor sem cadastro"
-                maxlength="18"
+                hint="Consumidor sem cadastro — CPF ou CNPJ"
+                :mask="mascaraDocumentoAtual"
+                :maxlength="tamanhoDocumentoAtual"
+                inputmode="numeric"
+                :rules="[documentoValidator]"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -205,13 +208,14 @@ import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
 import { FormaPagamento, FormaPagamentoPdvOpcoes } from 'constants/enums';
+import { mascaraDocumento, tamanhoFormatadoDocumento } from 'constants/masks';
 import type {
   PdvItemFormModel,
   PdvPagamentoFormModel,
   PdvVendaFormModel,
 } from 'types/dtos/pdv.dto';
 import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
-import { obrigatorio } from 'utils/validators';
+import { documentoCpfCnpj, obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -258,6 +262,14 @@ const formulario = ref<PdvVendaFormModel>({
   itens: [novoItem()],
   pagamentos: [novoPagamento()],
 });
+
+const documentoValidator = documentoCpfCnpj;
+const mascaraDocumentoAtual = computed(() =>
+  mascaraDocumento(formulario.value.clienteDocumentoAvulso),
+);
+const tamanhoDocumentoAtual = computed(() =>
+  tamanhoFormatadoDocumento(formulario.value.clienteDocumentoAvulso),
+);
 
 const {
   produtoOpcoes,

@@ -144,15 +144,13 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async sair() {
-      try {
-        await authService.logout();
-      } catch {
-        // Cookies podem já estar inválidos; limpar estado local mesmo assim.
-      }
-
       limparSessao();
       this.limparEstado();
       this.verificado = true;
+
+      try {
+        await authService.logout();
+      } catch {}
     },
 
     limparEstado() {

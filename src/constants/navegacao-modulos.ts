@@ -1,3 +1,4 @@
+import { TipoContrato } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
 
 export type FlagNavegacao =
@@ -12,6 +13,8 @@ export interface ItemNavegacao {
   /** Permissão Visualizar necessária; omitido = sempre visível se o módulo estiver. */
   permissao?: string;
   flag?: FlagNavegacao;
+  /** Query string opcional (ex.: tipo de contrato no legado). */
+  query?: Record<string, string>;
 }
 
 export interface ModuloNavegacao {
@@ -44,8 +47,8 @@ export const NAVEGACAO_DASHBOARD: ModuloNavegacao = {
 };
 
 /**
- * Estrutura 100% alinhada ao menu do legado (Sidebar.tsx):
- * Operacional → Produção → Financeiro → Relacionamento → Gestão → Base
+ * Estrutura alinhada ao menu/abas do legado (Sidebar + TABS por página).
+ * Extras só do novo ficam no final de cada módulo.
  */
 export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
   {
@@ -78,7 +81,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Orcamentos.Visualizar,
           },
           {
-            label: 'PDV',
+            label: 'PDV — Balcão',
             routeName: 'pdv-vender',
             permissao: Permissoes.Pdv.Visualizar,
           },
@@ -116,7 +119,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/estoque'],
         filhos: [
           {
-            label: 'Saldos',
+            label: 'Posição de Estoque',
             routeName: 'estoque-saldos',
             permissao: Permissoes.Estoque.Visualizar,
           },
@@ -141,7 +144,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Estoque.Visualizar,
           },
           {
-            label: 'Inventários',
+            label: 'Inventário Físico',
             routeName: 'estoque-inventarios',
             permissao: Permissoes.Estoque.Visualizar,
           },
@@ -159,18 +162,19 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/compras', '/expedicao', '/fornecedores'],
         filhos: [
           {
-            label: 'Recebimentos',
+            label: 'Recebimento de NF-e',
             routeName: 'recebimentos-compra',
             permissao: Permissoes.Compras.Visualizar,
           },
           {
-            label: 'Histórico',
+            label: 'Histórico de Compras',
             routeName: 'historico-compras',
             permissao: Permissoes.Compras.Visualizar,
           },
           {
             label: 'Fornecedores',
             routeName: 'fornecedores',
+            permissao: Permissoes.Fornecedores.Visualizar,
           },
           {
             label: 'Solicitações',
@@ -222,17 +226,12 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/logistica'],
         filhos: [
           {
-            label: 'Dashboard',
-            routeName: 'logistica-dashboard',
-            permissao: Permissoes.Logistica.Visualizar,
-          },
-          {
             label: 'Frota',
             routeName: 'logistica-veiculos',
             permissao: Permissoes.Logistica.Visualizar,
           },
           {
-            label: 'Cargas',
+            label: 'Programação',
             routeName: 'logistica-cargas',
             permissao: Permissoes.Logistica.Visualizar,
           },
@@ -242,7 +241,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Logistica.Visualizar,
           },
           {
-            label: 'Docs',
+            label: 'CT-e / MDF-e',
             routeName: 'logistica-docs-transporte',
             permissao: Permissoes.Logistica.Visualizar,
           },
@@ -257,8 +256,13 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Logistica.Visualizar,
           },
           {
-            label: 'Custos',
+            label: 'Relatórios',
             routeName: 'logistica-custos',
+            permissao: Permissoes.Logistica.Visualizar,
+          },
+          {
+            label: 'Dashboard',
+            routeName: 'logistica-dashboard',
             permissao: Permissoes.Logistica.Visualizar,
           },
         ],
@@ -277,14 +281,32 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/producao'],
         filhos: [
           {
-            label: 'Ordens produção',
+            label: 'Ordens de Produção',
             routeName: 'ordens-producao',
             permissao: Permissoes.Producao.Visualizar,
             flag: 'industriaProducao',
           },
           {
-            label: 'Receitas / BOM',
+            label: 'Estrutura de Produto (BOM)',
             routeName: 'receitas-producao',
+            permissao: Permissoes.Producao.Visualizar,
+            flag: 'industriaProducao',
+          },
+          {
+            label: 'Controle de Qualidade',
+            routeName: 'laudos',
+            permissao: Permissoes.Producao.Visualizar,
+            flag: 'industriaProducao',
+          },
+          {
+            label: 'Paradas de Linha',
+            routeName: 'paradas-linha',
+            permissao: Permissoes.Producao.Visualizar,
+            flag: 'industriaProducao',
+          },
+          {
+            label: 'Eficiência e OEE',
+            routeName: 'oee',
             permissao: Permissoes.Producao.Visualizar,
             flag: 'industriaProducao',
           },
@@ -295,26 +317,8 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             flag: 'industriaProducao',
           },
           {
-            label: 'Laudos qualidade',
-            routeName: 'laudos',
-            permissao: Permissoes.Producao.Visualizar,
-            flag: 'industriaProducao',
-          },
-          {
             label: 'Fichas técnicas',
             routeName: 'fichas-tecnicas',
-            permissao: Permissoes.Producao.Visualizar,
-            flag: 'industriaProducao',
-          },
-          {
-            label: 'Paradas de linha',
-            routeName: 'paradas-linha',
-            permissao: Permissoes.Producao.Visualizar,
-            flag: 'industriaProducao',
-          },
-          {
-            label: 'OEE',
-            routeName: 'oee',
             permissao: Permissoes.Producao.Visualizar,
             flag: 'industriaProducao',
           },
@@ -327,14 +331,10 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/safras', '/rastreabilidade'],
         filhos: [
           {
-            label: 'Fazendas',
-            routeName: 'safras-fazendas',
+            label: 'Planejamento de safras',
+            routeName: 'safras-planejamento',
             permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
-            label: 'Glebas',
-            routeName: 'safras-glebas',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'industria',
           },
           {
             label: 'Talhões',
@@ -347,8 +347,36 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Rastreabilidade.Visualizar,
           },
           {
-            label: 'Diário de campo',
+            label: 'Diário de Campo',
             routeName: 'safras-diario-campo',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Ordens de Serviço',
+            routeName: 'safras-ordens-servico',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'industria',
+          },
+          {
+            label: 'Custeio e Resultado',
+            routeName: 'safras-custeio',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'industria',
+          },
+          {
+            label: 'OEE de Campo',
+            routeName: 'safras-oee-campo',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'industria',
+          },
+          {
+            label: 'Fazendas',
+            routeName: 'safras-fazendas',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Glebas',
+            routeName: 'safras-glebas',
             permissao: Permissoes.Rastreabilidade.Visualizar,
           },
           {
@@ -367,40 +395,10 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Rastreabilidade.Visualizar,
           },
           {
-            label: 'Visitas técnicas',
-            routeName: 'safras-visitas-tecnicas',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'revenda',
-          },
-          {
             label: 'Recomendações',
             routeName: 'safras-recomendacoes',
             permissao: Permissoes.Rastreabilidade.Visualizar,
             flag: 'revenda',
-          },
-          {
-            label: 'Planejamento de safras',
-            routeName: 'safras-planejamento',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'industria',
-          },
-          {
-            label: 'OS agrícola',
-            routeName: 'safras-ordens-servico',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'industria',
-          },
-          {
-            label: 'Custeio',
-            routeName: 'safras-custeio',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'industria',
-          },
-          {
-            label: 'OEE campo',
-            routeName: 'safras-oee-campo',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'industria',
           },
         ],
       },
@@ -417,22 +415,22 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/financeiro', '/formas-pagamento-config'],
         filhos: [
           {
-            label: 'Contas a pagar',
+            label: 'Contas a Pagar',
             routeName: 'contas-pagar',
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Contas a receber',
+            label: 'Contas a Receber',
             routeName: 'contas-receber',
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Fluxo de caixa',
+            label: 'Fluxo de Caixa',
             routeName: 'fluxo-caixa',
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Conciliação',
+            label: 'Conciliação Bancária',
             routeName: 'conciliacao-bancaria',
             permissao: Permissoes.Financeiro.Visualizar,
           },
@@ -442,7 +440,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Orçamento financeiro',
+            label: 'Orçamento vs. Realizado',
             routeName: 'orcamento-financeiro',
             permissao: Permissoes.Financeiro.Visualizar,
           },
@@ -510,7 +508,12 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
-            label: 'Contingência',
+            label: 'Notas Entrada/Saída',
+            routeName: 'fiscal-notas-entrada-saida',
+            permissao: Permissoes.Fiscal.Visualizar,
+          },
+          {
+            label: 'Contingência SEFAZ',
             routeName: 'fiscal-contingencia',
             permissao: Permissoes.Fiscal.Visualizar,
           },
@@ -545,7 +548,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
-            label: 'SPED',
+            label: 'SPED e Acessórias',
             routeName: 'fiscal-sped',
             permissao: Permissoes.Fiscal.Visualizar,
           },
@@ -564,28 +567,22 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           '/cobranca-credito',
           '/financeiro/regua-cobranca',
           '/financeiro/renegociacoes',
-          '/crm/credito',
         ],
         filhos: [
           {
-            label: 'Painel crédito',
+            label: 'Painel da Carteira',
             routeName: 'cobranca-credito',
             permissao: Permissoes.CobrancaCredito.Visualizar,
           },
           {
-            label: 'Régua de cobrança',
+            label: 'Cobrança Ativa',
             routeName: 'regua-cobranca',
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Renegociações',
+            label: 'Títulos em Disputa',
             routeName: 'renegociacoes',
             permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'CRM Crédito',
-            routeName: 'crm-credito',
-            permissao: Permissoes.Crm.Visualizar,
           },
         ],
       },
@@ -596,7 +593,25 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/contratos'],
         filhos: [
           {
-            label: 'Contratos',
+            label: 'CPR',
+            routeName: 'contratos',
+            permissao: Permissoes.Contratos.Visualizar,
+            query: { tipo: TipoContrato.Cpr },
+          },
+          {
+            label: 'Barter',
+            routeName: 'contratos',
+            permissao: Permissoes.Contratos.Visualizar,
+            query: { tipo: TipoContrato.Barter },
+          },
+          {
+            label: 'Contratos a Termo',
+            routeName: 'contratos',
+            permissao: Permissoes.Contratos.Visualizar,
+            query: { tipo: TipoContrato.Termo },
+          },
+          {
+            label: 'Alertas de Prazo',
             routeName: 'contratos',
             permissao: Permissoes.Contratos.Visualizar,
           },
@@ -612,31 +627,42 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         id: 'crm',
         label: 'CRM Agrícola',
         icon: 'support_agent',
-        pathPrefixes: ['/crm'],
+        pathPrefixes: ['/crm', '/safras/visitas-tecnicas'],
         filhos: [
           {
-            label: 'Dashboard',
-            routeName: 'crm-dashboard',
-            permissao: Permissoes.Crm.Visualizar,
-          },
-          {
-            label: 'Carteira',
+            label: 'Produtores',
             routeName: 'crm-carteira',
             permissao: Permissoes.Crm.Visualizar,
           },
           {
-            label: 'Oportunidades',
+            label: 'Visitas Técnicas',
+            routeName: 'safras-visitas-tecnicas',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'revenda',
+          },
+          {
+            label: 'Pipeline',
             routeName: 'crm-oportunidades',
             permissao: Permissoes.Crm.Visualizar,
           },
           {
-            label: 'Amostras',
+            label: 'Análise de Crédito',
+            routeName: 'crm-credito',
+            permissao: Permissoes.Crm.Visualizar,
+          },
+          {
+            label: 'Amostras e Demos',
             routeName: 'crm-amostras',
             permissao: Permissoes.Crm.Visualizar,
           },
           {
             label: 'Campanhas',
             routeName: 'crm-campanhas',
+            permissao: Permissoes.Crm.Visualizar,
+          },
+          {
+            label: 'Dashboard',
+            routeName: 'crm-dashboard',
             permissao: Permissoes.Crm.Visualizar,
           },
         ],
@@ -649,7 +675,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
     modulos: [
       {
         id: 'rh',
-        label: 'Colaboradores',
+        label: 'RH e Folha',
         icon: 'groups',
         pathPrefixes: ['/colaboradores'],
         filhos: [
@@ -667,8 +693,18 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/manutencao'],
         filhos: [
           {
-            label: 'Dashboard',
-            routeName: 'manutencao-dashboard',
+            label: 'Preventiva',
+            routeName: 'manutencao-planos',
+            permissao: Permissoes.Manutencao.Visualizar,
+          },
+          {
+            label: 'Ordens de Serviço',
+            routeName: 'manutencao-ordens',
+            permissao: Permissoes.Manutencao.Visualizar,
+          },
+          {
+            label: 'Checklist Diário',
+            routeName: 'manutencao-checklists',
             permissao: Permissoes.Manutencao.Visualizar,
           },
           {
@@ -677,23 +713,13 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Manutencao.Visualizar,
           },
           {
-            label: 'Planos preventivos',
-            routeName: 'manutencao-planos',
-            permissao: Permissoes.Manutencao.Visualizar,
-          },
-          {
-            label: 'Ordens de serviço',
-            routeName: 'manutencao-ordens',
-            permissao: Permissoes.Manutencao.Visualizar,
-          },
-          {
-            label: 'Checklists',
-            routeName: 'manutencao-checklists',
-            permissao: Permissoes.Manutencao.Visualizar,
-          },
-          {
             label: 'Custos',
             routeName: 'manutencao-custos',
+            permissao: Permissoes.Manutencao.Visualizar,
+          },
+          {
+            label: 'Dashboard',
+            routeName: 'manutencao-dashboard',
             permissao: Permissoes.Manutencao.Visualizar,
           },
         ],
@@ -722,25 +748,55 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         label: 'Cadastros Gerais',
         icon: 'menu_book',
         pathPrefixes: [
-          '/unidades',
-          '/clientes',
           '/produtos',
+          '/clientes',
+          '/tabelas-preco',
+          '/unidades',
           '/categorias-produto',
           '/unidades-medida',
-          '/tabelas-preco',
         ],
         filhos: [
-          { label: 'Unidades', routeName: 'unidades' },
+          {
+            label: 'Produtos',
+            routeName: 'produtos',
+            permissao: Permissoes.Produtos.Visualizar,
+          },
           {
             label: 'Clientes',
             routeName: 'clientes',
             permissao: Permissoes.Clientes.Visualizar,
           },
           {
-            label: 'Produtos',
-            routeName: 'produtos',
-            permissao: Permissoes.Produtos.Visualizar,
+            label: 'Fornecedores',
+            routeName: 'fornecedores',
+            permissao: Permissoes.Fornecedores.Visualizar,
           },
+          {
+            label: 'Transportadoras',
+            routeName: 'logistica-transportadoras',
+            permissao: Permissoes.Logistica.Visualizar,
+          },
+          {
+            label: 'Colaboradores',
+            routeName: 'colaboradores',
+            permissao: Permissoes.Colaboradores.Visualizar,
+          },
+          {
+            label: 'Veículos',
+            routeName: 'logistica-veiculos',
+            permissao: Permissoes.Logistica.Visualizar,
+          },
+          {
+            label: 'Fazendas',
+            routeName: 'safras-fazendas',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Tabelas de Preço',
+            routeName: 'tabelas-preco',
+            permissao: Permissoes.TabelasPreco.Visualizar,
+          },
+          { label: 'Unidades', routeName: 'unidades' },
           {
             label: 'Categorias',
             routeName: 'categorias-produto',
@@ -750,11 +806,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             label: 'Unid. de medida',
             routeName: 'unidades-medida',
             permissao: Permissoes.UnidadesMedida.Visualizar,
-          },
-          {
-            label: 'Tabelas de preço',
-            routeName: 'tabelas-preco',
-            permissao: Permissoes.TabelasPreco.Visualizar,
           },
         ],
       },

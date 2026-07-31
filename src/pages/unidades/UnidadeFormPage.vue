@@ -14,6 +14,7 @@
           :somente-leitura="modo === 'visualizar'"
           :cnpjs="cnpjs"
           :carregando-cnpjs="carregandoCnpjs"
+          @atualizar-cnpjs="carregarCnpjs()"
         />
 
         <div v-if="!carregandoPagina && modo !== 'visualizar'" class="agro-form-actions">

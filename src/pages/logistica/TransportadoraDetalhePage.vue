@@ -13,7 +13,7 @@
             </div>
             <div class="col-6 col-md-4">
               <div class="text-caption">CNPJ</div>
-              <div class="text-metric">{{ transportadora.cnpj }}</div>
+              <div class="text-metric">{{ formatarCnpj(transportadora.cnpj) }}</div>
             </div>
             <div class="col-6 col-md-4">
               <div class="text-caption">RNTRC</div>
@@ -21,7 +21,7 @@
             </div>
             <div class="col-6 col-md-4">
               <div class="text-caption">Telefone</div>
-              <div>{{ transportadora.telefone ?? '—' }}</div>
+              <div>{{ transportadora.telefone ? formatarTelefone(transportadora.telefone) : '—' }}</div>
             </div>
             <div class="col-6 col-md-4">
               <div class="text-caption">E-mail</div>
@@ -111,7 +111,7 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import { freteVazio, useLogistica } from 'composables/useLogistica';
 import type { QTableColumn } from 'quasar';
 import type { FreteTransportadoraDto, FreteTransportadoraFormModel } from 'types/dtos/logistica.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarCnpj, formatarMoeda, formatarTelefone } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 

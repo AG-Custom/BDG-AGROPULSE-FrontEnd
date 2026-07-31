@@ -1,16 +1,15 @@
 <template>
   <q-form ref="formRef" class="entrada-estoque-formulario" greedy>
-    <q-select
+    <agro-select-cadastro
       v-model="formulario.produtoId"
-      outlined
+      entidade="produto"
       label="Produto"
       class="field-required"
-      emit-value
-      map-options
       aria-required="true"
       :options="produtoOpcoes"
       :loading="carregandoProdutos"
       :rules="[obrigatorio]"
+      @atualizar="carregarProdutos()"
       @update:model-value="onProdutoAlterado"
     />
 
@@ -74,6 +73,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import { useVerCustos } from 'composables/useVerCustos';
 import type { QForm } from 'quasar';
@@ -91,6 +91,7 @@ const {
   produtoOpcoes,
   carregando: carregandoProdutos,
   carregarDetalhe,
+  carregar: carregarProdutos,
   detalhes,
 } = useProdutoOpcoesEstoque();
 
@@ -101,12 +102,13 @@ const produtoDetalhe = computed(() =>
 const exigeLote = computed(() => produtoDetalhe.value?.exigeLote === true);
 const exigeValidade = computed(() => produtoDetalhe.value?.exigeValidade === true);
 
-async function onProdutoAlterado(produtoId: string | null): Promise<void> {
-  if (!produtoId) {
+async function onProdutoAlterado(produtoId: unknown): Promise<void> {
+  const id = typeof produtoId === 'string' ? produtoId : '';
+  if (!id) {
     return;
   }
 
-  await carregarDetalhe(produtoId);
+  await carregarDetalhe(id);
 }
 
 watch(

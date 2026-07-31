@@ -9,7 +9,7 @@ import type {
   PdvVendaResumoDto,
 } from 'types/dtos/pdv.dto';
 import type { FormaPagamentoValor } from 'constants/enums';
-import { parseMascaraMoeda } from 'utils/formatters';
+import { apenasDigitos, parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
 
 function parsePrecoOpcional(valor: string): number | null {
@@ -59,7 +59,7 @@ export function usePdv() {
       const criada = await pdvService.vender({
         clienteId: form.clienteId || null,
         clienteNomeAvulso: form.clienteNomeAvulso.trim() || null,
-        clienteDocumentoAvulso: form.clienteDocumentoAvulso.trim() || null,
+        clienteDocumentoAvulso: apenasDigitos(form.clienteDocumentoAvulso) || null,
         tabelaPrecoId: form.tabelaPrecoId || null,
         aPrazo: form.aPrazo,
         itens: form.itens.map((item) => ({

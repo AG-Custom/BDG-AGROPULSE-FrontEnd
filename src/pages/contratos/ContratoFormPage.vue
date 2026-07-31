@@ -16,27 +16,25 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.clienteId"
-                outlined
+                entidade="cliente"
                 label="Cliente"
                 class="field-required"
-                emit-value
-                map-options
                 :options="clienteOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarClientes()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -75,14 +73,13 @@
               <q-input v-model="formulario.dataFim" outlined label="Fim" type="date" />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.safraId"
-                outlined
+                entidade="safra"
                 clearable
-                emit-value
-                map-options
                 label="Safra"
                 :options="safraOpcoes"
+                @atualizar="carregarSafras()"
               />
             </div>
 
@@ -131,14 +128,13 @@
                 <AgroMoneyInput v-model="formulario.valorInsumos" label="Valor dos insumos" />
               </div>
               <div class="col-12 col-md-4">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.produtoGraoId"
-                  outlined
+                  entidade="produto"
                   clearable
-                  emit-value
-                  map-options
                   label="Produto grão a receber"
                   :options="produtoOpcoes"
+                  @atualizar="carregarProdutos()"
                 />
               </div>
               <div class="col-12 col-md-4">
@@ -241,6 +237,7 @@ import CotacaoMercadoCard from 'components/contratos/CotacaoMercadoCard.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import {
   contratoParaForm,

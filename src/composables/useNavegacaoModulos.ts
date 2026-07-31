@@ -131,15 +131,6 @@ export function useNavegacaoModulos() {
     return lista;
   });
 
-  function filhoAtivo(item: ItemNavegacao): boolean {
-    try {
-      const resolved = router.resolve({ name: item.routeName });
-      return pathCorresponde(route.path, resolved.path);
-    } catch {
-      return route.name === item.routeName;
-    }
-  }
-
   const moduloAtivo = computed<ModuloNavegacaoVisivel | null>(() => {
     const candidatos = modulosVisiveis.value.flatMap((modulo) =>
       modulo.pathPrefixes.map((prefixo) => ({ modulo, prefixo })),
@@ -159,6 +150,48 @@ export function useNavegacaoModulos() {
   const filhosVisiveis = computed(() => moduloAtivo.value?.filhosVisiveis ?? []);
 
   const mostrarSubnav = computed(() => filhosVisiveis.value.length > 1);
+
+  function queryBate(item: ItemNavegacao): boolean {
+    if (!item.query) {
+      return true;
+    }
+
+    return Object.entries(item.query).every(
+      ([chave, valor]) => String(route.query[chave] ?? '') === valor,
+    );
+  }
+
+  function filhoAtivo(item: ItemNavegacao): boolean {
+    const mesmoNome = route.name === item.routeName;
+    let pathOk = false;
+
+    try {
+      const resolved = router.resolve({
+        name: item.routeName,
+        query: item.query,
+      });
+      pathOk = pathCorresponde(route.path, resolved.path);
+    } catch {
+      pathOk = mesmoNome;
+    }
+
+    if (!pathOk && !mesmoNome) {
+      return false;
+    }
+
+    if (item.query) {
+      return queryBate(item);
+    }
+
+    const irmaosComQuery = filhosVisiveis.value.some(
+      (f) => f.routeName === item.routeName && f.query,
+    );
+    if (irmaosComQuery) {
+      return Object.keys(route.query).length === 0;
+    }
+
+    return true;
+  }
 
   onMounted(() => {
     if (possuiPermissao(Permissoes.Compras.Visualizar)) {

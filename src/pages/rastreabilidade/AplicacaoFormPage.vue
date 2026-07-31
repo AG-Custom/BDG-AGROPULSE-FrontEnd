@@ -8,30 +8,30 @@
         <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.talhaoId"
-                outlined
+                entidade="talhao"
                 label="Talhão"
                 class="field-required"
-                emit-value
-                map-options
                 :options="talhaoOpcoes"
                 :rules="[obrigatorio]"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarTalhoes()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
-                @update:model-value="onProdutoChange"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarProdutos()"
+                @update:model-value="onProdutoChange"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -67,29 +67,29 @@
               />
             </div>
             <div class="col-6 col-md-3">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.loteId"
-                outlined
+                entidade="lote"
                 label="Lote"
                 clearable
-                emit-value
-                map-options
                 :options="loteOpcoes"
                 :loading="carregandoLotes"
                 :disable="!formulario.produtoId"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura || !formulario.produtoId"
+                @atualizar="atualizarLotes()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.safraId"
-                outlined
+                entidade="safra"
                 label="Safra"
                 clearable
-                emit-value
-                map-options
                 :options="safraOpcoes"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarSafras()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -194,6 +194,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutos } from 'composables/useProdutos';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
@@ -282,13 +283,21 @@ const loteOpcoes = computed(() =>
     })),
 );
 
-async function onProdutoChange(produtoId: string | null): Promise<void> {
+async function onProdutoChange(produtoId: unknown): Promise<void> {
+  const id = typeof produtoId === 'string' ? produtoId : '';
   formulario.value.loteId = '';
-  if (!produtoId) {
+  if (!id) {
     lotes.value = [];
     return;
   }
-  await carregarLotes({ produtoId, apenasComSaldo: true });
+  await carregarLotes({ produtoId: id, apenasComSaldo: true });
+}
+
+async function atualizarLotes(): Promise<void> {
+  if (!formulario.value.produtoId) {
+    return;
+  }
+  await carregarLotes({ produtoId: formulario.value.produtoId, apenasComSaldo: true });
 }
 
 async function salvar(): Promise<void> {

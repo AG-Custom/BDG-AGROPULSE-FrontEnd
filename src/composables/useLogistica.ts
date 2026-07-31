@@ -43,7 +43,12 @@ import type {
   VeiculoLogisticaDto,
   VeiculoLogisticaFormModel,
 } from 'types/dtos/logistica.dto';
-import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
+import {
+  apenasAlfanumericos,
+  apenasDigitos,
+  formatarMoedaParaInput,
+  parseMascaraMoeda,
+} from 'utils/formatters';
 import { ref } from 'vue';
 
 function numOuNulo(valor: string): number | null {
@@ -55,7 +60,7 @@ function numOuNulo(valor: string): number | null {
 function veiculoPayload(form: VeiculoLogisticaFormModel): CriarVeiculoLogisticaPayload {
   return {
     tipo: form.tipo as TipoVeiculoLogisticaValor,
-    placa: form.placa.trim().toUpperCase(),
+    placa: apenasAlfanumericos(form.placa).toUpperCase(),
     marca: form.marca.trim() || null,
     modelo: form.modelo.trim() || null,
     ano: numOuNulo(form.ano),
@@ -65,7 +70,7 @@ function veiculoPayload(form: VeiculoLogisticaFormModel): CriarVeiculoLogisticaP
     vencimentoCrlv: form.vencimentoCrlv || null,
     vencimentoTacografo: form.vencimentoTacografo || null,
     motoristaNome: form.motoristaNome.trim() || null,
-    motoristaCnh: form.motoristaCnh.trim() || null,
+    motoristaCnh: apenasDigitos(form.motoristaCnh) || null,
     motoristaCategoria: form.motoristaCategoria.trim() || null,
     kmAtual: numOuNulo(form.kmAtual),
     status: form.status,
@@ -98,9 +103,9 @@ function transportadoraPayload(
 ): CriarTransportadoraLogisticaPayload {
   return {
     nome: form.nome.trim(),
-    cnpj: form.cnpj.trim(),
-    rntrc: form.rntrc.trim() || null,
-    telefone: form.telefone.trim() || null,
+    cnpj: apenasDigitos(form.cnpj),
+    rntrc: apenasDigitos(form.rntrc) || null,
+    telefone: apenasDigitos(form.telefone) || null,
     email: form.email.trim() || null,
   };
 }

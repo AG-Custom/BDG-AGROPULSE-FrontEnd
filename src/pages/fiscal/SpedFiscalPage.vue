@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="SPED Fiscal"
-      subtitulo="Exportação EFD ICMS/IPI, contribuições, contábil e envio ao escritório."
+      subtitulo="Exportação EFD ICMS/IPI, contribuições, contábil, EFD-Reinf e envio ao escritório."
     />
 
     <section class="agro-section grid">
@@ -43,6 +43,15 @@
             descricao="Exportar SPED Contábil"
             :loading="exportando"
             @click="onExportar('contabil')"
+          />
+          <agro-btn
+            color="primary"
+            unelevated
+            icon="download"
+            label="EFD-Reinf"
+            descricao="Exportar EFD-Reinf R-1000 / Funrural"
+            :loading="exportando"
+            @click="onExportar('efd-reinf')"
           />
         </div>
       </agro-card>
@@ -104,7 +113,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
-import { useSpedFiscal } from 'composables/useSpedFiscal';
+import { useSpedFiscal, type TipoExportacaoSped } from 'composables/useSpedFiscal';
 import { TipoSpedFiscalOpcoes, type TipoSpedFiscalValor } from 'constants/enums';
 import { obrigatorio } from 'utils/validators';
 import { reactive } from 'vue';
@@ -122,9 +131,7 @@ const envio = reactive({
   emailEscritorio: '',
 });
 
-async function onExportar(
-  tipo: 'efd-icms-ipi' | 'efd-contribuicoes' | 'contabil',
-): Promise<void> {
+async function onExportar(tipo: TipoExportacaoSped): Promise<void> {
   await exportar(tipo, {
     dataInicio: periodo.dataInicio,
     dataFim: periodo.dataFim,

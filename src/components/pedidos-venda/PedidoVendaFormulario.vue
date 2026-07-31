@@ -9,18 +9,18 @@
       <h3 class="pedido-venda-formulario__secao-titulo">Cabeçalho</h3>
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-6">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.clienteId"
-            outlined
+            entidade="cliente"
             label="Cliente"
             class="field-required"
-            emit-value
-            map-options
             aria-required="true"
             :options="clienteOpcoes"
             :loading="carregandoClientes"
             :rules="[obrigatorio]"
             :readonly="somenteLeitura"
+            :desabilitar-cadastro="somenteLeitura"
+            @atualizar="carregarClientes({ ativo: true })"
             @update:model-value="onClienteChange"
           />
         </div>
@@ -114,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import {
@@ -216,11 +217,12 @@ async function carregarContratosCliente(clienteId: string): Promise<void> {
   }
 }
 
-async function onClienteChange(clienteId: string): Promise<void> {
+async function onClienteChange(clienteId: unknown): Promise<void> {
+  const id = typeof clienteId === 'string' ? clienteId : '';
   formulario.value.contratoId = '';
   await Promise.all([
-    carregarTabelasPermitidas({ clienteId: clienteId || null }),
-    carregarContratosCliente(clienteId),
+    carregarTabelasPermitidas({ clienteId: id || null }),
+    carregarContratosCliente(id),
   ]);
   if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;

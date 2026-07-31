@@ -6,37 +6,20 @@
     :class="{ 'agro-formulario--bloqueado': bloqueado }"
   >
     <fieldset class="agro-formulario__fieldset">
-      <q-banner
-        v-if="!carregandoCnpjs && cnpjs.length === 0"
-        rounded
-        class="unidade-formulario__aviso"
-      >
-        Nenhum CNPJ cadastrado na empresa.
-        <template v-if="!bloqueado">
-          <router-link :to="{ name: 'cnpj-novo' }" class="unidade-formulario__link">
-            Cadastre um CNPJ
-          </router-link>
-          antes de vincular à unidade.
-        </template>
-        <template v-else>
-          Cadastre um CNPJ na empresa antes de vincular à unidade.
-        </template>
-      </q-banner>
-
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-6">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.cnpjEmpresaId"
-            outlined
+            entidade="cnpj"
             label="CNPJ"
             class="field-required"
-            emit-value
-            map-options
             aria-required="true"
             :options="cnpjOpcoes"
             :loading="carregandoCnpjs"
             :readonly="bloqueado || !!carregandoCnpjs"
+            :desabilitar-cadastro="bloqueado"
             :rules="bloqueado ? undefined : [obrigatorio]"
+            @atualizar="emit('atualizarCnpjs')"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -228,6 +211,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useBuscaCep } from 'composables/useBuscaCep';
 import {
   TimeZoneOpcoes,
@@ -254,6 +238,10 @@ const props = withDefaults(
     carregandoCnpjs: false,
   },
 );
+
+const emit = defineEmits<{
+  atualizarCnpjs: [];
+}>();
 
 const formulario = defineModel<UnidadeFormModel>('formulario', { required: true });
 
@@ -305,18 +293,6 @@ defineExpose({ validar });
 
 .agro-formulario__fieldset:disabled {
   opacity: 1;
-}
-
-.unidade-formulario__aviso {
-  background: var(--color-warning-50);
-  color: var(--color-warning-700);
-  margin-bottom: var(--spacing-4);
-}
-
-.unidade-formulario__link {
-  color: var(--color-primary-600);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: underline;
 }
 
 .unidade-matriz {

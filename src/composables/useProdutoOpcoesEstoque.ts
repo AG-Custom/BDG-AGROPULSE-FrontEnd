@@ -58,6 +58,7 @@ export function useProdutoOpcoesEstoque() {
     rotuloProduto,
     obterResumo,
     carregarDetalhe,
+    carregar: () => carregar({ ativo: true }),
     detalhes,
   };
 }

@@ -993,6 +993,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'fiscal/notas-entrada-saida',
+        name: 'fiscal-notas-entrada-saida',
+        component: () => import('pages/fiscal/NotasEntradaSaidaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.notasEntradaSaida',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
         path: 'fiscal/contingencia',
         name: 'fiscal-contingencia',
         component: () => import('pages/fiscal/ContingenciaFiscalPage.vue'),

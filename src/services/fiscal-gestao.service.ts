@@ -272,6 +272,10 @@ export const fiscalGestaoService = {
     return api.get<SpedLinhasDto>('/fiscal/sped/contabil', { params }).then((r) => r.data);
   },
 
+  spedEfdReinf(params: ListarSpedParams): Promise<SpedLinhasDto> {
+    return api.get<SpedLinhasDto>('/fiscal/sped/efd-reinf', { params }).then((r) => r.data);
+  },
+
   enviarEscritorio(
     payload: EnviarEscritorioFiscalPayload,
   ): Promise<EnvioEscritorioFiscalDto> {

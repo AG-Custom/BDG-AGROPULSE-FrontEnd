@@ -1,0 +1,22 @@
+---
+description: Proíbe comentários inline e narrativos no código
+alwaysApply: true
+---
+
+# Sem comentários inline
+
+- **NUNCA** adicionar comentários inline (`//` ou `/* */` no fim da linha)
+- **NUNCA** adicionar comentários que narram o óbvio (“limpa estado”, “chama API”, “incrementa contador”)
+- **NUNCA** deixar comentários de WIP, TODO óbvio ou explicação do que o código já deixa claro
+- Preferir nomes claros e código autoexplicativo
+- Comentários só quando forem indispensáveis: restrição de negócio não óbvia, workaround com motivo, ou contrato externo
+
+```typescript
+// ❌ BAD
+limparSessao(); // limpa a sessão local
+await authService.logout(); // revoga refresh no backend
+
+// ✅ GOOD
+limparSessao();
+await authService.logout();
+```

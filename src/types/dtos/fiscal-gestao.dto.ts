@@ -5,6 +5,7 @@ import type {
   StatusNotaFiscalValor,
   TipoDestinatarioFiscalValor,
   TipoManifestacaoSefazValor,
+  TipoNotaFiscalValor,
   TipoSpedFiscalValor,
 } from 'constants/enums';
 
@@ -46,6 +47,7 @@ export interface NotaFiscalGestaoDto {
 export interface ListarNotasFiscaisParams {
   status?: StatusNotaFiscalValor | string;
   modelo?: ModeloDocumentoFiscalValor | string;
+  tipo?: TipoNotaFiscalValor | string;
   dataInicio?: string;
   dataFim?: string;
 }

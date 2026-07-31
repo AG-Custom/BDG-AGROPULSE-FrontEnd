@@ -9,6 +9,12 @@ import type {
 import { baixarArquivo } from 'utils/download';
 import { ref } from 'vue';
 
+export type TipoExportacaoSped =
+  | 'efd-icms-ipi'
+  | 'efd-contribuicoes'
+  | 'contabil'
+  | 'efd-reinf';
+
 export function useSpedFiscal() {
   const ultimoEnvio = ref<EnvioEscritorioFiscalDto | null>(null);
   const exportando = ref(false);
@@ -16,10 +22,7 @@ export function useSpedFiscal() {
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
-  async function exportar(
-    tipo: 'efd-icms-ipi' | 'efd-contribuicoes' | 'contabil',
-    params: ListarSpedParams,
-  ): Promise<boolean> {
+  async function exportar(tipo: TipoExportacaoSped, params: ListarSpedParams): Promise<boolean> {
     if (!params.dataInicio || !params.dataFim) {
       erro('Informe o período de exportação.');
       return false;
@@ -31,7 +34,9 @@ export function useSpedFiscal() {
           ? await fiscalGestaoService.spedEfdIcmsIpi(params)
           : tipo === 'efd-contribuicoes'
             ? await fiscalGestaoService.spedEfdContribuicoes(params)
-            : await fiscalGestaoService.spedContabil(params);
+            : tipo === 'efd-reinf'
+              ? await fiscalGestaoService.spedEfdReinf(params)
+              : await fiscalGestaoService.spedContabil(params);
       const blob = new Blob([sped.linhas.join('\n')], { type: 'text/plain;charset=utf-8' });
       baixarArquivo(blob, `sped-${tipo}.txt`);
       sucesso('SPED exportado.');
