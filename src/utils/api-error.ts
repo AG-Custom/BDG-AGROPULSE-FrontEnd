@@ -2,9 +2,9 @@ import type { AxiosError } from 'axios';
 
 import type { ApiError, ApiErrorBody, ApiErrorCode, ApiErrorField } from 'types/api/api';
 
-export const MENSAGEM_ERRO_PADRAO = 'Não foi possível concluir a operação.';
-export const MENSAGEM_ERRO_CONEXAO = 'Não foi possível conectar à API do AgroPulse.';
-const MENSAGEM_ERRO_OPERACAO = 'Erro na operação.';
+export const MENSAGEM_ERRO_PADRAO = 'Não foi possível concluir a operação. Entre em contato com o suporte.';
+export const MENSAGEM_ERRO_CONEXAO = 'Não foi possível conectar à API do AgroPulse. Entre em contato com o suporte.';
+const MENSAGEM_ERRO_OPERACAO = 'Erro na operação. Entre em contato com o suporte.';
 
 const AXIOS_MESSAGE_PATTERN = /^Request failed with status code \d+$/;
 

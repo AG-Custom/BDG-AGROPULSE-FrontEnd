@@ -238,7 +238,7 @@ function normalizeApiError(error: AxiosError<ValidationProblemDetails | ApiError
   if (!error.response) {
     return {
       title: 'Erro de conexão',
-      detail: 'Não foi possível conectar à API do AgroPulse.',
+      detail: 'Não foi possível conectar à API do AgroPulse. Entre em contato com o suporte',
       status: 0,
     };
   }
