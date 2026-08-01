@@ -86,7 +86,7 @@
                   @click="abrirBaixa(props.row)"
                 >
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
-                  <q-item-section>Baixar</q-item-section>
+                  <q-item-section>Registrar baixa</q-item-section>
                   <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
                 </q-item>
                 <q-item
@@ -115,6 +115,7 @@
       :conta-opcoes="contaOpcoes"
       :loading="salvando"
       @confirmar="onBaixar"
+      @atualizar-contas="carregarContasBancarias()"
     />
 
     <q-dialog v-model="dialogVisualizar">

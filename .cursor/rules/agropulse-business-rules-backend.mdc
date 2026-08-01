@@ -1,0 +1,35 @@
+---
+description: Regras de negócio ficam no backend — frontend só consome API e faz UX
+alwaysApply: true
+---
+
+# Regras de negócio no backend
+
+## Princípio
+
+**NUNCA** implemente regra de negócio no frontend. Matching, cálculos, validações de domínio, elegibilidade, transições de status e interpretações de documento fiscal vivem no **backend** (`new_agropulse_backend`).
+
+O frontend:
+
+- chama a API;
+- exibe o resultado (`produtoId`, erros, totais, etc.);
+- cuida de UX (hints, empty state, loading, formulário).
+
+## Quando a regra “falta”
+
+1. Atualize `new_agropulse_backend/api-contract/` se o contrato mudar.
+2. Implemente no Domain/Application do backend.
+3. Só então ajuste o FE para consumir o novo campo/comportamento.
+
+## Exemplos
+
+| ❌ Frontend | ✅ Backend |
+|---|---|
+| Casar item de NF-e com produto por `cProd`/`xProd`/`EAN` | `ProdutoNfeMatcher` + `preview-xml` |
+| Calcular imposto / margem de crédito | Serviço de domínio fiscal/financeiro |
+| Decidir se pedido pode ser aprovado | Regra de aprovação no BE |
+| Normalizar código (`000001` → `1`) para match | Normalização no domínio |
+
+## Exceção válida no FE
+
+Formatação visual, máscaras de input, labels, empty states e validação **apenas de formulário** (campo obrigatório, formato de e-mail) — sem reinventar regra de negócio da API.

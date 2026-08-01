@@ -1,17 +1,16 @@
 <template>
   <q-form ref="formRef" class="ajuste-estoque-formulario" greedy>
-    <q-select
+    <agro-select-cadastro
       v-model="formulario.loteId"
-      outlined
+      entidade="lote"
       label="Lote"
       class="field-required"
-      emit-value
-      map-options
       aria-required="true"
       :options="loteOpcoes"
       :loading="carregandoLotes"
       :disable="loteFixo"
       :rules="[obrigatorio]"
+      @atualizar="carregarLotes({ apenasComSaldo: false })"
     />
 
     <q-input
@@ -43,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
 import type { QForm } from 'quasar';

@@ -75,15 +75,14 @@
             class="row q-col-gutter-md q-mb-sm"
           >
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-4 col-md-1">
@@ -155,6 +154,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
 import { usePedidosVenda } from 'composables/usePedidosVenda';
 import { useProdutos } from 'composables/useProdutos';

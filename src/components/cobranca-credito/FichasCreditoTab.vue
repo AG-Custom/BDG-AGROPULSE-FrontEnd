@@ -81,16 +81,15 @@
           <q-form greedy @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="form.clienteId"
-                  outlined
+                  entidade="cliente"
                   label="Cliente"
-                  emit-value
-                  map-options
                   class="field-required"
                   :options="clienteOpcoes"
                   :loading="carregandoClientes"
                   :rules="[obrigatorio]"
+                  @atualizar="carregarClientes()"
                 />
               </div>
               <div class="col-12 col-md-6">
@@ -180,6 +179,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

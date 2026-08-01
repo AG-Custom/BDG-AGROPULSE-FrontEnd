@@ -121,38 +121,41 @@
                   type="number" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.fazendaId"
-                  outlined
+                  entidade="fazenda"
                   label="Fazenda"
                   clearable
-                  emit-value
-                  map-options
-                  :options="fazendaOpcoes" :readonly="somenteLeitura" />
+                  :options="fazendaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarFazendas()"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.talhaoId"
-                  outlined
+                  entidade="talhao"
                   label="Talhão"
                   clearable
-                  emit-value
-                  map-options
-                  :options="talhaoOpcoes" :readonly="somenteLeitura" />
+                  :options="talhaoOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarTalhoes()"
+                />
               </div>
               <div class="col-12 col-md-6">
                 <q-input v-model="formulario.tecnicoNome" outlined label="Técnico" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.clienteId"
-                  outlined
+                  entidade="cliente"
                   label="Cliente"
                   clearable
-                  emit-value
-                  map-options
                   :options="clienteOpcoes"
-                  :loading="carregandoClientes" :readonly="somenteLeitura" />
+                  :loading="carregandoClientes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarClientes()"
+                />
               </div>
               <div class="col-12">
                 <q-input
@@ -264,6 +267,7 @@
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

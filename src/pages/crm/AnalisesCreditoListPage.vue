@@ -92,16 +92,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvar">
-            <q-select
+            <agro-select-cadastro
               v-model="clienteId"
-              outlined
+              entidade="cliente"
               label="Cliente"
-              emit-value
-              map-options
               class="field-required"
               :options="clienteOpcoes"
               :loading="carregandoClientes"
               :rules="[obrigatorio]"
+              @atualizar="carregarClientes()"
             />
             <div class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
@@ -123,6 +122,7 @@
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

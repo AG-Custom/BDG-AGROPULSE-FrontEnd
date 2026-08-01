@@ -10,16 +10,15 @@
         <q-form greedy class="agro-formulario" @submit.prevent="onCalcular">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="form.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
-                emit-value
-                map-options
                 class="field-required"
                 :options="produtoOpcoes"
                 :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -135,16 +134,15 @@
         <q-form greedy class="agro-formulario" @submit.prevent="onSugerir">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="sugestaoForm.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
-                emit-value
-                map-options
                 class="field-required"
                 :options="produtoOpcoes"
                 :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -190,6 +188,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCalculoImpostos } from 'composables/useCalculoImpostos';
 import { useFiscal } from 'composables/useFiscal';
 import { useProdutos } from 'composables/useProdutos';

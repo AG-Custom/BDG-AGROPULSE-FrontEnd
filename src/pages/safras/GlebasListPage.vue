@@ -86,16 +86,17 @@
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.fazendaId"
-                  outlined
+                  entidade="fazenda"
                   label="Fazenda"
                   class="field-required"
-                  emit-value
-                  map-options
                   :options="fazendaOpcoes"
                   :disable="!!editandoId"
-                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
+                  :rules="[obrigatorio]"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarFazendas()"
+                />
               </div>
               <div class="col-12 col-md-8">
                 <q-input
@@ -134,6 +135,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useFazendas } from 'composables/useFazendas';

@@ -65,16 +65,15 @@
               label="Nome"
               class="field-required q-mb-md"
               :rules="[obrigatorio]" :readonly="somenteLeitura" />
-            <q-select
+            <agro-select-cadastro
               v-model="formulario.unidadeId"
-              outlined
+              entidade="unidade"
               label="Unidade"
               clearable
-              emit-value
-              map-options
               :options="unidadeOpcoes"
               :loading="carregandoUnidades"
               :readonly="!!editandoId || somenteLeitura"
+              @atualizar="carregarUnidades()"
             />
             <div class="agro-form-actions">
               <template v-if="somenteLeitura">
@@ -96,6 +95,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCaixas } from 'composables/useCaixas';

@@ -90,44 +90,48 @@
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.origemContaBancariaId"
-                  outlined
+                  entidade="contaBancaria"
                   clearable
-                  emit-value
-                  map-options
                   label="Conta origem"
-                  :options="contaOpcoes" :readonly="somenteLeitura" />
+                  :options="contaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarContas()"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.origemCaixaId"
-                  outlined
+                  entidade="caixa"
                   clearable
-                  emit-value
-                  map-options
                   label="Caixa origem"
-                  :options="caixaOpcoes" :readonly="somenteLeitura" />
+                  :options="caixaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarCaixas()"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.destinoContaBancariaId"
-                  outlined
+                  entidade="contaBancaria"
                   clearable
-                  emit-value
-                  map-options
                   label="Conta destino"
-                  :options="contaOpcoes" :readonly="somenteLeitura" />
+                  :options="contaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarContas()"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.destinoCaixaId"
-                  outlined
+                  entidade="caixa"
                   clearable
-                  emit-value
-                  map-options
                   label="Caixa destino"
-                  :options="caixaOpcoes" :readonly="somenteLeitura" />
+                  :options="caixaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarCaixas()"
+                />
               </div>
               <div class="col-12 col-md-6">
                 <AgroMoneyInput
@@ -170,6 +174,7 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCaixas } from 'composables/useCaixas';

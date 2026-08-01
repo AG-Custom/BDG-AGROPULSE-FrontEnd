@@ -38,7 +38,7 @@ export function useContasReceber() {
 
     try {
       await financeiroService.baixarContaReceber(id, payload);
-      sucesso('Conta baixada com sucesso.');
+      sucesso('Baixa registrada com sucesso.');
       await carregar(paramsRecarregar);
       return true;
     } catch (e) {

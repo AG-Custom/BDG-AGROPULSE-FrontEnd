@@ -37,11 +37,9 @@ export function useAplicacoesFinanceiras() {
         tipo: form.tipo as TipoAplicacaoValor,
         descricao: form.descricao.trim(),
         valorAplicado: parseMascaraMoeda(form.valorAplicado) ?? 0,
+        taxa: form.taxa ? Number(form.taxa.replace(',', '.')) : 0,
         dataAplicacao: form.dataAplicacao,
         dataVencimento: form.dataVencimento || null,
-        taxaPercentual: form.taxaPercentual
-          ? Number(form.taxaPercentual.replace(',', '.'))
-          : null,
       });
       sucesso('Aplicação registrada.');
       await carregar();

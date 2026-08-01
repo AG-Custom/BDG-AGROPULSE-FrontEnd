@@ -33,6 +33,7 @@ Documentação completa: [`docs/ai/`](./)
 ## Responsabilidade única
 
 15. **NUNCA** misture regra de negócio com apresentação no mesmo arquivo.
+15a. **NUNCA** hardcode regra de negócio no frontend (match, cálculo fiscal, elegibilidade, status, interpretação de XML/NF-e, etc.). Fonte da verdade: `new_agropulse_backend` + `api-contract/`. O FE só consome a API e cuida de UX. Se a regra faltar no BE, atualize o BE primeiro (ou no mesmo trabalho).
 16. **NUNCA** coloque chamadas HTTP, lógica de domínio ou acesso a storage dentro de componentes.
 17. **NUNCA** coloque notificações (Notify) ou navegação (router) dentro de services.
 18. **NUNCA** coloque formatação visual (labels, cores) dentro de services — isso é responsabilidade da UI.

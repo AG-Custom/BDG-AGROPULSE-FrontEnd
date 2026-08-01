@@ -122,18 +122,17 @@
             <h4 class="subtitulo">Adicionar peça</h4>
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-4">
-                <q-select
+                <agro-select-cadastro
                   v-model="formPeca.produtoId"
-                  outlined
+                  entidade="produto"
                   dense
                   label="Produto (estoque)"
-                  emit-value
-                  map-options
                   clearable
                   use-input
                   input-debounce="200"
                   :options="produtoOpcoes"
-                  @update:model-value="onProduto"
+                  @atualizar="carregarProdutos()"
+                  @update:model-value="(produtoId: unknown) => onProduto(typeof produtoId === 'string' ? produtoId : null)"
                 />
               </div>
               <div class="col-12 col-md-4">
@@ -177,6 +176,7 @@ import PecasOsTable from 'components/manutencao/PecasOsTable.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useManutencao } from 'composables/useManutencao';
 import { useProdutos } from 'composables/useProdutos';
 import { StatusOrdemServicoManutencao } from 'constants/enums';

@@ -70,16 +70,17 @@
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.clienteId"
-                  outlined
-                  emit-value
-                  map-options
+                  entidade="cliente"
                   label="Cliente"
                   class="field-required"
                   :options="clienteOpcoes"
                   :rules="[obrigatorio]"
-                  @update:model-value="onCliente" :readonly="somenteLeitura" />
+                  :readonly="somenteLeitura"
+                  @update:model-value="onCliente"
+                  @atualizar="carregarClientes()"
+                />
               </div>
               <div class="col-12">
                 <q-select
@@ -134,6 +135,7 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';
@@ -188,10 +190,11 @@ function variante(status: StatusRenegociacaoValor): 'success' | 'warning' | 'err
   return 'default';
 }
 
-async function onCliente(clienteId: string): Promise<void> {
+async function onCliente(clienteId: unknown): Promise<void> {
+  const id = typeof clienteId === 'string' ? clienteId : '';
   formulario.value.contasReceberIds = [];
-  if (clienteId) {
-    await carregarCr({ clienteId, status: ContaReceberStatus.Aberta });
+  if (id) {
+    await carregarCr({ clienteId: id, status: ContaReceberStatus.Aberta });
   }
 }
 

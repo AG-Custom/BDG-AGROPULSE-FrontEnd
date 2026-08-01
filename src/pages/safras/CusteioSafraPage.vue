@@ -137,15 +137,14 @@
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.safraId"
-                  outlined
+                  entidade="safra"
                   label="Safra"
                   class="field-required"
-                  emit-value
-                  map-options
                   :options="safraOpcoes"
                   :rules="[obrigatorio]"
+                  @atualizar="carregarSafras()"
                 />
               </div>
               <div class="col-12 col-md-6">
@@ -181,14 +180,13 @@
                 <q-input v-model="formulario.data" outlined label="Data" type="date" />
               </div>
               <div class="col-12 col-md-4">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.talhaoId"
-                  outlined
+                  entidade="talhao"
                   label="Talhão"
                   clearable
-                  emit-value
-                  map-options
                   :options="talhaoOpcoes"
+                  @atualizar="carregarTalhoes()"
                 />
               </div>
             </div>
@@ -213,6 +211,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCusteioSafra } from 'composables/useCusteioSafra';

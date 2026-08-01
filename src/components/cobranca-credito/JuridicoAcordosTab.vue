@@ -123,16 +123,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvarAcordo">
-            <q-select
+            <agro-select-cadastro
               v-model="formAcordo.clienteId"
-              outlined
+              entidade="cliente"
               label="Cliente"
-              emit-value
-              map-options
               class="field-required q-mb-md"
               :options="clienteOpcoes"
               :loading="carregandoClientes"
               :rules="[obrigatorio]"
+              @atualizar="carregarClientes()"
             />
             <AgroMoneyInput
               v-model="formAcordo.valorOriginal"
@@ -182,16 +181,15 @@
         </q-card-section>
         <q-card-section>
           <q-form greedy @submit.prevent="salvarEnc">
-            <q-select
+            <agro-select-cadastro
               v-model="encClienteId"
-              outlined
+              entidade="cliente"
               label="Cliente"
-              emit-value
-              map-options
               class="field-required q-mb-md"
               :options="clienteOpcoes"
               :loading="carregandoClientes"
               :rules="[obrigatorio]"
+              @atualizar="carregarClientes()"
             />
             <q-select
               v-model="encContas"
@@ -226,6 +224,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

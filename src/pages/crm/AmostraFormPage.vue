@@ -8,30 +8,30 @@
         <q-form v-else greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.clienteId"
-                outlined
+                entidade="cliente"
                 label="Cliente"
-                emit-value
-                map-options
                 class="field-required"
                 :options="clienteOpcoes"
                 :loading="carregandoClientes"
                 :rules="[obrigatorio]"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarClientes()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.vendedorUsuarioId"
-                outlined
+                entidade="usuario"
                 label="Vendedor"
                 clearable
-                emit-value
-                map-options
                 :options="vendedorOpcoes"
                 :loading="carregandoUsuarios"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarUsuarios()"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -86,17 +86,17 @@
                 :readonly="somenteLeitura" />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
                 clearable
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :loading="carregandoProdutos"
-                @update:model-value="onProdutoChange"
                 :readonly="somenteLeitura"
+                :desabilitar-cadastro="somenteLeitura"
+                @atualizar="carregarProdutos()"
+                @update:model-value="onProdutoChange"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -141,6 +141,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { amostraDtoParaForm, amostraVazia, useCrm } from 'composables/useCrm';
 import { usePedidosVenda } from 'composables/usePedidosVenda';
@@ -234,7 +235,9 @@ const pedidoOpcoes = computed(() =>
   })),
 );
 
-function onProdutoChange(produtoId: string | null): void {
+function onProdutoChange(valor: unknown): void {
+  const produtoId = typeof valor === 'string' ? valor : '';
+
   if (!produtoId) {
     formulario.value.produtoNome = '';
     return;

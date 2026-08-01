@@ -171,15 +171,14 @@
         </template>
         <div class="row q-col-gutter-md items-end">
           <div class="col-12 col-md-5">
-            <q-select
+            <agro-select-cadastro
               v-model="bureauClienteId"
-              outlined
+              entidade="cliente"
               label="Cliente"
               clearable
-              emit-value
-              map-options
               :options="clienteOpcoes"
               :loading="carregandoClientes"
+              @atualizar="carregarClientes()"
             />
           </div>
           <div class="col-12 col-md-3">
@@ -221,15 +220,14 @@
         </template>
         <div class="row q-col-gutter-md items-end">
           <div class="col-12 col-md-3">
-            <q-select
+            <agro-select-cadastro
               v-model="bancoClienteId"
-              outlined
+              entidade="cliente"
               label="Cliente"
               clearable
-              emit-value
-              map-options
               :options="clienteOpcoes"
               :loading="carregandoClientes"
+              @atualizar="carregarClientes()"
             />
           </div>
           <div class="col-12 col-md-3">
@@ -278,6 +276,7 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import {
   configDtoParaForm,

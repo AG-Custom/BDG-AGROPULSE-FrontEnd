@@ -90,15 +90,16 @@
                   step="0.01" :readonly="somenteLeitura" />
               </div>
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.clienteId"
-                  outlined
+                  entidade="cliente"
                   label="Cliente"
                   clearable
-                  emit-value
-                  map-options
                   :options="clienteOpcoes"
-                  :loading="carregandoClientes" :readonly="somenteLeitura" />
+                  :loading="carregandoClientes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarClientes()"
+                />
               </div>
             </div>
             <div class="agro-form-actions">
@@ -121,6 +122,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClientes } from 'composables/useClientes';

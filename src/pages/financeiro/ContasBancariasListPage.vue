@@ -35,7 +35,7 @@
           </template>
           <template #body-cell-saldoMinimo="props">
             <q-td :props="props" class="text-metric">
-              {{ props.row.saldoMinimo != null ? formatarMoeda(props.row.saldoMinimo) : '—' }}
+              {{ formatarMoeda(props.row.saldoMinimo) }}
             </q-td>
           </template>
           <template #body-cell-ativo="props">
@@ -71,29 +71,29 @@
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.cnpjId"
-                  outlined
+                  entidade="cnpj"
                   label="CNPJ"
-                  emit-value
-                  map-options
                   class="field-required"
                   :options="cnpjOpcoes"
                   :loading="carregandoCnpjs"
                   :rules="[obrigatorio]"
                   :readonly="!!editandoId || somenteLeitura"
+                  @atualizar="carregarCnpjs()"
                 />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.unidadeId"
-                  outlined
+                  entidade="unidade"
                   label="Unidade"
                   clearable
-                  emit-value
-                  map-options
                   :options="unidadeOpcoes"
-                  :loading="carregandoUnidades" :readonly="somenteLeitura" />
+                  :loading="carregandoUnidades"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarUnidades()"
+                />
               </div>
               <div class="col-12 col-md-4">
                 <q-input
@@ -113,9 +113,9 @@
               </div>
               <div class="col-12 col-md-4">
                 <q-input
-                  v-model="formulario.numero"
+                  v-model="formulario.conta"
                   outlined
-                  label="Número"
+                  label="Conta"
                   class="field-required"
                   :rules="[obrigatorio]" :readonly="somenteLeitura" />
               </div>
@@ -133,8 +133,12 @@
               <div class="col-12 col-md-6">
                 <AgroMoneyInput v-model="formulario.saldoMinimo" label="Saldo mínimo" :readonly="somenteLeitura" />
               </div>
-              <div class="col-12">
-                <q-input v-model="formulario.descricao" outlined label="Descrição" :readonly="somenteLeitura" />
+              <div class="col-12 col-md-6">
+                <AgroMoneyInput
+                  v-model="formulario.saldoAtual"
+                  :label="editandoId ? 'Saldo atual' : 'Saldo inicial'"
+                  :readonly="!!editandoId || somenteLeitura"
+                />
               </div>
             </div>
             <div class="agro-form-actions">
@@ -158,6 +162,7 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCnpjs } from 'composables/useCnpjs';
@@ -211,7 +216,7 @@ const unidadeOpcoes = computed(() =>
 const colunas: QTableColumn<ContaBancariaDto>[] = [
   { name: 'banco', label: 'Banco', field: 'banco', align: 'left' },
   { name: 'agencia', label: 'Agência', field: 'agencia', align: 'left' },
-  { name: 'numero', label: 'Número', field: 'numero', align: 'left' },
+  { name: 'conta', label: 'Conta', field: 'conta', align: 'left' },
   { name: 'tipo', label: 'Tipo', field: 'tipo', align: 'left' },
   { name: 'saldoAtual', label: 'Saldo', field: 'saldoAtual', align: 'right' },
   { name: 'saldoMinimo', label: 'Mínimo', field: 'saldoMinimo', align: 'right' },
@@ -225,10 +230,10 @@ function formVazio(): ContaBancariaFormModel {
     unidadeId: '',
     banco: '',
     agencia: '',
-    numero: '',
+    conta: '',
     tipo: '',
-    saldoMinimo: '',
-    descricao: '',
+    saldoAtual: '0,00',
+    saldoMinimo: '0,00',
   };
 }
 
@@ -237,14 +242,14 @@ function abrirDialog(item?: ContaBancariaDto): void {
   editandoId.value = item?.id ?? null;
   formulario.value = item
     ? {
-        cnpjId: item.cnpjId,
+        cnpjId: item.cnpjId ?? '',
         unidadeId: item.unidadeId ?? '',
         banco: item.banco,
         agencia: item.agencia,
-        numero: item.numero,
+        conta: item.conta,
         tipo: item.tipo,
+        saldoAtual: formatarMoedaParaInput(item.saldoAtual),
         saldoMinimo: formatarMoedaParaInput(item.saldoMinimo),
-        descricao: item.descricao ?? '',
       }
     : formVazio();
   dialog.value = true;

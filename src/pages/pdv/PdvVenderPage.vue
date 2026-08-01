@@ -7,39 +7,31 @@
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.clienteId"
-                outlined
+                entidade="cliente"
                 use-input
                 fill-input
                 hide-selected
                 input-debounce="300"
                 label="Cliente (busca rápida)"
-                emit-value
-                map-options
                 clearable
                 :options="clienteOpcoesFiltradas"
                 :loading="carregandoClientes"
                 @filter="filtrarClientes"
+                @atualizar="carregarClientes({ ativo: true })"
                 @update:model-value="onClienteSelect"
-              >
-                <template #no-option>
-                  <q-item>
-                    <q-item-section class="text-grey">Nenhum cliente encontrado</q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
+              />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.tabelaPrecoId"
-                outlined
+                entidade="tabelaPreco"
                 label="Tabela de preço"
-                emit-value
-                map-options
                 clearable
                 :options="tabelaOpcoes"
                 :loading="carregandoTabelas"
+                @atualizar="carregarTabelasPermitidas({ clienteId: formulario.clienteId || null })"
               />
             </div>
             <div class="col-12 col-md-4">
@@ -78,17 +70,16 @@
             class="row q-col-gutter-md pdv-vender__item"
           >
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :loading="carregandoItensTabela"
                 :rules="[obrigatorio]"
-                @update:model-value="(id: string) => void onProdutoItem(index, id)"
+                @atualizar="carregarProdutos({ ativo: true })"
+                @update:model-value="(valor: unknown) => void onProdutoItem(index, typeof valor === 'string' ? valor : '')"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -201,6 +192,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { useNotificacao } from 'composables/useNotificacao';
 import { usePdv } from 'composables/usePdv';
@@ -321,7 +313,9 @@ function filtrarClientes(val: string, update: (fn: () => void) => void): void {
   });
 }
 
-function onClienteSelect(clienteId: string | null): void {
+function onClienteSelect(valor: unknown): void {
+  const clienteId = typeof valor === 'string' ? valor : '';
+
   if (clienteId) {
     formulario.value.clienteNomeAvulso = '';
     formulario.value.clienteDocumentoAvulso = '';

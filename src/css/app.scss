@@ -423,6 +423,10 @@ body {
   user-select: text;
 }
 
+.agro-formulario--bloqueado .agro-form-actions {
+  pointer-events: auto;
+}
+
 .agro-formulario--bloqueado .agro-formulario__fieldset:disabled,
 .agro-formulario--bloqueado fieldset:disabled {
   opacity: 1;

@@ -13,14 +13,14 @@ import { computed, ref } from 'vue';
 
 function formParaCriar(form: ContaBancariaFormModel) {
   return {
-    cnpjId: form.cnpjId,
+    cnpjId: form.cnpjId || null,
     unidadeId: form.unidadeId || null,
     banco: form.banco.trim(),
     agencia: form.agencia.trim(),
-    numero: form.numero.trim(),
+    conta: form.conta.trim(),
     tipo: form.tipo as TipoContaBancariaValor,
-    saldoMinimo: parseMascaraMoeda(form.saldoMinimo),
-    descricao: form.descricao.trim() || null,
+    saldoAtual: parseMascaraMoeda(form.saldoAtual) ?? 0,
+    saldoMinimo: parseMascaraMoeda(form.saldoMinimo) ?? 0,
   };
 }
 
@@ -36,7 +36,7 @@ export function useContasBancarias() {
     contas.value
       .filter((c) => c.ativo)
       .map((c) => ({
-        label: `${c.banco} — ${c.agencia}/${c.numero}`,
+        label: `${c.banco} — ${c.agencia}/${c.conta}`,
         value: c.id,
       })),
   );
@@ -68,18 +68,18 @@ export function useContasBancarias() {
     }
   }
 
-  async function editar(id: string, form: ContaBancariaFormModel, ativo = true): Promise<boolean> {
+  async function editar(id: string, form: ContaBancariaFormModel): Promise<boolean> {
     salvando.value = true;
     try {
       const base = formParaCriar(form);
       await financeiroGestaoService.editarContaBancaria(id, {
+        cnpjId: base.cnpjId,
+        unidadeId: base.unidadeId,
         banco: base.banco,
         agencia: base.agencia,
-        numero: base.numero,
+        conta: base.conta,
         tipo: base.tipo,
         saldoMinimo: base.saldoMinimo,
-        descricao: base.descricao,
-        ativo,
       });
       sucesso('Conta bancária atualizada.');
       await carregar();

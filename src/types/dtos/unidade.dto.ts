@@ -23,6 +23,7 @@ export interface UnidadeDto {
   telefone: string | null;
   timeZoneId: string;
   matriz: boolean;
+  propagarCadastrosParaFiliais: boolean;
   status: UnidadeStatusValor;
 }
 
@@ -36,6 +37,7 @@ export interface CriarUnidadePayload {
   telefone: string | null;
   timeZoneId: string;
   matriz: boolean;
+  propagarCadastrosParaFiliais: boolean;
 }
 
 export interface EditarUnidadePayload extends CriarUnidadePayload {
@@ -62,5 +64,6 @@ export interface UnidadeFormModel {
   complemento: string;
   timeZoneId: string;
   matriz: boolean;
+  propagarCadastrosParaFiliais: boolean;
   status: UnidadeStatusValor;
 }

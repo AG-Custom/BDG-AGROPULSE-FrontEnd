@@ -14,27 +14,27 @@
         >
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
-                emit-value
-                map-options
                 clearable
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :readonly="somenteLeitura"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.receitaId"
-                outlined
+                entidade="receitaProducao"
                 label="Receita (opcional)"
-                emit-value
-                map-options
                 clearable
                 :options="receitaOpcoes"
+                :loading="carregandoReceitas"
                 :readonly="somenteLeitura"
+                @atualizar="carregarReceitas()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -117,6 +117,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useFichasTecnicas } from 'composables/useFichasTecnicas';
 import { useProdutos } from 'composables/useProdutos';
 import { useReceitasProducao } from 'composables/useReceitasProducao';
@@ -127,8 +128,12 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const { ficha, salvando, obter, criar, editar } = useFichasTecnicas();
-const { produtos, carregar: carregarProdutos } = useProdutos();
-const { receitas, carregar: carregarReceitas } = useReceitasProducao();
+const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } = useProdutos();
+const {
+  receitas,
+  carregando: carregandoReceitas,
+  carregar: carregarReceitas,
+} = useReceitasProducao();
 
 const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
   if (route.name === 'ficha-tecnica-visualizar') {

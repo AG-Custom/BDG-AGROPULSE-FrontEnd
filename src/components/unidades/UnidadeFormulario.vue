@@ -34,20 +34,6 @@
           />
         </div>
         <div class="col-12 col-md-6">
-          <q-select
-            v-model="formulario.tipo"
-            outlined
-            label="Tipo"
-            class="field-required"
-            emit-value
-            map-options
-            aria-required="true"
-            :options="TipoUnidadeOpcoes"
-            :readonly="bloqueado"
-            :rules="bloqueado ? undefined : [obrigatorio]"
-          />
-        </div>
-        <div class="col-12 col-md-6">
           <q-input
             v-model="formulario.codigo"
             outlined
@@ -58,7 +44,12 @@
           />
         </div>
         <div class="col-12 col-md-6 unidade-matriz">
-          <q-toggle v-model="formulario.matriz" label="Unidade matriz" :disable="bloqueado" />
+          <q-toggle
+            v-model="formulario.matriz"
+            label="Unidade matriz"
+            :disable="bloqueado"
+            @update:model-value="onMatrizChange"
+          />
           <q-icon
             name="info"
             size="18px"
@@ -69,6 +60,17 @@
               Unidade matriz é a unidade principal (sede) da empresa dentro do AgroPulse.
             </q-tooltip>
           </q-icon>
+        </div>
+        <div v-if="formulario.matriz" class="col-12">
+          <q-toggle
+            v-model="formulario.propagarCadastrosParaFiliais"
+            label="Deseja que os itens cadastráveis a partir da matriz sejam também criados nas filiais?"
+            :disable="bloqueado"
+          />
+          <p class="hint-propagacao">
+            Produtos, categorias, unidades de medida, clientes, fornecedores e tabelas de preço
+            criados/editados na matriz serão refletidos nas filiais ativas.
+          </p>
         </div>
         <div v-if="modo !== 'criar'" class="col-12 col-md-6">
           <q-select
@@ -213,11 +215,7 @@
 <script setup lang="ts">
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useBuscaCep } from 'composables/useBuscaCep';
-import {
-  TimeZoneOpcoes,
-  TipoUnidadeOpcoes,
-  UnidadeStatusOpcoes,
-} from 'constants/enums';
+import { TimeZoneOpcoes, TipoUnidade, UnidadeStatusOpcoes } from 'constants/enums';
 import { MASCARAS, TAMANHO_FORMATADO, mascaraTelefone, tamanhoFormatadoTelefone } from 'constants/masks';
 import type { QForm } from 'quasar';
 import type { CnpjEmpresaDto } from 'types/dtos/cnpj.dto';
@@ -267,16 +265,24 @@ const cnpjOpcoes = computed(() =>
 );
 
 watch(
-  () => [formulario.value.tipo, formulario.value.nome] as const,
-  ([tipo, nome]) => {
+  () => formulario.value.nome,
+  (nome) => {
     if (props.modo === 'criar' && !props.somenteLeitura) {
-      formulario.value.codigo = gerarCodigoUnidade(tipo, nome);
+      formulario.value.tipo = TipoUnidade.Filial;
+      formulario.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome);
     }
   },
   { immediate: true },
 );
 
+function onMatrizChange(valor: boolean): void {
+  if (!valor) {
+    formulario.value.propagarCadastrosParaFiliais = false;
+  }
+}
+
 async function validar(): Promise<boolean> {
+  formulario.value.tipo = TipoUnidade.Filial;
   return (await formRef.value?.validate()) ?? false;
 }
 
@@ -305,5 +311,11 @@ defineExpose({ validar });
 .unidade-matriz__info {
   cursor: help;
   flex-shrink: 0;
+}
+
+.hint-propagacao {
+  margin: calc(var(--spacing-1) * -1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 </style>

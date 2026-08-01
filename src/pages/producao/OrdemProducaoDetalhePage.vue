@@ -133,15 +133,16 @@
               />
             </div>
             <div class="col-12 col-md-3">
-              <q-select
+              <agro-select-cadastro
                 v-model="consumo.loteId"
-                outlined
+                entidade="lote"
                 dense
                 label="Lote"
-                emit-value
-                map-options
                 clearable
                 :options="loteOpcoes"
+                :loading="carregandoLotes"
+                :desabilitar-cadastro="!consumo.produtoInsumoId"
+                @atualizar="atualizarLotesConsumo()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -256,6 +257,7 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
@@ -284,7 +286,7 @@ const {
   apontarProducao,
 } = useProducao();
 const { produtos, carregar: carregarProdutos } = useProdutos();
-const { lotes, carregar: carregarLotes } = useEstoqueLotes();
+const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
 
 const id = computed(() => route.params.id as string);
 const dialogConcluir = ref(false);
@@ -396,6 +398,13 @@ async function salvarProducao(): Promise<void> {
     quantidade: Number(producaoQtd.value),
   });
   if (ok) producaoQtd.value = '';
+}
+
+async function atualizarLotesConsumo(): Promise<void> {
+  if (!consumo.value.produtoInsumoId) {
+    return;
+  }
+  await carregarLotes({ produtoId: consumo.value.produtoInsumoId, apenasComSaldo: true });
 }
 
 watch(

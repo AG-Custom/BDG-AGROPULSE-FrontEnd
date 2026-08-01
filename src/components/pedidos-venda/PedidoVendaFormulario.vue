@@ -25,31 +25,31 @@
           />
         </div>
         <div class="col-12 col-md-6">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.vendedorUsuarioId"
-            outlined
+            entidade="usuario"
             label="Vendedor"
             hint="Opcional — se vazio, usa o usuário autenticado"
-            emit-value
-            map-options
             clearable
             :options="vendedorOpcoes"
             :loading="carregandoUsuarios"
             :readonly="somenteLeitura"
+            :desabilitar-cadastro="somenteLeitura"
+            @atualizar="carregarUsuarios()"
           />
         </div>
         <div class="col-12 col-md-6">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.tabelaPrecoId"
-            outlined
+            entidade="tabelaPreco"
             label="Tabela de preço"
             hint="Opcional — resolve preço automático nos itens"
-            emit-value
-            map-options
             clearable
             :options="tabelaOpcoes"
             :loading="carregandoTabelas"
             :readonly="somenteLeitura"
+            :desabilitar-cadastro="somenteLeitura"
+            @atualizar="carregarTabelasPermitidas({ clienteId: formulario.clienteId || null })"
           />
         </div>
         <div class="col-12 col-md-6">

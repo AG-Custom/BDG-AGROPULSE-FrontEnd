@@ -31,6 +31,7 @@ export function criarUnidadeFormVazia(): UnidadeFormModel {
     complemento: '',
     timeZoneId: TIMEZONE_PADRAO,
     matriz: false,
+    propagarCadastrosParaFiliais: false,
     status: UnidadeStatus.Ativa,
   };
 }
@@ -40,7 +41,7 @@ export function unidadeDtoParaForm(dto: UnidadeDto): UnidadeFormModel {
     cnpjEmpresaId: dto.cnpjEmpresaId,
     nome: dto.nome,
     codigo: dto.codigo,
-    tipo: dto.tipo,
+    tipo: TipoUnidade.Filial,
     email: dto.email ?? '',
     telefone: formatarTelefone(dto.telefone ?? ''),
     logradouro: dto.endereco.logradouro,
@@ -52,6 +53,7 @@ export function unidadeDtoParaForm(dto: UnidadeDto): UnidadeFormModel {
     complemento: dto.endereco.complemento ?? '',
     timeZoneId: dto.timeZoneId,
     matriz: dto.matriz,
+    propagarCadastrosParaFiliais: dto.propagarCadastrosParaFiliais ?? false,
     status: dto.status,
   };
 }
@@ -74,12 +76,13 @@ export function formParaCriarPayload(form: UnidadeFormModel): CriarUnidadePayloa
     cnpjEmpresaId: form.cnpjEmpresaId,
     nome: form.nome.trim(),
     codigo: form.codigo.trim(),
-    tipo: form.tipo,
+    tipo: TipoUnidade.Filial,
     endereco: montarEndereco(form),
     email: form.email.trim() || null,
     telefone: apenasDigitos(form.telefone) || null,
     timeZoneId: form.timeZoneId,
     matriz: form.matriz,
+    propagarCadastrosParaFiliais: form.matriz ? form.propagarCadastrosParaFiliais : false,
   };
 }
 

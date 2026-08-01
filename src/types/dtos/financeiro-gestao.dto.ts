@@ -17,16 +17,16 @@ import type { FiltroEscopoFinanceiro } from 'types/dtos/financeiro.dto';
 export interface ContaBancariaDto {
   id: string;
   empresaId: string;
-  cnpjId: string;
+  cnpjId: string | null;
   unidadeId: string | null;
   banco: string;
   agencia: string;
-  numero: string;
+  conta: string;
   tipo: TipoContaBancariaValor;
   saldoAtual: number;
-  saldoMinimo: number | null;
+  saldoMinimo: number;
   ativo: boolean;
-  descricao: string | null;
+  abaixoSaldoMinimo: boolean;
 }
 
 export interface ContaBancariaFormModel {
@@ -34,31 +34,31 @@ export interface ContaBancariaFormModel {
   unidadeId: string;
   banco: string;
   agencia: string;
-  numero: string;
+  conta: string;
   tipo: TipoContaBancariaValor | '';
+  saldoAtual: string;
   saldoMinimo: string;
-  descricao: string;
 }
 
 export interface CriarContaBancariaPayload {
-  cnpjId: string;
+  cnpjId?: string | null;
   unidadeId?: string | null;
   banco: string;
   agencia: string;
-  numero: string;
+  conta: string;
   tipo: TipoContaBancariaValor;
-  saldoMinimo?: number | null;
-  descricao?: string | null;
+  saldoAtual: number;
+  saldoMinimo: number;
 }
 
 export interface EditarContaBancariaPayload {
+  cnpjId?: string | null;
+  unidadeId?: string | null;
   banco: string;
   agencia: string;
-  numero: string;
+  conta: string;
   tipo: TipoContaBancariaValor;
-  saldoMinimo?: number | null;
-  descricao?: string | null;
-  ativo: boolean;
+  saldoMinimo: number;
 }
 
 export interface CaixaDto {
@@ -189,18 +189,19 @@ export interface ListarChequesParams extends FiltroEscopoFinanceiro {
 
 export interface FluxoCaixaItemDto {
   data: string;
-  entradas: number;
-  saidas: number;
-  saldo: number;
-  projetado?: boolean;
+  entradasPrevistas: number;
+  saidasPrevistas: number;
+  saldoProjetado: number;
 }
 
 export interface FluxoCaixaDto {
   periodo: PeriodoFluxoCaixaValor;
   dias: number;
+  saldoContas: number;
+  saldoCaixas: number;
   itens: FluxoCaixaItemDto[];
-  saldoInicial: number;
-  saldoFinal: number;
+  stub: boolean;
+  mensagemStub: string | null;
 }
 
 export interface ListarFluxoCaixaParams extends FiltroEscopoFinanceiro {
@@ -209,22 +210,9 @@ export interface ListarFluxoCaixaParams extends FiltroEscopoFinanceiro {
 }
 
 export interface TesourariaSaldoIntradayDto {
-  data: string;
-  contas: Array<{
-    contaBancariaId: string;
-    banco: string;
-    numero: string;
-    saldo: number;
-    saldoMinimo: number | null;
-    alertaSaldoMinimo: boolean;
-  }>;
-  caixas: Array<{
-    caixaId: string;
-    nome: string;
-    saldo: number;
-  }>;
-  saldoTotal: number;
-  stub?: boolean;
+  contas: ContaBancariaDto[];
+  stub: boolean;
+  mensagem: string;
 }
 
 export interface TesourariaProjecaoItemDto {
@@ -237,7 +225,8 @@ export interface TesourariaProjecaoItemDto {
 export interface TesourariaProjecaoDto {
   dias: number;
   itens: TesourariaProjecaoItemDto[];
-  stub?: boolean;
+  stub: boolean;
+  mensagem: string;
 }
 
 export interface AplicacaoFinanceiraDto {
@@ -247,11 +236,10 @@ export interface AplicacaoFinanceiraDto {
   tipo: TipoAplicacaoValor;
   descricao: string;
   valorAplicado: number;
-  valorAtual: number;
+  taxa: number;
   dataAplicacao: string;
   dataVencimento: string | null;
   status: StatusAplicacaoValor;
-  taxaPercentual: number | null;
 }
 
 export interface AplicacaoFormModel {
@@ -261,7 +249,7 @@ export interface AplicacaoFormModel {
   valorAplicado: string;
   dataAplicacao: string;
   dataVencimento: string;
-  taxaPercentual: string;
+  taxa: string;
 }
 
 export interface CriarAplicacaoPayload {
@@ -269,9 +257,9 @@ export interface CriarAplicacaoPayload {
   tipo: TipoAplicacaoValor;
   descricao: string;
   valorAplicado: number;
+  taxa: number;
   dataAplicacao: string;
   dataVencimento?: string | null;
-  taxaPercentual?: number | null;
 }
 
 export interface ResgatarAplicacaoPayload {

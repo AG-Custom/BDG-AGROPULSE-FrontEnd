@@ -102,24 +102,26 @@
                   type="date" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.safraId"
-                  outlined
+                  entidade="safra"
                   label="Safra"
                   clearable
-                  emit-value
-                  map-options
-                  :options="safraOpcoes" :readonly="somenteLeitura" />
+                  :options="safraOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarSafras()"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.talhaoId"
-                  outlined
+                  entidade="talhao"
                   label="Talhão"
                   clearable
-                  emit-value
-                  map-options
-                  :options="talhaoOpcoes" :readonly="somenteLeitura" />
+                  :options="talhaoOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarTalhoes()"
+                />
               </div>
               <div class="col-12 col-md-6">
                 <q-input v-model="formulario.responsavel" outlined label="Responsável" :readonly="somenteLeitura" />
@@ -153,6 +155,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useOrdensServicoAgricola } from 'composables/useOrdensServicoAgricola';

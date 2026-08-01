@@ -11,15 +11,14 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.ativoId"
-                outlined
+                entidade="ativo"
                 label="Ativo"
-                emit-value
-                map-options
                 class="field-required"
                 :options="ativoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarAtivos()"
               />
             </div>
             <div class="col-12 col-md-3">
@@ -131,6 +130,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { checklistVazio, useManutencao } from 'composables/useManutencao';
 import { StatusChecklistInspecaoOpcoes } from 'constants/enums';
 import type { ChecklistManutencaoFormModel } from 'types/dtos/manutencao.dto';

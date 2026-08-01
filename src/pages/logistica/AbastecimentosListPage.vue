@@ -89,15 +89,16 @@
         </q-card-section>
         <q-card-section class="q-pt-none">
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
-            <q-select
+            <agro-select-cadastro
               v-model="formulario.veiculoId"
-              outlined
+              entidade="veiculo"
               label="Veículo"
-              emit-value
-              map-options
               class="field-required q-mb-md"
               :options="veiculoOpcoes"
-              :rules="[obrigatorio]" :readonly="somenteLeitura" />
+              :rules="[obrigatorio]"
+              :readonly="somenteLeitura"
+              :desabilitar-cadastro="somenteLeitura"
+              @atualizar="carregarVeiculos()" />
             <q-input
               v-model="formulario.data"
               outlined
@@ -156,6 +157,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { abastecimentoVazio, useLogistica } from 'composables/useLogistica';

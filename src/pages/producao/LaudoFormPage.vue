@@ -59,27 +59,28 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoId"
-                outlined
+                entidade="produto"
                 label="Produto"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.loteId"
-                outlined
+                entidade="lote"
                 label="Lote"
                 class="field-required"
-                emit-value
-                map-options
                 :options="loteOpcoes"
+                :loading="carregandoLotes"
                 :rules="[obrigatorio]"
+                :desabilitar-cadastro="!formulario.produtoId"
+                @atualizar="atualizarLotes()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -199,6 +200,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useLaudos } from 'composables/useLaudos';
 import { useProducao } from 'composables/useProducao';
@@ -229,8 +231,8 @@ function novoParam(): ParametroLaudoFormModel {
 const route = useRoute();
 const router = useRouter();
 const { laudo, salvando, obter, criar, aprovar, reprovar } = useLaudos();
-const { produtos, carregar: carregarProdutos } = useProdutos();
-const { lotes, carregar: carregarLotes } = useEstoqueLotes();
+const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } = useProdutos();
+const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
 const { ordens, carregarOrdens } = useProducao();
 
 const modo = computed(() => (route.name === 'laudo-detalhe' ? 'detalhe' : 'criar'));
@@ -286,6 +288,13 @@ function rotuloProduto(pid: string): string {
 
 function adicionarParam(): void {
   formulario.value.parametros.push(novoParam());
+}
+
+async function atualizarLotes(): Promise<void> {
+  await carregarLotes({
+    produtoId: formulario.value.produtoId || undefined,
+    apenasComSaldo: false,
+  });
 }
 
 function abrirReprovar(): void {

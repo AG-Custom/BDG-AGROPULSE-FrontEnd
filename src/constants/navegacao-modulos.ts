@@ -675,7 +675,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
     modulos: [
       {
         id: 'rh',
-        label: 'RH e Folha',
+        label: 'Colaboradores',
         icon: 'groups',
         pathPrefixes: ['/colaboradores'],
         filhos: [

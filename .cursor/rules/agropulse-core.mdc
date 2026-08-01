@@ -22,6 +22,7 @@ Component/Page → Composable → Store → Service → boot/axios → API
 - **NUNCA** importar `boot/axios` ou `services/` em `.vue` (pages, layouts, components)
 - **NUNCA** colocar HTTP, regra de negócio ou Notify/router em services
 - **NUNCA** colocar Notify/router em stores
+- **NUNCA** hardcodar regra de negócio no frontend (match, cálculo fiscal, validação de domínio, elegibilidade, status transitions, etc.) — a fonte da verdade é o **backend** (`new_agropulse_backend`). O FE só consome o resultado da API e cuida de UX (exibir hint, empty state, loading). Se a regra faltar no BE, **atualize o BE** (e `api-contract/`) antes ou junto do FE.
 - **NUNCA** usar `any` sem justificativa
 - **NUNCA** duplicar lógica — extrair composable, util ou store
 - **NUNCA** usar caminhos relativos longos — usar aliases (`composables/`, `types/`, etc.)

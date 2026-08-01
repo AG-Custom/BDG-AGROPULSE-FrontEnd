@@ -25,27 +25,28 @@
         >
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoEntradaId"
-                outlined
+                entidade="produto"
                 label="Produto entrada"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
                 @update:model-value="onProdutoEntrada"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.loteEntradaId"
-                outlined
+                entidade="lote"
                 label="Lote entrada"
-                emit-value
-                map-options
                 clearable
                 :options="loteOpcoes"
+                :loading="carregandoLotes"
+                :desabilitar-cadastro="!formulario.produtoEntradaId"
+                @atualizar="atualizarLotesEntrada()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -91,15 +92,15 @@
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="saida.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -159,6 +160,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
@@ -196,8 +198,8 @@ const {
   editarBeneficiamento,
   confirmarBeneficiamento,
 } = useProducao();
-const { produtos, carregar: carregarProdutos } = useProdutos();
-const { lotes, carregar: carregarLotes } = useEstoqueLotes();
+const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } = useProdutos();
+const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
 
 const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
   if (route.name === 'beneficiamento-visualizar') {
@@ -251,9 +253,17 @@ function adicionarSaida(): void {
   formulario.value.saidas.push(novaSaida());
 }
 
-function onProdutoEntrada(produtoId: string): void {
+function onProdutoEntrada(produtoId: unknown): void {
   formulario.value.loteEntradaId = '';
-  if (produtoId) void carregarLotes({ produtoId, apenasComSaldo: true });
+  const id = typeof produtoId === 'string' ? produtoId : '';
+  if (id) void carregarLotes({ produtoId: id, apenasComSaldo: true });
+}
+
+async function atualizarLotesEntrada(): Promise<void> {
+  if (!formulario.value.produtoEntradaId) {
+    return;
+  }
+  await carregarLotes({ produtoId: formulario.value.produtoEntradaId, apenasComSaldo: true });
 }
 
 async function salvar(): Promise<void> {

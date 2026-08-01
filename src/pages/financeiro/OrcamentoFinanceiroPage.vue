@@ -158,15 +158,14 @@
                 />
               </div>
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.unidadeId"
-                  outlined
+                  entidade="unidade"
                   label="Unidade"
                   clearable
-                  emit-value
-                  map-options
                   :options="unidadeOpcoes"
                   :loading="carregandoUnidades"
+                  @atualizar="carregarUnidades()"
                 />
               </div>
             </div>
@@ -184,6 +183,7 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useOrcamentoFinanceiro } from 'composables/useOrcamentoFinanceiro';

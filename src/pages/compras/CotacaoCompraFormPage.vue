@@ -21,15 +21,14 @@
 
           <div v-for="(item, index) in itens" :key="item.chave" class="row q-col-gutter-md q-mb-sm">
             <div class="col-12 col-md-7">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Produto"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-8 col-md-3">
@@ -61,6 +60,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCompras } from 'composables/useCompras';
 import { useProdutos } from 'composables/useProdutos';
 import { obrigatorio } from 'utils/validators';

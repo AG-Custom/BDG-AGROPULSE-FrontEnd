@@ -154,17 +154,17 @@
         />
       </div>
       <div class="col-12 col-md-6">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.vendedorUsuarioId"
-          outlined
+          entidade="usuario"
           label="Vendedor"
-          emit-value
-          map-options
           :clearable="!carteiraRestrita && !somenteLeitura"
           :options="vendedorOpcoes"
           :loading="carregandoUsuarios"
           :readonly="somenteLeitura || carteiraRestrita"
+          :desabilitar-cadastro="somenteLeitura || carteiraRestrita"
           :hint="carteiraRestrita ? 'Carteira vinculada ao seu usuário' : undefined"
+          @atualizar="carregarUsuarios()"
         />
       </div>
     </div>
@@ -174,6 +174,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {

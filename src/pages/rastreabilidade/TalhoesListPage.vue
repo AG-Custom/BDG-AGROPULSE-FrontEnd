@@ -102,15 +102,14 @@
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.glebaId"
-                  outlined
+                  entidade="gleba"
                   label="Gleba"
                   clearable
-                  emit-value
-                  map-options
                   :options="glebaOpcoes"
                   :readonly="somenteLeitura"
+                  @atualizar="carregarGlebas()"
                 />
               </div>
               <div class="col-12">
@@ -164,6 +163,7 @@
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useGlebas } from 'composables/useGlebas';

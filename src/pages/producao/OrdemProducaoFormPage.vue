@@ -8,28 +8,28 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoSaidaId"
-                outlined
+                entidade="produto"
                 label="Produto de saída"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
                 @update:model-value="onProdutoSaida"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.receitaId"
-                outlined
+                entidade="receitaProducao"
                 label="Receita / BOM"
-                emit-value
-                map-options
                 clearable
                 :options="receitaOpcoes"
+                :loading="carregandoReceitas"
                 @update:model-value="onReceita"
+                @atualizar="carregarReceitas()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -56,15 +56,15 @@
 
           <div v-for="(item, index) in formulario.itens" :key="item.chave" class="row q-col-gutter-md q-mb-sm">
             <div class="col-12 col-md-7">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoInsumoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Insumo"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-8 col-md-3">
@@ -104,6 +104,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useProducao } from 'composables/useProducao';
 import { useProdutos } from 'composables/useProdutos';
 import { useReceitasProducao } from 'composables/useReceitasProducao';
@@ -122,8 +123,12 @@ function novoItem(): ItemOrdemProducaoFormModel {
 const route = useRoute();
 const router = useRouter();
 const { ordem, salvando, obterOrdem, criarOrdem, editarOrdem } = useProducao();
-const { produtos, carregar: carregarProdutos } = useProdutos();
-const { receitas, carregar: carregarReceitas } = useReceitasProducao();
+const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } = useProdutos();
+const {
+  receitas,
+  carregando: carregandoReceitas,
+  carregar: carregarReceitas,
+} = useReceitasProducao();
 
 const modo = computed(() => (route.name === 'ordem-producao-editar' ? 'editar' : 'criar'));
 const ordemId = computed(() => route.params.id as string | undefined);
@@ -173,8 +178,8 @@ function aplicarReceita(receitaId: string): void {
   }));
 }
 
-function onReceita(receitaId: string | null): void {
-  if (receitaId) aplicarReceita(receitaId);
+function onReceita(receitaId: unknown): void {
+  if (typeof receitaId === 'string' && receitaId) aplicarReceita(receitaId);
 }
 
 function onProdutoSaida(): void {

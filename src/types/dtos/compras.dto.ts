@@ -157,6 +157,7 @@ export interface ComprasConfigDto {
 
 export interface PreviewRecebimentoXmlItemDto {
   codigoProdutoXml: string;
+  descricaoProdutoXml: string | null;
   produtoId: string | null;
   produtoDescricao: string | null;
   quantidade: number;

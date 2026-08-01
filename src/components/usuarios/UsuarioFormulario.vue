@@ -78,36 +78,36 @@
         />
       </div>
       <div class="col-12 col-md-6">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.colaboradorId"
-          outlined
+          entidade="colaborador"
           label="Colaborador vinculado"
-          emit-value
-          map-options
           clearable
           :options="colaboradorOpcoes"
           :loading="carregandoColaboradores"
           :readonly="somenteLeitura"
+          :desabilitar-cadastro="somenteLeitura"
           hint="Opcional — vincule a um cadastro de RH existente"
+          @atualizar="carregarColaboradores({ ativo: true })"
         />
       </div>
       <div class="col-12">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.unidadeIds"
-          outlined
+          entidade="unidade"
           label="Unidades permitidas"
-          emit-value
-          map-options
           multiple
           use-chips
           :options="unidadeOpcoes"
           :loading="carregandoUnidades"
           :readonly="somenteLeitura || perfilGlobal"
+          :desabilitar-cadastro="somenteLeitura || perfilGlobal"
           :hint="
             perfilGlobal
               ? 'Perfil global — acesso a todas as unidades'
               : 'Selecione as unidades que o usuário pode acessar'
           "
+          @atualizar="carregar({ ativo: true })"
         />
       </div>
     </div>
@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useColaboradores } from 'composables/useColaboradores';
 import { useUnidades } from 'composables/useUnidades';
 import {

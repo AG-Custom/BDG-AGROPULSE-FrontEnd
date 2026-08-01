@@ -7,7 +7,7 @@
 
     <section class="agro-section">
       <q-banner v-if="saldo?.stub || projecao?.stub" rounded class="q-mb-md stub-banner">
-        Integração externa em modo stub — saldos/projeção podem ser simulados.
+        {{ mensagemStub }}
       </q-banner>
 
       <div class="row q-col-gutter-md q-mb-md">
@@ -31,24 +31,25 @@
           <h3 class="secao-titulo">Saldo intraday</h3>
         </template>
         <agro-table-skeleton v-if="carregando && !saldo" :colunas="4" />
-        <template v-else-if="saldo">
-          <p class="saldo-total text-metric">Total: {{ formatarMoeda(saldo.saldoTotal) }}</p>
+        <template v-else-if="saldo && saldo.contas.length > 0">
+          <p class="saldo-total text-metric">Total: {{ formatarMoeda(saldoTotal) }}</p>
           <q-table
             flat
             bordered
-            row-key="contaBancariaId"
+            row-key="id"
             :rows="saldo.contas"
             :columns="colunasContas"
             :rows-per-page-options="[10, 25]"
-            class="q-mb-md"
           >
-            <template #body-cell-saldo="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.saldo) }}</q-td>
+            <template #body-cell-saldoAtual="props">
+              <q-td :props="props" class="text-metric">
+                {{ formatarMoeda(props.row.saldoAtual) }}
+              </q-td>
             </template>
-            <template #body-cell-alertaSaldoMinimo="props">
+            <template #body-cell-abaixoSaldoMinimo="props">
               <q-td :props="props">
                 <agro-badge
-                  v-if="props.row.alertaSaldoMinimo"
+                  v-if="props.row.abaixoSaldoMinimo"
                   label="Abaixo do mínimo"
                   variant="warning"
                 />
@@ -56,23 +57,11 @@
               </q-td>
             </template>
           </q-table>
-          <q-table
-            flat
-            bordered
-            row-key="caixaId"
-            :rows="saldo.caixas"
-            :columns="colunasCaixas"
-            :rows-per-page-options="[10, 25]"
-          >
-            <template #body-cell-saldo="props">
-              <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.saldo) }}</q-td>
-            </template>
-          </q-table>
         </template>
         <empty-state
           v-else
           titulo="Sem saldo"
-          descricao="Não há saldos intraday disponíveis."
+          descricao="Não há contas bancárias com saldo disponível."
           icon="savings"
         />
       </agro-card>
@@ -154,10 +143,8 @@
               {{ formatarMoeda(props.row.valorAplicado) }}
             </q-td>
           </template>
-          <template #body-cell-valorAtual="props">
-            <q-td :props="props" class="text-metric">
-              {{ formatarMoeda(props.row.valorAtual) }}
-            </q-td>
+          <template #body-cell-taxa="props">
+            <q-td :props="props" class="text-metric">{{ props.row.taxa }}%</q-td>
           </template>
           <template #body-cell-status="props">
             <q-td :props="props">
@@ -191,15 +178,14 @@
           <q-form greedy class="agro-formulario" @submit.prevent="salvarApp">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formApp.contaBancariaId"
-                  outlined
-                  emit-value
-                  map-options
+                  entidade="contaBancaria"
                   label="Conta bancária"
                   class="field-required"
                   :options="contaOpcoes"
                   :rules="[obrigatorio]"
+                  @atualizar="carregarContas()"
                 />
               </div>
               <div class="col-12 col-md-6">
@@ -245,7 +231,13 @@
                 <q-input v-model="formApp.dataVencimento" outlined type="date" label="Vencimento" />
               </div>
               <div class="col-12">
-                <q-input v-model="formApp.taxaPercentual" outlined label="Taxa %" />
+                <q-input
+                  v-model="formApp.taxa"
+                  outlined
+                  label="Taxa %"
+                  class="field-required"
+                  :rules="[obrigatorio]"
+                />
               </div>
             </div>
             <div class="agro-form-actions">
@@ -270,6 +262,7 @@ import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useAplicacoesFinanceiras } from 'composables/useAplicacoesFinanceiras';
@@ -284,11 +277,12 @@ import type { QTableColumn } from 'quasar';
 import type {
   AplicacaoFinanceiraDto,
   AplicacaoFormModel,
+  ContaBancariaDto,
   TesourariaProjecaoItemDto,
 } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { saldo, projecao, carregando, carregarSaldo, carregarProjecao } = useTesouraria();
 const {
@@ -311,18 +305,25 @@ const formApp = ref<AplicacaoFormModel>({
   valorAplicado: '',
   dataAplicacao: new Date().toISOString().slice(0, 10),
   dataVencimento: '',
-  taxaPercentual: '',
+  taxa: '',
 });
 
-const colunasContas: QTableColumn[] = [
+const saldoTotal = computed(() =>
+  (saldo.value?.contas ?? []).reduce((acc, c) => acc + (c.saldoAtual ?? 0), 0),
+);
+
+const mensagemStub = computed(
+  () =>
+    saldo.value?.mensagem ||
+    projecao.value?.mensagem ||
+    'Integração externa em modo stub — saldos/projeção podem ser simulados.',
+);
+
+const colunasContas: QTableColumn<ContaBancariaDto>[] = [
   { name: 'banco', label: 'Banco', field: 'banco', align: 'left' },
-  { name: 'numero', label: 'Número', field: 'numero', align: 'left' },
-  { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right' },
-  { name: 'alertaSaldoMinimo', label: 'Alerta', field: 'alertaSaldoMinimo', align: 'left' },
-];
-const colunasCaixas: QTableColumn[] = [
-  { name: 'nome', label: 'Caixa', field: 'nome', align: 'left' },
-  { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right' },
+  { name: 'conta', label: 'Conta', field: 'conta', align: 'left' },
+  { name: 'saldoAtual', label: 'Saldo', field: 'saldoAtual', align: 'right' },
+  { name: 'abaixoSaldoMinimo', label: 'Alerta', field: 'abaixoSaldoMinimo', align: 'left' },
 ];
 const colunasProjecao: QTableColumn<TesourariaProjecaoItemDto>[] = [
   { name: 'data', label: 'Data', field: 'data', align: 'left' },
@@ -334,7 +335,7 @@ const colunasApps: QTableColumn<AplicacaoFinanceiraDto>[] = [
   { name: 'tipo', label: 'Tipo', field: 'tipo', align: 'left' },
   { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left' },
   { name: 'valorAplicado', label: 'Aplicado', field: 'valorAplicado', align: 'right' },
-  { name: 'valorAtual', label: 'Atual', field: 'valorAtual', align: 'right' },
+  { name: 'taxa', label: 'Taxa', field: 'taxa', align: 'right' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];

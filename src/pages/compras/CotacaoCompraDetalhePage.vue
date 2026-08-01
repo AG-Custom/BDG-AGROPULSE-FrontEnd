@@ -179,15 +179,14 @@
       <q-card class="dialog">
         <q-card-section><h4 class="titulo">Enviar cotação</h4></q-card-section>
         <q-card-section>
-          <q-select
+          <agro-select-cadastro
             v-model="fornecedoresEnvio"
-            outlined
+            entidade="fornecedor"
             label="Fornecedores"
             multiple
-            emit-value
-            map-options
             use-chips
             :options="fornecedorOpcoes"
+            @atualizar="carregarFornecedores()"
           />
           <div class="text-caption q-mt-sm">
             Registra fila interna de envio (sem e-mail real / SendGrid).
@@ -213,13 +212,12 @@
         <q-card-section><h4 class="titulo">Responder cotação</h4></q-card-section>
         <q-card-section class="row q-col-gutter-md">
           <div class="col-12">
-            <q-select
+            <agro-select-cadastro
               v-model="resposta.fornecedorId"
-              outlined
+              entidade="fornecedor"
               label="Fornecedor"
-              emit-value
-              map-options
               :options="fornecedorOpcoes"
+              @atualizar="carregarFornecedores()"
             />
           </div>
           <div class="col-12">
@@ -277,6 +275,7 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';

@@ -57,14 +57,13 @@
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="fornecedorId"
-                outlined
+                entidade="fornecedor"
                 label="Fornecedor"
-                emit-value
-                map-options
                 :options="fornecedorOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarFornecedores({ ativo: true })"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -92,44 +91,78 @@
             <agro-btn flat icon="add" label="Item" descricao="Adicionar item" @click="adicionarItem" />
           </div>
 
-          <div v-for="(item, index) in itens" :key="item.chave" class="item-row row q-col-gutter-sm q-mb-sm">
-            <div class="col-12 col-md-4">
-              <q-select
-                v-model="item.produtoId"
-                outlined
-                dense
-                label="Produto"
-                emit-value
-                map-options
-                :options="produtoOpcoes"
-                :rules="[obrigatorio]"
-              />
+          <div v-if="itensSemProduto.length > 0" class="banner-faltantes" role="status">
+            <div class="banner-faltantes__titulo">Produtos do XML não cadastrados nesta unidade</div>
+            <p class="banner-faltantes__texto">
+              A NF-e tem itens que não bateram 100% com o cadastro (código/EAN/nome). Cadastre-os aqui
+              para continuar o recebimento com agilidade.
+            </p>
+            <ul class="banner-faltantes__lista">
+              <li v-for="item in itensSemProduto" :key="item.chave">
+                <span class="text-metric">{{ rotuloItemXml(item) }}</span>
+                <agro-btn
+                  flat
+                  dense
+                  color="warning"
+                  label="Cadastrar produto"
+                  descricao="Cadastrar produto do XML"
+                  @click="abrirCadastroRapido(item)"
+                />
+              </li>
+            </ul>
+          </div>
+
+          <div v-for="(item, index) in itens" :key="item.chave" class="item-row">
+            <div class="row q-col-gutter-sm items-start">
+              <div class="col-12 col-md-4">
+                <agro-select-cadastro
+                  v-model="item.produtoId"
+                  entidade="produto"
+                  dense
+                  label="Produto"
+                  :options="produtoOpcoes"
+                  :hint="hintProdutoXml(item)"
+                  :rules="[obrigatorio]"
+                  @atualizar="carregarProdutos({ ativo: true })"
+                />
+              </div>
+              <div class="col-6 col-md-2">
+                <q-input v-model="item.quantidadeNota" outlined dense label="Qtd NF" type="number" />
+              </div>
+              <div class="col-6 col-md-2">
+                <q-input v-model="item.quantidadeRecebida" outlined dense label="Qtd recebida" type="number" />
+              </div>
+              <div class="col-6 col-md-2">
+                <AgroMoneyInput v-model="item.custoUnitario" dense label="Custo" />
+              </div>
+              <div class="col-5 col-md-1">
+                <q-input v-model="item.numeroLote" outlined dense label="Lote" />
+              </div>
+              <div class="col-5 col-md-1">
+                <q-input v-model="item.dataValidade" outlined dense label="Validade" type="date" />
+              </div>
+              <div class="col-2 col-md-auto">
+                <agro-btn
+                  flat
+                  round
+                  dense
+                  icon="delete"
+                  color="negative"
+                  descricao="Remover item"
+                  :disable="itens.length <= 1"
+                  @click="itens.splice(index, 1)"
+                />
+              </div>
             </div>
-            <div class="col-6 col-md-2">
-              <q-input v-model="item.quantidadeNota" outlined dense label="Qtd NF" type="number" />
-            </div>
-            <div class="col-6 col-md-2">
-              <q-input v-model="item.quantidadeRecebida" outlined dense label="Qtd recebida" type="number" />
-            </div>
-            <div class="col-6 col-md-2">
-              <AgroMoneyInput v-model="item.custoUnitario" dense label="Custo" />
-            </div>
-            <div class="col-5 col-md-1">
-              <q-input v-model="item.numeroLote" outlined dense label="Lote" />
-            </div>
-            <div class="col-5 col-md-1">
-              <q-input v-model="item.dataValidade" outlined dense label="Validade" type="date" />
-            </div>
-            <div class="col-2 col-md-auto">
+            <div v-if="itemSemProduto(item)" class="item-row__cta">
               <agro-btn
                 flat
-                round
                 dense
-                icon="delete"
-                color="negative"
-                descricao="Remover item"
-                :disable="itens.length <= 1"
-                @click="itens.splice(index, 1)"
+                no-caps
+                color="warning"
+                label="Cadastrar produto"
+                descricao="Cadastrar produto do XML"
+                @click="abrirCadastroRapido(item)"
               />
             </div>
           </div>
@@ -165,18 +198,29 @@
         </q-form>
       </agro-card>
     </section>
+
+    <ProdutoRapidoDialog
+      v-model="dialogProdutoAberto"
+      :descricao-produto-xml="itemCadastroRapido?.descricaoProdutoXml"
+      :codigo-produto-xml="itemCadastroRapido?.codigoProdutoXml"
+      :preco-sugerido="precoSugeridoCadastro"
+      @criado="onProdutoCriado"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
+import ProdutoRapidoDialog from 'components/compras/ProdutoRapidoDialog.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFiscal } from 'composables/useFiscal';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useProdutos } from 'composables/useProdutos';
 import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import type { QTableColumn } from 'quasar';
+import type { ProdutoDto } from 'types/dtos/produto.dto';
 import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
@@ -186,6 +230,7 @@ interface ItemForm {
   chave: string;
   produtoId: string;
   codigoProdutoXml: string;
+  descricaoProdutoXml: string;
   quantidadeNota: string;
   quantidadeRecebida: string;
   custoUnitario: string;
@@ -221,13 +266,33 @@ const serie = ref('');
 const mensagemSefaz = ref('');
 const duplicatasPreview = ref<DuplicataPreviewRow[]>([]);
 const itens = ref<ItemForm[]>([criarItemVazio()]);
+const dialogProdutoAberto = ref(false);
+const itemCadastroRapido = ref<ItemForm | null>(null);
 
 const fornecedorOpcoes = computed(() =>
   fornecedores.value.map((f) => ({ label: f.razaoSocial, value: f.id })),
 );
 const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
+  produtos.value.map((p) => ({
+    label: p.codigo ? `${p.descricao} (${p.codigo})` : p.descricao,
+    value: p.id,
+  })),
 );
+
+const itensSemProduto = computed(() =>
+  itens.value.filter(
+    (item) =>
+      itemSemProduto(item) && (!!item.codigoProdutoXml || !!item.descricaoProdutoXml),
+  ),
+);
+
+const precoSugeridoCadastro = computed(() => {
+  const item = itemCadastroRapido.value;
+  if (!item) {
+    return 0;
+  }
+  return parseMascaraMoeda(item.custoUnitario) ?? 0;
+});
 
 const colunasDuplicatas: QTableColumn<DuplicataPreviewRow>[] = [
   { name: 'numero', label: 'Número', field: 'numero', align: 'left' },
@@ -240,6 +305,7 @@ function criarItemVazio(): ItemForm {
     chave: crypto.randomUUID(),
     produtoId: '',
     codigoProdutoXml: '',
+    descricaoProdutoXml: '',
     quantidadeNota: '1',
     quantidadeRecebida: '1',
     custoUnitario: formatarMoedaParaInput(0),
@@ -248,8 +314,52 @@ function criarItemVazio(): ItemForm {
   };
 }
 
+function itemSemProduto(item: ItemForm): boolean {
+  return !item.produtoId;
+}
+
+function rotuloItemXml(item: ItemForm): string {
+  const codigo = item.codigoProdutoXml?.trim();
+  const descricao = item.descricaoProdutoXml?.trim();
+  if (codigo && descricao) {
+    return `${codigo} — ${descricao}`;
+  }
+  return descricao || codigo || 'Item sem identificação';
+}
+
+function hintProdutoXml(item: ItemForm): string | undefined {
+  if (!item.codigoProdutoXml && !item.descricaoProdutoXml) {
+    return undefined;
+  }
+
+  const partes = [
+    item.codigoProdutoXml ? `XML: ${item.codigoProdutoXml}` : null,
+    item.descricaoProdutoXml || null,
+  ].filter(Boolean);
+
+  if (!item.produtoId) {
+    return `${partes.join(' — ')} (não encontrado — cadastre ou selecione)`;
+  }
+
+  return partes.join(' — ');
+}
+
 function adicionarItem(): void {
   itens.value.push(criarItemVazio());
+}
+
+function abrirCadastroRapido(item: ItemForm): void {
+  itemCadastroRapido.value = item;
+  dialogProdutoAberto.value = true;
+}
+
+async function onProdutoCriado(produto: ProdutoDto): Promise<void> {
+  const item = itemCadastroRapido.value;
+  await carregarProdutos({ ativo: true });
+  if (item) {
+    item.produtoId = produto.id;
+  }
+  itemCadastroRapido.value = null;
 }
 
 async function analisarXml(): Promise<void> {
@@ -265,6 +375,7 @@ async function analisarXml(): Promise<void> {
     chave: crypto.randomUUID(),
     produtoId: item.produtoId ?? '',
     codigoProdutoXml: item.codigoProdutoXml,
+    descricaoProdutoXml: item.descricaoProdutoXml ?? '',
     quantidadeNota: String(item.quantidade),
     quantidadeRecebida: String(item.quantidade),
     custoUnitario: formatarMoedaParaInput(item.custoUnitario),
@@ -323,8 +434,8 @@ async function salvar(): Promise<void> {
 }
 
 onMounted(async () => {
-  void carregarFornecedores();
-  void carregarProdutos();
+  void carregarFornecedores({ ativo: true });
+  void carregarProdutos({ ativo: true });
   const pedidoId = route.query.pedidoCompraId;
   if (typeof pedidoId === 'string' && pedidoId) {
     pedidoCompraId.value = pedidoId;
@@ -365,5 +476,50 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin: var(--spacing-4) 0 var(--spacing-3);
+}
+.banner-faltantes {
+  margin: 0 0 var(--spacing-4);
+  padding: var(--spacing-4);
+  border: var(--border-width-thin) solid var(--color-warning-500);
+  border-left: var(--border-width-accent) solid var(--color-warning-500);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-50);
+}
+.banner-faltantes__titulo {
+  margin: 0 0 var(--spacing-2);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning-700);
+}
+.banner-faltantes__texto {
+  margin: 0 0 var(--spacing-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+.banner-faltantes__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--spacing-2);
+}
+.banner-faltantes__lista li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+.item-row {
+  margin-bottom: var(--spacing-4);
+}
+.item-row__cta {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--spacing-1);
+  padding-left: 0;
 }
 </style>

@@ -42,16 +42,16 @@
     <h3 class="tabela-preco-formulario__secao-titulo">Escopo (opcional)</h3>
     <div class="row q-col-gutter-md">
       <div v-if="!clienteIdFixo" class="col-12 col-md-4">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.clienteId"
-          outlined
+          entidade="cliente"
           label="Cliente"
-          emit-value
-          map-options
           clearable
           :options="clienteOpcoes"
           :loading="carregandoClientes"
           :readonly="somenteLeitura"
+          :desabilitar-cadastro="somenteLeitura"
+          @atualizar="carregarClientes({ ativo: true })"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { CanalVendaOpcoes, GrupoComercialOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';

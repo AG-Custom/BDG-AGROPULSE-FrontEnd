@@ -156,29 +156,27 @@
             <q-form greedy class="agro-formulario" @submit.prevent="emitNfpr">
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
-                  <q-select
+                  <agro-select-cadastro
                     v-model="nfpr.clienteId"
-                    outlined
+                    entidade="cliente"
                     label="Cliente"
-                    emit-value
-                    map-options
                     class="field-required"
                     :options="clienteOpcoes"
                     :loading="carregandoClientes"
                     :rules="[obrigatorio]"
+                    @atualizar="carregarClientes()"
                   />
                 </div>
                 <div class="col-12 col-md-6">
-                  <q-select
+                  <agro-select-cadastro
                     v-model="nfpr.produtoId"
-                    outlined
+                    entidade="produto"
                     label="Produto"
-                    emit-value
-                    map-options
                     class="field-required"
                     :options="produtoOpcoes"
                     :loading="carregandoProdutos"
                     :rules="[obrigatorio]"
+                    @atualizar="carregarProdutos()"
                   />
                 </div>
                 <div class="col-12 col-md-3">
@@ -214,6 +212,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
 import { usePdv } from 'composables/usePdv';

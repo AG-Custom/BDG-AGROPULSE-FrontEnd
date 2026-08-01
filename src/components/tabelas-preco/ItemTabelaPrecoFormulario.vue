@@ -1,17 +1,16 @@
 <template>
   <q-form ref="formRef" class="item-tabela-preco-formulario" greedy>
-    <q-select
+    <agro-select-cadastro
       v-if="modo === 'criar'"
       v-model="produtoId"
-      outlined
+      entidade="produto"
       label="Produto"
       class="field-required"
-      emit-value
-      map-options
       aria-required="true"
       :options="produtoOpcoes"
       :loading="carregandoProdutos"
       :rules="[obrigatorio]"
+      @atualizar="carregarProdutos({ ativo: true })"
     />
 
     <AgroMoneyInput
@@ -37,6 +36,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useProdutos } from 'composables/useProdutos';
 import { useVerCustos } from 'composables/useVerCustos';
 import type { QForm } from 'quasar';

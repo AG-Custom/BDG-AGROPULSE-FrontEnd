@@ -8,15 +8,14 @@
         <q-form v-else greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.ativoId"
-                outlined
+                entidade="ativo"
                 label="Ativo"
-                emit-value
-                map-options
                 class="field-required"
                 :options="ativoOpcoes"
                 :rules="[obrigatorio]"
+                @atualizar="carregarAtivos()"
               />
             </div>
             <div class="col-12 col-md-3">
@@ -70,15 +69,14 @@
               <q-input v-model="formulario.responsavelNome" outlined label="Responsável" />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.colaboradorId"
-                outlined
+                entidade="colaborador"
                 label="Colaborador"
                 clearable
-                emit-value
-                map-options
                 :options="colaboradorOpcoes"
                 :loading="carregandoColaboradores"
+                @atualizar="carregarColaboradores({ ativo: true })"
               />
             </div>
             <div class="col-12 col-md-6">
@@ -132,6 +130,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useColaboradores } from 'composables/useColaboradores';
 import { osVazia, useManutencao } from 'composables/useManutencao';
 import {

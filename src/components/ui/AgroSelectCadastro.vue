@@ -57,10 +57,8 @@ const props = withDefaults(
     desabilitarCadastro?: boolean;
   }>(),
   {
-    modelValue: null,
     options: () => [],
     loading: false,
-    label: undefined,
     desabilitarCadastro: false,
   },
 );

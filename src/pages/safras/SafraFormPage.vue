@@ -29,27 +29,25 @@
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.fazendaId"
-                outlined
+                entidade="fazenda"
                 label="Fazenda"
                 clearable
-                emit-value
-                map-options
                 :options="fazendaOpcoes"
                 :readonly="somenteLeitura"
+                @atualizar="carregarFazendas()"
               />
             </div>
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.talhaoId"
-                outlined
+                entidade="talhao"
                 label="Talhão"
                 clearable
-                emit-value
-                map-options
                 :options="talhaoOpcoes"
                 :readonly="somenteLeitura"
+                @atualizar="carregarTalhoes()"
               />
             </div>
             <div class="col-12 col-md-3">
@@ -137,6 +135,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useFazendas } from 'composables/useFazendas';
 import { useRastreabilidade } from 'composables/useRastreabilidade';
 import { useSafras } from 'composables/useSafras';

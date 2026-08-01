@@ -36,14 +36,13 @@
               />
             </div>
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.veiculoId"
-                outlined
+                entidade="veiculo"
                 label="Veículo"
-                emit-value
-                map-options
                 clearable
                 :options="veiculoOpcoes"
+                @atualizar="carregarVeiculos()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -120,6 +119,7 @@
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { cargaDtoParaForm, cargaVazia, useLogistica } from 'composables/useLogistica';
 import type { CargaLogisticaFormModel } from 'types/dtos/logistica.dto';
 import { obrigatorio } from 'utils/validators';

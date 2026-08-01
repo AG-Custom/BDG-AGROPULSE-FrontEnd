@@ -31,14 +31,13 @@
               />
             </div>
             <div class="col-12">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.fazendaId"
-                outlined
+                entidade="fazenda"
                 label="Fazenda (opcional)"
                 clearable
-                emit-value
-                map-options
                 :options="fazendaOpcoes"
+                @atualizar="carregar()"
               />
             </div>
           </div>
@@ -59,6 +58,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useFazendas } from 'composables/useFazendas';
 import { TipoGeoImportacaoOpcoes } from 'constants/enums';
 import type { ImportarGeoFormModel } from 'types/dtos/safras.dto';

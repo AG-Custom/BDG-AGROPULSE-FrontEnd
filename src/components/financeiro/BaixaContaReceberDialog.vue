@@ -2,7 +2,7 @@
   <q-dialog :model-value="modelValue" persistent @update:model-value="$emit('update:modelValue', $event)">
     <q-card class="dialog">
       <q-card-section>
-        <h4 class="titulo">Baixar conta a receber</h4>
+        <h4 class="titulo">Registrar baixa — conta a receber</h4>
       </q-card-section>
       <q-card-section>
         <q-form greedy class="agro-formulario" @submit.prevent="confirmar">
@@ -50,15 +50,14 @@
               <AgroMoneyInput v-model="linha.valor" dense label="Valor" />
             </div>
             <div class="col-12 col-md-4">
-              <q-select
+              <agro-select-cadastro
                 v-model="linha.contaBancariaId"
-                outlined
+                entidade="contaBancaria"
                 dense
-                emit-value
-                map-options
                 clearable
                 label="Conta"
                 :options="contaOpcoes"
+                @atualizar="emit('atualizarContas')"
               />
             </div>
             <div class="col-12 col-md-1 flex flex-center">
@@ -80,8 +79,8 @@
             <agro-btn
               color="primary"
               unelevated
-              label="Baixar"
-              descricao="Confirmar baixa"
+              label="Registrar baixa"
+              descricao="Confirmar registro da baixa"
               type="submit"
               :loading="loading"
             />
@@ -94,6 +93,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { FormaPagamentoOpcoes, type FormaPagamentoValor } from 'constants/enums';
 import type {
   BaixaContaReceberFormModel,
@@ -114,6 +114,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
   confirmar: [payload: BaixarContaReceberPayload];
+  atualizarContas: [];
 }>();
 
 function formaVazia(): FormaBaixaReceberFormModel {

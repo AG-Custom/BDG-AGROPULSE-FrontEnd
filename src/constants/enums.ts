@@ -8,13 +8,19 @@ export const TipoUnidade = {
 
 export type TipoUnidadeValor = (typeof TipoUnidade)[keyof typeof TipoUnidade];
 
+/** Opções de create/edit — novas unidades são sempre Filial (matriz = flag). */
 export const TipoUnidadeOpcoes = [
   { label: 'Filial', value: TipoUnidade.Filial },
-  { label: 'Loja', value: TipoUnidade.Loja },
-  { label: 'Depósito', value: TipoUnidade.Deposito },
-  { label: 'Indústria', value: TipoUnidade.Industria },
-  { label: 'Operação física', value: TipoUnidade.OperacaoFisica },
 ];
+
+/** Labels para listagem (inclui valores legados retornados pela API). */
+export const TipoUnidadeLabels: Record<TipoUnidadeValor, string> = {
+  [TipoUnidade.Filial]: 'Filial',
+  [TipoUnidade.Loja]: 'Loja',
+  [TipoUnidade.Deposito]: 'Depósito',
+  [TipoUnidade.Industria]: 'Indústria',
+  [TipoUnidade.OperacaoFisica]: 'Operação física',
+};
 
 export const UnidadeStatus = {
   Ativa: 'Ativa',

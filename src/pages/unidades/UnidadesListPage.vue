@@ -109,7 +109,8 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { TipoUnidadeOpcoes, UnidadeStatus } from 'constants/enums';
+import { TipoUnidadeLabels, UnidadeStatus } from 'constants/enums';
+import type { TipoUnidadeValor } from 'constants/enums';
 import { useUnidades } from 'composables/useUnidades';
 import type { ListarUnidadesParams, UnidadeDto } from 'types/dtos/unidade.dto';
 import type { QTableColumn } from 'quasar';
@@ -167,7 +168,7 @@ function montarParams(): ListarUnidadesParams | undefined {
 }
 
 function rotuloTipo(tipo: string): string {
-  return TipoUnidadeOpcoes.find((opcao) => opcao.value === tipo)?.label ?? tipo;
+  return TipoUnidadeLabels[tipo as TipoUnidadeValor] ?? tipo;
 }
 
 async function recarregar(): Promise<void> {

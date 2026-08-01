@@ -12,19 +12,6 @@
         />
       </div>
       <div class="col-12 col-md-6">
-        <q-select
-          v-model="unidade.tipo"
-          outlined
-          label="Tipo"
-          class="field-required"
-          emit-value
-          map-options
-          aria-required="true"
-          :options="TipoUnidadeOpcoes"
-          :rules="[obrigatorio]"
-        />
-      </div>
-      <div class="col-12 col-md-6">
         <q-input
           v-model="unidade.codigo"
           outlined
@@ -145,7 +132,7 @@
 
 <script setup lang="ts">
 import { useBuscaCep } from 'composables/useBuscaCep';
-import { TipoUnidadeOpcoes } from 'constants/enums';
+import { TipoUnidade } from 'constants/enums';
 import { MASCARAS, TAMANHO_FORMATADO, mascaraTelefone, tamanhoFormatadoTelefone } from 'constants/masks';
 import type { QForm } from 'quasar';
 import type { UnidadeFormModel } from 'types/dtos/onboarding.dto';
@@ -172,14 +159,16 @@ const mascaraTelefoneAtual = computed(() => mascaraTelefone(unidade.value.telefo
 const tamanhoTelefone = computed(() => tamanhoFormatadoTelefone(unidade.value.telefone));
 
 watch(
-  () => [unidade.value.tipo, unidade.value.nome] as const,
-  ([tipo, nome]) => {
-    unidade.value.codigo = gerarCodigoUnidade(tipo, nome);
+  () => unidade.value.nome,
+  (nome) => {
+    unidade.value.tipo = TipoUnidade.Filial;
+    unidade.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome);
   },
   { immediate: true },
 );
 
 async function validar(): Promise<boolean> {
+  unidade.value.tipo = TipoUnidade.Filial;
   return (await formRef.value?.validate()) ?? false;
 }
 

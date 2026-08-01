@@ -157,14 +157,15 @@
                 <q-input v-model="formulario.emitente" outlined label="Emitente" :readonly="somenteLeitura" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.contaBancariaId"
-                  outlined
+                  entidade="contaBancaria"
                   clearable
-                  emit-value
-                  map-options
                   label="Conta bancária"
-                  :options="contaOpcoes" :readonly="somenteLeitura" />
+                  :options="contaOpcoes"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarContas()"
+                />
               </div>
               <div class="col-12">
                 <q-input v-model="formulario.observacao" outlined label="Observação" :readonly="somenteLeitura" />
@@ -191,6 +192,7 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCheques } from 'composables/useCheques';

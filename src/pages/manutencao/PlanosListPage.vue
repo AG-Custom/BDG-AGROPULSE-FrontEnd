@@ -110,16 +110,16 @@
           >
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="formulario.ativoId"
-                  outlined
+                  entidade="ativo"
                   label="Ativo"
-                  emit-value
-                  map-options
                   class="field-required"
                   :options="ativoOpcoes"
                   :readonly="somenteLeitura"
+                  :desabilitar-cadastro="somenteLeitura"
                   :rules="[obrigatorio]"
+                  @atualizar="carregarAtivos()"
                 />
               </div>
               <div class="col-12">
@@ -232,6 +232,7 @@
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import {

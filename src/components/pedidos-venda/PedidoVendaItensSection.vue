@@ -95,17 +95,16 @@
           <q-form ref="formRef" greedy>
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="itemForm.produtoId"
-                  outlined
+                  entidade="produto"
                   label="Produto"
                   class="field-required"
-                  emit-value
-                  map-options
                   aria-required="true"
                   :options="produtoOpcoes"
                   :loading="carregandoProdutos || carregandoItensTabela"
                   :rules="[obrigatorio]"
+                  @atualizar="carregarProdutos({ ativo: true })"
                   @update:model-value="onProdutoSelecionado"
                 />
               </div>
@@ -168,6 +167,7 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
@@ -252,7 +252,9 @@ function rotuloProduto(produtoId: string): string {
   return mapaProdutos.value.get(produtoId) ?? produtoId;
 }
 
-async function onProdutoSelecionado(produtoId: string): Promise<void> {
+async function onProdutoSelecionado(valor: unknown): Promise<void> {
+  const produtoId = typeof valor === 'string' ? valor : '';
+
   if (!produtoId) {
     return;
   }

@@ -16,18 +16,18 @@
         />
       </div>
       <div class="col-12 col-md-4">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.categoriaProdutoId"
-          outlined
+          entidade="categoriaProduto"
           label="Categoria"
           class="field-required"
-          emit-value
-          map-options
           aria-required="true"
           :options="categoriaOpcoes"
           :loading="carregandoCategorias"
           :readonly="somenteLeitura"
+          :desabilitar-cadastro="somenteLeitura"
           :rules="[obrigatorio]"
+          @atualizar="carregarCategorias({ ativo: true })"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -179,6 +179,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
 import { useVerCustos } from 'composables/useVerCustos';

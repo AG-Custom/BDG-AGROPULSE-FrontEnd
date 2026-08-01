@@ -14,16 +14,16 @@
         >
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
-              <q-select
+              <agro-select-cadastro
                 v-model="formulario.produtoSaidaId"
-                outlined
+                entidade="produto"
                 label="Produto de saída"
                 class="field-required"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-3">
@@ -67,16 +67,16 @@
             class="row q-col-gutter-md q-mb-sm"
           >
             <div class="col-12 col-md-5">
-              <q-select
+              <agro-select-cadastro
                 v-model="item.produtoInsumoId"
-                outlined
+                entidade="produto"
                 dense
                 label="Insumo"
-                emit-value
-                map-options
                 :options="produtoOpcoes"
+                :loading="carregandoProdutos"
                 :readonly="somenteLeitura"
                 :rules="[obrigatorio]"
+                @atualizar="carregarProdutos()"
               />
             </div>
             <div class="col-6 col-md-2">
@@ -137,6 +137,7 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useProdutos } from 'composables/useProdutos';
 import { useReceitasProducao } from 'composables/useReceitasProducao';
 import type { ItemReceitaFormModel, ReceitaProducaoFormModel } from 'types/dtos/producao.dto';
@@ -156,7 +157,7 @@ function novoItem(): ItemReceitaFormModel {
 const route = useRoute();
 const router = useRouter();
 const { receita, salvando, obter, criar, editar } = useReceitasProducao();
-const { produtos, carregar: carregarProdutos } = useProdutos();
+const { produtos, carregando: carregandoProdutos, carregar: carregarProdutos } = useProdutos();
 
 const modo = computed<'criar' | 'editar' | 'visualizar'>(() => {
   if (route.name === 'receita-producao-visualizar') {

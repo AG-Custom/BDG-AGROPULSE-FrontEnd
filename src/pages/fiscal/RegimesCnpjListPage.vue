@@ -60,16 +60,17 @@
           <q-form greedy class="agro-formulario" :class="{ 'agro-formulario--bloqueado': somenteLeitura }" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-12">
-                <q-select
+                <agro-select-cadastro
                   v-model="form.cnpjEmpresaId"
-                  outlined
+                  entidade="cnpj"
                   label="CNPJ empresa"
-                  emit-value
-                  map-options
                   class="field-required"
                   :options="cnpjOpcoes"
                   :loading="carregandoCnpjs"
-                  :rules="[obrigatorio]" :readonly="somenteLeitura" />
+                  :rules="[obrigatorio]"
+                  :readonly="somenteLeitura"
+                  @atualizar="carregarCnpjs()"
+                />
               </div>
               <div class="col-12 col-md-6">
                 <q-select
@@ -114,6 +115,7 @@
 <script setup lang="ts">
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCnpjs } from 'composables/useCnpjs';

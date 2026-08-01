@@ -238,17 +238,17 @@
     <h3 class="colaborador-formulario__secao-titulo">Vínculos</h3>
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
-        <q-select
+        <agro-select-cadastro
           v-model="formulario.usuarioId"
-          outlined
+          entidade="usuario"
           label="Usuário vinculado"
-          emit-value
-          map-options
           clearable
           :options="usuarioOpcoes"
           :loading="carregandoUsuarios"
           :readonly="somenteLeitura"
+          :desabilitar-cadastro="somenteLeitura"
           hint="Opcional — vincule a uma conta de acesso existente (1:1)"
+          @atualizar="carregarUsuarios()"
         />
       </div>
       <div class="col-12">
@@ -269,6 +269,7 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useBuscaCep } from 'composables/useBuscaCep';
 import { useUsuarios } from 'composables/useUsuarios';
 import {

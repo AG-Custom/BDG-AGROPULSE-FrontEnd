@@ -8,17 +8,16 @@
     <section class="agro-section">
       <agro-card>
         <q-form greedy class="transferencia-form" @submit.prevent="salvar">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.unidadeDestinoId"
-            outlined
+            entidade="unidade"
             label="Unidade destino"
             class="field-required"
-            emit-value
-            map-options
             aria-required="true"
             :options="unidadeDestinoOpcoes"
             :loading="carregandoUnidades"
             :rules="[obrigatorio]"
+            @atualizar="carregarUnidades({ ativo: true })"
           />
 
           <q-input
@@ -40,29 +39,29 @@
             :key="item.chave"
             class="transferencia-form__item"
           >
-            <q-select
+            <agro-select-cadastro
               v-model="item.produtoId"
-              outlined
+              entidade="produto"
               dense
               label="Produto"
               class="field-required"
-              emit-value
-              map-options
               :options="produtoOpcoes"
+              :loading="carregandoProdutos"
               :rules="[obrigatorio]"
               @update:model-value="(valor) => onProdutoItem(index, valor)"
+              @atualizar="carregarProdutos()"
             />
 
-            <q-select
+            <agro-select-cadastro
               v-model="item.loteId"
-              outlined
+              entidade="lote"
               dense
               label="Lote (opcional)"
-              emit-value
-              map-options
               clearable
               :loading="carregandoLotes"
               :options="loteOpcoesPorItem[item.chave] ?? []"
+              :desabilitar-cadastro="!item.produtoId"
+              @atualizar="atualizarLotesItem(index)"
             />
 
             <q-input
@@ -113,6 +112,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useEstoqueLotes } from 'composables/useEstoqueLotes';
 import { useEstoqueTransferencias } from 'composables/useEstoqueTransferencias';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
@@ -132,7 +132,11 @@ const router = useRouter();
 const authStore = useAuthStore();
 const { salvando, criar } = useEstoqueTransferencias();
 const { unidades, carregando: carregandoUnidades, carregar: carregarUnidades } = useUnidades();
-const { produtoOpcoes } = useProdutoOpcoesEstoque();
+const {
+  produtoOpcoes,
+  carregando: carregandoProdutos,
+  carregar: carregarProdutos,
+} = useProdutoOpcoesEstoque();
 const { lotes, carregando: carregandoLotes, carregar: carregarLotes } = useEstoqueLotes();
 
 const formulario = ref<TransferenciaEstoqueFormModel>(criarTransferenciaFormVazia());
@@ -159,7 +163,7 @@ function removerItem(index: number): void {
   }
 }
 
-async function onProdutoItem(index: number, produtoId: string | null): Promise<void> {
+async function onProdutoItem(index: number, produtoIdValor: unknown): Promise<void> {
   const item = formulario.value.itens[index];
   if (!item) {
     return;
@@ -167,12 +171,29 @@ async function onProdutoItem(index: number, produtoId: string | null): Promise<v
 
   item.loteId = '';
 
+  const produtoId = typeof produtoIdValor === 'string' ? produtoIdValor : '';
+
   if (!produtoId) {
     loteOpcoesPorItem[item.chave] = [];
     return;
   }
 
   await carregarLotes({ produtoId, apenasComSaldo: true });
+  loteOpcoesPorItem[item.chave] = lotes.value.map((lote) => ({
+    label: `${lote.numeroLote} — saldo ${formatarDecimal(lote.quantidade)}${
+      lote.dataValidade ? ` — val. ${formatarData(lote.dataValidade)}` : ''
+    }`,
+    value: lote.id,
+  }));
+}
+
+async function atualizarLotesItem(index: number): Promise<void> {
+  const item = formulario.value.itens[index];
+  if (!item?.produtoId) {
+    return;
+  }
+
+  await carregarLotes({ produtoId: item.produtoId, apenasComSaldo: true });
   loteOpcoesPorItem[item.chave] = lotes.value.map((lote) => ({
     label: `${lote.numeroLote} — saldo ${formatarDecimal(lote.quantidade)}${
       lote.dataValidade ? ` — val. ${formatarData(lote.dataValidade)}` : ''
