@@ -5,17 +5,21 @@ import type {
   AlertaEstoqueMinimoDto,
   AlertaEstoqueZeradoDto,
   ConfirmarTransferenciaEstoquePayload,
+  CriarLocalEstoquePayload,
   CriarTransferenciaEstoquePayload,
+  EditarLocalEstoquePayload,
   EntradaEstoquePayload,
   EstoqueInicialStatusDto,
   IniciarInventarioPayload,
   InventarioDto,
   LancarEstoqueInicialPayload,
-  LeituraPesoDto,
   ListarAlertasValidadeParams,
+  ListarLocaisEstoqueParams,
   ListarLotesParams,
   ListarMovimentacoesParams,
   ListarSaldosParams,
+  LocalEstoqueDto,
+  LocalEstoqueNoDto,
   LoteDto,
   MovimentacaoEstoqueDto,
   ProdutoPorCodigoDto,
@@ -29,6 +33,38 @@ import type {
 import type { GenealogiaLoteDto } from 'types/dtos/producao.dto';
 
 export const estoqueService = {
+  listarLocais(params?: ListarLocaisEstoqueParams): Promise<LocalEstoqueDto[]> {
+    return api
+      .get<LocalEstoqueDto[]>('/estoque/locais', { params: { ...params, formato: 'flat' } })
+      .then((r) => r.data);
+  },
+
+  listarLocaisArvore(ativo?: boolean): Promise<LocalEstoqueNoDto[]> {
+    return api
+      .get<LocalEstoqueNoDto[]>('/estoque/locais', { params: { ativo, formato: 'tree' } })
+      .then((r) => r.data);
+  },
+
+  obterLocal(id: string): Promise<LocalEstoqueDto> {
+    return api.get<LocalEstoqueDto>(`/estoque/locais/${id}`).then((r) => r.data);
+  },
+
+  criarLocal(payload: CriarLocalEstoquePayload): Promise<LocalEstoqueDto> {
+    return api.post<LocalEstoqueDto>('/estoque/locais', payload).then((r) => r.data);
+  },
+
+  editarLocal(id: string, payload: EditarLocalEstoquePayload): Promise<LocalEstoqueDto> {
+    return api.put<LocalEstoqueDto>(`/estoque/locais/${id}`, payload).then((r) => r.data);
+  },
+
+  inativarLocal(id: string, justificativa: string): Promise<void> {
+    return api.patch(`/estoque/locais/${id}/inativar`, { justificativa }).then(() => undefined);
+  },
+
+  ativarLocal(id: string): Promise<void> {
+    return api.patch(`/estoque/locais/${id}/ativar`).then(() => undefined);
+  },
+
   listarLotes(params?: ListarLotesParams): Promise<LoteDto[]> {
     return api.get<LoteDto[]>('/estoque/lotes', { params }).then((r) => r.data);
   },
@@ -181,14 +217,6 @@ export const estoqueService = {
   obterProdutoPorCodigo(valor: string): Promise<ProdutoPorCodigoDto> {
     return api
       .get<ProdutoPorCodigoDto>('/estoque/produtos/por-codigo', { params: { valor } })
-      .then((r) => r.data);
-  },
-
-  lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto> {
-    return api
-      .post<LeituraPesoDto>('/estoque/dispositivos/leitura-peso', {
-        dispositivoId: dispositivoId ?? null,
-      })
       .then((r) => r.data);
   },
 };

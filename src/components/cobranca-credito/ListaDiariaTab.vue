@@ -39,6 +39,17 @@
             <div class="item__valores">
               <div class="text-metric text-negative">{{ formatarMoeda(item.saldo) }}</div>
               <div class="text-caption">{{ item.diasAtraso }}d atraso</div>
+              <agro-btn
+                v-if="item.telefone"
+                flat
+                dense
+                size="sm"
+                icon="chat"
+                label="WhatsApp"
+                aria-label="Abrir WhatsApp"
+                descricao="Abrir conversa no WhatsApp"
+                @click.stop="abrirWhatsAppCobranca(item)"
+              />
             </div>
           </div>
         </agro-card>
@@ -53,14 +64,25 @@
               {{ formatarMoeda(selecionado.saldo) }} · prioridade {{ selecionado.prioridade }}
             </div>
           </div>
-          <agro-btn
-            color="primary"
-            unelevated
-            icon="add"
-            label="Registrar"
-            descricao="Registrar tentativa"
-            @click="dialogTentativa = true"
-          />
+          <div class="detalhe__acoes">
+            <agro-btn
+              v-if="selecionado.telefone"
+              flat
+              icon="chat"
+              label="WhatsApp"
+              aria-label="Abrir WhatsApp"
+              descricao="Abrir conversa no WhatsApp"
+              @click="abrirWhatsAppCobranca(selecionado)"
+            />
+            <agro-btn
+              color="primary"
+              unelevated
+              icon="add"
+              label="Registrar"
+              descricao="Registrar tentativa"
+              @click="dialogTentativa = true"
+            />
+          </div>
         </div>
 
         <h4 class="subtitulo">Tentativas</h4>
@@ -138,12 +160,14 @@ import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { tentativaVazia, useCobrancaCredito } from 'composables/useCobrancaCredito';
+import { useNotificacao } from 'composables/useNotificacao';
 import {
   CanalTentativaCobrancaOpcoes,
   ResultadoTentativaCobrancaOpcoes,
 } from 'constants/enums';
 import type { ListaDiariaItemDto } from 'types/dtos/cobranca-credito.dto';
 import { formatarData, formatarDataHora, formatarMoeda } from 'utils/formatters';
+import { abrirWhatsAppWeb } from 'utils/whatsapp-web';
 import { onMounted, reactive, ref } from 'vue';
 
 const {
@@ -155,6 +179,7 @@ const {
   carregarTentativas,
   registrarTentativa,
 } = useCobrancaCredito();
+const { erro } = useNotificacao();
 
 const selecionado = ref<ListaDiariaItemDto | null>(null);
 const dialogTentativa = ref(false);
@@ -163,6 +188,24 @@ const formTentativa = reactive(tentativaVazia());
 async function abrirItem(item: ListaDiariaItemDto): Promise<void> {
   selecionado.value = item;
   await carregarTentativas(item.clienteId);
+}
+
+function mensagemCobranca(item: ListaDiariaItemDto): string {
+  return (
+    `Olá ${item.clienteNome}, estamos entrando em contato sobre o título com saldo de ` +
+    `${formatarMoeda(item.saldo)} (vencimento ${formatarData(item.vencimento)}).`
+  );
+}
+
+function abrirWhatsAppCobranca(item: ListaDiariaItemDto): void {
+  if (!item.telefone) {
+    erro('Este cliente não possui telefone cadastrado.');
+    return;
+  }
+
+  if (!abrirWhatsAppWeb(item.telefone, mensagemCobranca(item))) {
+    erro('Telefone inválido para abrir o WhatsApp.');
+  }
 }
 
 async function salvarTentativa(): Promise<void> {
@@ -236,6 +279,13 @@ onMounted(() => {
   justify-content: space-between;
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-3);
+}
+
+.detalhe__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  align-items: flex-start;
 }
 
 .subtitulo {

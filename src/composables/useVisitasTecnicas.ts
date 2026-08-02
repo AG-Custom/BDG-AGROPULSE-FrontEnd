@@ -147,13 +147,42 @@ export function useVisitasTecnicas() {
     id: string,
     form: AdicionarFotoVisitaFormModel,
   ): Promise<boolean> {
+    if (!form.arquivo) {
+      erro('Selecione uma foto para enviar.');
+      return false;
+    }
+
     salvando.value = true;
     try {
-      await safrasService.adicionarFotoVisita(id, {
-        url: form.url.trim(),
-        descricao: form.descricao.trim() || null,
-      });
+      await safrasService.adicionarFotoVisita(
+        id,
+        form.arquivo,
+        form.legenda.trim() || null,
+      );
       sucesso('Foto adicionada.');
+      await carregar();
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function removerFoto(visitaId: string, fotoId: string): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Remover foto',
+      mensagem: 'Deseja remover esta foto da visita?',
+      textoConfirmar: 'Remover',
+      icone: 'warning',
+    });
+    if (!confirmou) return false;
+
+    salvando.value = true;
+    try {
+      await safrasService.removerFotoVisita(visitaId, fotoId);
+      sucesso('Foto removida.');
       await carregar();
       return true;
     } catch (e) {
@@ -174,5 +203,6 @@ export function useVisitasTecnicas() {
     remover,
     checkIn,
     adicionarFoto,
+    removerFoto,
   };
 }

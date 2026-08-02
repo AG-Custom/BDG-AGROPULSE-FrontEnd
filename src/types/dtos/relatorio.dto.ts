@@ -201,10 +201,3 @@ export interface AlertaGerencialDto {
   referenciaId: string | null;
   linkSugerido: string | null;
 }
-
-export interface PowerBiStubDto {
-  stub: boolean;
-  mensagem: string;
-  embedUrl: string | null;
-  workspaceId: string | null;
-}

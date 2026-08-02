@@ -110,20 +110,6 @@ export interface LeituraHorimetroFormModel {
   lidoEm: string;
 }
 
-export interface TelemetriaLeituraPayload {
-  ativoId: string;
-  horimetro: number;
-  km?: number | null;
-  lidoEm?: string | null;
-  dispositivoId?: string | null;
-}
-
-export interface TelemetriaLeituraFormModel {
-  horimetro: string;
-  km: string;
-  dispositivoId: string;
-}
-
 export interface PlanoManutencaoDto {
   id: string;
   empresaId: string;
@@ -270,7 +256,6 @@ export interface ChecklistManutencaoDto {
   operadorNome: string;
   horimetro: number;
   status: StatusChecklistInspecaoValor;
-  sincronizado: boolean;
   itens: ItemChecklistManutencaoDto[];
 }
 

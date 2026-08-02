@@ -28,9 +28,6 @@ export interface VeiculoLogisticaDto {
   motoristaCnh: string | null;
   motoristaCategoria: string | null;
   kmAtual: number | null;
-  ultimaPosicaoLat: number | null;
-  ultimaPosicaoLng: number | null;
-  ultimaPosicaoEm: string | null;
   status: StatusVeiculoLogisticaValor;
 }
 
@@ -49,9 +46,6 @@ export interface CriarVeiculoLogisticaPayload {
   motoristaCnh?: string | null;
   motoristaCategoria?: string | null;
   kmAtual?: number | null;
-  ultimaPosicaoLat?: number | null;
-  ultimaPosicaoLng?: number | null;
-  ultimaPosicaoEm?: string | null;
   status: StatusVeiculoLogisticaValor;
 }
 

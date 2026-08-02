@@ -46,7 +46,19 @@
 
       <template #body-cell-telefone="props">
         <q-td :props="props">
-          {{ formatarTelefone(props.row.telefone) }}
+          <div class="cliente-contatos__telefone">
+            <span>{{ formatarTelefone(props.row.telefone) }}</span>
+            <agro-btn
+              v-if="props.row.telefone"
+              flat
+              dense
+              size="sm"
+              icon="chat"
+              aria-label="Abrir WhatsApp"
+              descricao="Abrir conversa no WhatsApp"
+              @click="abrirWhatsAppContato(props.row)"
+            />
+          </div>
         </q-td>
       </template>
 
@@ -110,9 +122,11 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useClienteContatos } from 'composables/useClienteContatos';
+import { useNotificacao } from 'composables/useNotificacao';
 import type { ClienteContatoDto } from 'types/dtos/cliente.dto';
 import { contatoDtoParaForm, criarContatoFormVazio } from 'utils/mappers/cliente.mapper';
 import { formatarTelefone } from 'utils/formatters';
+import { abrirWhatsAppWeb } from 'utils/whatsapp-web';
 import type { QTableColumn } from 'quasar';
 import { computed, ref, toRef, watch } from 'vue';
 
@@ -121,6 +135,8 @@ const props = defineProps<{
   contatosIniciais: ClienteContatoDto[];
   somenteLeitura?: boolean;
 }>();
+
+const { erro } = useNotificacao();
 
 const {
   contatos,
@@ -160,6 +176,19 @@ watch(
   },
   { immediate: true },
 );
+
+function abrirWhatsAppContato(contato: ClienteContatoDto): void {
+  if (!contato.telefone) {
+    erro('Este contato não possui telefone cadastrado.');
+    return;
+  }
+
+  const mensagem = contato.nome ? `Olá ${contato.nome},` : undefined;
+
+  if (!abrirWhatsAppWeb(contato.telefone, mensagem)) {
+    erro('Telefone inválido para abrir o WhatsApp.');
+  }
+}
 
 function abrirDialogCriar(): void {
   modoDialog.value = 'criar';
@@ -210,6 +239,12 @@ async function salvarContato(): Promise<void> {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   margin: 0;
+}
+
+.cliente-contatos__telefone {
+  align-items: center;
+  display: flex;
+  gap: var(--spacing-1);
 }
 
 .cliente-contatos__acoes {

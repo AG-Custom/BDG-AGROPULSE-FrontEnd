@@ -104,10 +104,6 @@ export const crmService = {
     return api.put<CampanhaDto>(`/crm/campanhas/${id}`, payload).then((r) => r.data);
   },
 
-  dispararCampanha(id: string): Promise<CampanhaDto> {
-    return api.post<CampanhaDto>(`/crm/campanhas/${id}/disparar`).then((r) => r.data);
-  },
-
   removerCampanha(id: string): Promise<void> {
     return api.delete(`/crm/campanhas/${id}`).then(() => undefined);
   },

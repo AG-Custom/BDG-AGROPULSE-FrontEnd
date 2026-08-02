@@ -25,11 +25,11 @@
         <giro-estoque-tab v-else-if="aba === 'giro'" />
         <margem-por-lote-tab v-else-if="aba === 'margem'" />
         <dre-tab v-else-if="aba === 'dre'" />
+        <ranking-unidades-tab v-else-if="aba === 'ranking'" />
         <rentabilidade-tab v-else-if="aba === 'rentabilidade'" />
         <inadimplencia-tab v-else-if="aba === 'inadimplencia'" />
         <desempenho-equipe-tab v-else-if="aba === 'desempenho'" />
         <alertas-tab v-else-if="aba === 'alertas'" />
-        <power-bi-tab v-else-if="aba === 'powerbi'" />
       </agro-card>
     </section>
   </q-page>
@@ -44,7 +44,7 @@ import DreTab from 'components/relatorios/DreTab.vue';
 import GiroEstoqueTab from 'components/relatorios/GiroEstoqueTab.vue';
 import InadimplenciaTab from 'components/relatorios/InadimplenciaTab.vue';
 import MargemPorLoteTab from 'components/relatorios/MargemPorLoteTab.vue';
-import PowerBiTab from 'components/relatorios/PowerBiTab.vue';
+import RankingUnidadesTab from 'components/relatorios/RankingUnidadesTab.vue';
 import RentabilidadeTab from 'components/relatorios/RentabilidadeTab.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import { useVerCustos } from 'composables/useVerCustos';
@@ -57,11 +57,11 @@ type AbaRelatorio =
   | 'giro'
   | 'margem'
   | 'dre'
+  | 'ranking'
   | 'rentabilidade'
   | 'inadimplencia'
   | 'desempenho'
-  | 'alertas'
-  | 'powerbi';
+  | 'alertas';
 
 const ABAS_VALIDAS: AbaRelatorio[] = [
   'abc',
@@ -69,11 +69,11 @@ const ABAS_VALIDAS: AbaRelatorio[] = [
   'giro',
   'margem',
   'dre',
+  'ranking',
   'rentabilidade',
   'inadimplencia',
   'desempenho',
   'alertas',
-  'powerbi',
 ];
 
 const route = useRoute();
@@ -86,11 +86,11 @@ const abasVisiveis = computed(() => {
     { name: 'giro', label: 'Giro' },
     { name: 'margem', label: 'Margem por lote', sensivel: true },
     { name: 'dre', label: 'DRE', sensivel: true },
+    { name: 'ranking', label: 'Ranking' },
     { name: 'rentabilidade', label: 'Rentabilidade', sensivel: true },
     { name: 'inadimplencia', label: 'Inadimplência', sensivel: true },
     { name: 'desempenho', label: 'Desempenho', sensivel: true },
     { name: 'alertas', label: 'Alertas' },
-    { name: 'powerbi', label: 'Power BI' },
   ];
 
   return todas.filter((abaItem) => !(abaItem.sensivel && !verCustos.value));

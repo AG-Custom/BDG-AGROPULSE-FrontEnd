@@ -134,6 +134,11 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Estoque.Visualizar,
           },
           {
+            label: 'Locais',
+            routeName: 'estoque-locais',
+            permissao: Permissoes.Estoque.Visualizar,
+          },
+          {
             label: 'Alertas',
             routeName: 'estoque-alertas',
             permissao: Permissoes.Estoque.Visualizar,

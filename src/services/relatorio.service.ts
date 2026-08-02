@@ -17,7 +17,6 @@ import type {
   InadimplenciaDto,
   MargemPorLoteItemDto,
   MargemPorLoteParams,
-  PowerBiStubDto,
   RankingUnidadeItemDto,
   RankingUnidadesParams,
   RentabilidadeItemDto,
@@ -149,9 +148,5 @@ export const relatorioService = {
 
   alertas(): Promise<AlertaGerencialDto[]> {
     return api.get<AlertaGerencialDto[]>('/relatorios/alertas').then((r) => r.data);
-  },
-
-  powerBi(): Promise<PowerBiStubDto> {
-    return api.get<PowerBiStubDto>('/relatorios/power-bi').then((r) => r.data);
   },
 };

@@ -122,9 +122,9 @@ export interface SafraFormModel {
 
 export interface VisitaTecnicaFotoDto {
   id: string;
-  url: string;
-  descricao: string | null;
-  criadoEm: string;
+  visitaId: string;
+  urlOuBlobRef: string;
+  legenda: string | null;
 }
 
 export interface VisitaTecnicaDto {
@@ -182,14 +182,9 @@ export interface CheckInVisitaTecnicaFormModel {
   longitude: string;
 }
 
-export interface AdicionarFotoVisitaPayload {
-  url: string;
-  descricao?: string | null;
-}
-
 export interface AdicionarFotoVisitaFormModel {
-  url: string;
-  descricao: string;
+  arquivo: File | null;
+  legenda: string;
 }
 
 export interface RecomendacaoDto {

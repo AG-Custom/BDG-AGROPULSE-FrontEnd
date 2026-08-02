@@ -1,6 +1,5 @@
 import { api } from 'services/api';
 import type {
-  AdicionarFotoVisitaPayload,
   CheckInVisitaTecnicaPayload,
   CriarCusteioSafraPayload,
   CriarDiarioCampoPayload,
@@ -37,6 +36,7 @@ import type {
   RecomendacaoDto,
   SafraDto,
   VisitaTecnicaDto,
+  VisitaTecnicaFotoDto,
 } from 'types/dtos/safras.dto';
 
 export const safrasService = {
@@ -128,11 +128,26 @@ export const safrasService = {
 
   adicionarFotoVisita(
     id: string,
-    payload: AdicionarFotoVisitaPayload,
-  ): Promise<VisitaTecnicaDto> {
+    arquivo: File,
+    legenda?: string | null,
+  ): Promise<VisitaTecnicaFotoDto> {
+    const formData = new FormData();
+    formData.append('arquivo', arquivo);
+    if (legenda?.trim()) {
+      formData.append('legenda', legenda.trim());
+    }
+
     return api
-      .post<VisitaTecnicaDto>(`/safras/visitas-tecnicas/${id}/fotos`, payload)
+      .post<VisitaTecnicaFotoDto>(`/safras/visitas-tecnicas/${id}/fotos`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
       .then((r) => r.data);
+  },
+
+  removerFotoVisita(id: string, fotoId: string): Promise<void> {
+    return api
+      .delete(`/safras/visitas-tecnicas/${id}/fotos/${fotoId}`)
+      .then(() => undefined);
   },
 
   listarRecomendacoes(): Promise<RecomendacaoDto[]> {

@@ -63,15 +63,14 @@
     />
 
     <div class="entrada-estoque-formulario__localizacao">
-      <q-input v-model="formulario.deposito" outlined label="Depósito" maxlength="50" />
-      <q-input v-model="formulario.galpao" outlined label="Galpão" maxlength="50" />
-      <q-input v-model="formulario.corredor" outlined label="Corredor" maxlength="50" />
-      <q-input v-model="formulario.prateleira" outlined label="Prateleira" maxlength="50" />
+      <p class="entrada-estoque-formulario__localizacao-titulo">Localização</p>
+      <LocalEstoqueSelectCascade v-model="formulario.localEstoqueId" />
     </div>
   </q-form>
 </template>
 
 <script setup lang="ts">
+import LocalEstoqueSelectCascade from 'components/estoque/LocalEstoqueSelectCascade.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
@@ -136,13 +135,13 @@ defineExpose({ validar });
 
 .entrada-estoque-formulario__localizacao {
   display: grid;
-  gap: var(--spacing-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-3);
 }
 
-@media (max-width: 600px) {
-  .entrada-estoque-formulario__localizacao {
-    grid-template-columns: 1fr;
-  }
+.entrada-estoque-formulario__localizacao-titulo {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
 }
 </style>

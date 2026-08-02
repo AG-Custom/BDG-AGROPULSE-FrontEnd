@@ -111,6 +111,7 @@
             <agro-card>
               <div class="secao-header">
                 <div class="text-subtitle1">Ranking de unidades</div>
+                <relatorio-export-buttons :loading="exportandoRanking" @exportar="exportarRanking" />
               </div>
               <empty-state
                 v-if="ranking.length === 0"
@@ -177,6 +178,7 @@
 </template>
 
 <script setup lang="ts">
+import RelatorioExportButtons from 'components/relatorios/RelatorioExportButtons.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -185,7 +187,9 @@ import MetricTile from 'components/ui/MetricTile.vue';
 import { useAprovacoes } from 'composables/useAprovacoes';
 import { useAuth } from 'composables/useAuth';
 import { useDashboard } from 'composables/useDashboard';
+import { useRelatorios } from 'composables/useRelatorios';
 import { useVerCustos } from 'composables/useVerCustos';
+import type { ExportacaoFormatoValor } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
 import type { QTableColumn } from 'quasar';
 import { filtrarAlertasGerenciaisPorPolitica } from 'utils/alerta-politica';
@@ -194,6 +198,7 @@ import { computed, onMounted, ref } from 'vue';
 
 const { usuario, possuiPermissao } = useAuth();
 const { kpis, ranking, alertas, carregando, carregar } = useDashboard();
+const { exportando: exportandoRanking, exportarRankingUnidades } = useRelatorios();
 const { fila: filaAprovacoes, carregar: carregarAprovacoes } = useAprovacoes();
 const { verCustos } = useVerCustos();
 const dias = ref('30');
@@ -296,6 +301,10 @@ async function atualizar(): Promise<void> {
   if (podeVerAprovacoes.value) {
     void carregarAprovacoes();
   }
+}
+
+async function exportarRanking(formato: ExportacaoFormatoValor): Promise<void> {
+  await exportarRankingUnidades(formato, { dias: Number(dias.value) || undefined });
 }
 
 onMounted(() => {

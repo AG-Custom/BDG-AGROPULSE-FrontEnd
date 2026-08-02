@@ -10,8 +10,6 @@ import type {
   CobrancaCreditoConfigDto,
   CobrancaCreditoConfigPayload,
   ConcentracaoItemDto,
-  CreditoBancarioStubDto,
-  CreditoBancarioStubPayload,
   CriarAcordoJudicialPayload,
   CriarDisputaTituloPayload,
   CriarEncaminhamentoJuridicoPayload,
@@ -20,6 +18,7 @@ import type {
   CriarTentativaCobrancaPayload,
   DisputaTituloDto,
   EditarFichaCreditoRuralPayload,
+  EncaminhamentoJuridicoAnexoDto,
   EncaminhamentoJuridicoDto,
   FichaCreditoRuralDto,
   GarantiaCreditoDto,
@@ -174,6 +173,27 @@ export const cobrancaCreditoService = {
       .then((r) => r.data);
   },
 
+  listarAnexosJuridico(id: string): Promise<EncaminhamentoJuridicoAnexoDto[]> {
+    return api
+      .get<EncaminhamentoJuridicoAnexoDto[]>(`${BASE}/juridico/${id}/anexos`)
+      .then((r) => r.data);
+  },
+
+  adicionarAnexoJuridico(id: string, arquivo: File): Promise<EncaminhamentoJuridicoAnexoDto> {
+    const formData = new FormData();
+    formData.append('arquivo', arquivo);
+
+    return api
+      .post<EncaminhamentoJuridicoAnexoDto>(`${BASE}/juridico/${id}/anexos`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then((r) => r.data);
+  },
+
+  removerAnexoJuridico(id: string, anexoId: string): Promise<void> {
+    return api.delete(`${BASE}/juridico/${id}/anexos/${anexoId}`);
+  },
+
   listarAcordos(): Promise<AcordoJudicialDto[]> {
     return api.get<AcordoJudicialDto[]>(`${BASE}/acordos-judiciais`).then((r) => r.data);
   },
@@ -198,17 +218,5 @@ export const cobrancaCreditoService = {
 
   removerGarantia(id: string): Promise<void> {
     return api.delete(`${BASE}/garantias/${id}`).then(() => undefined);
-  },
-
-  solicitarCreditoBancario(
-    payload: CreditoBancarioStubPayload,
-  ): Promise<CreditoBancarioStubDto> {
-    return api
-      .post<CreditoBancarioStubDto>(`${BASE}/credito-bancario`, payload)
-      .then((r) => r.data);
-  },
-
-  listarCreditoBancario(): Promise<CreditoBancarioStubDto[]> {
-    return api.get<CreditoBancarioStubDto[]>(`${BASE}/credito-bancario`).then((r) => r.data);
   },
 };

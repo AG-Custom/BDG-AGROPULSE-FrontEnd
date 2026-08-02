@@ -107,10 +107,7 @@
             :options="categoriaOpcoes"
             :loading="carregandoCategorias"
           />
-          <q-input v-model="filtros.deposito" outlined dense label="Depósito" maxlength="50" />
-          <q-input v-model="filtros.galpao" outlined dense label="Galpão" maxlength="50" />
-          <q-input v-model="filtros.corredor" outlined dense label="Corredor" maxlength="50" />
-          <q-input v-model="filtros.prateleira" outlined dense label="Prateleira" maxlength="50" />
+          <LocalEstoqueSelectCascade v-model="filtros.localEstoqueId" />
         </q-card-section>
 
         <q-card-actions align="right" class="agro-form-actions">
@@ -130,6 +127,7 @@
 </template>
 
 <script setup lang="ts">
+import LocalEstoqueSelectCascade from 'components/estoque/LocalEstoqueSelectCascade.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
@@ -144,8 +142,6 @@ import { formatarDataHora } from 'utils/formatters';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-
-
 const router = useRouter();
 const { inventarios, carregando, salvando, carregar, iniciar } = useEstoqueInventarios();
 const {
@@ -157,10 +153,7 @@ const {
 const dialogoAberto = ref(false);
 const filtros = reactive({
   categoriaProdutoId: null as string | null,
-  deposito: '',
-  galpao: '',
-  corredor: '',
-  prateleira: '',
+  localEstoqueId: null as string | null,
 });
 
 const categoriaOpcoes = computed(() =>
@@ -207,16 +200,17 @@ function formatarEscopo(inventario: InventarioDto): string {
     }
   }
 
+  if (partes.length === 0 && inventario.localEstoqueId) {
+    partes.push('Local filtrado');
+  }
+
   return partes.length > 0 ? partes.join(' · ') : 'Geral';
 }
 
 async function iniciarNovo(): Promise<void> {
   const criado = await iniciar({
     categoriaProdutoId: filtros.categoriaProdutoId,
-    deposito: filtros.deposito.trim() || null,
-    galpao: filtros.galpao.trim() || null,
-    corredor: filtros.corredor.trim() || null,
-    prateleira: filtros.prateleira.trim() || null,
+    localEstoqueId: filtros.localEstoqueId,
   });
 
   if (criado) {

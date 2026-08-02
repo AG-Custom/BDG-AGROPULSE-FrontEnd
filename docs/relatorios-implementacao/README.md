@@ -46,6 +46,7 @@ Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Fr
 | RH e Folha | — | **Fora de escopo** |
 | QA — Notificações / aprovações / travas | [fluxo-teste-notificacoes-aprovacoes.md](./fluxo-teste-notificacoes-aprovacoes.md) | Roteiro de teste |
 | Legado React — mocks / sem integração real | [legado-stub-integracoes.md](./legado-stub-integracoes.md) | Documento para cliente |
+| Plano de ação stubs (baixa → alta) | [plano-acao-stubs-cliente.md](./plano-acao-stubs-cliente.md) | Decisão com cliente: implementar / fase 2 / não |
 
 ---
 
@@ -53,18 +54,21 @@ Cada arquivo lista o que está pronto, o que ainda falta e um mapa Backend × Fr
 
 ### 1. Integrações externas (stubs → real) — impacto alto
 
-| Prioridade | Módulo | Pendência |
-|------------|--------|-----------|
-| Alta | Fiscal | Focus/SEFAZ real; contingência; cancelamento com reversão estoque/CR/CP; SPED além de blocos stub |
-| Alta | Financeiro | Boletos registrados; OFX/API bancária; PTAX Bacen |
-| Alta | Vendas | NF-e devolução; contingência PDV; NF-e/NFC-e real |
-| Média | Compras | SEFAZ documentos destinados; e-mail/portal real no envio de cotação |
-| Média | Contratos | NF-e real na liquidação/barter; cotação CBOT/ESALQ |
-| Média | Cobrança | Serasa/SPC; crédito bancário BB/Sicredi |
-| Média | Logística | GPS/telemetria; CT-e/MDF-e SEFAZ; balança rodoviária |
-| Baixa | CRM | WhatsApp / e-mail |
-| Baixa | Relatórios | Power BI embed |
-| Baixa | Estoque / Produção / Manutenção / Safras | Hardware IoT, geo real, offline PWA, telemetria |
+Decisões detalhadas (fora / implementar / a validar): ver [plano-acao-stubs-cliente.md](./plano-acao-stubs-cliente.md).
+
+| Prioridade | Módulo | Pendência | Decisão (2026-08-01) |
+|------------|--------|-----------|----------------------|
+| Alta | Fiscal | Focus/SEFAZ; contingência; reversões; SPED | **A validar** (contingência tende a “só online”) |
+| Alta | Financeiro | Boletos; OFX; PTAX; saldo intraday | **A validar** |
+| Alta | Vendas | NFC-e/PDV alinhado ao Fiscal | **A validar** |
+| Média | Contratos / Compras / Logística fiscal | NF satélite; destinados; CT-e/MDF-e | **A validar** |
+| Média | Cobrança | Serasa/SPC | **A validar** · crédito BB/Sicredi = **Fora/Feito** |
+| Média | Estoque | Locais hierárquicos | **Feito** |
+| Baixa | CRM / Jurídico | Foto check-in + anexos R2 · WhatsApp Web | **Feito** · API campanha = **Fora/Feito** |
+| Baixa | Relatórios | Excel/PDF (+ ranking) | **Feito** · Power BI = **Fora/Feito** |
+| Baixa | IoT / GPS / balança / telemetria | — | **Fora/Feito** (geo/offline ainda a validar) |
+
+Detalhe da rodada: [plano-acao-stubs-cliente.md](./plano-acao-stubs-cliente.md) §6.
 
 ### 2. Domínio interno ainda aberto (opcional)
 

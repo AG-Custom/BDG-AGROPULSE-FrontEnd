@@ -40,6 +40,7 @@ export function criarEntradaFormVazia(): EntradaEstoqueFormModel {
     galpao: '',
     corredor: '',
     prateleira: '',
+    localEstoqueId: null,
   };
 }
 
@@ -51,10 +52,7 @@ export function formParaEntradaPayload(form: EntradaEstoqueFormModel): EntradaEs
     dataFabricacao: form.dataFabricacao || null,
     custoUnitario: parseMascaraMoeda(form.custoUnitario),
     quantidade: parseNumeroObrigatorio(form.quantidade),
-    deposito: form.deposito.trim() || null,
-    galpao: form.galpao.trim() || null,
-    corredor: form.corredor.trim() || null,
-    prateleira: form.prateleira.trim() || null,
+    localEstoqueId: form.localEstoqueId || null,
   };
 }
 

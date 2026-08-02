@@ -20,7 +20,6 @@ import type {
   PlanoManutencaoDto,
   RegistrarExecucaoPlanoPayload,
   RelatorioCustosManutencaoDto,
-  TelemetriaLeituraPayload,
 } from 'types/dtos/manutencao.dto';
 
 export const manutencaoService = {
@@ -177,18 +176,6 @@ export const manutencaoService = {
   criarChecklist(payload: CriarChecklistManutencaoPayload): Promise<ChecklistManutencaoDto> {
     return api
       .post<ChecklistManutencaoDto>('/manutencao/checklists', payload)
-      .then((r) => r.data);
-  },
-
-  sincronizarChecklist(id: string): Promise<ChecklistManutencaoDto> {
-    return api
-      .post<ChecklistManutencaoDto>(`/manutencao/checklists/${id}/sincronizar`)
-      .then((r) => r.data);
-  },
-
-  registrarTelemetria(payload: TelemetriaLeituraPayload): Promise<LeituraHorimetroDto> {
-    return api
-      .post<LeituraHorimetroDto>('/manutencao/telemetria/leitura', payload)
       .then((r) => r.data);
   },
 

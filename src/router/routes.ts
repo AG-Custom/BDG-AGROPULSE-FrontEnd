@@ -357,6 +357,15 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'estoque/locais',
+        name: 'estoque-locais',
+        component: () => import('pages/estoque/LocaisEstoquePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.estoqueLocais',
+          permissao: Permissoes.Estoque.Visualizar,
+        },
+      },
+      {
         path: 'estoque/movimentacoes',
         name: 'estoque-movimentacoes',
         component: () => import('pages/estoque/MovimentacoesListPage.vue'),

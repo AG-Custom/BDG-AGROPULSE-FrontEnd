@@ -67,7 +67,7 @@
                 </q-item>
                 <q-item v-close-popup clickable class="agro-acoes-menu__item" @click="abrirFoto(props.row)">
                   <q-item-section avatar><q-icon name="photo_camera" class="agro-acoes-menu__icon" /></q-item-section>
-                  <q-item-section>Adicionar foto</q-item-section>
+                  <q-item-section>Fotos</q-item-section>
                 </q-item>
               </agro-acoes-menu>
             </q-td>
@@ -233,28 +233,73 @@
     </q-dialog>
 
     <q-dialog v-model="dialogFoto" persistent>
-      <q-card class="dialog">
+      <q-card class="dialog dialog--fotos">
         <q-card-section>
-          <h4 class="titulo">Adicionar foto</h4>
+          <h4 class="titulo">Fotos da visita</h4>
         </q-card-section>
         <q-card-section>
+          <empty-state
+            v-if="fotosVisita.length === 0"
+            titulo="Nenhuma foto"
+            descricao="Envie a primeira foto do check-in."
+            icon="photo_camera"
+          />
+          <div v-else class="fotos-lista">
+            <div v-for="foto in fotosVisita" :key="foto.id" class="fotos-lista__item">
+              <a
+                :href="foto.urlOuBlobRef"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="fotos-lista__link"
+              >
+                <img
+                  v-if="ehImagem(foto.urlOuBlobRef)"
+                  :src="foto.urlOuBlobRef"
+                  :alt="foto.legenda || 'Foto da visita'"
+                  class="fotos-lista__thumb"
+                />
+                <span v-else>{{ foto.legenda || 'Abrir arquivo' }}</span>
+              </a>
+              <div class="fotos-lista__meta">
+                <span class="fotos-lista__legenda">{{ foto.legenda || 'Sem legenda' }}</span>
+                <agro-btn
+                  flat
+                  dense
+                  round
+                  icon="delete"
+                  color="negative"
+                  descricao="Remover foto"
+                  :loading="salvando"
+                  @click="removerFotoVisita(foto.id)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <q-separator class="q-my-md" />
+
           <q-form greedy @submit.prevent="salvarFoto">
-            <q-input
-              v-model="formFoto.url"
+            <q-file
+              v-model="formFoto.arquivo"
               outlined
-              label="URL da foto"
+              label="Arquivo"
+              accept="image/*"
+              clearable
               class="field-required q-mb-md"
-              :rules="[obrigatorio]"
+              :disable="salvando"
+              :rules="[(v) => !!v || 'Selecione um arquivo']"
             />
-            <q-input v-model="formFoto.descricao" outlined label="Descrição" />
+            <q-input v-model="formFoto.legenda" outlined label="Legenda" class="q-mb-md" />
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogFoto = false" />
+              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogFoto = false" />
               <agro-btn
                 color="primary"
                 unelevated
-                label="Salvar"
+                icon="upload"
+                label="Enviar"
                 type="submit"
                 :loading="salvando"
+                :disable="!formFoto.arquivo"
               />
             </div>
           </q-form>
@@ -281,6 +326,7 @@ import type {
   AdicionarFotoVisitaFormModel,
   CheckInVisitaTecnicaFormModel,
   VisitaTecnicaDto,
+  VisitaTecnicaFotoDto,
   VisitaTecnicaFormModel,
 } from 'types/dtos/safras.dto';
 import { formatarData, formatarDataHora } from 'utils/formatters';
@@ -298,6 +344,7 @@ const {
   remover,
   checkIn,
   adicionarFoto,
+  removerFoto,
 } = useVisitasTecnicas();
 const { fazendas, fazendaOpcoes, carregar: carregarFazendas } = useFazendas();
 const {
@@ -316,7 +363,12 @@ const editandoId = ref<string | null>(null);
 const visitaAcaoId = ref<string | null>(null);
 const formulario = ref<VisitaTecnicaFormModel>(visitaVazia());
 const formCheckIn = ref<CheckInVisitaTecnicaFormModel>({ latitude: '', longitude: '' });
-const formFoto = ref<AdicionarFotoVisitaFormModel>({ url: '', descricao: '' });
+const formFoto = ref<AdicionarFotoVisitaFormModel>({ arquivo: null, legenda: '' });
+
+const fotosVisita = computed<VisitaTecnicaFotoDto[]>(() => {
+  if (!visitaAcaoId.value) return [];
+  return visitas.value.find((v) => v.id === visitaAcaoId.value)?.fotos ?? [];
+});
 
 const talhaoOpcoes = computed(() =>
   talhoes.value.filter((t) => t.ativo).map((t) => ({ label: t.nome, value: t.id })),
@@ -400,8 +452,12 @@ function abrirCheckIn(item: VisitaTecnicaDto): void {
 
 function abrirFoto(item: VisitaTecnicaDto): void {
   visitaAcaoId.value = item.id;
-  formFoto.value = { url: '', descricao: '' };
+  formFoto.value = { arquivo: null, legenda: '' };
   dialogFoto.value = true;
+}
+
+function ehImagem(url: string): boolean {
+  return /\.(jpe?g|png|gif|webp|bmp|svg)(\?|$)/i.test(url) || url.startsWith('https://');
 }
 
 function usarGps(): void {
@@ -436,7 +492,12 @@ async function salvarCheckIn(): Promise<void> {
 async function salvarFoto(): Promise<void> {
   if (!visitaAcaoId.value) return;
   const ok = await adicionarFoto(visitaAcaoId.value, formFoto.value);
-  if (ok) dialogFoto.value = false;
+  if (ok) formFoto.value = { arquivo: null, legenda: '' };
+}
+
+async function removerFotoVisita(fotoId: string): Promise<void> {
+  if (!visitaAcaoId.value) return;
+  await removerFoto(visitaAcaoId.value, fotoId);
 }
 
 function abrirDialogVisualizar(item: VisitaTecnicaDto): void {
@@ -456,12 +517,50 @@ onMounted(() => {
 .dialog {
   min-width: min(560px, 94vw);
 }
+.dialog--fotos {
+  min-width: min(640px, 94vw);
+}
 .titulo {
   margin: 0;
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
 }
 .acoes {
+  white-space: nowrap;
+}
+.fotos-lista {
+  display: grid;
+  gap: var(--spacing-3);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.fotos-lista__item {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.fotos-lista__link {
+  color: var(--color-primary-500);
+  display: block;
+  text-decoration: none;
+}
+.fotos-lista__thumb {
+  display: block;
+  height: 120px;
+  object-fit: cover;
+  width: 100%;
+}
+.fotos-lista__meta {
+  align-items: center;
+  display: flex;
+  gap: var(--spacing-2);
+  justify-content: space-between;
+  padding: var(--spacing-2);
+}
+.fotos-lista__legenda {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 </style>

@@ -470,20 +470,6 @@ export function useCrm() {
     }
   }
 
-  async function dispararCampanha(id: string): Promise<boolean> {
-    salvando.value = true;
-    try {
-      campanha.value = await crmService.dispararCampanha(id);
-      sucesso('Campanha disparada.');
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
   async function removerCampanha(id: string): Promise<boolean> {
     const confirmou = await messageService.confirmar({
       titulo: 'Remover campanha',
@@ -673,7 +659,6 @@ export function useCrm() {
     obterCampanha,
     criarCampanha,
     editarCampanha,
-    dispararCampanha,
     removerCampanha,
     carregarAnalises,
     obterAnalise,

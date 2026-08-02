@@ -35,7 +35,6 @@ import type {
   PlanoManutencaoFormModel,
   RegistrarExecucaoPlanoFormModel,
   RelatorioCustosManutencaoDto,
-  TelemetriaLeituraFormModel,
 } from 'types/dtos/manutencao.dto';
 import { formatarMoedaParaInput, parseMascaraMoeda, parseMascaraMoedaObrigatorio } from 'utils/formatters';
 import { ref } from 'vue';
@@ -352,29 +351,6 @@ export function useManutencao() {
     }
   }
 
-  async function registrarTelemetria(
-    ativoId: string,
-    form: TelemetriaLeituraFormModel,
-  ): Promise<boolean> {
-    salvando.value = true;
-    try {
-      await manutencaoService.registrarTelemetria({
-        ativoId,
-        horimetro: Number(form.horimetro),
-        km: numOuNulo(form.km),
-        dispositivoId: form.dispositivoId.trim() || null,
-      });
-      sucesso('Telemetria registrada (stub).');
-      ativo.value = await manutencaoService.obterAtivo(ativoId);
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
   async function carregarPlanos(): Promise<void> {
     carregando.value = true;
     try {
@@ -669,21 +645,6 @@ export function useManutencao() {
     }
   }
 
-  async function sincronizarChecklist(id: string): Promise<boolean> {
-    salvando.value = true;
-    try {
-      await manutencaoService.sincronizarChecklist(id);
-      sucesso('Checklist sincronizado.');
-      await carregarChecklists();
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
   async function carregarCustos(params?: ListarCustosManutencaoParams): Promise<void> {
     carregando.value = true;
     try {
@@ -728,7 +689,6 @@ export function useManutencao() {
     removerAtivo,
     carregarDepreciacao,
     registrarLeituraHorimetro,
-    registrarTelemetria,
     carregarPlanos,
     obterPlano,
     criarPlano,
@@ -747,7 +707,6 @@ export function useManutencao() {
     removerPeca,
     carregarChecklists,
     criarChecklist,
-    sincronizarChecklist,
     carregarCustos,
     carregarDashboard,
   };

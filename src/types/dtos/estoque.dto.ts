@@ -1,6 +1,7 @@
 import type {
   AtalhoPeriodoEstoqueValor,
   InventarioStatusValor,
+  NivelLocalEstoqueValor,
   OrigemMovimentacaoEstoqueValor,
   TipoMovimentacaoEstoqueValor,
 } from 'constants/enums';
@@ -19,8 +20,45 @@ export interface LoteDto {
   galpao: string | null;
   corredor: string | null;
   prateleira: string | null;
+  localEstoqueId: string | null;
   notaFiscalOrigemId: string | null;
   ativo: boolean;
+}
+
+export interface LocalEstoqueDto {
+  id: string;
+  empresaId: string;
+  unidadeId: string;
+  parentId: string | null;
+  nivel: NivelLocalEstoqueValor;
+  codigo: string;
+  nome: string;
+  ativo: boolean;
+  caminho: string;
+}
+
+export interface LocalEstoqueNoDto extends LocalEstoqueDto {
+  filhos: LocalEstoqueNoDto[];
+}
+
+export interface CriarLocalEstoquePayload {
+  parentId?: string | null;
+  nivel: NivelLocalEstoqueValor;
+  codigo: string;
+  nome: string;
+}
+
+export interface EditarLocalEstoquePayload {
+  codigo: string;
+  nome: string;
+}
+
+export interface ListarLocaisEstoqueParams {
+  ativo?: boolean;
+  nivel?: NivelLocalEstoqueValor;
+  parentId?: string;
+  apenasRaizes?: boolean;
+  formato?: 'flat' | 'tree';
 }
 
 export interface SaldoProdutoDto {
@@ -73,6 +111,7 @@ export interface InventarioDto {
   galpao: string | null;
   corredor: string | null;
   prateleira: string | null;
+  localEstoqueId: string | null;
   itens: InventarioItemDto[];
 }
 
@@ -126,6 +165,7 @@ export interface EntradaEstoquePayload {
   galpao?: string | null;
   corredor?: string | null;
   prateleira?: string | null;
+  localEstoqueId?: string | null;
   notaFiscalOrigemId?: string | null;
 }
 
@@ -143,6 +183,7 @@ export interface IniciarInventarioPayload {
   galpao?: string | null;
   corredor?: string | null;
   prateleira?: string | null;
+  localEstoqueId?: string | null;
 }
 
 export interface CriarTransferenciaEstoquePayload {
@@ -236,6 +277,7 @@ export interface EntradaEstoqueFormModel {
   galpao: string;
   corredor: string;
   prateleira: string;
+  localEstoqueId: string | null;
 }
 
 export interface SaidaEstoqueFormModel {
@@ -261,10 +303,4 @@ export interface ProdutoPorCodigoDto {
   id: string;
   codigo: string;
   descricao: string;
-}
-
-export interface LeituraPesoDto {
-  peso: number;
-  unidade: string;
-  dispositivoId: string | null;
 }

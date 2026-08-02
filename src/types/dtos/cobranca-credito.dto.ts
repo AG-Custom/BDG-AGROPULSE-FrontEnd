@@ -254,6 +254,14 @@ export interface EncaminhamentoJuridicoDto {
   encaminhadoEm: string;
 }
 
+export interface EncaminhamentoJuridicoAnexoDto {
+  id: string;
+  nomeOriginal: string;
+  contentType: string;
+  tamanhoBytes: number;
+  urlPublica: string | null;
+}
+
 export interface CriarEncaminhamentoJuridicoPayload {
   clienteId: string;
   contaReceberIds: string[];
@@ -324,26 +332,6 @@ export interface GarantiaCreditoFormModel {
   vigenciaInicio: string;
   vigenciaFim: string;
   ativo: boolean;
-}
-
-export interface CreditoBancarioStubDto {
-  id: string;
-  clienteId: string;
-  instituicao: string;
-  tipoOperacao: string;
-  valor: number;
-  status: string;
-  referenciaExterna: string | null;
-  mensagem: string | null;
-  solicitadoEm: string;
-  stub: boolean;
-}
-
-export interface CreditoBancarioStubPayload {
-  clienteId: string;
-  instituicao: string;
-  tipoOperacao: string;
-  valor: number;
 }
 
 export interface RevisaoLimiteItemDto {

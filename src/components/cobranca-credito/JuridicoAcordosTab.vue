@@ -58,7 +58,7 @@
       <template #body-cell-acoes="props">
         <q-td :props="props">
           <agro-btn
-            v-if="props.row.status === StatusEncaminhamentoJuridico.Pendente"
+            v-if="props.row.status === StatusEncaminhamentoJuridico.Rascunho"
             flat
             dense
             color="primary"
@@ -67,15 +67,23 @@
             @click="encaminharJuridico(props.row.id)"
           />
           <agro-btn
+            flat
+            dense
+            icon="attach_file"
+            color="primary"
+            label="Anexos"
+            descricao="Gerenciar anexos jurídicos"
+            @click="abrirAnexos(props.row)"
+          />
+          <agro-btn
             v-if="props.row.pacoteDocsUrl"
             flat
             dense
-            icon="download"
-            color="primary"
-            label="Pacote"
-            descricao="Baixar pacote jurídico"
+            icon="description"
+            label="Resumo"
+            descricao="Baixar resumo HTML gerado"
             :loading="salvando"
-            @click="baixarPacoteJuridico(props.row.id)"
+            @click="baixarResumoJuridico(props.row.id)"
           />
         </q-td>
       </template>
@@ -218,10 +226,26 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <EncaminhamentoAnexosDialog
+      v-model="dialogAnexos"
+      :encaminhamento-id="encaminhamentoAnexos?.id ?? null"
+      :cliente-label="
+        encaminhamentoAnexos
+          ? (mapaClientes.get(encaminhamentoAnexos.clienteId) ?? encaminhamentoAnexos.clienteId)
+          : undefined
+      "
+      :anexos="anexosJuridico"
+      :salvando="salvando"
+      @enviar="onEnviarAnexo"
+      @remover="onRemoverAnexo"
+      @update:model-value="onDialogAnexos"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import EncaminhamentoAnexosDialog from 'components/cobranca-credito/EncaminhamentoAnexosDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
@@ -236,13 +260,18 @@ import {
   StatusEncaminhamentoJuridico,
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
-import type { AcordoJudicialDto, EncaminhamentoJuridicoDto } from 'types/dtos/cobranca-credito.dto';
+import type {
+  AcordoJudicialDto,
+  EncaminhamentoJuridicoAnexoDto,
+  EncaminhamentoJuridicoDto,
+} from 'types/dtos/cobranca-credito.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, reactive, ref } from 'vue';
 
 const {
   encaminhamentos,
+  anexosJuridico,
   acordos,
   carregando,
   salvando,
@@ -250,7 +279,10 @@ const {
   criarAcordo,
   criarEncaminhamento,
   encaminharJuridico,
-  baixarPacoteJuridico,
+  baixarResumoJuridico,
+  carregarAnexosJuridico,
+  enviarAnexoJuridico,
+  solicitarRemocaoAnexoJuridico,
 } = useCobrancaCredito();
 const {
   clientes,
@@ -265,10 +297,12 @@ const {
 
 const dialogAcordo = ref(false);
 const dialogEnc = ref(false);
+const dialogAnexos = ref(false);
 const formAcordo = reactive(acordoVazio());
 const encClienteId = ref('');
 const encContas = ref<string[]>([]);
 const encObs = ref('');
+const encaminhamentoAnexos = ref<EncaminhamentoJuridicoDto | null>(null);
 const mapaAcordo = new Map(StatusAcordoJudicialOpcoes.map((o) => [o.value, o.label]));
 
 const clienteOpcoes = computed(() =>
@@ -336,6 +370,32 @@ async function salvarEnc(): Promise<void> {
     encContas.value = [];
     encObs.value = '';
   }
+}
+
+async function abrirAnexos(row: EncaminhamentoJuridicoDto): Promise<void> {
+  encaminhamentoAnexos.value = row;
+  dialogAnexos.value = true;
+  await carregarAnexosJuridico(row.id);
+}
+
+function onDialogAnexos(aberto: boolean): void {
+  dialogAnexos.value = aberto;
+  if (!aberto) {
+    encaminhamentoAnexos.value = null;
+    anexosJuridico.value = [];
+  }
+}
+
+async function onEnviarAnexo(arquivo: File): Promise<void> {
+  const enc = encaminhamentoAnexos.value;
+  if (!enc) return;
+  await enviarAnexoJuridico(enc.id, arquivo);
+}
+
+async function onRemoverAnexo(anexo: EncaminhamentoJuridicoAnexoDto): Promise<void> {
+  const enc = encaminhamentoAnexos.value;
+  if (!enc) return;
+  await solicitarRemocaoAnexoJuridico(enc.id, anexo);
 }
 
 onMounted(() => {

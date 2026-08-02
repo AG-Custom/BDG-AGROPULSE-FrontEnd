@@ -7,6 +7,7 @@ import type {
   TipoGarantiaCreditoValor,
 } from 'constants/enums';
 import { cobrancaCreditoService } from 'services/cobranca-credito.service';
+import { messageService } from 'services/message.service';
 import { baixarArquivo } from 'utils/download';
 import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import type {
@@ -19,7 +20,6 @@ import type {
   CobrancaCreditoConfigFormModel,
   CobrancaCreditoConfigPayload,
   ConcentracaoItemDto,
-  CreditoBancarioStubDto,
   CriarAcordoJudicialPayload,
   CriarDisputaTituloPayload,
   CriarEncaminhamentoJuridicoPayload,
@@ -27,6 +27,7 @@ import type {
   CriarGarantiaCreditoPayload,
   CriarTentativaCobrancaPayload,
   DisputaTituloDto,
+  EncaminhamentoJuridicoAnexoDto,
   EncaminhamentoJuridicoDto,
   FichaCreditoRuralDto,
   FichaCreditoRuralFormModel,
@@ -195,11 +196,11 @@ export function useCobrancaCredito() {
   const tentativas = ref<TentativaCobrancaDto[]>([]);
   const disputas = ref<DisputaTituloDto[]>([]);
   const encaminhamentos = ref<EncaminhamentoJuridicoDto[]>([]);
+  const anexosJuridico = ref<EncaminhamentoJuridicoAnexoDto[]>([]);
   const acordos = ref<AcordoJudicialDto[]>([]);
   const garantias = ref<GarantiaCreditoDto[]>([]);
 
   const bureauResultado = ref<BureauConsultaDto | null>(null);
-  const creditoBancario = ref<CreditoBancarioStubDto[]>([]);
   const revisaoLimites = ref<RevisaoLimiteItemDto[]>([]);
 
   async function carregarPainel(): Promise<void> {
@@ -439,12 +440,12 @@ export function useCobrancaCredito() {
     }
   }
 
-  async function baixarPacoteJuridico(id: string): Promise<boolean> {
+  async function baixarResumoJuridico(id: string): Promise<boolean> {
     salvando.value = true;
     try {
       const blob = await cobrancaCreditoService.baixarPacoteJuridico(id);
-      baixarArquivo(blob, `pacote-juridico-${id}.html`);
-      sucesso('Pacote jurídico baixado.');
+      baixarArquivo(blob, `resumo-juridico-${id}.html`);
+      sucesso('Resumo HTML baixado.');
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -452,6 +453,61 @@ export function useCobrancaCredito() {
     } finally {
       salvando.value = false;
     }
+  }
+
+  async function carregarAnexosJuridico(id: string): Promise<EncaminhamentoJuridicoAnexoDto[]> {
+    try {
+      anexosJuridico.value = await cobrancaCreditoService.listarAnexosJuridico(id);
+      return anexosJuridico.value;
+    } catch (e) {
+      erro(mensagem(e));
+      anexosJuridico.value = [];
+      return [];
+    }
+  }
+
+  async function enviarAnexoJuridico(id: string, arquivo: File): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await cobrancaCreditoService.adicionarAnexoJuridico(id, arquivo);
+      sucesso('Anexo enviado.');
+      await carregarAnexosJuridico(id);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function removerAnexoJuridico(id: string, anexoId: string): Promise<boolean> {
+    salvando.value = true;
+    try {
+      await cobrancaCreditoService.removerAnexoJuridico(id, anexoId);
+      sucesso('Anexo removido.');
+      await carregarAnexosJuridico(id);
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function solicitarRemocaoAnexoJuridico(
+    id: string,
+    anexo: EncaminhamentoJuridicoAnexoDto,
+  ): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Remover anexo',
+      mensagem: `Deseja remover o anexo ${anexo.nomeOriginal}?`,
+      textoConfirmar: 'Remover',
+      icone: 'warning',
+    });
+    if (!confirmou) return false;
+    return removerAnexoJuridico(id, anexo.id);
   }
 
   async function criarAcordo(form: AcordoJudicialFormModel): Promise<boolean> {
@@ -527,29 +583,6 @@ export function useCobrancaCredito() {
     }
   }
 
-  async function solicitarCreditoBancario(
-    clienteId: string,
-    instituicao: string,
-    tipoOperacao: string,
-    valor: number,
-  ): Promise<void> {
-    salvando.value = true;
-    try {
-      const r = await cobrancaCreditoService.solicitarCreditoBancario({
-        clienteId,
-        instituicao,
-        tipoOperacao,
-        valor,
-      });
-      creditoBancario.value = [r, ...creditoBancario.value];
-      sucesso('Solicitação bancária (stub) registrada.');
-    } catch (e) {
-      erro(mensagem(e));
-    } finally {
-      salvando.value = false;
-    }
-  }
-
   async function revisarLimites(): Promise<void> {
     salvando.value = true;
     try {
@@ -580,10 +613,10 @@ export function useCobrancaCredito() {
     tentativas,
     disputas,
     encaminhamentos,
+    anexosJuridico,
     acordos,
     garantias,
     bureauResultado,
-    creditoBancario,
     revisaoLimites,
     carregarPainel,
     carregarConfig,
@@ -600,12 +633,15 @@ export function useCobrancaCredito() {
     carregarJuridico,
     criarEncaminhamento,
     encaminharJuridico,
-    baixarPacoteJuridico,
+    baixarResumoJuridico,
+    carregarAnexosJuridico,
+    enviarAnexoJuridico,
+    removerAnexoJuridico,
+    solicitarRemocaoAnexoJuridico,
     criarAcordo,
     carregarGarantias,
     criarGarantia,
     consultarBureau,
-    solicitarCreditoBancario,
     revisarLimites,
   };
 }

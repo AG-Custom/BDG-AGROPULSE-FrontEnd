@@ -20,7 +20,8 @@ import type {
   InadimplenciaDto,
   MargemPorLoteItemDto,
   MargemPorLoteParams,
-  PowerBiStubDto,
+  RankingUnidadeItemDto,
+  RankingUnidadesParams,
   RentabilidadeItemDto,
   RentabilidadeParams,
 } from 'types/dtos/relatorio.dto';
@@ -33,11 +34,11 @@ export function useRelatorios() {
   const giroEstoque = ref<GiroEstoqueItemDto[]>([]);
   const margemPorLote = ref<MargemPorLoteItemDto[]>([]);
   const dre = ref<DreDto | null>(null);
+  const rankingUnidades = ref<RankingUnidadeItemDto[]>([]);
   const rentabilidade = ref<RentabilidadeItemDto[]>([]);
   const inadimplencia = ref<InadimplenciaDto | null>(null);
   const desempenhoEquipe = ref<DesempenhoEquipeItemDto[]>([]);
   const alertas = ref<AlertaGerencialDto[]>([]);
-  const powerBi = ref<PowerBiStubDto | null>(null);
   const carregando = ref(false);
   const exportando = ref(false);
   const { erro, sucesso } = useNotificacao();
@@ -99,6 +100,17 @@ export function useRelatorios() {
     }
   }
 
+  async function carregarRankingUnidades(params?: RankingUnidadesParams): Promise<void> {
+    carregando.value = true;
+    try {
+      rankingUnidades.value = await relatorioService.rankingUnidades(params);
+    } catch (e) {
+      erro(mensagem(e));
+    } finally {
+      carregando.value = false;
+    }
+  }
+
   async function carregarRentabilidade(params?: RentabilidadeParams): Promise<void> {
     carregando.value = true;
     try {
@@ -138,18 +150,6 @@ export function useRelatorios() {
     try {
       alertas.value = await relatorioService.alertas();
     } catch (e) {
-      erro(mensagem(e));
-    } finally {
-      carregando.value = false;
-    }
-  }
-
-  async function carregarPowerBi(): Promise<void> {
-    carregando.value = true;
-    try {
-      powerBi.value = await relatorioService.powerBi();
-    } catch (e) {
-      powerBi.value = null;
       erro(mensagem(e));
     } finally {
       carregando.value = false;
@@ -212,6 +212,15 @@ export function useRelatorios() {
     );
   }
 
+  function exportarRankingUnidades(
+    formato: ExportacaoFormatoValor,
+    params?: Omit<RankingUnidadesParams, 'exportar'>,
+  ): Promise<boolean> {
+    return baixarExportacao('ranking-unidades', formato, () =>
+      relatorioService.exportarRankingUnidades(formato, params),
+    );
+  }
+
   function exportarRentabilidade(
     formato: ExportacaoFormatoValor,
     params?: Omit<RentabilidadeParams, 'exportar'>,
@@ -236,11 +245,11 @@ export function useRelatorios() {
     giroEstoque,
     margemPorLote,
     dre,
+    rankingUnidades,
     rentabilidade,
     inadimplencia,
     desempenhoEquipe,
     alertas,
-    powerBi,
     carregando,
     exportando,
     carregarCurvaAbc,
@@ -248,15 +257,16 @@ export function useRelatorios() {
     carregarGiroEstoque,
     carregarMargemPorLote,
     carregarDre,
+    carregarRankingUnidades,
     carregarRentabilidade,
     carregarInadimplencia,
     carregarDesempenhoEquipe,
     carregarAlertas,
-    carregarPowerBi,
     exportarCurvaAbc,
     exportarComissoes,
     exportarGiroEstoque,
     exportarMargemPorLote,
+    exportarRankingUnidades,
     exportarRentabilidade,
     exportarDesempenhoEquipe,
   };

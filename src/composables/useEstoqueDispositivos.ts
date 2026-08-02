@@ -1,12 +1,11 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { estoqueService } from 'services/estoque.service';
-import type { LeituraPesoDto, ProdutoPorCodigoDto } from 'types/dtos/estoque.dto';
+import type { ProdutoPorCodigoDto } from 'types/dtos/estoque.dto';
 import { ref } from 'vue';
 
 export function useEstoqueDispositivos() {
   const buscandoCodigo = ref(false);
-  const lendoPeso = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -29,24 +28,8 @@ export function useEstoqueDispositivos() {
     }
   }
 
-  async function lerPesoBalanca(dispositivoId?: string): Promise<LeituraPesoDto | null> {
-    lendoPeso.value = true;
-    try {
-      const leitura = await estoqueService.lerPesoBalanca(dispositivoId);
-      sucesso('Peso lido da balança.');
-      return leitura;
-    } catch (e) {
-      erro(mensagem(e));
-      return null;
-    } finally {
-      lendoPeso.value = false;
-    }
-  }
-
   return {
     buscandoCodigo,
-    lendoPeso,
     buscarProdutoPorCodigo,
-    lerPesoBalanca,
   };
 }

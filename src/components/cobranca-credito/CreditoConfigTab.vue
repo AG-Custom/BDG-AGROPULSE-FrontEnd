@@ -162,7 +162,7 @@
         </q-table>
       </agro-card>
 
-      <agro-card class="q-mb-md">
+      <agro-card>
         <template #header>
           <div class="header-flex">
             <h3 class="secao-titulo">Bureau Serasa / SPC</h3>
@@ -210,63 +210,6 @@
           — {{ bureauResultado.mensagem }}
         </div>
       </agro-card>
-
-      <agro-card>
-        <template #header>
-          <div class="header-flex">
-            <h3 class="secao-titulo">Crédito bancário rural</h3>
-            <agro-badge label="Stub" variant="warning" />
-          </div>
-        </template>
-        <div class="row q-col-gutter-md items-end">
-          <div class="col-12 col-md-3">
-            <agro-select-cadastro
-              v-model="bancoClienteId"
-              entidade="cliente"
-              label="Cliente"
-              clearable
-              :options="clienteOpcoes"
-              :loading="carregandoClientes"
-              @atualizar="carregarClientes()"
-            />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="bancoInstituicao"
-              outlined
-              label="Instituição"
-              :options="InstituicaoCreditoBancarioOpcoes"
-              emit-value
-              map-options
-            />
-          </div>
-          <div class="col-12 col-md-2">
-            <q-input v-model="bancoTipoOperacao" outlined label="Tipo operação" />
-          </div>
-          <div class="col-12 col-md-2">
-            <AgroMoneyInput v-model="bancoValor" label="Valor" />
-          </div>
-          <div class="col-12 col-md-2">
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Solicitar"
-              descricao="Stub bancário"
-              :loading="salvando"
-              :disable="!bancoClienteId"
-              @click="onBanco"
-            />
-          </div>
-        </div>
-        <div v-if="creditoBancario.length" class="q-mt-md">
-          <div v-for="c in creditoBancario" :key="c.id" class="text-caption q-mb-xs">
-            <agro-badge v-if="c.stub" label="Stub" variant="warning" class="q-mr-sm" />
-            {{ c.instituicao }} · {{ c.tipoOperacao }} ·
-            {{ c.referenciaExterna || c.status }}
-            <span v-if="c.mensagem"> — {{ c.mensagem }}</span>
-          </div>
-        </div>
-      </agro-card>
     </template>
   </div>
 </template>
@@ -283,16 +226,11 @@ import {
   configVazia,
   useCobrancaCredito,
 } from 'composables/useCobrancaCredito';
-import {
-  BureauCredito,
-  BureauCreditoOpcoes,
-  InstituicaoCreditoBancario,
-  InstituicaoCreditoBancarioOpcoes,
-} from 'constants/enums';
-import type { BureauCreditoValor, InstituicaoCreditoBancarioValor } from 'constants/enums';
+import { BureauCredito, BureauCreditoOpcoes } from 'constants/enums';
+import type { BureauCreditoValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { RevisaoLimiteItemDto } from 'types/dtos/cobranca-credito.dto';
-import { formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
+import { formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const {
@@ -300,12 +238,10 @@ const {
   carregando,
   salvando,
   bureauResultado,
-  creditoBancario,
   revisaoLimites,
   carregarConfig,
   salvarConfig,
   consultarBureau,
-  solicitarCreditoBancario,
   revisarLimites,
 } = useCobrancaCredito();
 const {
@@ -317,12 +253,6 @@ const {
 const form = reactive(configVazia());
 const bureauClienteId = ref<string | null>('');
 const bureauTipo = ref<BureauCreditoValor>(BureauCredito.Serasa);
-const bancoClienteId = ref<string | null>('');
-const bancoInstituicao = ref<InstituicaoCreditoBancarioValor>(
-  InstituicaoCreditoBancario.BancoDoBrasil,
-);
-const bancoTipoOperacao = ref('Custeio');
-const bancoValor = ref('');
 
 const clienteOpcoes = computed(() =>
   clientes.value.map((c) => ({
@@ -364,17 +294,6 @@ async function onBureau(): Promise<void> {
   const id = bureauClienteId.value?.trim();
   if (!id) return;
   await consultarBureau(id, bureauTipo.value);
-}
-
-async function onBanco(): Promise<void> {
-  const id = bancoClienteId.value?.trim();
-  if (!id) return;
-  await solicitarCreditoBancario(
-    id,
-    bancoInstituicao.value,
-    bancoTipoOperacao.value.trim() || 'Custeio',
-    parseMascaraMoeda(bancoValor.value) ?? 0,
-  );
 }
 
 onMounted(() => {

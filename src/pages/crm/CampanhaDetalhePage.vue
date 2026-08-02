@@ -1,17 +1,6 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header titulo="Campanha" :subtitulo="campanha?.nome ?? 'Detalhes e métricas'">
-      <agro-btn
-        color="primary"
-        unelevated
-        icon="send"
-        label="Disparar"
-        descricao="Disparar campanha"
-        :loading="salvando"
-        :disable="!campanha"
-        @click="disparar"
-      />
-    </app-page-header>
+    <app-page-header titulo="Campanha" :subtitulo="campanha?.nome ?? 'Detalhes e métricas'" />
 
     <section class="agro-section">
       <agro-form-skeleton v-if="carregando && !campanha" :campos="5" />
@@ -74,7 +63,7 @@ import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const { campanha, carregando, salvando, obterCampanha, dispararCampanha } = useCrm();
+const { campanha, carregando, obterCampanha } = useCrm();
 const id = String(route.params.id);
 
 const mapaCanal = computed(() => {
@@ -106,10 +95,6 @@ function rotuloCanal(canal: string): string {
 
 function rotuloStatus(status: string): string {
   return mapaStatus.value.get(status) ?? status;
-}
-
-async function disparar(): Promise<void> {
-  await dispararCampanha(id);
 }
 
 onMounted(() => {

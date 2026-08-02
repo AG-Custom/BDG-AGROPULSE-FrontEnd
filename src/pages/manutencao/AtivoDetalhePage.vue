@@ -17,13 +17,6 @@
           descricao="Registrar leitura"
           @click="dialogHorimetro = true"
         />
-        <agro-btn
-          flat
-          icon="sensors"
-          label="Telemetria"
-          descricao="Registrar telemetria stub"
-          @click="dialogTelemetria = true"
-        />
       </div>
     </app-page-header>
 
@@ -136,40 +129,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <q-dialog v-model="dialogTelemetria" persistent>
-      <q-card class="dialog">
-        <q-card-section>
-          <h4 class="titulo">Telemetria (stub)</h4>
-        </q-card-section>
-        <q-card-section>
-          <q-form greedy @submit.prevent="salvarTelemetria">
-            <div class="row q-col-gutter-md">
-              <div class="col-12">
-                <q-input
-                  v-model="formTelemetria.horimetro"
-                  outlined
-                  label="Horímetro"
-                  type="number"
-                  class="field-required"
-                  :rules="[obrigatorio]"
-                />
-              </div>
-              <div class="col-12">
-                <q-input v-model="formTelemetria.km" outlined label="Km" type="number" />
-              </div>
-              <div class="col-12">
-                <q-input v-model="formTelemetria.dispositivoId" outlined label="Dispositivo ID" />
-              </div>
-            </div>
-            <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialogTelemetria = false" />
-              <agro-btn color="primary" unelevated label="Enviar" type="submit" :loading="salvando" />
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -178,10 +137,7 @@ import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.v
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useManutencao } from 'composables/useManutencao';
-import type {
-  LeituraHorimetroFormModel,
-  TelemetriaLeituraFormModel,
-} from 'types/dtos/manutencao.dto';
+import type { LeituraHorimetroFormModel } from 'types/dtos/manutencao.dto';
 import { formatarData, formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
@@ -197,17 +153,10 @@ const {
   obterAtivo,
   carregarDepreciacao,
   registrarLeituraHorimetro,
-  registrarTelemetria,
 } = useManutencao();
 
 const dialogHorimetro = ref(false);
-const dialogTelemetria = ref(false);
 const formHorimetro = ref<LeituraHorimetroFormModel>({ horimetro: '', km: '', lidoEm: '' });
-const formTelemetria = ref<TelemetriaLeituraFormModel>({
-  horimetro: '',
-  km: '',
-  dispositivoId: '',
-});
 
 const subtitulo = computed(() =>
   ativo.value ? `${ativo.value.tipo} · ${ativo.value.localizacao ?? 'Sem localização'}` : '',
@@ -219,11 +168,6 @@ async function salvarHorimetro(): Promise<void> {
     dialogHorimetro.value = false;
     await carregarDepreciacao(id.value);
   }
-}
-
-async function salvarTelemetria(): Promise<void> {
-  const ok = await registrarTelemetria(id.value, formTelemetria.value);
-  if (ok) dialogTelemetria.value = false;
 }
 
 onMounted(async () => {

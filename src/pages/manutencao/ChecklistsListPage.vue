@@ -55,41 +55,13 @@
           <template #body-cell-itens="props">
             <q-td :props="props" class="text-metric">{{ props.row.itens.length }}</q-td>
           </template>
-          <template #body-cell-sincronizado="props">
-            <q-td :props="props">
-              <agro-badge
-                :label="props.row.sincronizado ? 'Sincronizado' : 'Pendente'"
-                :variant="props.row.sincronizado ? 'success' : 'warning'"
-              />
-            </q-td>
-          </template>
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu
                 :mostrar-editar="false"
                 :mostrar-status="false"
                 @visualizar="abrirDialogVisualizar(props.row)"
-              >
-                <q-item
-                  v-if="!props.row.sincronizado"
-                  v-close-popup
-                  clickable
-                  dense
-                  class="agro-acoes-menu__item"
-                  :disable="salvando"
-                  @click="sincronizarChecklist(props.row.id)"
-                >
-                  <q-item-section avatar>
-                    <span class="agro-acoes-menu__icon agro-acoes-menu__icon--success">
-                      <q-icon name="sync" size="16px" />
-                    </span>
-                  </q-item-section>
-                  <q-item-section>Sincronizar</q-item-section>
-                  <q-item-section v-if="salvando" side>
-                    <q-spinner size="16px" color="primary" />
-                  </q-item-section>
-                </q-item>
-              </agro-acoes-menu>
+              />
             </q-td>
           </template>
         </q-table>
@@ -150,20 +122,6 @@
               <div class="col-12 col-md-6">
                 <q-input
                   :model-value="
-                    checklistVisualizar
-                      ? checklistVisualizar.sincronizado
-                        ? 'Sincronizado'
-                        : 'Pendente'
-                      : ''
-                  "
-                  outlined
-                  label="Sincronização"
-                  readonly
-                />
-              </div>
-              <div class="col-12">
-                <q-input
-                  :model-value="
                     checklistVisualizar ? String(checklistVisualizar.itens.length) : ''
                   "
                   outlined
@@ -186,7 +144,6 @@
 <script setup lang="ts">
 import ManutencaoStatusBadge from 'components/manutencao/ManutencaoStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
-import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -200,10 +157,8 @@ const {
   checklists,
   ativos,
   carregando,
-  salvando,
   carregarChecklists,
   carregarAtivos,
-  sincronizarChecklist,
 } = useManutencao();
 
 const dialogVisualizar = ref(false);
@@ -220,7 +175,6 @@ const colunas: QTableColumn<ChecklistManutencaoDto>[] = [
   { name: 'horimetro', label: 'Horímetro', field: 'horimetro', align: 'right' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
   { name: 'itens', label: 'Itens', field: 'itens', align: 'right' },
-  { name: 'sincronizado', label: 'Sync', field: 'sincronizado', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 

@@ -426,6 +426,37 @@ export const InventarioStatusOpcoes = [
   { label: 'Concluído', value: InventarioStatus.Concluido },
 ];
 
+export const NivelLocalEstoque = {
+  Galpao: 'Galpao',
+  Deposito: 'Deposito',
+  Corredor: 'Corredor',
+  Prateleira: 'Prateleira',
+} as const;
+
+export type NivelLocalEstoqueValor = (typeof NivelLocalEstoque)[keyof typeof NivelLocalEstoque];
+
+export const NivelLocalEstoqueOpcoes = [
+  { label: 'Galpão', value: NivelLocalEstoque.Galpao },
+  { label: 'Depósito', value: NivelLocalEstoque.Deposito },
+  { label: 'Corredor', value: NivelLocalEstoque.Corredor },
+  { label: 'Prateleira', value: NivelLocalEstoque.Prateleira },
+];
+
+export const NivelLocalEstoqueLabels: Record<NivelLocalEstoqueValor, string> = {
+  [NivelLocalEstoque.Galpao]: 'Galpão',
+  [NivelLocalEstoque.Deposito]: 'Depósito',
+  [NivelLocalEstoque.Corredor]: 'Corredor',
+  [NivelLocalEstoque.Prateleira]: 'Prateleira',
+};
+
+export const NivelLocalEstoqueOrdem: NivelLocalEstoqueValor[] = [
+  NivelLocalEstoque.Galpao,
+  NivelLocalEstoque.Deposito,
+  NivelLocalEstoque.Corredor,
+  NivelLocalEstoque.Prateleira,
+];
+
+
 export const AtalhoPeriodoEstoque = {
   Hoje: 'hoje',
   SeteDias: '7d',
@@ -1742,19 +1773,6 @@ export const BureauCreditoOpcoes = [
   { label: 'SPC', value: BureauCredito.Spc },
 ];
 
-export const InstituicaoCreditoBancario = {
-  BancoDoBrasil: 'BancoDoBrasil',
-  Sicredi: 'Sicredi',
-} as const;
-
-export type InstituicaoCreditoBancarioValor =
-  (typeof InstituicaoCreditoBancario)[keyof typeof InstituicaoCreditoBancario];
-
-export const InstituicaoCreditoBancarioOpcoes = [
-  { label: 'Banco do Brasil', value: InstituicaoCreditoBancario.BancoDoBrasil },
-  { label: 'Sicredi', value: InstituicaoCreditoBancario.Sicredi },
-];
-
 export const TipoGarantiaCredito = {
   AlienacaoFiduciaria: 'AlienacaoFiduciaria',
   Penhor: 'Penhor',
@@ -1860,7 +1878,7 @@ export const StatusAcordoJudicialOpcoes = [
 ];
 
 export const StatusEncaminhamentoJuridico = {
-  Pendente: 'Pendente',
+  Rascunho: 'Rascunho',
   Encaminhado: 'Encaminhado',
   EmAndamento: 'EmAndamento',
   Encerrado: 'Encerrado',
@@ -1870,7 +1888,7 @@ export type StatusEncaminhamentoJuridicoValor =
   (typeof StatusEncaminhamentoJuridico)[keyof typeof StatusEncaminhamentoJuridico];
 
 export const StatusEncaminhamentoJuridicoOpcoes = [
-  { label: 'Pendente', value: StatusEncaminhamentoJuridico.Pendente },
+  { label: 'Rascunho', value: StatusEncaminhamentoJuridico.Rascunho },
   { label: 'Encaminhado', value: StatusEncaminhamentoJuridico.Encaminhado },
   { label: 'Em andamento', value: StatusEncaminhamentoJuridico.EmAndamento },
   { label: 'Encerrado', value: StatusEncaminhamentoJuridico.Encerrado },
