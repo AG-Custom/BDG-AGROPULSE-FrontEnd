@@ -159,10 +159,10 @@ const mascaraTelefoneAtual = computed(() => mascaraTelefone(unidade.value.telefo
 const tamanhoTelefone = computed(() => tamanhoFormatadoTelefone(unidade.value.telefone));
 
 watch(
-  () => unidade.value.nome,
-  (nome) => {
+  () => [unidade.value.nome, unidade.value.matriz] as const,
+  ([nome, matriz]) => {
     unidade.value.tipo = TipoUnidade.Filial;
-    unidade.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome);
+    unidade.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome, matriz);
   },
   { immediate: true },
 );

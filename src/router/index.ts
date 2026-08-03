@@ -18,29 +18,36 @@ router.beforeEach(async (to) => {
   }
 
   const autenticado = authStore.autenticado;
-  const precisaOnboarding = authStore.precisaOnboarding;
+  const precisaConsolePlataforma = authStore.precisaConsolePlataforma;
   const precisaSelecionarUnidade = authStore.precisaSelecionarUnidade;
   const temEmpresa = authStore.temEmpresa;
   const temUnidade = authStore.temUnidade;
+  const isSuperHost = authStore.isSuperHost;
 
-  if (autenticado && precisaOnboarding && !to.meta.onboarding) {
-    return { name: 'onboarding' };
+  if (autenticado && precisaConsolePlataforma && !to.meta.plataforma) {
+    return { name: 'plataforma' };
   }
 
   if (autenticado && precisaSelecionarUnidade && !to.meta.selecaoUnidade) {
     return { name: 'selecionar-unidade' };
   }
 
-  if (autenticado && temUnidade && (to.meta.onboarding || to.meta.selecaoUnidade)) {
+  if (autenticado && temUnidade && to.meta.selecaoUnidade) {
     return { name: 'dashboard' };
   }
 
-  if (to.meta.convidado && autenticado && temUnidade) {
-    return { name: 'dashboard' };
-  }
+  if (to.meta.convidado && autenticado) {
+    if (precisaConsolePlataforma) {
+      return { name: 'plataforma' };
+    }
 
-  if (to.meta.convidado && autenticado && precisaSelecionarUnidade) {
-    return { name: 'selecionar-unidade' };
+    if (precisaSelecionarUnidade) {
+      return { name: 'selecionar-unidade' };
+    }
+
+    if (temUnidade) {
+      return { name: 'dashboard' };
+    }
   }
 
   if (to.meta.publica) {
@@ -55,8 +62,16 @@ router.beforeEach(async (to) => {
     return { name: 'login', query: { redirect: to.fullPath } };
   }
 
+  if (to.meta.requerSuperHost && !isSuperHost) {
+    return { name: 'dashboard' };
+  }
+
   if ((to.meta.requerEmpresa || to.meta.requerUnidade) && autenticado && temEmpresa && !temUnidade) {
     return { name: 'selecionar-unidade' };
+  }
+
+  if ((to.meta.requerEmpresa || to.meta.requerUnidade) && autenticado && !temEmpresa && isSuperHost) {
+    return { name: 'plataforma' };
   }
 
   const permissao = to.meta.permissao;

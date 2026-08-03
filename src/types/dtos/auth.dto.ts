@@ -5,22 +5,15 @@ export interface LoginPayload {
   senha: string;
 }
 
-export interface RegisterPayload {
-  nome: string;
-  sobrenome: string;
-  email: string;
-  senha: string;
-  confirmarSenha: string;
-}
-
-export interface RegisterResponseDto {
-  userId: string;
-  message: string;
-}
-
 export interface ConfirmEmailPayload {
   userId: string;
   token: string;
+}
+
+export interface DefinirSenhaPrimeiroAcessoPayload {
+  userId: string;
+  token: string;
+  senha: string;
 }
 
 export interface AuthUsuarioDto {
@@ -42,6 +35,8 @@ export interface AuthSessionDto {
   empresaId: string | null;
   unidadeId: string | null;
   requiresUnidadeSelection: boolean;
+  requiresEmpresaSelection: boolean;
+  isSuperHost: boolean;
   unidadesDisponiveis: UnidadeDisponivelDto[] | null;
   usuario: AuthUsuarioDto;
 }
@@ -51,6 +46,8 @@ export interface AuthContextSessionDto {
   empresaId: string | null;
   unidadeId: string | null;
   requiresUnidadeSelection: boolean;
+  requiresEmpresaSelection: boolean;
+  isSuperHost: boolean;
   unidadesDisponiveis: UnidadeDisponivelDto[] | null;
 }
 
@@ -59,6 +56,8 @@ export interface SessaoPersistida {
   empresaId: string | null;
   unidadeId: string | null;
   requiresUnidadeSelection: boolean;
+  requiresEmpresaSelection: boolean;
+  isSuperHost: boolean;
   unidadesDisponiveis: UnidadeDisponivelDto[] | null;
   usuario: AuthUsuarioDto;
 }
@@ -71,7 +70,16 @@ export interface SelecionarUnidadeResponseDto {
   expiresAt: string;
   empresaId: string | null;
   unidadeId: string | null;
+  requiresUnidadeSelection?: boolean;
+  requiresEmpresaSelection?: boolean;
+  isSuperHost?: boolean;
 }
+
+export interface SelecionarEmpresaPayload {
+  empresaId: string;
+}
+
+export type SelecionarEmpresaResponseDto = AuthContextSessionDto;
 
 export interface UnidadesDisponiveisResponseDto {
   unidades: UnidadeDisponivelDto[];

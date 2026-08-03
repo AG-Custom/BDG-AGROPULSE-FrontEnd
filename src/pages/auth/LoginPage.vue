@@ -45,12 +45,6 @@
         />
       </q-form>
 
-      <template #footer>
-        <span class="text-body-md text-secondary">
-          Ainda não tem conta?
-          <router-link :to="{ name: 'cadastro' }" class="auth-link">Cadastre-se</router-link>
-        </span>
-      </template>
     </auth-card>
   </q-page>
 </template>

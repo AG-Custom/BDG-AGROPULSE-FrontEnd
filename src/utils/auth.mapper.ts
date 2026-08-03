@@ -1,6 +1,7 @@
 import type {
   AuthContextSessionDto,
   AuthSessionDto,
+  SelecionarEmpresaResponseDto,
   SelecionarUnidadeResponseDto,
   SessaoPersistida,
 } from 'types/dtos/auth.dto';
@@ -14,6 +15,8 @@ export function loginParaSessao(resposta: AuthSessionDto): SessaoPersistida {
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
     requiresUnidadeSelection: resposta.requiresUnidadeSelection,
+    requiresEmpresaSelection: resposta.requiresEmpresaSelection ?? false,
+    isSuperHost: resposta.isSuperHost ?? false,
     unidadesDisponiveis: resposta.unidadesDisponiveis,
     usuario: resposta.usuario,
   };
@@ -29,6 +32,8 @@ export function refreshParaSessao(
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
     requiresUnidadeSelection: resposta.requiresUnidadeSelection,
+    requiresEmpresaSelection: resposta.requiresEmpresaSelection,
+    isSuperHost: resposta.isSuperHost,
     unidadesDisponiveis: resposta.unidadesDisponiveis,
   };
 }
@@ -49,6 +54,7 @@ export function mesclarSessaoRemotaComLocal(
     return {
       ...remota,
       usuario,
+      isSuperHost: remota.isSuperHost || local?.isSuperHost === true,
     };
   }
 
@@ -58,6 +64,7 @@ export function mesclarSessaoRemotaComLocal(
     unidadeId: local.unidadeId,
     requiresUnidadeSelection: false,
     unidadesDisponiveis: null,
+    isSuperHost: remota.isSuperHost || local.isSuperHost,
   };
 }
 
@@ -71,14 +78,43 @@ export function selecionarUnidadeParaSessao(
     empresaId: resposta.empresaId,
     unidadeId: resposta.unidadeId,
     requiresUnidadeSelection: false,
+    requiresEmpresaSelection: false,
+    isSuperHost: resposta.isSuperHost ?? sessaoAtual.isSuperHost,
     unidadesDisponiveis: null,
+  };
+}
+
+export function selecionarEmpresaParaSessao(
+  resposta: SelecionarEmpresaResponseDto,
+  sessaoAtual: SessaoPersistida,
+): SessaoPersistida {
+  return {
+    ...sessaoAtual,
+    expiresAt: resposta.expiresAt,
+    empresaId: resposta.empresaId,
+    unidadeId: resposta.unidadeId,
+    requiresUnidadeSelection: resposta.requiresUnidadeSelection,
+    requiresEmpresaSelection: resposta.requiresEmpresaSelection,
+    isSuperHost: resposta.isSuperHost,
+    unidadesDisponiveis: resposta.unidadesDisponiveis,
   };
 }
 
 export function usuarioDtoParaLogado(
   usuario: AuthSessionDto['usuario'],
   empresaId?: string | null,
+  isSuperHost = false,
 ): UsuarioLogado {
+  if (isSuperHost) {
+    return {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      perfil: PerfilUsuario.Diretor,
+      permissoes: resolverPermissoesPorPerfil(PerfilUsuario.Diretor),
+    };
+  }
+
   const perfil =
     usuario.perfil ??
     (empresaId ? PerfilUsuario.Administrador : null);

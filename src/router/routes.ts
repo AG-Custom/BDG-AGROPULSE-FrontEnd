@@ -16,18 +16,6 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/cadastro',
-    component: () => import('layouts/AuthLayout.vue'),
-    meta: { publica: true, convidado: true, layout: 'auth' },
-    children: [
-      {
-        path: '',
-        name: 'cadastro',
-        component: () => import('pages/auth/RegisterPage.vue'),
-      },
-    ],
-  },
-  {
     path: '/confirm-email',
     component: () => import('layouts/AuthLayout.vue'),
     meta: { publica: true, layout: 'auth' },
@@ -36,6 +24,18 @@ export const routes: RouteRecordRaw[] = [
         path: '',
         name: 'confirm-email',
         component: () => import('pages/auth/ConfirmEmailPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/primeiro-acesso',
+    component: () => import('layouts/AuthLayout.vue'),
+    meta: { publica: true, layout: 'auth' },
+    children: [
+      {
+        path: '',
+        name: 'primeiro-acesso',
+        component: () => import('pages/auth/PrimeiroAcessoPage.vue'),
       },
     ],
   },
@@ -52,14 +52,35 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/onboarding',
-    component: () => import('layouts/OnboardingLayout.vue'),
-    meta: { requerAuth: true, onboarding: true, layout: 'onboarding' },
+    path: '/plataforma',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: {
+      layout: 'main',
+      requerAuth: true,
+      requerSuperHost: true,
+      plataforma: true,
+    },
     children: [
       {
         path: '',
-        name: 'onboarding',
-        component: () => import('pages/onboarding/OnboardingPage.vue'),
+        name: 'plataforma',
+        component: () => import('pages/plataforma/PlataformaEmpresasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.plataforma',
+          requerSuperHost: true,
+          plataforma: true,
+        },
+      },
+      {
+        path: 'empresas/nova',
+        name: 'plataforma-empresa-nova',
+        component: () => import('pages/plataforma/PlataformaEmpresaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.plataformaNovaEmpresa',
+          breadcrumbPais: ['navegacao.plataforma'],
+          requerSuperHost: true,
+          plataforma: true,
+        },
       },
     ],
   },

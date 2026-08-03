@@ -7,7 +7,8 @@ declare module 'vue-router' {
     requerAuth?: boolean;
     requerEmpresa?: boolean;
     requerUnidade?: boolean;
-    onboarding?: boolean;
+    requerSuperHost?: boolean;
+    plataforma?: boolean;
     selecaoUnidade?: boolean;
     layout?: 'auth' | 'main' | 'onboarding';
     breadcrumb?: string;

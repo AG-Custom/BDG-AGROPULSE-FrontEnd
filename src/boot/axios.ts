@@ -25,7 +25,14 @@ export const api = axios.create({
   },
 });
 
-const rotasSemRefresh = ['/auth/login', '/auth/register', '/auth/confirm-email', '/auth/refresh', '/auth/logout'];
+const rotasSemRefresh = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/confirm-email',
+  '/auth/primeiro-acesso',
+  '/auth/refresh',
+  '/auth/logout',
+];
 
 type RequestComRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 

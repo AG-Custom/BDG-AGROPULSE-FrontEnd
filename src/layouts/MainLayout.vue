@@ -1,6 +1,7 @@
 <template>
   <q-layout view="hHh Lpr lFf" class="main-layout">
     <q-header class="main-layout__header">
+      <super-host-banner v-if="isSuperHost" :tem-empresa="temEmpresa" />
       <q-toolbar class="main-layout__toolbar">
         <agro-btn
           flat
@@ -13,8 +14,8 @@
         <agro-logo size="sm" :show-text="false" class="main-layout__logo-mobile" />
         <q-space />
         <div class="main-layout__actions">
-          <notificacoes-menu v-if="podeVerNotificacoes" />
-          <empresa-header-link />
+          <notificacoes-menu v-if="podeVerNotificacoes && temEmpresa" />
+          <empresa-header-link v-if="temEmpresa" />
           <q-btn
             v-if="usuario"
             flat
@@ -66,9 +67,26 @@
           <div v-if="usuario && !sidebarCollapsed" class="main-layout__user">
             <div class="main-layout__user-name">{{ nomeUsuario }}</div>
           </div>
-          <unidade-switcher v-if="!sidebarCollapsed" compact />
+          <unidade-switcher v-if="!sidebarCollapsed && temEmpresa" compact />
         </div>
-        <app-sidebar :collapsed="sidebarCollapsed" />
+        <app-sidebar v-if="temEmpresa" :collapsed="sidebarCollapsed" />
+        <nav
+          v-else-if="isSuperHost && !sidebarCollapsed"
+          class="main-layout__plataforma-nav"
+          aria-label="Console da plataforma"
+        >
+          <q-item
+            clickable
+            v-ripple
+            :to="{ name: 'plataforma' }"
+            class="main-layout__plataforma-item"
+          >
+            <q-item-section avatar>
+              <q-icon name="business" size="20px" />
+            </q-item-section>
+            <q-item-section>Empresas</q-item-section>
+          </q-item>
+        </nav>
         <button
           type="button"
           class="main-layout__collapse-btn"
@@ -81,7 +99,7 @@
     </q-drawer>
 
     <q-page-container class="main-layout__content">
-      <app-module-subnav />
+      <app-module-subnav v-if="temEmpresa" />
       <router-view :key="`${String($route.name ?? $route.path)}-${unidadeId ?? ''}`" />
     </q-page-container>
   </q-layout>
@@ -92,6 +110,7 @@ import AppModuleSubnav from 'components/layout/AppModuleSubnav.vue';
 import AppSidebar from 'components/layout/AppSidebar.vue';
 import EmpresaHeaderLink from 'components/layout/EmpresaHeaderLink.vue';
 import NotificacoesMenu from 'components/layout/NotificacoesMenu.vue';
+import SuperHostBanner from 'components/layout/SuperHostBanner.vue';
 import UnidadeSwitcher from 'components/layout/UnidadeSwitcher.vue';
 import AgroLogo from 'components/shared/AgroLogo.vue';
 import { useAuth } from 'composables/useAuth';
@@ -106,7 +125,7 @@ const STORAGE_SIDEBAR_COLLAPSED = 'agropulse.sidebar.collapsed';
 const drawer = ref(true);
 const sidebarCollapsed = ref(false);
 const router = useRouter();
-const { sair: sairAuth, usuario, unidadeId, possuiPermissao } = useAuth();
+const { sair: sairAuth, usuario, unidadeId, possuiPermissao, isSuperHost, temEmpresa } = useAuth();
 const { carregar: carregarNotificacoes } = useNotificacoes();
 
 const nomeUsuario = computed(() => usuario.value?.nome ?? '');
@@ -142,7 +161,7 @@ let pollingTimer: ReturnType<typeof setInterval> | undefined;
 function iniciarPolling(): void {
   pararPolling();
 
-  if (!podeVerNotificacoes.value) {
+  if (!podeVerNotificacoes.value || !temEmpresa.value) {
     return;
   }
 
@@ -241,6 +260,18 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.main-layout__plataforma-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--spacing-2);
+}
+
+.main-layout__plataforma-item {
+  border-radius: var(--radius-md);
+  color: var(--color-sidebar-text);
 }
 
 .main-layout__collapse-btn {

@@ -4,8 +4,8 @@ import { authService } from 'services/auth.service';
 import type {
   AuthContextSessionDto,
   ConfirmEmailPayload,
+  DefinirSenhaPrimeiroAcessoPayload,
   LoginPayload,
-  RegisterPayload,
   SessaoPersistida,
   UnidadeDisponivelDto,
 } from 'types/dtos/auth.dto';
@@ -14,6 +14,7 @@ import {
   loginParaSessao,
   mesclarSessaoRemotaComLocal,
   refreshParaSessao,
+  selecionarEmpresaParaSessao,
   selecionarUnidadeParaSessao,
   usuarioDtoParaLogado,
 } from 'utils/auth.mapper';
@@ -26,6 +27,8 @@ interface AuthState {
   empresaId: string | null;
   unidadeId: string | null;
   requiresUnidadeSelection: boolean;
+  requiresEmpresaSelection: boolean;
+  isSuperHost: boolean;
   unidadesDisponiveis: UnidadeDisponivelDto[] | null;
 }
 
@@ -37,11 +40,15 @@ export const useAuthStore = defineStore('auth', {
     empresaId: null,
     unidadeId: null,
     requiresUnidadeSelection: false,
+    requiresEmpresaSelection: false,
+    isSuperHost: false,
     unidadesDisponiveis: null,
   }),
   getters: {
     permissoes: (state): string[] => state.usuario?.permissoes ?? [],
-    precisaOnboarding: (state): boolean => state.autenticado && !state.empresaId,
+    precisaOnboarding: (): boolean => false,
+    precisaConsolePlataforma: (state): boolean =>
+      state.autenticado && state.isSuperHost && (state.requiresEmpresaSelection || !state.empresaId),
     temEmpresa: (state): boolean => !!state.empresaId,
     temUnidade: (state): boolean => !!state.unidadeId,
     precisaSelecionarUnidade: (state): boolean =>
@@ -51,10 +58,12 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     aplicarSessao(sessao: SessaoPersistida) {
-      this.usuario = usuarioDtoParaLogado(sessao.usuario, sessao.empresaId);
+      this.usuario = usuarioDtoParaLogado(sessao.usuario, sessao.empresaId, sessao.isSuperHost);
       this.empresaId = sessao.empresaId;
       this.unidadeId = sessao.unidadeId;
       this.requiresUnidadeSelection = sessao.requiresUnidadeSelection;
+      this.requiresEmpresaSelection = sessao.requiresEmpresaSelection;
+      this.isSuperHost = sessao.isSuperHost;
       this.unidadesDisponiveis = sessao.unidadesDisponiveis;
       this.autenticado = true;
       this.verificado = true;
@@ -100,12 +109,12 @@ export const useAuthStore = defineStore('auth', {
       this.aplicarSessao(sessao);
     },
 
-    async cadastrar(payload: RegisterPayload) {
-      return authService.register(payload);
-    },
-
     async confirmarEmail(payload: ConfirmEmailPayload) {
       await authService.confirmarEmail(payload);
+    },
+
+    async definirSenhaPrimeiroAcesso(payload: DefinirSenhaPrimeiroAcessoPayload) {
+      await authService.definirSenhaPrimeiroAcesso(payload);
     },
 
     async listarUnidades() {
@@ -126,6 +135,19 @@ export const useAuthStore = defineStore('auth', {
       this.aplicarSessao(novaSessao);
     },
 
+    async selecionarEmpresa(empresaId: string) {
+      const sessaoAtual = obterSessao();
+
+      if (!sessaoAtual) {
+        throw new Error('Sessão inválida para seleção de empresa.');
+      }
+
+      const resposta = await authService.selecionarEmpresa({ empresaId });
+      const novaSessao = selecionarEmpresaParaSessao(resposta, sessaoAtual);
+      salvarSessao(novaSessao);
+      this.aplicarSessao(novaSessao);
+    },
+
     async renovarTokens() {
       const sessaoAtual = obterSessao();
 
@@ -140,6 +162,10 @@ export const useAuthStore = defineStore('auth', {
     },
 
     possuiPermissao(permissao: string): boolean {
+      if (this.isSuperHost) {
+        return true;
+      }
+
       return this.permissoes.includes(permissao);
     },
 
@@ -159,6 +185,8 @@ export const useAuthStore = defineStore('auth', {
       this.empresaId = null;
       this.unidadeId = null;
       this.requiresUnidadeSelection = false;
+      this.requiresEmpresaSelection = false;
+      this.isSuperHost = false;
       this.unidadesDisponiveis = null;
     },
   },

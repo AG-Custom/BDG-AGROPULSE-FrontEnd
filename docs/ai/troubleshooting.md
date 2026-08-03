@@ -131,22 +131,21 @@ meta: { layout: 'main' }  // rota /
 
 ---
 
-### AUTH-003 — Fluxo cadastro → onboarding
+### AUTH-003 — Fluxo SuperHost / sistema fechado
 
 | | |
 |---|---|
-| **Sintoma** | Após confirmar e-mail, usuário cai no dashboard vazio ou não consegue cadastrar empresa. |
-| **Causa** | Login retorna `empresaId: null` para usuário novo; guard não redirecionava para onboarding. |
-| **Solução** | Guard em `router/index.ts`: se `precisaOnboarding` → `/onboarding`. Após `POST /onboarding/company`, chamar `auth/refresh` para atualizar JWT. |
-| **Prevenção** | Sempre verificar `temEmpresa` / `precisaOnboarding` antes de liberar dashboard. |
-| **Status** | ✅ Implementado em 2026-07-05 |
+| **Sintoma** | SuperHost sem empresa cai no dashboard ou usuário tenta cadastro público. |
+| **Causa** | Cadastro público e onboarding self-service foram removidos. |
+| **Solução** | Guard: `precisaConsolePlataforma` → `/plataforma`. Criar empresa via console; acessar com `POST /auth/selecionar-empresa`. |
+| **Prevenção** | Não reintroduzir `/cadastro` nem `/onboarding` self-service. |
+| **Status** | ✅ Implementado em 2026-08-03 |
 
-**Fluxo esperado:**
+**Fluxo esperado (SuperHost):**
 
-1. `/cadastro` → register → e-mail
-2. `/confirm-email?userId&token` → confirm → login na mesma tela
-3. `/onboarding` → empresa + unidades → refresh tokens
-4. `/` dashboard
+1. `/login` → `isSuperHost` + `requiresEmpresaSelection`
+2. `/plataforma` → listar/criar empresas
+3. Acessar → `selecionar-empresa` → (opcional) unidade → dashboard
 
 ---
 

@@ -18,9 +18,10 @@ O contrato oficial de rotas, DTOs, enums e erros **não** fica neste repositóri
 
 | Arquivo | Quando consultar |
 |---|---|
-| `auth.md` | Login, registro, confirm-email, refresh, seleção de unidade |
-| `onboarding.md` | Cadastro de empresa e dashboard inicial |
-| `empresas.md` | Empresas, CNPJs, unidades, módulos |
+| `auth.md` | Login, session, refresh, selecionar-empresa/unidade |
+| `plataforma.md` | Console SuperHost (listar/criar empresas) |
+| `onboarding.md` | Removido — criação só via plataforma |
+| `empresas.md` | CNPJs e unidades da empresa atual |
 | `enums.md` | Valores de enums (strings na API) |
 | `integration.md` | Como integrar o contrato no front-end |
 | `CHANGELOG.md` | Alterações recentes do contrato |

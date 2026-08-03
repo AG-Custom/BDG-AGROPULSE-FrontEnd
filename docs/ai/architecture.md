@@ -253,26 +253,23 @@ index.html
     → app.mount('#app')
 ```
 
-### Fluxo de cadastro e onboarding
+### Fluxo SuperHost (sistema fechado)
 
 ```
-/cadastro
-  → authService.register
-  → sessionStorage pendingEmail
+/login (SuperHost)
+  → authService.login → isSuperHost + requiresEmpresaSelection
+  → redirect /plataforma
 
-/confirm-email?userId&token
-  → authService.confirmarEmail (204)
-  → formulário email + senha
-  → authService.login → empresaId null
-  → redirect /onboarding
-
-/onboarding
-  → onboardingService.criarEmpresa
-  → authService.refresh (atualiza JWT)
-  → redirect /dashboard
+/plataforma
+  → plataformaService.listarEmpresas / criarEmpresa (empresa + Diretor)
+  → "Acessar" → authService.selecionarEmpresa
+  → (opcional) /selecionar-unidade
+  → /dashboard no contexto da empresa
 ```
 
-Guards: `precisaOnboarding` bloqueia dashboard; `temEmpresa` bloqueia retorno ao onboarding.
+Cadastro público de usuário/empresa **não existe**. Usuários de cada empresa nascem via `/usuarios` (admin) ou no create da plataforma (primeiro Diretor).
+
+Guards: `precisaConsolePlataforma` bloqueia o app sem empresa selecionada; `requerSuperHost` protege `/plataforma`.
 
 Contrato API (rotas, DTOs, enums): `C:\Users\Guilherme\Documents\new_agropulse_backend\api-contract\` — ver índice em `docs/ai/api.md#contrato-da-api-fonte-da-verdade`.
 

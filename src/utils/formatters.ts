@@ -172,8 +172,8 @@ export function parseMascaraMoedaObrigatorio(valor: string): number {
   return parseMascaraMoeda(valor) ?? 0;
 }
 
-export function gerarCodigoUnidade(tipo: string, nome: string): string {
-  const tipoSlug = slugify(tipo);
+export function gerarCodigoUnidade(tipo: string, nome: string, matriz = false): string {
+  const tipoSlug = matriz ? 'matriz' : slugify(tipo);
   const nomeSlug = slugify(nome);
 
   if (!tipoSlug && !nomeSlug) {

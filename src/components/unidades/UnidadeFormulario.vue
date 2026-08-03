@@ -265,11 +265,11 @@ const cnpjOpcoes = computed(() =>
 );
 
 watch(
-  () => formulario.value.nome,
-  (nome) => {
+  () => [formulario.value.nome, formulario.value.matriz] as const,
+  ([nome, matriz]) => {
     if (props.modo === 'criar' && !props.somenteLeitura) {
       formulario.value.tipo = TipoUnidade.Filial;
-      formulario.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome);
+      formulario.value.codigo = gerarCodigoUnidade(TipoUnidade.Filial, nome, matriz);
     }
   },
   { immediate: true },

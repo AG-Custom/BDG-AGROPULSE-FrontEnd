@@ -5,8 +5,8 @@
         <q-icon name="error_outline" size="48px" color="negative" />
         <div class="text-h6">Link inválido</div>
         <p class="text-body-md text-secondary">
-          O link de confirmação está incompleto ou expirou. Solicite um novo cadastro ou entre em
-          contato com o suporte.
+          O link de confirmação está incompleto ou expirou. Entre em contato com o administrador da
+          sua empresa ou com o suporte.
         </p>
         <agro-btn
           color="primary"
@@ -26,7 +26,7 @@
         <q-icon name="check_circle" size="48px" color="positive" />
         <div class="text-h6">E-mail confirmado</div>
         <p class="text-body-md text-secondary">
-          Informe sua senha para continuar e configurar sua empresa no AgroPulse.
+          Informe sua senha para acessar o AgroPulse.
         </p>
 
         <q-form class="auth-form full-width" greedy @submit.prevent="continuar">
@@ -67,8 +67,8 @@
             unelevated
             type="submit"
             class="full-width"
-            label="Continuar para configuração"
-            descricao="Entrar e iniciar a configuração da empresa"
+            label="Entrar"
+            descricao="Acessar sua conta no AgroPulse"
             :loading="carregando"
           />
         </q-form>
@@ -100,7 +100,7 @@ import { obterEmailPendente } from 'utils/pending-email-storage';
 import { email as emailValidator, obrigatorio } from 'utils/validators';
 
 const route = useRoute();
-const { carregando, confirmar, loginParaOnboarding } = useAutenticacao();
+const { carregando, confirmar, login } = useAutenticacao();
 
 const confirmando = ref(
   typeof route.query.userId === 'string' &&
@@ -149,7 +149,7 @@ async function confirmarConta(): Promise<void> {
 }
 
 async function continuar(): Promise<void> {
-  await loginParaOnboarding({
+  await login({
     email: email.value.trim(),
     senha: senha.value,
   });

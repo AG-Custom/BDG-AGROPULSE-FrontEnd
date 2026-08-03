@@ -4,9 +4,10 @@ import type {
   AuthContextSessionDto,
   AuthSessionDto,
   ConfirmEmailPayload,
+  DefinirSenhaPrimeiroAcessoPayload,
   LoginPayload,
-  RegisterPayload,
-  RegisterResponseDto,
+  SelecionarEmpresaPayload,
+  SelecionarEmpresaResponseDto,
   SelecionarUnidadePayload,
   SelecionarUnidadeResponseDto,
   UnidadesDisponiveisResponseDto,
@@ -17,12 +18,12 @@ export const authService = {
     return api.post<AuthSessionDto>('/auth/login', payload).then((response) => response.data);
   },
 
-  register(payload: RegisterPayload): Promise<RegisterResponseDto> {
-    return api.post<RegisterResponseDto>('/auth/register', payload).then((response) => response.data);
-  },
-
   confirmarEmail(payload: ConfirmEmailPayload): Promise<void> {
     return api.post('/auth/confirm-email', payload).then(() => undefined);
+  },
+
+  definirSenhaPrimeiroAcesso(payload: DefinirSenhaPrimeiroAcessoPayload): Promise<void> {
+    return api.post('/auth/primeiro-acesso', payload).then(() => undefined);
   },
 
   refresh(): Promise<AuthContextSessionDto> {
@@ -44,6 +45,12 @@ export const authService = {
   selecionarUnidade(payload: SelecionarUnidadePayload): Promise<SelecionarUnidadeResponseDto> {
     return api
       .post<SelecionarUnidadeResponseDto>('/auth/selecionar-unidade', payload)
+      .then((response) => response.data);
+  },
+
+  selecionarEmpresa(payload: SelecionarEmpresaPayload): Promise<SelecionarEmpresaResponseDto> {
+    return api
+      .post<SelecionarEmpresaResponseDto>('/auth/selecionar-empresa', payload)
       .then((response) => response.data);
   },
 };
