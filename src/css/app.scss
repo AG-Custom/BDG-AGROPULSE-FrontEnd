@@ -202,17 +202,20 @@ body {
   border-width: var(--border-width-medium);
 }
 
+.q-field--outlined .q-field__native,
+.q-field--outlined .q-field__input,
+.q-field--outlined .q-field__prefix,
+.q-field--outlined .q-field__suffix {
+  font-size: var(--font-size-input);
+}
+
 .q-field--outlined .q-field__label {
+  font-size: var(--font-size-input);
   font-weight: var(--font-weight-medium);
 }
 
 .q-field__bottom {
   color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
-}
-
-// Texto “placeholder” no Quasar: label dentro do campo vazio + ::placeholder nativo + QSelect
-.q-field--outlined .q-field__label {
   font-size: var(--font-size-sm);
 }
 
@@ -223,39 +226,38 @@ body {
 .q-field__native::-moz-placeholder,
 .q-field__input::-moz-placeholder {
   color: var(--color-text-tertiary) !important;
-  font-size: var(--font-size-xs) !important;
+  font-size: var(--font-size-input) !important;
   opacity: 1;
 }
 
 .q-placeholder {
   color: var(--color-text-tertiary);
-  font-size: var(--font-size-xs) !important;
+  font-size: var(--font-size-input) !important;
 }
 
-// ─── Formulários criar/editar — densidade compacta ───
-// Inputs padrão Quasar outlined ~56px; em forms usamos ~40px (equiv. dense)
-// para reduzir a sensação de UI “esticada” em cadastros longos.
+// ─── Formulários criar/editar — densidade confortável ───
+// ~48px acomoda texto de 16px (padrão web) sem parecer “esticado” como o Quasar 56px.
 .agro-formulario {
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__control {
-    height: 40px;
-    min-height: 40px;
+    height: 48px;
+    min-height: 48px;
   }
 
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__marginal {
-    height: 40px;
+    height: 48px;
   }
 
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__native,
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__input,
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__prefix,
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__suffix {
-    min-height: 24px;
+    min-height: 28px;
     padding-top: 0;
     padding-bottom: 0;
   }
 
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height) .q-field__label {
-    top: 10px;
+    top: 14px;
   }
 
   .q-field--outlined:not(.q-textarea):not(.q-field--auto-height).q-field--float .q-field__label {
@@ -267,7 +269,7 @@ body {
     .q-field__input,
     .q-field__prefix,
     .q-field__suffix {
-      padding-top: 12px;
+      padding-top: 14px;
       padding-bottom: 0;
     }
   }

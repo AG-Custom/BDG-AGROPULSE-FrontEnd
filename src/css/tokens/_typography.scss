@@ -18,6 +18,9 @@ $font-size-2xl: 1.5rem;    // 21px
 $font-size-3xl: 1.875rem;  // ~26.25px
 $font-size-4xl: 2.25rem;   // ~31.5px
 
+// Inputs: 16px absoluto (padrão web / evita zoom iOS no focus). Independente do root 14px.
+$font-size-input: 16px;
+
 // Base tipográfica do app (browser 16px → 14px). Tudo em rem escala junto.
 $font-size-root: 87.5%;
 
@@ -51,6 +54,7 @@ $letter-spacing-wider: 0.05em;
   --font-size-2xl: #{$font-size-2xl};
   --font-size-3xl: #{$font-size-3xl};
   --font-size-4xl: #{$font-size-4xl};
+  --font-size-input: #{$font-size-input};
 
   --line-height-tight: #{$line-height-tight};
   --line-height-snug: #{$line-height-snug};

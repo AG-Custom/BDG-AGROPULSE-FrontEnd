@@ -28,7 +28,12 @@ router.beforeEach(async (to) => {
     return { name: 'plataforma' };
   }
 
-  if (autenticado && precisaSelecionarUnidade && !to.meta.selecaoUnidade) {
+  if (
+    autenticado &&
+    precisaSelecionarUnidade &&
+    !to.meta.selecaoUnidade &&
+    !(isSuperHost && to.meta.plataforma)
+  ) {
     return { name: 'selecionar-unidade' };
   }
 

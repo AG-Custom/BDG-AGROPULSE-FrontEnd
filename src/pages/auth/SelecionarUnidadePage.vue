@@ -38,6 +38,18 @@
           </button>
         </li>
       </ul>
+
+      <div v-if="isSuperHost" class="selecionar-unidade__console">
+        <agro-btn
+          flat
+          no-caps
+          icon="arrow_back"
+          label="Voltar ao console"
+          descricao="Sair da seleção de unidade e voltar ao console da plataforma"
+          :disable="carregando"
+          :to="{ name: 'plataforma' }"
+        />
+      </div>
     </auth-card>
   </q-page>
 </template>
@@ -50,7 +62,7 @@ import { useContextoUnidade } from 'composables/useContextoUnidade';
 import type { UnidadeDisponivelDto } from 'types/dtos/auth.dto';
 import { computed, onMounted, ref } from 'vue';
 
-const { unidadesDisponiveis } = useAuth();
+const { unidadesDisponiveis, isSuperHost } = useAuth();
 const { carregando, unidadeSelecionandoId, listarUnidades, selecionarUnidadeInicial } =
   useContextoUnidade();
 
@@ -140,5 +152,12 @@ async function escolher(unidadeId: string): Promise<void> {
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
+}
+
+.selecionar-unidade__console {
+  border-top: var(--border-width-thin) solid var(--color-border-default);
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-4);
 }
 </style>
