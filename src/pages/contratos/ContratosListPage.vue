@@ -14,9 +14,12 @@
     <section class="agro-section">
       <cotacao-mercado-card
         class="q-mb-md"
+        v-model:fonte="fonteCotacao"
         :cotacao="cotacao"
+        :cotacoes="cotacoes"
+        :loading="carregandoCotacao"
         mostrar-aplicar
-        @atualizar="carregarCotacaoMercado()"
+        @atualizar="carregarCotacaoMercado(undefined, fonteCotacao)"
         @aplicar="aplicarCotacaoNoFormulario"
       />
 
@@ -142,9 +145,11 @@ import { useProdutos } from 'composables/useProdutos';
 import { useSafras } from 'composables/useSafras';
 import {
   ContratoStatusOpcoes,
+  FontePreco,
   TipoContrato,
   TipoContratoOpcoes,
   type ContratoStatusValor,
+  type FontePrecoValor,
   type TipoContratoValor,
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
@@ -152,8 +157,6 @@ import type { ContratoDto, CotacaoMercadoDto } from 'types/dtos/contrato.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-
 
 const route = useRoute();
 const router = useRouter();
@@ -163,12 +166,15 @@ const tipo = ref<TipoContratoValor>(
 );
 const filtroStatus = ref<ContratoStatusValor | null>(null);
 const filtroSafraId = ref<string | null>(null);
+const fonteCotacao = ref<FontePrecoValor>(FontePreco.Esalq);
 
 const {
   contratos,
   cotacao,
+  cotacoes,
   alertas,
   carregando,
+  carregandoCotacao,
   carregar,
   carregarCotacaoMercado,
   carregarAlertas,
@@ -246,7 +252,7 @@ onMounted(() => {
   void carregarProdutos();
   void carregarSafras();
   void carregar();
-  void carregarCotacaoMercado();
+  void carregarCotacaoMercado(undefined, fonteCotacao.value);
   void carregarAlertas();
 });
 

@@ -114,6 +114,10 @@ export interface CotacaoMercadoDto {
   fonte: FontePrecoValor;
   preco: number;
   consultadoEm: string;
+  unidade: string;
+  provedor: string;
+  aviso: string;
+  indicativa: boolean;
 }
 
 export interface ListarCotacaoMercadoParams {

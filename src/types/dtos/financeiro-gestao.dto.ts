@@ -493,14 +493,18 @@ export interface DreOrcamentoDto {
   totalRealizado: number;
 }
 
+export type OrigemCotacaoMoeda = 'Manual' | 'Bacen';
+
 export interface CotacaoMoedaDto {
   id: string;
+  empresaId?: string;
   moeda: string;
   data: string;
   taxaCompra: number;
   taxaVenda: number;
+  taxaPtax?: number;
+  origem?: OrigemCotacaoMoeda;
   fonte: string | null;
-  stub?: boolean;
 }
 
 export interface CotacaoMoedaFormModel {
@@ -517,17 +521,28 @@ export interface CriarCotacaoMoedaPayload {
   taxaVenda: number;
 }
 
+export interface AtualizarCotacaoMoedaPayload {
+  taxaCompra: number;
+  taxaVenda: number;
+}
+
+export interface SincronizarPtaxPayload {
+  moeda?: string;
+  data?: string;
+}
+
 export interface ExposicaoCambialItemDto {
   moeda: string;
   valorExposto: number;
   valorEmReais: number;
   variacaoCambial: number;
+  taxa?: number;
 }
 
 export interface ExposicaoCambialDto {
   itens: ExposicaoCambialItemDto[];
   totalExpostoReais: number;
-  stub?: boolean;
+  cotacaoPendente?: boolean;
   mensagem?: string | null;
 }
 

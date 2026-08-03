@@ -94,8 +94,8 @@ Controle financeiro integrado às operações em três níveis (unidade, CNPJ e 
 #### 19. Orçamento financeiro + DRE — ✅ BE/FE
 - Versões R0/R1/R2, DRE orçado vs realizado, alertas 80%/100%
 
-#### 20. PTAX / FX / exposição — ⚠️ stub PTAX BE/FE
-- Cotações manuais/stub + exposição cambial CAP/CR ≠ BRL
+#### 20. PTAX / FX / exposição — ✅ BE/FE (BCB Olinda)
+- Sync PTAX real (`POST /cotacoes-moeda/sincronizar-ptax`); cotação manual; exposição agregada por moeda
 
 ---
 
@@ -147,13 +147,13 @@ Contrato API: `new_agropulse_backend/api-contract/financeiro.md`
 | **Orçamento vs realizado** | | |
 | Orçamento / DRE / R0–R2 / alertas | ✅ | ✅ |
 | **Multi-moeda** | | |
-| PTAX / FX / exposição | ⚠️ PTAX stub | ⚠️ stub UI |
+| PTAX / FX / exposição | ✅ BCB Olinda | ✅ sync + manual |
 
 **Legenda:** ✅ pronto · ⚠️ parcial/stub · ❌ ausente
 
 ### Observações
 
-- Integrações bancárias reais (OFX/Open Finance, CNAB, Asaas, PTAX Bacen) permanecem stub.
+- Integrações bancárias reais (OFX/Open Finance, CNAB, Asaas) permanecem stub. PTAX Bacen entregue.
 - Geração automática de CAP/CR (compras/vendas) foi reutilizada — não duplicada.
 - Permissão FE: `financeiro.visualizar` (+ `formas-pagamento-config.visualizar` para formas).
 - Rota legado `compras/contas-pagar` redireciona para `financeiro/contas-pagar`.
@@ -167,7 +167,7 @@ Contrato API: `new_agropulse_backend/api-contract/financeiro.md`
 | Integração | Boletos bancários registrados (CNAB / registradora) — hoje stub |
 | Integração | Conciliação OFX / API bancária real + proposta de lançamentos |
 | Integração | Saldo intraday real (hoje stub) |
-| Integração | PTAX Banco Central real (hoje stub/manual) |
+| Integração | Boletos / OFX / saldo intraday (PTAX já entregue) |
 | Fora de escopo | — |
 
-**Status:** CAP/CR, fluxo, régua interna, renegociação, antecipação e orçamento/DRE cobertos; falta banking/FX reais.
+**Status:** CAP/CR, fluxo, régua interna, renegociação, antecipação, orçamento/DRE e PTAX cobertos; falta banking real (boletos/OFX/intraday).

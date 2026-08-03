@@ -181,12 +181,14 @@ export function useContratos(tipo: TipoContratoValor | Ref<TipoContratoValor>) {
   const contratos = ref<ContratoDto[]>([]);
   const contrato = ref<ContratoDto | null>(null);
   const cotacao = ref<CotacaoMercadoDto | null>(null);
+  const cotacoes = ref<CotacaoMercadoDto[]>([]);
   const alertas = ref<AlertaContratoDto[]>([]);
   const painel = ref<PainelContratoItemDto[]>([]);
   const painelSafra = ref<PainelSafraItemDto[]>([]);
   const vinculos = ref<VinculoPedidoContratoDto[]>([]);
   const entregas = ref<EntregaContratoDto[]>([]);
   const carregando = ref(false);
+  const carregandoCotacao = ref(false);
   const salvando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
@@ -345,12 +347,26 @@ export function useContratos(tipo: TipoContratoValor | Ref<TipoContratoValor>) {
 
   async function carregarCotacaoMercado(
     produto?: string,
-    fonte?: FontePrecoValor,
+    fonte: FontePrecoValor = 'Esalq',
   ): Promise<void> {
+    carregandoCotacao.value = true;
+
     try {
-      cotacao.value = await contratoService.cotacaoMercado(produto, fonte);
+      if (produto) {
+        cotacao.value = await contratoService.cotacaoMercado(produto, fonte);
+        return;
+      }
+
+      cotacoes.value = await contratoService.listarCotacoesMercado(fonte);
+      cotacao.value = cotacoes.value[0] ?? null;
     } catch (e) {
       erro(mensagem(e));
+      if (!produto) {
+        cotacoes.value = [];
+      }
+      cotacao.value = null;
+    } finally {
+      carregandoCotacao.value = false;
     }
   }
 
@@ -426,12 +442,14 @@ export function useContratos(tipo: TipoContratoValor | Ref<TipoContratoValor>) {
     contratos,
     contrato,
     cotacao,
+    cotacoes,
     alertas,
     painel,
     painelSafra,
     vinculos,
     entregas,
     carregando,
+    carregandoCotacao,
     salvando,
     carregar,
     obter,

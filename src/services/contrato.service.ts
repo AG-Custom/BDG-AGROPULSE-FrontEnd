@@ -119,4 +119,12 @@ export const contratoService = {
       .get<CotacaoMercadoDto>('/contratos/cotacao-mercado', { params })
       .then((r) => r.data);
   },
+
+  listarCotacoesMercado(fonte?: FontePrecoValor): Promise<CotacaoMercadoDto[]> {
+    const params: ListarCotacaoMercadoParams = {};
+    if (fonte !== undefined) params.fonte = fonte;
+    return api
+      .get<CotacaoMercadoDto[]>('/contratos/cotacao-mercado/lista', { params })
+      .then((r) => r.data);
+  },
 };

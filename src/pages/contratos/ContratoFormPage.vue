@@ -5,9 +5,12 @@
     <section class="agro-section">
       <cotacao-mercado-card
         class="q-mb-md"
+        v-model:fonte="fonteCotacao"
         :cotacao="cotacao"
+        :cotacoes="cotacoes"
+        :loading="carregandoCotacao"
         mostrar-aplicar
-        @atualizar="carregarCotacaoMercado()"
+        @atualizar="carregarCotacaoMercado(undefined, fonteCotacao)"
         @aplicar="aplicarCotacao"
       />
 
@@ -247,6 +250,7 @@ import {
 import { useProdutos } from 'composables/useProdutos';
 import { useSafras } from 'composables/useSafras';
 import {
+  FontePreco,
   FontePrecoOpcoes,
   TipoContrato,
   TipoOperacaoTermoOpcoes,
@@ -284,6 +288,8 @@ const {
   criar,
   editar,
   cotacao,
+  cotacoes,
+  carregandoCotacao,
   carregarCotacaoMercado,
   calcularEquivalente,
 } = useContratos(tipo);
@@ -293,6 +299,7 @@ const { safraOpcoes, carregar: carregarSafras } = useSafras();
 
 const carregandoPagina = ref(false);
 const calculando = ref(false);
+const fonteCotacao = ref<FontePrecoValor>(FontePreco.Esalq);
 const formulario = ref(formVazioContrato());
 
 const clienteOpcoes = computed(() =>
@@ -357,14 +364,19 @@ onMounted(async () => {
   void carregarClientes();
   void carregarProdutos();
   void carregarSafras();
-  void carregarCotacaoMercado();
-
   if (modo.value === 'criar') {
     const precoQuery = route.query.preco as string | undefined;
     const fonteQuery = route.query.fonte as FontePrecoValor | undefined;
     if (precoQuery) formulario.value.preco = formatarMoedaParaInput(precoQuery);
-    if (fonteQuery) formulario.value.fontePreco = fonteQuery;
+    if (fonteQuery) {
+      formulario.value.fontePreco = fonteQuery;
+      if (fonteQuery === FontePreco.Cbot || fonteQuery === FontePreco.Esalq) {
+        fonteCotacao.value = fonteQuery;
+      }
+    }
   }
+
+  void carregarCotacaoMercado(undefined, fonteCotacao.value);
 
   if (modo.value === 'editar' && contratoId.value) {
     carregandoPagina.value = true;

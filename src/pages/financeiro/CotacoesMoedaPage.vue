@@ -2,36 +2,54 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Cotações / multi-moeda"
-      subtitulo="PTAX, cotações manuais e exposição cambial."
+      subtitulo="PTAX do Banco Central, cotações manuais e exposição cambial."
     >
+      <q-select
+        v-model="moedaPtax"
+        outlined
+        dense
+        emit-value
+        map-options
+        label="Moeda PTAX"
+        class="moeda-ptax-select"
+        :options="MoedaCotacaoOpcoes"
+        :disable="sincronizando"
+      />
+      <agro-btn
+        flat
+        icon="sync"
+        label="Atualizar PTAX"
+        descricao="Sincronizar PTAX no Banco Central"
+        :loading="sincronizando"
+        @click="atualizarPtax"
+      />
       <agro-btn
         color="primary"
         unelevated
         icon="add"
         label="Nova cotação"
         descricao="Registrar cotação"
-        @click="dialog = true"
+        @click="abrirNovaCotacao"
       />
     </app-page-header>
 
     <section class="agro-section">
       <q-banner
-        v-if="temStub"
+        v-if="temAlerta"
         rounded
-        class="q-mb-md stub-banner"
+        class="q-mb-md alerta-banner"
       >
-        Integração externa em modo stub — PTAX/exposição cambial podem ser simulados.
-        <span v-if="exposicao?.mensagem"> {{ exposicao.mensagem }}</span>
+        {{ textoAlerta }}
       </q-banner>
 
       <div class="row q-col-gutter-md">
         <div class="col-12 col-lg-7">
           <agro-card>
-            <agro-table-skeleton v-if="carregando && cotacoes.length === 0" :colunas="5" />
+            <agro-table-skeleton v-if="carregando && cotacoes.length === 0" :colunas="6" />
             <empty-state
               v-else-if="!carregando && cotacoes.length === 0"
               titulo="Nenhuma cotação"
-              descricao="Registre cotações de moeda ou aguarde a PTAX."
+              descricao="Atualize a PTAX ou registre uma cotação manual."
               icon="currency_exchange"
             />
             <q-table
@@ -55,6 +73,17 @@
               <template #body-cell-taxaVenda="props">
                 <q-td :props="props" class="text-metric">
                   {{ props.row.taxaVenda.toFixed(4) }}
+                </q-td>
+              </template>
+              <template #body-cell-acoes="props">
+                <q-td :props="props" class="acoes">
+                  <agro-acoes-menu
+                    :mostrar-visualizar="false"
+                    :ativo="true"
+                    :loading-status="salvando"
+                    @editar="abrirEditar(props.row)"
+                    @desabilitar="solicitarInativacao(props.row)"
+                  />
                 </q-td>
               </template>
             </q-table>
@@ -118,17 +147,23 @@
 
     <q-dialog v-model="dialog" persistent>
       <q-card class="dialog">
-        <q-card-section><h4 class="titulo">Nova cotação</h4></q-card-section>
+        <q-card-section>
+          <h4 class="titulo">{{ editandoId ? 'Editar cotação' : 'Nova cotação' }}</h4>
+        </q-card-section>
         <q-card-section>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <div class="row q-col-gutter-md">
               <div class="col-6">
-                <q-input
+                <q-select
                   v-model="formulario.moeda"
                   outlined
-                  label="Moeda (ex: USD)"
+                  emit-value
+                  map-options
+                  label="Moeda"
                   class="field-required"
+                  :options="MoedaCotacaoOpcoes"
                   :rules="[obrigatorio]"
+                  :readonly="!!editandoId"
                 />
               </div>
               <div class="col-6">
@@ -139,6 +174,7 @@
                   label="Data"
                   class="field-required"
                   :rules="[obrigatorio]"
+                  :readonly="!!editandoId"
                 />
               </div>
               <div class="col-6">
@@ -161,7 +197,7 @@
               </div>
             </div>
             <div class="agro-form-actions">
-              <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
+              <agro-btn flat label="Cancelar" descricao="Fechar" @click="fecharDialog" />
               <agro-btn color="primary" unelevated label="Salvar" type="submit" :loading="salvando" />
             </div>
           </q-form>
@@ -172,10 +208,12 @@
 </template>
 
 <script setup lang="ts">
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCotacoesMoeda } from 'composables/useCotacoesMoeda';
+import { MoedaCotacao, MoedaCotacaoOpcoes } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type {
   CotacaoMoedaDto,
@@ -191,21 +229,31 @@ const {
   exposicao,
   carregando,
   salvando,
+  sincronizando,
   carregar,
   carregarExposicao,
   criar,
+  atualizar,
+  solicitarInativacao,
+  sincronizarPtax,
 } = useCotacoesMoeda();
 
 const dialog = ref(false);
+const editandoId = ref<string | null>(null);
+const moedaPtax = ref(MoedaCotacao.Usd);
 const formulario = ref<CotacaoMoedaFormModel>({
-  moeda: 'USD',
+  moeda: MoedaCotacao.Usd,
   data: new Date().toISOString().slice(0, 10),
   taxaCompra: '',
   taxaVenda: '',
 });
 
-const temStub = computed(
-  () => cotacoes.value.some((c) => c.stub) || !!exposicao.value?.stub,
+const temAlerta = computed(() => !!exposicao.value?.cotacaoPendente);
+
+const textoAlerta = computed(
+  () =>
+    exposicao.value?.mensagem ??
+    'Há títulos em moeda estrangeira sem cotação. Atualize a PTAX.',
 );
 
 const colunas: QTableColumn<CotacaoMoedaDto>[] = [
@@ -214,6 +262,7 @@ const colunas: QTableColumn<CotacaoMoedaDto>[] = [
   { name: 'taxaCompra', label: 'Compra', field: 'taxaCompra', align: 'right' },
   { name: 'taxaVenda', label: 'Venda', field: 'taxaVenda', align: 'right' },
   { name: 'fonte', label: 'Fonte', field: 'fonte', align: 'left' },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 const colunasExp: QTableColumn<ExposicaoCambialItemDto>[] = [
   { name: 'moeda', label: 'Moeda', field: 'moeda', align: 'left' },
@@ -222,9 +271,42 @@ const colunasExp: QTableColumn<ExposicaoCambialItemDto>[] = [
   { name: 'variacaoCambial', label: 'Variação', field: 'variacaoCambial', align: 'right' },
 ];
 
+function abrirNovaCotacao(): void {
+  editandoId.value = null;
+  formulario.value = {
+    moeda: moedaPtax.value,
+    data: new Date().toISOString().slice(0, 10),
+    taxaCompra: '',
+    taxaVenda: '',
+  };
+  dialog.value = true;
+}
+
+function abrirEditar(row: CotacaoMoedaDto): void {
+  editandoId.value = row.id;
+  formulario.value = {
+    moeda: row.moeda,
+    data: row.data.slice(0, 10),
+    taxaCompra: String(row.taxaCompra),
+    taxaVenda: String(row.taxaVenda),
+  };
+  dialog.value = true;
+}
+
+function fecharDialog(): void {
+  dialog.value = false;
+  editandoId.value = null;
+}
+
 async function salvar(): Promise<void> {
-  const ok = await criar(formulario.value);
-  if (ok) dialog.value = false;
+  const ok = editandoId.value
+    ? await atualizar(editandoId.value, formulario.value)
+    : await criar(formulario.value);
+  if (ok) fecharDialog();
+}
+
+async function atualizarPtax(): Promise<void> {
+  await sincronizarPtax({ moeda: moedaPtax.value });
 }
 
 onMounted(() => {
@@ -234,9 +316,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.stub-banner {
+.alerta-banner {
   background: var(--color-surface-sunken);
   border: var(--border-width-thin) solid var(--color-border-default);
+}
+.moeda-ptax-select {
+  min-width: 220px;
 }
 .secao-titulo {
   margin: 0;
@@ -256,5 +341,8 @@ onMounted(() => {
   margin: 0;
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
+}
+.acoes {
+  white-space: nowrap;
 }
 </style>

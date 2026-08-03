@@ -59,14 +59,14 @@ Decisões detalhadas (fora / implementar / a validar): ver [plano-acao-stubs-cli
 | Prioridade | Módulo | Pendência | Decisão (2026-08-01) |
 |------------|--------|-----------|----------------------|
 | Alta | Fiscal | Focus/SEFAZ; contingência; reversões; SPED | **A validar** (contingência tende a “só online”) |
-| Alta | Financeiro | Boletos; OFX; PTAX; saldo intraday | **A validar** |
+| Alta | Financeiro | Boletos; OFX; saldo intraday (PTAX ✅) | **A validar** |
 | Alta | Vendas | NFC-e/PDV alinhado ao Fiscal | **A validar** |
 | Média | Contratos / Compras / Logística fiscal | NF satélite; destinados; CT-e/MDF-e | **A validar** |
 | Média | Cobrança | Serasa/SPC | **A validar** · crédito BB/Sicredi = **Fora/Feito** |
 | Média | Estoque | Locais hierárquicos | **Feito** |
 | Baixa | CRM / Jurídico | Foto check-in + anexos R2 · WhatsApp Web | **Feito** · API campanha = **Fora/Feito** |
 | Baixa | Relatórios | Excel/PDF (+ ranking) | **Feito** · Power BI = **Fora/Feito** |
-| Baixa | IoT / GPS / balança / telemetria | — | **Fora/Feito** (geo/offline ainda a validar) |
+| Baixa | IoT / GPS / balança / telemetria / geo / offline | — | **Fora/Feito** (B4 geo + B5 offline = Fora) |
 
 Detalhe da rodada: [plano-acao-stubs-cliente.md](./plano-acao-stubs-cliente.md) §6.
 

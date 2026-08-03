@@ -8,31 +8,32 @@
     <section class="agro-section form-grid">
       <agro-card>
         <h3 class="titulo">XML da NF-e</h3>
-        <q-input
-          v-model="xmlConteudo"
-          outlined
-          label="Conteúdo XML"
-          type="textarea"
-          autogrow
-          class="q-mb-md"
-        />
-        <div class="acoes-xml">
-          <agro-btn
-            color="primary"
-            unelevated
-            label="Pré-visualizar XML"
-            descricao="Analisar XML da NF-e"
-            :loading="salvando"
-            :disable="!xmlConteudo.trim()"
-            @click="analisarXml"
-          />
-          <agro-btn
-            flat
-            label="Consultar SEFAZ"
-            descricao="Consultar documentos destinados Focus/SEFAZ"
-            :loading="consultandoSefaz"
-            @click="consultarSefaz"
-          />
+        <div class="row q-col-gutter-md items-end q-mb-md">
+          <div class="col-12 col-md-8">
+            <q-file
+              v-model="arquivoXml"
+              outlined
+              label="Arquivo XML"
+              accept=".xml,text/xml,application/xml"
+              clearable
+              :disable="salvando"
+              @update:model-value="onArquivoXmlSelecionado"
+            >
+              <template #prepend>
+                <q-icon name="upload_file" />
+              </template>
+            </q-file>
+          </div>
+          <div class="col-12 col-md-4">
+            <agro-btn
+              flat
+              class="full-width"
+              label="Consultar SEFAZ"
+              descricao="Consultar documentos destinados Focus/SEFAZ"
+              :loading="consultandoSefaz"
+              @click="consultarSefaz"
+            />
+          </div>
         </div>
         <p v-if="mensagemSefaz" class="texto-sefaz">{{ mensagemSefaz }}</p>
         <q-list v-if="documentosSefaz?.documentos?.length" bordered class="q-mt-md lista-sefaz">
@@ -217,6 +218,7 @@ import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCompras } from 'composables/useCompras';
 import { useFiscal } from 'composables/useFiscal';
 import { useFornecedores } from 'composables/useFornecedores';
+import { useNotificacao } from 'composables/useNotificacao';
 import { useProdutos } from 'composables/useProdutos';
 import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import type { QTableColumn } from 'quasar';
@@ -256,7 +258,9 @@ const {
   documentosSefaz,
   listarDocumentosSefaz,
 } = useFiscal();
+const { erro } = useNotificacao();
 
+const arquivoXml = ref<File | null>(null);
 const xmlConteudo = ref('');
 const fornecedorId = ref('');
 const pedidoCompraId = ref('');
@@ -362,6 +366,39 @@ async function onProdutoCriado(produto: ProdutoDto): Promise<void> {
   itemCadastroRapido.value = null;
 }
 
+async function onArquivoXmlSelecionado(file: File | FileList | null): Promise<void> {
+  const selecionado = file instanceof FileList ? file.item(0) : file;
+
+  if (!selecionado) {
+    xmlConteudo.value = '';
+    return;
+  }
+
+  if (!selecionado.name.toLowerCase().endsWith('.xml')) {
+    erro('Selecione um arquivo XML válido.');
+    arquivoXml.value = null;
+    xmlConteudo.value = '';
+    return;
+  }
+
+  try {
+    const conteudo = (await selecionado.text()).trim();
+    if (!conteudo) {
+      erro('O arquivo XML está vazio.');
+      arquivoXml.value = null;
+      xmlConteudo.value = '';
+      return;
+    }
+
+    xmlConteudo.value = conteudo;
+    await analisarXml();
+  } catch {
+    erro('Não foi possível ler o arquivo XML.');
+    arquivoXml.value = null;
+    xmlConteudo.value = '';
+  }
+}
+
 async function analisarXml(): Promise<void> {
   const preview = await previewXmlConteudo({ xmlConteudo: xmlConteudo.value });
   if (!preview) return;
@@ -460,11 +497,6 @@ onMounted(async () => {
   margin: 0 0 var(--spacing-3);
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
-}
-.acoes-xml {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
 }
 .texto-sefaz {
   margin: var(--spacing-3) 0 0;

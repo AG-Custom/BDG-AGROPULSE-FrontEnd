@@ -9,11 +9,13 @@
       </q-card-section>
       <q-card-section>
         <div v-if="cotacao" class="cotacao-box q-mb-md">
-          <div class="text-caption">Cotação sugerida</div>
+          <div class="text-caption">Cotação sugerida (referência)</div>
           <div>
             {{ cotacao.produto }} · {{ cotacao.fonte }} ·
             <span class="text-metric">{{ formatarMoeda(cotacao.preco) }}</span>
+            <span v-if="cotacao.unidade" class="text-caption"> {{ cotacao.unidade }}</span>
           </div>
+          <p v-if="cotacao.aviso" class="cotacao-aviso">{{ cotacao.aviso }}</p>
           <agro-btn
             flat
             dense
@@ -151,10 +153,16 @@ function confirmar(): void {
 .cotacao-box {
   align-items: flex-start;
   background: var(--color-surface-sunken);
-  border: 1px solid var(--color-border-default);
+  border: var(--border-width-thin) solid var(--color-border-default);
   border-radius: var(--radius-md);
   display: grid;
   gap: var(--spacing-1);
   padding: var(--spacing-3);
+}
+
+.cotacao-aviso {
+  margin: 0;
+  color: var(--color-warning-700);
+  font-size: var(--font-size-sm);
 }
 </style>

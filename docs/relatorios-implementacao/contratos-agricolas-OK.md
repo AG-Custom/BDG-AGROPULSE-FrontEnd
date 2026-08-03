@@ -114,7 +114,7 @@ Contratos Agrícolas passaram de CRUD genérico para modelo tipado com entregas 
 | Tipo | Item |
 |------|------|
 | Integração | NF-e real na liquidação física / barter (hoje `StubNfe`) |
-| Integração | Cotação CBOT / ESALQ real (hoje `GET /contratos/cotacao-mercado` stub) |
+| Integração | Cotação referência CBOT/ESALQ (Yahoo + AgroDoc; indicativa — upgrade licenciado opcional) |
 | Fora de escopo | — |
 
 **Status:** CPR / Barter / Termo tipados com painel, alertas, entregas parciais e estoque real na entrega; faltam NF-e e CBOT/ESALQ reais.

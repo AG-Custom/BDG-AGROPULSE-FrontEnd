@@ -2051,3 +2051,35 @@ export const StatusDocTransporteLogisticaOpcoes = [
   { label: 'Autorizado', value: StatusDocTransporteLogistica.Autorizado },
   { label: 'Cancelado', value: StatusDocTransporteLogistica.Cancelado },
 ];
+
+export const MoedaCotacao = {
+  Usd: 'USD',
+  Eur: 'EUR',
+  Gbp: 'GBP',
+  Ars: 'ARS',
+  Cny: 'CNY',
+  Jpy: 'JPY',
+  Chf: 'CHF',
+  Cad: 'CAD',
+  Aud: 'AUD',
+  Pyg: 'PYG',
+  Uyu: 'UYU',
+  Clp: 'CLP',
+} as const;
+
+export type MoedaCotacaoValor = (typeof MoedaCotacao)[keyof typeof MoedaCotacao];
+
+export const MoedaCotacaoOpcoes = [
+  { label: 'USD — Dólar americano', value: MoedaCotacao.Usd },
+  { label: 'EUR — Euro', value: MoedaCotacao.Eur },
+  { label: 'GBP — Libra esterlina', value: MoedaCotacao.Gbp },
+  { label: 'ARS — Peso argentino', value: MoedaCotacao.Ars },
+  { label: 'CNY — Yuan chinês', value: MoedaCotacao.Cny },
+  { label: 'JPY — Iene japonês', value: MoedaCotacao.Jpy },
+  { label: 'CHF — Franco suíço', value: MoedaCotacao.Chf },
+  { label: 'CAD — Dólar canadense', value: MoedaCotacao.Cad },
+  { label: 'AUD — Dólar australiano', value: MoedaCotacao.Aud },
+  { label: 'PYG — Guarani', value: MoedaCotacao.Pyg },
+  { label: 'UYU — Peso uruguaio', value: MoedaCotacao.Uyu },
+  { label: 'CLP — Peso chileno', value: MoedaCotacao.Clp },
+];

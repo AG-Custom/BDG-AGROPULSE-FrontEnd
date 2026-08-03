@@ -16,8 +16,10 @@ import type {
   CriarCentroCustoPayload,
   CriarChequePayload,
   CriarContaBancariaPayload,
+  AtualizarCotacaoMoedaPayload,
   CriarCotacaoMoedaPayload,
   CriarOrcamentoFinanceiroPayload,
+  SincronizarPtaxPayload,
   CriarRenegociacaoPayload,
   CriarTransferenciaPayload,
   DreOrcamentoDto,
@@ -329,6 +331,25 @@ export const financeiroGestaoService = {
 
   criarCotacaoMoeda(payload: CriarCotacaoMoedaPayload): Promise<CotacaoMoedaDto> {
     return api.post<CotacaoMoedaDto>('/cotacoes-moeda', payload).then((r) => r.data);
+  },
+
+  atualizarCotacaoMoeda(
+    id: string,
+    payload: AtualizarCotacaoMoedaPayload,
+  ): Promise<CotacaoMoedaDto> {
+    return api
+      .put<CotacaoMoedaDto>(`/cotacoes-moeda/${id}`, payload)
+      .then((r) => r.data);
+  },
+
+  inativarCotacaoMoeda(id: string): Promise<void> {
+    return api.post(`/cotacoes-moeda/${id}/inativar`).then(() => undefined);
+  },
+
+  sincronizarPtax(payload: SincronizarPtaxPayload = {}): Promise<CotacaoMoedaDto> {
+    return api
+      .post<CotacaoMoedaDto>('/cotacoes-moeda/sincronizar-ptax', payload)
+      .then((r) => r.data);
   },
 
   obterExposicaoCambial(): Promise<ExposicaoCambialDto> {
