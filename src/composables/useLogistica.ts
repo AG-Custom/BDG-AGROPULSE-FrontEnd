@@ -112,10 +112,10 @@ function transportadoraPayload(
 
 function fretePayload(form: FreteTransportadoraFormModel): FreteTransportadoraPayload {
   return {
-    regiao: form.regiao.trim(),
+    regiao: (form.regiao ?? '').trim(),
     valorPorKg: parseMascaraMoeda(form.valorPorKg) ?? 0,
     valorMinimo: parseMascaraMoeda(form.valorMinimo) ?? 0,
-    prazoDias: Number(form.prazoDias),
+    prazoDias: Number(form.prazoDias) || 0,
   };
 }
 
@@ -490,8 +490,14 @@ export function useLogistica() {
     transportadoraId: string,
     form: FreteTransportadoraFormModel,
   ): Promise<boolean> {
+    const payload = fretePayload(form);
+    if (!payload.regiao) {
+      erro('Informe a região do frete.');
+      return false;
+    }
+
     const r = await wrapSave(
-      () => logisticaService.adicionarFrete(transportadoraId, fretePayload(form)),
+      () => logisticaService.adicionarFrete(transportadoraId, payload),
       'Frete adicionado.',
     );
     if (r) transportadora.value = r;

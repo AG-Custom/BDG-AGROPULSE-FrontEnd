@@ -2,35 +2,20 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Diário de campo"
-      subtitulo="Registros de atividades e sync offline."
+      subtitulo="Registros de atividades no campo."
     >
-      <div class="header-actions">
-        <agro-btn
-          outline
-          color="primary"
-          icon="sync"
-          label="Sync offline"
-          descricao="Sincronizar pendências"
-          :loading="sincronizando"
-          @click="sincronizar"
-        />
-        <agro-btn
-          color="primary"
-          unelevated
-          icon="add"
-          label="Nova entrada"
-          descricao="Registrar atividade"
-          @click="abrirDialog"
-        />
-      </div>
+      <agro-btn
+        color="primary"
+        unelevated
+        icon="add"
+        label="Nova entrada"
+        descricao="Registrar atividade"
+        @click="abrirDialog"
+      />
     </app-page-header>
 
     <section class="agro-section">
       <agro-card>
-        <p v-if="pendentesSync.length > 0" class="pendentes text-caption">
-          {{ pendentesSync.length }} pendência(s) local(is) para sync.
-        </p>
-
         <agro-table-skeleton v-if="carregando && entradas.length === 0" :colunas="5" />
         <empty-state
           v-else-if="!carregando && entradas.length === 0"
@@ -124,13 +109,6 @@
             <div class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Fechar" @click="dialog = false" />
               <agro-btn
-                flat
-                color="primary"
-                label="Enfileirar offline"
-                descricao="Guardar para sync"
-                @click="enfileirar"
-              />
-              <agro-btn
                 color="primary"
                 unelevated
                 label="Salvar"
@@ -160,17 +138,7 @@ import { formatarData } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
-const {
-  entradas,
-  pendentesSync,
-  carregando,
-  salvando,
-  sincronizando,
-  carregar,
-  criar,
-  enfileirarOffline,
-  sincronizar,
-} = useDiarioCampo();
+const { entradas, carregando, salvando, carregar, criar } = useDiarioCampo();
 const { talhoes, carregarTalhoes } = useRastreabilidade();
 const { safraOpcoes, carregar: carregarSafras } = useSafras();
 
@@ -231,11 +199,6 @@ async function salvar(): Promise<void> {
   if (ok) dialog.value = false;
 }
 
-function enfileirar(): void {
-  enfileirarOffline(formulario.value);
-  dialog.value = false;
-}
-
 onMounted(() => {
   void carregar();
   void carregarTalhoes();
@@ -244,15 +207,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.header-actions {
-  display: flex;
-  gap: var(--spacing-2);
-  flex-wrap: wrap;
-}
-.pendentes {
-  margin: 0 0 var(--spacing-3);
-  color: var(--color-text-secondary);
-}
 .dialog {
   min-width: min(560px, 94vw);
 }

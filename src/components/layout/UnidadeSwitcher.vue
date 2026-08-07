@@ -11,6 +11,7 @@
       dense
       emit-value
       map-options
+      options-dense
       :options="opcoes"
       :loading="carregandoLista"
       :disable="carregando"
@@ -19,7 +20,21 @@
       @update:model-value="onTrocar"
     >
       <template #prepend>
-        <q-icon name="storefront" size="18px" />
+        <q-icon name="storefront" size="16px" />
+      </template>
+      <template #selected>
+        <span class="unidade-switcher__selected" :title="labelSelecionado">
+          {{ labelSelecionado }}
+        </span>
+      </template>
+      <template #option="scope">
+        <q-item v-bind="scope.itemProps" dense>
+          <q-item-section>
+            <q-item-label class="unidade-switcher__option-label">
+              {{ scope.opt.label }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
       </template>
     </q-select>
   </div>
@@ -51,6 +66,11 @@ const opcoes = computed(() =>
     value: unidade.id,
   })),
 );
+
+const labelSelecionado = computed(() => {
+  const opcao = opcoes.value.find((item) => item.value === unidadeAtivaId.value);
+  return opcao?.label ?? '';
+});
 
 watch(
   unidadeId,
@@ -91,6 +111,8 @@ async function onTrocar(novoId: string | null): Promise<void> {
   display: grid;
   gap: var(--spacing-1);
   margin-top: var(--spacing-2);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .unidade-switcher--compact {
@@ -101,7 +123,30 @@ async function onTrocar(novoId: string | null): Promise<void> {
   color: var(--color-sidebar-text-muted);
 }
 
-/* Adaptação do q-select ao fundo verde-floresta da sidebar */
+.unidade-switcher__selected {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unidade-switcher :deep(.q-field) {
+  min-width: 0;
+}
+
+.unidade-switcher :deep(.q-field__control) {
+  min-height: 32px;
+}
+
+.unidade-switcher :deep(.q-field__native) {
+  min-width: 0;
+  overflow: hidden;
+}
+
 .unidade-switcher :deep(.q-field--outlined .q-field__control) {
   background: var(--color-sidebar-item-hover);
 }
@@ -126,5 +171,19 @@ async function onTrocar(novoId: string | null): Promise<void> {
 
 .unidade-switcher :deep(.q-field__prepend .q-icon) {
   color: var(--color-sidebar-text-secondary);
+}
+</style>
+
+<style>
+.unidade-switcher-menu {
+  max-width: min(280px, 90vw);
+}
+
+.unidade-switcher-menu .unidade-switcher__option-label {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

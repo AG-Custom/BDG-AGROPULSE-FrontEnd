@@ -26,14 +26,6 @@
               <q-input v-model="form.dataEntrega" outlined label="Data da entrega" type="date" />
             </div>
             <div class="col-12 col-md-6">
-              <q-input
-                v-model="form.notaFiscal"
-                outlined
-                label="Nota fiscal (stub)"
-                placeholder="Número da NF-e"
-              />
-            </div>
-            <div class="col-12 col-md-6">
               <AgroMoneyInput v-model="form.precoEntrega" label="Preço na entrega" />
             </div>
             <div class="col-12">
@@ -102,10 +94,9 @@ function confirmar(): void {
   const payload: EntregaPayload = {
     quantidade: Number(form.quantidade),
     dataEntrega: form.dataEntrega || new Date().toISOString().slice(0, 10),
-    numeroNfe: form.notaFiscal.trim() || null,
+    numeroNfe: null,
     observacao: form.observacao.trim() || null,
     precoEntrega: parseMascaraMoeda(form.precoEntrega),
-    stubNfe: true,
   };
   emit('confirmar', payload);
 }

@@ -98,7 +98,7 @@ export function rotaDaNotificacao(item: NotificacaoDto): RouteLocationRaw | null
   }
 
   if (tipo === NotificacaoTipo.ContingenciaSefaz) {
-    return { name: 'fiscal-contingencia' };
+    return null;
   }
 
   if (tipo === NotificacaoTipo.RecomendacaoPendente) {

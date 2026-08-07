@@ -35,7 +35,8 @@ import type {
   ListarFluxoCaixaParams,
   OrcamentoFinanceiroDto,
   ProporLancamentosPayload,
-  ReguaCobrancaConfigDto,
+  ProcessarReguaDiaDto,
+  ReguaCobrancaConfigEtapaDto,
   ReguaCobrancaPainelDto,
   RemessaBoletoPayload,
   RemessaBoletoResultDto,
@@ -234,15 +235,15 @@ export const financeiroGestaoService = {
       .then((r) => r.data);
   },
 
-  obterReguaConfig(): Promise<ReguaCobrancaConfigDto> {
-    return api.get<ReguaCobrancaConfigDto>('/regua-cobranca/config').then((r) => r.data);
+  obterReguaConfig(): Promise<ReguaCobrancaConfigEtapaDto[]> {
+    return api.get<ReguaCobrancaConfigEtapaDto[]>('/regua-cobranca/config').then((r) => r.data);
   },
 
   salvarReguaConfig(
     payload: UpsertReguaCobrancaConfigPayload,
-  ): Promise<ReguaCobrancaConfigDto> {
+  ): Promise<ReguaCobrancaConfigEtapaDto[]> {
     return api
-      .put<ReguaCobrancaConfigDto>('/regua-cobranca/config', payload)
+      .put<ReguaCobrancaConfigEtapaDto[]>('/regua-cobranca/config', payload)
       .then((r) => r.data);
   },
 
@@ -250,9 +251,9 @@ export const financeiroGestaoService = {
     return api.get<ReguaCobrancaPainelDto>('/regua-cobranca/painel').then((r) => r.data);
   },
 
-  processarReguaDia(): Promise<ReguaCobrancaPainelDto> {
+  processarReguaDia(): Promise<ProcessarReguaDiaDto> {
     return api
-      .post<ReguaCobrancaPainelDto>('/regua-cobranca/processar-dia')
+      .post<ProcessarReguaDiaDto>('/regua-cobranca/processar-dia')
       .then((r) => r.data);
   },
 

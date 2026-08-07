@@ -1,17 +1,12 @@
 export interface HistoricoComercialItemDto {
   id: string;
   tipo: 'Pedido' | 'Orcamento' | 'Pdv' | 'Devolucao' | 'Negociacao' | string;
-  referencia: string | null;
-  status: string | null;
-  valorTotal: number;
   data: string;
-  observacao: string | null;
+  valor: number;
+  status: string;
 }
 
-export interface HistoricoComercialDto {
-  clienteId: string;
-  itens: HistoricoComercialItemDto[];
-}
+export type HistoricoComercialDto = HistoricoComercialItemDto[];
 
 export interface MetaVendedorDto {
   id: string;

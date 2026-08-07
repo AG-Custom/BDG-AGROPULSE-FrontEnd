@@ -162,104 +162,35 @@
         </q-table>
       </agro-card>
 
-      <agro-card>
-        <template #header>
-          <div class="header-flex">
-            <h3 class="secao-titulo">Bureau Serasa / SPC</h3>
-            <agro-badge label="Stub" variant="warning" />
-          </div>
-        </template>
-        <div class="row q-col-gutter-md items-end">
-          <div class="col-12 col-md-5">
-            <agro-select-cadastro
-              v-model="bureauClienteId"
-              entidade="cliente"
-              label="Cliente"
-              clearable
-              :options="clienteOpcoes"
-              :loading="carregandoClientes"
-              @atualizar="carregarClientes()"
-            />
-          </div>
-          <div class="col-12 col-md-3">
-            <q-select
-              v-model="bureauTipo"
-              outlined
-              label="Bureau"
-              :options="BureauCreditoOpcoes"
-              emit-value
-              map-options
-            />
-          </div>
-          <div class="col-12 col-md-4">
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Consultar"
-              descricao="Consultar bureau"
-              :loading="salvando"
-              :disable="!bureauClienteId"
-              @click="onBureau"
-            />
-          </div>
-        </div>
-        <div v-if="bureauResultado" class="q-mt-md">
-          <agro-badge label="Stub" variant="warning" class="q-mr-sm" />
-          Score externo:
-          <span class="text-metric">{{ bureauResultado.scoreExterno }}</span>
-          — {{ bureauResultado.mensagem }}
-        </div>
-      </agro-card>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
-import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
-import { useClientes } from 'composables/useClientes';
 import {
   configDtoParaForm,
   configVazia,
   useCobrancaCredito,
 } from 'composables/useCobrancaCredito';
-import { BureauCredito, BureauCreditoOpcoes } from 'constants/enums';
-import type { BureauCreditoValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { RevisaoLimiteItemDto } from 'types/dtos/cobranca-credito.dto';
 import { formatarMoeda } from 'utils/formatters';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, watch } from 'vue';
 
 const {
   config,
   carregando,
   salvando,
-  bureauResultado,
   revisaoLimites,
   carregarConfig,
   salvarConfig,
-  consultarBureau,
   revisarLimites,
 } = useCobrancaCredito();
-const {
-  clientes,
-  carregando: carregandoClientes,
-  carregar: carregarClientes,
-} = useClientes();
 
 const form = reactive(configVazia());
-const bureauClienteId = ref<string | null>('');
-const bureauTipo = ref<BureauCreditoValor>(BureauCredito.Serasa);
-
-const clienteOpcoes = computed(() =>
-  clientes.value.map((c) => ({
-    label: c.nomeFantasia || c.nomeRazao,
-    value: c.id,
-  })),
-);
 
 const somaPesos = computed(
   () =>
@@ -290,15 +221,8 @@ async function onSalvar(): Promise<void> {
   await salvarConfig(form);
 }
 
-async function onBureau(): Promise<void> {
-  const id = bureauClienteId.value?.trim();
-  if (!id) return;
-  await consultarBureau(id, bureauTipo.value);
-}
-
 onMounted(() => {
   void carregarConfig();
-  void carregarClientes();
 });
 </script>
 

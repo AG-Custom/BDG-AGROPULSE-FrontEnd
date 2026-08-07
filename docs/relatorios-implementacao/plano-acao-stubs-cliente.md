@@ -187,22 +187,22 @@ Legenda **Viabilidade**:
 
 Marcar **SIM** / **NÃO** / **Fase 2**:
 
-- [ ] **A1** Escopo Focus: NF-e? NFC-e? CT-e/MDF-e? NFPR?
-- [ ] **A2** Só online (sem contingência)?
-- [ ] **A3** Reversão automática no cancelamento?
-- [ ] **A4** Manifestação / inutilização / GNRE?
-- [ ] **A5** SPED no produto ou no escritório?
-- [ ] **A6** DANFE custom ou padrão Focus?
-- [ ] **A7** Boletos: CNAB / API / intermediador?
-- [ ] **A8** OFX e/ou Open Finance?
-- [ ] **A9** Saldo intraday?
-- [x] **A10** PTAX BCB — **feito 2026-08-03**
-- [ ] **A11** NFC-e PDV junto com A1?
-- [x] **M1** Cotação referência (Yahoo/AgroDoc) — **feito 2026-08-03**; upgrade licenciado opcional
-- [ ] **M2 / M6 / M9 / M10** Satélites fiscais no go-live?
-- [ ] **M3** Serasa/SPC?
-- [x] **B4** Geo — **Fora** (2026-08-03)
-- [x] **B5** Offline PWA — **Fora** (2026-08-03)
+- [NÃO] **A1** Escopo Focus: NF-e? NFC-e? CT-e/MDF-e? NFPR?
+- [NÃO] **A2** Só online (sem contingência)?
+- [NÃO] **A3** Reversão automática no cancelamento?
+- [NÃO] **A4** Manifestação / inutilização / GNRE?
+- [NÃO] **A5** SPED no produto ou no escritório?
+- [NÃO] **A6** DANFE custom ou padrão Focus?
+- [NÃO] **A7** Boletos: CNAB / API / intermediador?
+- [NÃO] **A8** OFX e/ou Open Finance?
+- [NÃO] **A9** Saldo intraday?
+- [NÃO] **A10** PTAX BCB — **feito 2026-08-03**
+- [NÃO] **A11** NFC-e PDV junto com A1?
+- [NÃO] **M1** Cotação referência (Yahoo/AgroDoc) — **feito 2026-08-03**; upgrade licenciado opcional
+- [NÃO] **M2 / M6 / M9 / M10** Satélites fiscais no go-live?
+- [NÃO] **M3** Serasa/SPC?
+- [NÃO] **B4** Geo — **Fora** (2026-08-03)
+- [NÃO] **B5** Offline PWA — **Fora** (2026-08-03)
 
 ## B5. Pacotes comerciais (só o que falta decidir)
 

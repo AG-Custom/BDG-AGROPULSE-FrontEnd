@@ -43,24 +43,11 @@
             <div class="transferencia-detalhe__label">Destino</div>
             <div>{{ rotuloUnidade(transferencia.unidadeDestinoId) }}</div>
           </div>
-          <div>
-            <div class="transferencia-detalhe__label">NF</div>
-            <div class="text-metric">
-              {{ transferencia.notaFiscalId ? transferencia.notaFiscalId.slice(0, 8) + '…' : '—' }}
-            </div>
-          </div>
         </div>
 
         <p v-if="transferencia.justificativa" class="transferencia-detalhe__justificativa">
           {{ transferencia.justificativa }}
         </p>
-
-        <q-toggle
-          v-if="transferencia.status === TransferenciaEstoqueStatus.Pendente"
-          v-model="emitirNotaFiscal"
-          label="Emitir NF de transferência (stub)"
-          class="q-mb-md"
-        />
 
         <q-table
           flat
@@ -107,7 +94,7 @@ import {
 import type { QTableColumn } from 'quasar';
 import type { TransferenciaEstoqueItemDto } from 'types/dtos/estoque.dto';
 import { formatarDecimal } from 'utils/formatters';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -115,8 +102,6 @@ const { transferencia, carregando, salvando, obter, confirmar, cancelar } =
   useEstoqueTransferencias();
 const { unidades, carregar: carregarUnidades } = useUnidades();
 const { rotuloProduto } = useProdutoOpcoesEstoque();
-
-const emitirNotaFiscal = ref(false);
 
 const colunas: QTableColumn<TransferenciaEstoqueItemDto>[] = [
   { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left' },
@@ -147,7 +132,7 @@ function varianteStatus(status: string): 'accent' | 'success' | 'default' {
 
 async function confirmarTransferencia(): Promise<void> {
   const id = String(route.params.id);
-  await confirmar(id, { emitirNotaFiscal: emitirNotaFiscal.value });
+  await confirmar(id, { emitirNotaFiscal: false });
 }
 
 async function cancelarTransferencia(): Promise<void> {
@@ -164,7 +149,7 @@ onMounted(() => {
 .transferencia-detalhe__resumo {
   display: grid;
   gap: var(--spacing-4);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: var(--spacing-6);
 }
 

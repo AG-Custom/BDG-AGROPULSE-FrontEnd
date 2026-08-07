@@ -1,15 +1,6 @@
 ﻿<template>
   <q-page class="agro-page">
-    <app-page-header titulo="Notas fiscais" subtitulo="Emissão, eventos e documentos fiscais.">
-      <agro-btn
-        color="primary"
-        unelevated
-        icon="add"
-        label="Emitir"
-        descricao="Emitir CT-e, MDF-e ou NFPR"
-        @click="dialogEmitir = true"
-      />
-    </app-page-header>
+    <app-page-header titulo="Notas fiscais" subtitulo="Consulta de documentos fiscais." />
 
     <section class="agro-section">
       <agro-card>
@@ -62,7 +53,7 @@
         <empty-state
           v-else-if="!carregando && notas.length === 0"
           titulo="Nenhuma nota fiscal"
-          descricao="Emita NF-e, NFC-e, CT-e, MDF-e ou NFPR."
+          descricao="Nenhum documento fiscal encontrado com os filtros atuais."
           icon="receipt_long"
         />
         <q-table
@@ -91,10 +82,6 @@
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
-                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirDanfe(props.row.id)">
-                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="description" size="16px" /></span></q-item-section>
-                  <q-item-section>DANFE</q-item-section>
-                </q-item>
                 <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="baixarXml(props.row.id)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="code" size="16px" /></span></q-item-section>
                   <q-item-section>XML</q-item-section>
@@ -107,10 +94,6 @@
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="add_circle" size="16px" /></span></q-item-section>
                   <q-item-section>Complementar</q-item-section>
                 </q-item>
-                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCancelar(props.row)">
-                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--danger"><q-icon name="cancel" size="16px" /></span></q-item-section>
-                  <q-item-section>Cancelar</q-item-section>
-                </q-item>
               </agro-acoes-menu>
             </q-td>
           </template>
@@ -118,26 +101,11 @@
       </agro-card>
     </section>
 
-    <cancelar-nota-dialog
-      v-model="dialogCancelar"
-      :loading="salvando"
-      @confirm="onCancelar"
-    />
     <cce-nota-dialog v-model="dialogCce" :loading="salvando" @confirm="onCce" />
     <complementar-nota-dialog
       v-model="dialogComplementar"
       :loading="salvando"
       @confirm="onComplementar"
-    />
-    <emitir-documentos-dialog
-      v-model="dialogEmitir"
-      :loading="salvando"
-      @nfe="onEmitirNfe"
-      @nfce="onEmitirNfce"
-      @devolucao="onEmitirDevolucao"
-      @cte="onEmitirCte"
-      @mdfe="onEmitirMdfe"
-      @nfpr="onEmitirNfpr"
     />
 
     <q-dialog v-model="dialogVisualizar">
@@ -235,10 +203,8 @@
 </template>
 
 <script setup lang="ts">
-import CancelarNotaDialog from 'components/fiscal/CancelarNotaDialog.vue';
 import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
 import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
-import EmitirDocumentosDialog from 'components/fiscal/EmitirDocumentosDialog.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
@@ -252,12 +218,8 @@ import {
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type {
-  CancelarNotaFormModel,
   CceFormModel,
   ComplementarFormModel,
-  EmitirCteFormModel,
-  EmitirMdfeFormModel,
-  EmitirNfprFormModel,
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
@@ -268,16 +230,8 @@ const {
   carregando,
   salvando,
   carregar,
-  emitirNfe,
-  emitirNfce,
-  emitirDevolucao,
-  emitirCte,
-  emitirMdfe,
-  emitirNfpr,
-  cancelar,
   registrarCce,
   complementar,
-  abrirDanfe,
   baixarXml,
 } = useNotasFiscais();
 
@@ -288,10 +242,8 @@ const filtro = reactive({
   dataFim: '',
 });
 
-const dialogCancelar = ref(false);
 const dialogCce = ref(false);
 const dialogComplementar = ref(false);
-const dialogEmitir = ref(false);
 const dialogVisualizar = ref(false);
 const notaSelecionada = ref<NotaFiscalGestaoDto | null>(null);
 const notaVisualizar = ref<NotaFiscalGestaoDto | null>(null);
@@ -315,11 +267,6 @@ async function aplicarFiltro(): Promise<void> {
   });
 }
 
-function abrirCancelar(nota: NotaFiscalGestaoDto): void {
-  notaSelecionada.value = nota;
-  dialogCancelar.value = true;
-}
-
 function abrirCce(nota: NotaFiscalGestaoDto): void {
   notaSelecionada.value = nota;
   dialogCce.value = true;
@@ -328,12 +275,6 @@ function abrirCce(nota: NotaFiscalGestaoDto): void {
 function abrirComplementar(nota: NotaFiscalGestaoDto): void {
   notaSelecionada.value = nota;
   dialogComplementar.value = true;
-}
-
-async function onCancelar(form: CancelarNotaFormModel): Promise<void> {
-  if (!notaSelecionada.value) return;
-  const ok = await cancelar(notaSelecionada.value.id, form);
-  if (ok) dialogCancelar.value = false;
 }
 
 async function onCce(form: CceFormModel): Promise<void> {
@@ -348,44 +289,14 @@ async function onComplementar(form: ComplementarFormModel): Promise<void> {
   if (ok) dialogComplementar.value = false;
 }
 
-async function onEmitirNfe(pedidoId: string): Promise<void> {
-  const ok = await emitirNfe(pedidoId);
-  if (ok) dialogEmitir.value = false;
-}
-
-async function onEmitirNfce(pdvVendaId: string): Promise<void> {
-  const ok = await emitirNfce(pdvVendaId);
-  if (ok) dialogEmitir.value = false;
-}
-
-async function onEmitirDevolucao(devolucaoId: string): Promise<void> {
-  const ok = await emitirDevolucao(devolucaoId);
-  if (ok) dialogEmitir.value = false;
-}
-
-async function onEmitirCte(form: EmitirCteFormModel): Promise<void> {
-  const ok = await emitirCte(form);
-  if (ok) dialogEmitir.value = false;
-}
-
-async function onEmitirMdfe(form: EmitirMdfeFormModel): Promise<void> {
-  const ok = await emitirMdfe(form);
-  if (ok) dialogEmitir.value = false;
-}
-
-async function onEmitirNfpr(form: EmitirNfprFormModel): Promise<void> {
-  const ok = await emitirNfpr(form);
-  if (ok) dialogEmitir.value = false;
-}
-
 onMounted(() => {
   void aplicarFiltro();
 });
+
 function abrirDialogVisualizar(item: NotaFiscalGestaoDto): void {
   notaVisualizar.value = item;
   dialogVisualizar.value = true;
 }
-
 </script>
 
 <style scoped>

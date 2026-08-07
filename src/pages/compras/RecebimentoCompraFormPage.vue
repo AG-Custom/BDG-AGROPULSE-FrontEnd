@@ -8,50 +8,20 @@
     <section class="agro-section form-grid">
       <agro-card>
         <h3 class="titulo">XML da NF-e</h3>
-        <div class="row q-col-gutter-md items-end q-mb-md">
-          <div class="col-12 col-md-8">
-            <q-file
-              v-model="arquivoXml"
-              outlined
-              label="Arquivo XML"
-              accept=".xml,text/xml,application/xml"
-              clearable
-              :disable="salvando"
-              @update:model-value="onArquivoXmlSelecionado"
-            >
-              <template #prepend>
-                <q-icon name="upload_file" />
-              </template>
-            </q-file>
-          </div>
-          <div class="col-12 col-md-4">
-            <agro-btn
-              flat
-              class="full-width"
-              label="Consultar SEFAZ"
-              descricao="Consultar documentos destinados Focus/SEFAZ"
-              :loading="consultandoSefaz"
-              @click="consultarSefaz"
-            />
-          </div>
-        </div>
-        <p v-if="mensagemSefaz" class="texto-sefaz">{{ mensagemSefaz }}</p>
-        <q-list v-if="documentosSefaz?.documentos?.length" bordered class="q-mt-md lista-sefaz">
-          <q-item
-            v-for="doc in documentosSefaz.documentos"
-            :key="doc.chaveAcesso"
-            clickable
-            @click="selecionarDocumentoSefaz(doc)"
-          >
-            <q-item-section>
-              <q-item-label>{{ doc.nomeEmitente || doc.cnpjEmitente || doc.tipo }}</q-item-label>
-              <q-item-label caption>{{ doc.chaveAcesso }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>{{ doc.dataEmissao }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <q-file
+          v-model="arquivoXml"
+          outlined
+          label="Arquivo XML"
+          accept=".xml,text/xml,application/xml"
+          clearable
+          :disable="salvando"
+          class="q-mb-md"
+          @update:model-value="onArquivoXmlSelecionado"
+        >
+          <template #prepend>
+            <q-icon name="upload_file" />
+          </template>
+        </q-file>
       </agro-card>
 
       <agro-card>
@@ -216,7 +186,6 @@ import AgroCard from 'components/ui/AgroCard.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCompras } from 'composables/useCompras';
-import { useFiscal } from 'composables/useFiscal';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useProdutos } from 'composables/useProdutos';
@@ -253,11 +222,6 @@ const { salvando, previewXmlConteudo, criar, limparPreview } = useRecebimentosCo
 const { receberPedido } = useCompras();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
 const { produtos, carregar: carregarProdutos } = useProdutos();
-const {
-  consultandoSefaz,
-  documentosSefaz,
-  listarDocumentosSefaz,
-} = useFiscal();
 const { erro } = useNotificacao();
 
 const arquivoXml = ref<File | null>(null);
@@ -267,7 +231,6 @@ const pedidoCompraId = ref('');
 const chaveAcesso = ref('');
 const numeroNota = ref('');
 const serie = ref('');
-const mensagemSefaz = ref('');
 const duplicatasPreview = ref<DuplicataPreviewRow[]>([]);
 const itens = ref<ItemForm[]>([criarItemVazio()]);
 const dialogProdutoAberto = ref(false);
@@ -432,19 +395,6 @@ async function analisarXml(): Promise<void> {
   }));
 }
 
-async function consultarSefaz(): Promise<void> {
-  const resp = await listarDocumentosSefaz();
-  mensagemSefaz.value = resp?.mensagem ?? documentosSefaz.value?.mensagem ?? '';
-}
-
-function selecionarDocumentoSefaz(doc: {
-  chaveAcesso: string;
-  nomeEmitente?: string | null;
-}): void {
-  chaveAcesso.value = doc.chaveAcesso;
-  mensagemSefaz.value = `Documento selecionado: ${doc.nomeEmitente ?? doc.chaveAcesso}`;
-}
-
 async function salvar(): Promise<void> {
   const criado = await criar({
     fornecedorId: fornecedorId.value,
@@ -497,11 +447,6 @@ onMounted(async () => {
   margin: 0 0 var(--spacing-3);
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
-}
-.texto-sefaz {
-  margin: var(--spacing-3) 0 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
 }
 .itens-header {
   display: flex;

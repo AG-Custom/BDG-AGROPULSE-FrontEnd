@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Contas a receber"
-      subtitulo="Títulos a receber com baixa parcial, boleto e visão por escopo."
+      subtitulo="Títulos a receber com baixa parcial e visão por escopo."
     />
 
     <section class="agro-section">
@@ -88,19 +88,6 @@
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
                   <q-item-section>Registrar baixa</q-item-section>
                   <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
-                </q-item>
-                <q-item
-                  v-if="podeBaixar(props.row.status)"
-                  v-close-popup
-                  clickable
-                  dense
-                  class="agro-acoes-menu__item"
-                  :disable="emitindo"
-                  @click="onEmitirBoleto(props.row)"
-                >
-                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="receipt_long" size="16px" /></span></q-item-section>
-                  <q-item-section>Emitir boleto</q-item-section>
-                  <q-item-section v-if="emitindo" side><q-spinner size="16px" color="primary" /></q-item-section>
                 </q-item>
                 <q-item
                   v-if="podeCancelar(props.row.status)"
@@ -207,7 +194,6 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
-import { useBoletos } from 'composables/useBoletos';
 import { useClientes } from 'composables/useClientes';
 import { useContasBancarias } from 'composables/useContasBancarias';
 import { useContasReceber } from 'composables/useContasReceber';
@@ -226,7 +212,6 @@ import { computed, onMounted, ref } from 'vue';
 const { contas, carregando, salvando, carregar, baixar, cancelar } = useContasReceber();
 const { clientes, carregar: carregarClientes } = useClientes();
 const { contaOpcoes, carregar: carregarContasBancarias } = useContasBancarias();
-const { emitir, salvando: emitindo } = useBoletos();
 
 const filtroClienteId = ref<string | null>(null);
 const filtroStatus = ref<ContaReceberStatusValor | null>(null);
@@ -311,10 +296,6 @@ async function onBaixar(payload: BaixarContaReceberPayload): Promise<void> {
 
 async function onCancelar(item: ContaReceberDto): Promise<void> {
   await cancelar(item, paramsFiltro());
-}
-
-async function onEmitirBoleto(item: ContaReceberDto): Promise<void> {
-  await emitir(item.id);
 }
 
 onMounted(() => {

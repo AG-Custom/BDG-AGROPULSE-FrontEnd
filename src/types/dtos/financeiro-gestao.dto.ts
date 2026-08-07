@@ -334,47 +334,89 @@ export interface RetornoBoletoResultDto {
   mensagem?: string | null;
 }
 
-export interface ReguaCobrancaEtapaDto {
-  diasAtraso: number;
-  avisoGerente: boolean;
-  avisoVendedor: boolean;
-  bloquearPedidos: boolean;
-}
-
-export interface ReguaCobrancaConfigDto {
+export interface ReguaCobrancaConfigEtapaDto {
   id: string;
   empresaId: string;
+  etapaDias: number;
+  nomeEtapa: string;
+  avisarGerente: boolean;
+  avisarVendedor: boolean;
+  bloquearPedidos: boolean;
   ativo: boolean;
-  etapas: ReguaCobrancaEtapaDto[];
+}
+
+export interface ReguaCobrancaConfigFormEtapa {
+  etapaDias: string;
+  nomeEtapa: string;
+  avisarGerente: boolean;
+  avisarVendedor: boolean;
+  bloquearPedidos: boolean;
+  ativo: boolean;
 }
 
 export interface ReguaCobrancaConfigFormModel {
   ativo: boolean;
-  etapas: Array<{
-    diasAtraso: string;
-    avisoGerente: boolean;
-    avisoVendedor: boolean;
-    bloquearPedidos: boolean;
-  }>;
+  etapas: ReguaCobrancaConfigFormEtapa[];
+}
+
+export interface ReguaCobrancaEtapaPayload {
+  etapaDias: number;
+  nomeEtapa: string;
+  avisarGerente: boolean;
+  avisarVendedor: boolean;
+  bloquearPedidos: boolean;
+  ativo: boolean;
 }
 
 export interface UpsertReguaCobrancaConfigPayload {
-  ativo: boolean;
-  etapas: ReguaCobrancaEtapaDto[];
+  etapas: ReguaCobrancaEtapaPayload[];
 }
 
-export interface ReguaCobrancaPainelItemDto {
+export interface ReguaPainelTituloDto {
+  id: string;
   clienteId: string;
-  clienteNome: string;
-  diasAtraso: number;
-  valorEmAberto: number;
-  etapaAtual: number | null;
-  ultimoAvisoEm: string | null;
+  parcela: number;
+  valor: number;
+  saldo: number;
+  vencimento: string;
+  status: string;
+}
+
+export interface ReguaPainelEtapaDto {
+  etapaDias: number;
+  nomeEtapa: string;
+  titulos: ReguaPainelTituloDto[];
 }
 
 export interface ReguaCobrancaPainelDto {
-  itens: ReguaCobrancaPainelItemDto[];
-  processadoEm: string | null;
+  etapas: ReguaPainelEtapaDto[];
+}
+
+export interface ReguaCobrancaPainelItemDto {
+  id: string;
+  clienteId: string;
+  parcela: number;
+  valor: number;
+  saldo: number;
+  vencimento: string;
+  status: string;
+  etapaDias: number;
+  nomeEtapa: string;
+}
+
+export interface AvisoCobrancaDto {
+  id: string;
+  contaReceberId: string;
+  clienteId: string;
+  etapaDias: number;
+  mensagem: string;
+  dataAviso: string;
+  destinatarioTipo: string;
+}
+
+export interface ProcessarReguaDiaDto {
+  painel: ReguaCobrancaPainelDto;
+  avisosGerados: AvisoCobrancaDto[];
 }
 
 export interface RenegociacaoDto {

@@ -241,6 +241,7 @@ export interface FreteTransportadoraDto {
 export interface TransportadoraLogisticaDto {
   id: string;
   empresaId: string;
+  unidadeId: string;
   nome: string;
   cnpj: string;
   rntrc: string | null;

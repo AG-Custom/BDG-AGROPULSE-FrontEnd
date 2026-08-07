@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Régua de cobrança"
-      subtitulo="Configuração de etapas e painel de clientes em atraso."
+      subtitulo="Configuração de etapas e painel de títulos em atraso."
     >
       <agro-btn
         color="primary"
@@ -29,16 +29,22 @@
             class="etapa row q-col-gutter-sm q-mb-sm"
           >
             <div class="col-12 col-md-2">
-              <q-input v-model="etapa.diasAtraso" outlined dense label="D+ dias" />
+              <q-input v-model="etapa.etapaDias" outlined dense label="D+ dias" type="number" />
             </div>
-            <div class="col-12 col-md-3 flex flex-center">
-              <q-toggle v-model="etapa.avisoGerente" label="Aviso gerente" />
+            <div class="col-12 col-md-2">
+              <q-input v-model="etapa.nomeEtapa" outlined dense label="Nome" />
             </div>
-            <div class="col-12 col-md-3 flex flex-center">
-              <q-toggle v-model="etapa.avisoVendedor" label="Aviso vendedor" />
+            <div class="col-6 col-md-2 flex flex-center">
+              <q-toggle v-model="etapa.avisarGerente" label="Aviso gerente" />
             </div>
-            <div class="col-12 col-md-3 flex flex-center">
+            <div class="col-6 col-md-2 flex flex-center">
+              <q-toggle v-model="etapa.avisarVendedor" label="Aviso vendedor" />
+            </div>
+            <div class="col-6 col-md-2 flex flex-center">
               <q-toggle v-model="etapa.bloquearPedidos" label="Bloquear pedidos" />
+            </div>
+            <div class="col-6 col-md-1 flex flex-center">
+              <q-toggle v-model="etapa.ativo" label="Ativa" />
             </div>
             <div class="col-12 col-md-1 flex flex-center">
               <agro-btn
@@ -71,30 +77,35 @@
         <template #header>
           <h3 class="secao-titulo">Painel</h3>
         </template>
-        <agro-table-skeleton v-if="carregando && !painel" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && !painel" :colunas="6" />
         <empty-state
-          v-else-if="!painel || painel.itens.length === 0"
-          titulo="Nenhum cliente em atraso"
-          descricao="O painel é atualizado pelo processamento diário."
+          v-else-if="itensPainel.length === 0"
+          titulo="Nenhum título em atraso"
+          descricao="O painel agrupa contas a receber vencidas por etapa da régua."
           icon="campaign"
         />
         <q-table
           v-else
           flat
           bordered
-          row-key="clienteId"
-          :rows="painel.itens"
+          row-key="id"
+          :rows="itensPainel"
           :columns="colunas"
           :rows-per-page-options="[10, 25, 50]"
         >
-          <template #body-cell-valorEmAberto="props">
+          <template #body-cell-valor="props">
             <q-td :props="props" class="text-metric">
-              {{ formatarMoeda(props.row.valorEmAberto) }}
+              {{ formatarMoeda(props.row.valor) }}
             </q-td>
           </template>
-          <template #body-cell-ultimoAvisoEm="props">
+          <template #body-cell-saldo="props">
+            <q-td :props="props" class="text-metric">
+              {{ formatarMoeda(props.row.saldo) }}
+            </q-td>
+          </template>
+          <template #body-cell-vencimento="props">
             <q-td :props="props">
-              {{ props.row.ultimoAvisoEm ? formatarData(props.row.ultimoAvisoEm) : '—' }}
+              {{ formatarData(props.row.vencimento) }}
             </q-td>
           </template>
         </q-table>
@@ -120,6 +131,7 @@ import { onMounted, reactive, watch } from 'vue';
 const {
   config,
   painel,
+  itensPainel,
   carregando,
   salvando,
   carregarConfig,
@@ -131,26 +143,51 @@ const {
 const form = reactive<ReguaCobrancaConfigFormModel>({
   ativo: true,
   etapas: [
-    { diasAtraso: '1', avisoGerente: false, avisoVendedor: true, bloquearPedidos: false },
-    { diasAtraso: '5', avisoGerente: true, avisoVendedor: true, bloquearPedidos: false },
-    { diasAtraso: '15', avisoGerente: true, avisoVendedor: true, bloquearPedidos: true },
+    {
+      etapaDias: '1',
+      nomeEtapa: 'D+1',
+      avisarGerente: false,
+      avisarVendedor: true,
+      bloquearPedidos: false,
+      ativo: true,
+    },
+    {
+      etapaDias: '5',
+      nomeEtapa: 'D+5',
+      avisarGerente: true,
+      avisarVendedor: true,
+      bloquearPedidos: false,
+      ativo: true,
+    },
+    {
+      etapaDias: '15',
+      nomeEtapa: 'D+15',
+      avisarGerente: true,
+      avisarVendedor: true,
+      bloquearPedidos: true,
+      ativo: true,
+    },
   ],
 });
 
 const colunas: QTableColumn<ReguaCobrancaPainelItemDto>[] = [
-  { name: 'clienteNome', label: 'Cliente', field: 'clienteNome', align: 'left' },
-  { name: 'diasAtraso', label: 'Dias atraso', field: 'diasAtraso', align: 'right' },
-  { name: 'valorEmAberto', label: 'Valor', field: 'valorEmAberto', align: 'right' },
-  { name: 'etapaAtual', label: 'Etapa', field: 'etapaAtual', align: 'right' },
-  { name: 'ultimoAvisoEm', label: 'Último aviso', field: 'ultimoAvisoEm', align: 'left' },
+  { name: 'nomeEtapa', label: 'Etapa', field: 'nomeEtapa', align: 'left' },
+  { name: 'clienteId', label: 'Cliente', field: 'clienteId', align: 'left' },
+  { name: 'parcela', label: 'Parcela', field: 'parcela', align: 'right' },
+  { name: 'vencimento', label: 'Vencimento', field: 'vencimento', align: 'left' },
+  { name: 'valor', label: 'Valor', field: 'valor', align: 'right' },
+  { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right' },
+  { name: 'status', label: 'Status', field: 'status', align: 'left' },
 ];
 
 function addEtapa(): void {
   form.etapas.push({
-    diasAtraso: '30',
-    avisoGerente: true,
-    avisoVendedor: true,
+    etapaDias: '30',
+    nomeEtapa: 'D+30',
+    avisarGerente: true,
+    avisarVendedor: true,
     bloquearPedidos: true,
+    ativo: true,
   });
 }
 
@@ -161,13 +198,15 @@ async function onSalvar(): Promise<void> {
 watch(
   config,
   (value) => {
-    if (!value) return;
-    form.ativo = value.ativo;
-    form.etapas = value.etapas.map((e) => ({
-      diasAtraso: String(e.diasAtraso),
-      avisoGerente: e.avisoGerente,
-      avisoVendedor: e.avisoVendedor,
+    if (!value?.length) return;
+    form.ativo = value.some((e) => e.ativo);
+    form.etapas = value.map((e) => ({
+      etapaDias: String(e.etapaDias),
+      nomeEtapa: e.nomeEtapa,
+      avisarGerente: e.avisarGerente,
+      avisarVendedor: e.avisarVendedor,
       bloquearPedidos: e.bloquearPedidos,
+      ativo: e.ativo,
     }));
   },
   { immediate: true },

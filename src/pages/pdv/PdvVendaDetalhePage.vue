@@ -1,15 +1,6 @@
 <template>
   <q-page class="agro-page">
     <app-page-header :titulo="'Venda PDV'" :subtitulo="subtitulo">
-        <agro-btn
-          v-if="podeEmitirNfce"
-          color="primary"
-          unelevated
-          label="Emitir NFC-e"
-          descricao="Emitir NFC-e via Focus NFe"
-          :loading="emitindoNfce"
-          @click="emitir"
-        />
       <agro-btn
         v-if="podeCancelar"
         color="negative"
@@ -109,14 +100,12 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const { venda, carregando, salvando, emitindoNfce, obterVenda, cancelar, emitirNfce } =
-  usePdv();
+const { venda, carregando, salvando, obterVenda, cancelar } = usePdv();
 const { clientes, carregar: carregarClientes } = useClientes();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
 const vendaId = computed(() => route.params.id as string);
 const podeCancelar = computed(() => venda.value?.status === PdvVendaStatus.Concluida);
-const podeEmitirNfce = computed(() => venda.value?.status === PdvVendaStatus.Concluida);
 const subtitulo = computed(() =>
   venda.value ? `Status: ${venda.value.status}` : 'Carregando...',
 );
@@ -163,10 +152,6 @@ function rotuloProduto(id: string): string {
 
 async function cancelarVenda(): Promise<void> {
   await cancelar(vendaId.value);
-}
-
-async function emitir(): Promise<void> {
-  await emitirNfce(vendaId.value);
 }
 
 onMounted(async () => {

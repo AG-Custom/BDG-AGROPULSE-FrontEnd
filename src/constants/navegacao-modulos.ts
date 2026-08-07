@@ -1,4 +1,3 @@
-import { TipoContrato } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
 
 export type FlagNavegacao =
@@ -246,11 +245,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Logistica.Visualizar,
           },
           {
-            label: 'CT-e / MDF-e',
-            routeName: 'logistica-docs-transporte',
-            permissao: Permissoes.Logistica.Visualizar,
-          },
-          {
             label: 'Transportadoras',
             routeName: 'logistica-transportadoras',
             permissao: Permissoes.Logistica.Visualizar,
@@ -395,11 +389,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Rastreabilidade.Visualizar,
           },
           {
-            label: 'Importação geo',
-            routeName: 'safras-geo',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
             label: 'Recomendações',
             routeName: 'safras-recomendacoes',
             permissao: Permissoes.Rastreabilidade.Visualizar,
@@ -432,16 +421,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           {
             label: 'Fluxo de Caixa',
             routeName: 'fluxo-caixa',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Conciliação Bancária',
-            routeName: 'conciliacao-bancaria',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Tesouraria',
-            routeName: 'tesouraria',
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
@@ -485,11 +464,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Financeiro.Visualizar,
           },
           {
-            label: 'Boletos',
-            routeName: 'boletos',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
             label: 'Antecipações',
             routeName: 'antecipacoes',
             permissao: Permissoes.Financeiro.Visualizar,
@@ -518,16 +492,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
-            label: 'Contingência SEFAZ',
-            routeName: 'fiscal-contingencia',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'Inutilizações',
-            routeName: 'fiscal-inutilizacoes',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
             label: 'PIS/COFINS NCM',
             routeName: 'fiscal-ncm-pis-cofins',
             permissao: Permissoes.Fiscal.Visualizar,
@@ -538,11 +502,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
-            label: 'GNRE',
-            routeName: 'fiscal-gnre',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
             label: 'Funrural',
             routeName: 'fiscal-funrural',
             permissao: Permissoes.Fiscal.Visualizar,
@@ -550,11 +509,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           {
             label: 'Regimes por CNPJ',
             routeName: 'fiscal-regimes-cnpj',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'SPED e Acessórias',
-            routeName: 'fiscal-sped',
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
@@ -598,25 +552,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         pathPrefixes: ['/contratos'],
         filhos: [
           {
-            label: 'CPR',
-            routeName: 'contratos',
-            permissao: Permissoes.Contratos.Visualizar,
-            query: { tipo: TipoContrato.Cpr },
-          },
-          {
-            label: 'Barter',
-            routeName: 'contratos',
-            permissao: Permissoes.Contratos.Visualizar,
-            query: { tipo: TipoContrato.Barter },
-          },
-          {
-            label: 'Contratos a Termo',
-            routeName: 'contratos',
-            permissao: Permissoes.Contratos.Visualizar,
-            query: { tipo: TipoContrato.Termo },
-          },
-          {
-            label: 'Alertas de Prazo',
+            label: 'Contratos',
             routeName: 'contratos',
             permissao: Permissoes.Contratos.Visualizar,
           },

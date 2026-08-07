@@ -161,9 +161,15 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
-const tipo = ref<TipoContratoValor>(
-  (route.query.tipo as TipoContratoValor) || TipoContrato.Cpr,
-);
+function tipoDaRota(): TipoContratoValor {
+  const valor = route.query.tipo;
+  if (valor === TipoContrato.Barter || valor === TipoContrato.Termo || valor === TipoContrato.Cpr) {
+    return valor;
+  }
+  return TipoContrato.Cpr;
+}
+
+const tipo = ref<TipoContratoValor>(tipoDaRota());
 const filtroStatus = ref<ContratoStatusValor | null>(null);
 const filtroSafraId = ref<string | null>(null);
 const fonteCotacao = ref<FontePrecoValor>(FontePreco.Esalq);
@@ -241,11 +247,23 @@ function aplicarCotacaoNoFormulario(c: CotacaoMercadoDto): void {
 }
 
 watch(tipo, (novo) => {
-  void router.replace({ query: { tipo: novo } });
+  if (route.query.tipo !== novo) {
+    void router.replace({ query: { ...route.query, tipo: novo } });
+  }
   filtroStatus.value = null;
   filtroSafraId.value = null;
   void carregar();
 });
+
+watch(
+  () => route.query.tipo,
+  () => {
+    const daRota = tipoDaRota();
+    if (tipo.value !== daRota) {
+      tipo.value = daRota;
+    }
+  },
+);
 
 onMounted(() => {
   void carregarClientes();

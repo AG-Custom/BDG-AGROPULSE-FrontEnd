@@ -630,33 +630,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'financeiro/tesouraria',
-        name: 'tesouraria',
-        component: () => import('pages/financeiro/TesourariaPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.tesouraria',
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
-        path: 'financeiro/conciliacao-bancaria',
-        name: 'conciliacao-bancaria',
-        component: () => import('pages/financeiro/ConciliacaoBancariaPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.conciliacaoBancaria',
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
-        path: 'financeiro/boletos',
-        name: 'boletos',
-        component: () => import('pages/financeiro/BoletosListPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.boletos',
-          permissao: Permissoes.Financeiro.Visualizar,
-        },
-      },
-      {
         path: 'financeiro/regua-cobranca',
         name: 'regua-cobranca',
         component: () => import('pages/financeiro/ReguaCobrancaPage.vue'),
@@ -1033,26 +1006,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'fiscal/contingencia',
-        name: 'fiscal-contingencia',
-        component: () => import('pages/fiscal/ContingenciaFiscalPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.contingenciaFiscal',
-          breadcrumbPais: ['navegacao.fiscal'],
-          permissao: Permissoes.Fiscal.Visualizar,
-        },
-      },
-      {
-        path: 'fiscal/inutilizacoes',
-        name: 'fiscal-inutilizacoes',
-        component: () => import('pages/fiscal/InutilizacoesListPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.inutilizacoesFiscais',
-          breadcrumbPais: ['navegacao.fiscal'],
-          permissao: Permissoes.Fiscal.Visualizar,
-        },
-      },
-      {
         path: 'fiscal/ncm-pis-cofins',
         name: 'fiscal-ncm-pis-cofins',
         component: () => import('pages/fiscal/NcmPisCofinsListPage.vue'),
@@ -1073,16 +1026,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'fiscal/gnre',
-        name: 'fiscal-gnre',
-        component: () => import('pages/fiscal/GnreListPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.gnre',
-          breadcrumbPais: ['navegacao.fiscal'],
-          permissao: Permissoes.Fiscal.Visualizar,
-        },
-      },
-      {
         path: 'fiscal/funrural',
         name: 'fiscal-funrural',
         component: () => import('pages/fiscal/FunruralPage.vue'),
@@ -1098,16 +1041,6 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/fiscal/RegimesCnpjListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.regimesCnpj',
-          breadcrumbPais: ['navegacao.fiscal'],
-          permissao: Permissoes.Fiscal.Visualizar,
-        },
-      },
-      {
-        path: 'fiscal/sped',
-        name: 'fiscal-sped',
-        component: () => import('pages/fiscal/SpedFiscalPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.spedFiscal',
           breadcrumbPais: ['navegacao.fiscal'],
           permissao: Permissoes.Fiscal.Visualizar,
         },
@@ -1634,15 +1567,6 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'logistica/docs-transporte',
-        name: 'logistica-docs-transporte',
-        component: () => import('pages/logistica/DocsTransporteListPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.logisticaDocsTransporte',
-          permissao: Permissoes.Logistica.Visualizar,
-        },
-      },
-      {
         path: 'logistica/custos',
         name: 'logistica-custos',
         component: () => import('pages/logistica/CustoLogisticaPage.vue'),
@@ -1875,15 +1799,6 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/safras/HistoricoProdutividadePage.vue'),
         meta: {
           breadcrumb: 'navegacao.historicoProdutividade',
-          permissao: Permissoes.Rastreabilidade.Visualizar,
-        },
-      },
-      {
-        path: 'safras/geo',
-        name: 'safras-geo',
-        component: () => import('pages/safras/GeoImportPage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.geoImport',
           permissao: Permissoes.Rastreabilidade.Visualizar,
         },
       },

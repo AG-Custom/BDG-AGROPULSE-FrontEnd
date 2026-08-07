@@ -35,30 +35,45 @@
             <h3 class="titulo-sec">Tabela de fretes</h3>
           </div>
 
-          <div class="add-frete row q-col-gutter-md q-mb-md">
-            <div class="col-12 col-md-3">
-              <q-input v-model="formFrete.regiao" outlined dense label="Região" />
+          <q-form greedy class="add-frete q-mb-md" @submit.prevent="salvarFrete">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-3">
+                <q-input
+                  v-model="formFrete.regiao"
+                  outlined
+                  dense
+                  label="Região"
+                  class="field-required"
+                  :rules="[obrigatorio]"
+                />
+              </div>
+              <div class="col-6 col-md-2">
+                <AgroMoneyInput v-model="formFrete.valorPorKg" dense label="R$/kg" />
+              </div>
+              <div class="col-6 col-md-2">
+                <AgroMoneyInput v-model="formFrete.valorMinimo" dense label="Mínimo" />
+              </div>
+              <div class="col-6 col-md-2">
+                <q-input
+                  v-model="formFrete.prazoDias"
+                  outlined
+                  dense
+                  label="Prazo (dias)"
+                  type="number"
+                />
+              </div>
+              <div class="col-6 col-md-3">
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  label="Adicionar frete"
+                  descricao="Adicionar frete"
+                  type="submit"
+                  :loading="salvando"
+                />
+              </div>
             </div>
-            <div class="col-6 col-md-2">
-              <AgroMoneyInput v-model="formFrete.valorPorKg" dense label="R$/kg" />
-            </div>
-            <div class="col-6 col-md-2">
-              <AgroMoneyInput v-model="formFrete.valorMinimo" dense label="Mínimo" />
-            </div>
-            <div class="col-6 col-md-2">
-              <q-input v-model="formFrete.prazoDias" outlined dense label="Prazo (dias)" type="number" />
-            </div>
-            <div class="col-6 col-md-3">
-              <agro-btn
-                color="primary"
-                unelevated
-                label="Adicionar frete"
-                descricao="Adicionar frete"
-                :loading="salvando"
-                @click="salvarFrete"
-              />
-            </div>
-          </div>
+          </q-form>
 
           <empty-state
             v-if="!transportadora.fretes?.length"
@@ -112,7 +127,8 @@ import { freteVazio, useLogistica } from 'composables/useLogistica';
 import type { QTableColumn } from 'quasar';
 import type { FreteTransportadoraDto, FreteTransportadoraFormModel } from 'types/dtos/logistica.dto';
 import { formatarCnpj, formatarMoeda, formatarTelefone } from 'utils/formatters';
-import { computed, onMounted, ref } from 'vue';
+import { obrigatorio } from 'utils/validators';
+import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -126,7 +142,7 @@ const {
   removerFrete,
 } = useLogistica();
 
-const formFrete = ref<FreteTransportadoraFormModel>(freteVazio());
+const formFrete = reactive<FreteTransportadoraFormModel>(freteVazio());
 
 const colunas: QTableColumn<FreteTransportadoraDto>[] = [
   { name: 'regiao', label: 'Região', field: 'regiao', align: 'left' },
@@ -137,8 +153,9 @@ const colunas: QTableColumn<FreteTransportadoraDto>[] = [
 ];
 
 async function salvarFrete(): Promise<void> {
-  const ok = await adicionarFrete(id.value, formFrete.value);
-  if (ok) formFrete.value = freteVazio();
+  const snapshot: FreteTransportadoraFormModel = { ...formFrete };
+  const ok = await adicionarFrete(id.value, snapshot);
+  if (ok) Object.assign(formFrete, freteVazio());
 }
 
 onMounted(() => {
