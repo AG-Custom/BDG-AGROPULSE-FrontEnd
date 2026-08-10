@@ -23,7 +23,10 @@
           :custo-medio-ponderado="produtoCarregado?.custoMedioPonderado"
         />
 
-        <div v-if="!carregandoPagina && modo !== 'visualizar' && !produtoInativo" class="agro-form-actions">
+        <div
+          v-if="!carregandoPagina && !etapaInicialCadastro && modo !== 'visualizar' && !produtoInativo"
+          class="agro-form-actions"
+        >
           <agro-btn
             flat
             label="Cancelar"
@@ -50,6 +53,35 @@
           />
         </div>
       </agro-card>
+
+      <produto-limites-estoque-section
+        v-if="!carregandoPagina && etapaInicialCadastro"
+        ref="limitesSectionRef"
+        :produto-id="produtoIdPersistido"
+        :somente-leitura="somenteLeitura"
+        v-model:limites="complementos.limites"
+      />
+
+      <div
+        v-if="!carregandoPagina && etapaInicialCadastro && !produtoInativo"
+        class="agro-form-actions"
+      >
+        <agro-btn
+          flat
+          label="Cancelar"
+          descricao="Voltar para a listagem sem salvar"
+          :disable="salvando"
+          @click="voltar"
+        />
+        <agro-btn
+          color="primary"
+          unelevated
+          label="Salvar"
+          :descricao="descricaoBotaoPrincipal"
+          :loading="salvando"
+          @click="salvar"
+        />
+      </div>
 
       <template v-if="mostrarComplementos">
         <produto-fiscal-section
@@ -267,8 +299,27 @@ function voltar(): void {
   void router.push({ name: 'produtos' });
 }
 
+function limitesEstoqueValidos(): boolean {
+  if (complementos.value.limites.length === 0) {
+    return true;
+  }
+
+  const limitesValidos = limitesSectionRef.value?.validarLimites() ?? false;
+
+  if (!limitesValidos) {
+    erro('Verifique os limites de estoque: mínimo e máximo (mínimo ≤ máximo).');
+    return false;
+  }
+
+  return true;
+}
+
 async function salvarCadastroInicial(): Promise<void> {
-  const produto = await criar(formulario.value, undefined, {
+  if (!limitesEstoqueValidos()) {
+    return;
+  }
+
+  const produto = await criar(formulario.value, complementos.value, {
     mensagemSucesso: 'Produto salvo. Continue com as configurações complementares.',
   });
 
@@ -285,13 +336,8 @@ async function salvarCadastroInicial(): Promise<void> {
 }
 
 async function salvarEdicao(opcoes?: { mensagemSucesso?: string; irParaLista?: boolean }): Promise<boolean> {
-  if (complementos.value.limites.length > 0) {
-    const limitesValidos = limitesSectionRef.value?.validarLimites() ?? false;
-
-    if (!limitesValidos) {
-      erro('Verifique os limites de estoque: mínimo e máximo (mínimo ≤ máximo).');
-      return false;
-    }
+  if (!limitesEstoqueValidos()) {
+    return false;
   }
 
   const sucesso = await editar(produtoId.value!, formulario.value, {
