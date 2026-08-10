@@ -22,7 +22,7 @@ export function usePrecificacao() {
         return { label: `${tabela.nome} (padrão)`, value: tabela.id };
       }
 
-      if (tabela.clienteId) {
+      if (tabela.clienteIds && tabela.clienteIds.length > 0) {
         return { label: `${tabela.nome} (cliente)`, value: tabela.id };
       }
 

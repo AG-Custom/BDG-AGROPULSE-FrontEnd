@@ -21,7 +21,7 @@ function tabelaDtoParaResumo(dto: TabelaPrecoDto): TabelaPrecoResumoDto {
     vigenciaFim: dto.vigenciaFim,
     ativo: dto.ativo,
     ehPadrao: dto.ehPadrao,
-    clienteId: dto.clienteId,
+    clienteIds: dto.clienteIds ?? [],
   };
 }
 
@@ -80,6 +80,37 @@ export function useTabelasPreco() {
     try {
       await tabelaPrecoService.editar(tabelaId, formParaSalvarTabelaPrecoPayload(form));
       sucesso('Tabela de preço atualizada com sucesso.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function vincularCliente(tabelaId: string, clienteId: string): Promise<boolean> {
+    salvando.value = true;
+
+    try {
+      await tabelaPrecoService.vincularCliente(tabelaId, { clienteId });
+      sucesso('Tabela de preço vinculada ao cliente.');
+      return true;
+    } catch (e) {
+      erro(mensagem(e));
+      return false;
+    } finally {
+      salvando.value = false;
+    }
+  }
+
+  async function desvincularCliente(tabelaId: string, clienteId: string): Promise<boolean> {
+    salvando.value = true;
+
+    try {
+      await tabelaPrecoService.desvincularCliente(tabelaId, clienteId);
+      sucesso('Vínculo da tabela de preço removido.');
+      await carregar(ultimosParams.value);
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -187,6 +218,8 @@ export function useTabelasPreco() {
     carregar,
     criar,
     editar,
+    vincularCliente,
+    desvincularCliente,
     solicitarInativacao,
     solicitarAtivacao,
     definirPadrao,

@@ -1,87 +1,88 @@
 <template>
   <q-form ref="formRef" class="tabela-preco-formulario agro-formulario" greedy :class="{ 'agro-formulario--bloqueado': somenteLeitura }">
     <fieldset class="agro-formulario__fieldset">
-<h3 class="tabela-preco-formulario__secao-titulo">Identificação</h3>
-    <div class="row q-col-gutter-md">
-      <div class="col-12">
-        <q-input
-          v-model="formulario.nome"
-          outlined
-          label="Nome"
-          class="field-required"
-          maxlength="200"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
+      <h3 class="tabela-preco-formulario__secao-titulo">Identificação</h3>
+      <div class="row q-col-gutter-md">
+        <div class="col-12">
+          <q-input
+            v-model="formulario.nome"
+            outlined
+            label="Nome"
+            class="field-required"
+            maxlength="200"
+            aria-required="true"
+            :rules="[obrigatorio]"
+            :readonly="somenteLeitura"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <q-input
+            v-model="formulario.vigenciaInicio"
+            outlined
+            label="Vigência início"
+            type="date"
+            class="field-required"
+            aria-required="true"
+            :rules="[obrigatorio]"
+            :readonly="somenteLeitura"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <q-input
+            v-model="formulario.vigenciaFim"
+            outlined
+            label="Vigência fim"
+            type="date"
+            hint="Opcional"
+            :readonly="somenteLeitura"
+          />
+        </div>
       </div>
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.vigenciaInicio"
-          outlined
-          label="Vigência início"
-          type="date"
-          class="field-required"
-          aria-required="true"
-          :rules="[obrigatorio]"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.vigenciaFim"
-          outlined
-          label="Vigência fim"
-          type="date"
-          hint="Opcional"
-          :readonly="somenteLeitura"
-        />
-      </div>
-    </div>
 
-    <h3 class="tabela-preco-formulario__secao-titulo">Escopo (opcional)</h3>
-    <div class="row q-col-gutter-md">
-      <div v-if="!clienteIdFixo" class="col-12 col-md-4">
-        <agro-select-cadastro
-          v-model="formulario.clienteId"
-          entidade="cliente"
-          label="Cliente"
-          clearable
-          :options="clienteOpcoes"
-          :loading="carregandoClientes"
-          :readonly="somenteLeitura"
-          :desabilitar-cadastro="somenteLeitura"
-          @atualizar="carregarClientes({ ativo: true })"
-        />
+      <h3 class="tabela-preco-formulario__secao-titulo">Escopo (opcional)</h3>
+      <div class="row q-col-gutter-md">
+        <div v-if="!clienteIdFixo" class="col-12 col-md-6">
+          <q-select
+            v-model="formulario.clienteIds"
+            outlined
+            label="Clientes"
+            multiple
+            emit-value
+            map-options
+            use-chips
+            clearable
+            :options="clienteOpcoes"
+            :loading="carregandoClientes"
+            :readonly="somenteLeitura"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <q-select
+            v-model="formulario.canalVenda"
+            outlined
+            label="Canal de venda"
+            emit-value
+            map-options
+            clearable
+            :options="CanalVendaOpcoes"
+            :readonly="somenteLeitura"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <q-input
+            v-model="formulario.regiao"
+            outlined
+            label="Região"
+            maxlength="100"
+            :readonly="somenteLeitura"
+          />
+        </div>
       </div>
-      <div class="col-12 col-md-4">
-        <q-select
-          v-model="formulario.canalVenda"
-          outlined
-          label="Canal de venda"
-          emit-value
-          map-options
-          clearable
-          :options="CanalVendaOpcoes"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model="formulario.regiao"
-          outlined
-          label="Região"
-          maxlength="100"
-          :readonly="somenteLeitura"
-        />
-      </div>
-    </div>
-  </fieldset>
-</q-form>
+    </fieldset>
+  </q-form>
 </template>
 
 <script setup lang="ts">
-import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { CanalVendaOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
@@ -102,7 +103,10 @@ const { clientes, carregando: carregandoClientes, carregar: carregarClientes } =
 
 const clienteOpcoes = computed(() =>
   clientes.value
-    .filter((cliente) => cliente.ativo || cliente.id === formulario.value.clienteId)
+    .filter(
+      (cliente) =>
+        cliente.ativo || formulario.value.clienteIds.includes(cliente.id),
+    )
     .map((cliente) => ({
       label: cliente.nomeRazao,
       value: cliente.id,
@@ -112,8 +116,8 @@ const clienteOpcoes = computed(() =>
 watch(
   () => props.clienteIdFixo,
   (clienteId) => {
-    if (clienteId) {
-      formulario.value.clienteId = clienteId;
+    if (clienteId && !formulario.value.clienteIds.includes(clienteId)) {
+      formulario.value.clienteIds = [clienteId, ...formulario.value.clienteIds];
     }
   },
   { immediate: true },
@@ -133,7 +137,6 @@ defineExpose({ validar });
 </script>
 
 <style scoped>
-
 .agro-formulario__fieldset {
   border: 0;
   margin: 0;

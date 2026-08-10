@@ -27,17 +27,84 @@
           class="cliente-form-page__tabela-preco"
         >
           <q-toggle
-            v-model="cadastrarTabelaPreco"
-            label="Deseja cadastrar tabelas de preço vinculado ao cliente"
+            v-model="vincularTabelaPreco"
+            label="Deseja vincular tabela de preço ao cliente"
             :disable="salvando"
           />
 
-          <tabela-preco-formulario
-            v-if="cadastrarTabelaPreco"
-            ref="formularioTabelaRef"
-            v-model:formulario="formTabela"
-            cliente-id-fixo="pendente"
-          />
+          <div v-if="vincularTabelaPreco" class="cliente-form-page__tabela-lista">
+            <div class="agro-filter-bar">
+              <q-input
+                v-model="buscaTabela"
+                outlined
+                dense
+                clearable
+                label="Buscar tabela"
+                :disable="salvando"
+                @update:model-value="agendarBuscaTabelas"
+              />
+            </div>
+
+            <agro-table-skeleton v-if="carregandoTabelas && tabelas.length === 0" :colunas="4" />
+
+            <empty-state
+              v-else-if="!carregandoTabelas && tabelas.length === 0"
+              titulo="Nenhuma tabela encontrada"
+              descricao="Cadastre uma tabela de preço ou ajuste a busca."
+              icon="sell"
+            />
+
+            <q-table
+              v-else
+              flat
+              bordered
+              row-key="id"
+              hide-pagination
+              class="cliente-form-page__tabela"
+              :rows="tabelas"
+              :columns="colunasTabelas"
+              :loading="carregandoTabelas"
+              :pagination="{ rowsPerPage: 0 }"
+            >
+              <template #body-cell-selecao="props">
+                <q-td :props="props">
+                  <q-radio
+                    v-model="tabelaSelecionadaId"
+                    :val="props.row.id"
+                    color="primary"
+                    :disable="salvando"
+                    :aria-label="`Selecionar ${props.row.nome}`"
+                  />
+                </q-td>
+              </template>
+
+              <template #body-cell-vigencia="props">
+                <q-td :props="props">
+                  {{ formatarVigencia(props.row) }}
+                </q-td>
+              </template>
+
+              <template #body-cell-ativo="props">
+                <q-td :props="props">
+                  <agro-badge
+                    :label="props.row.ativo ? 'Ativo' : 'Inativo'"
+                    :variant="props.row.ativo ? 'success' : 'default'"
+                  />
+                </q-td>
+              </template>
+
+              <template #body-cell-acoes="props">
+                <q-td :props="props">
+                  <agro-acoes-menu
+                    :mostrar-editar="false"
+                    :mostrar-status="false"
+                    :visualizar-to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
+                    visualizar-label="Visualizar tabela de preço"
+                  />
+                </q-td>
+              </template>
+            </q-table>
+          </div>
         </div>
 
         <div
@@ -113,9 +180,12 @@ import ClienteEnderecosSection from 'components/clientes/ClienteEnderecosSection
 import ClienteFormulario from 'components/clientes/ClienteFormulario.vue';
 import ClienteTabelasPrecoSection from 'components/clientes/ClienteTabelasPrecoSection.vue';
 import ClientePerfil360Section from 'components/crm/ClientePerfil360Section.vue';
-import TabelaPrecoFormulario from 'components/tabelas-preco/TabelaPrecoFormulario.vue';
+import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
+import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
+import EmptyState from 'components/ui/EmptyState.vue';
 import { useAuth } from 'composables/useAuth';
 import { useClientes } from 'composables/useClientes';
 import { useNotificacao } from 'composables/useNotificacao';
@@ -124,27 +194,34 @@ import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { Permissoes } from 'constants/permissoes';
 import { clienteService } from 'services/cliente.service';
 import type { ClienteDto, ClienteFormModel } from 'types/dtos/cliente.dto';
-import type { TabelaPrecoFormModel } from 'types/dtos/tabela-preco.dto';
+import type { TabelaPrecoResumoDto } from 'types/dtos/tabela-preco.dto';
 import { clienteDtoParaForm, criarClienteFormVazio } from 'utils/mappers/cliente.mapper';
-import { criarTabelaPrecoFormVazia } from 'utils/mappers/tabela-preco.mapper';
-import { computed, onMounted, ref } from 'vue';
+import type { QTableColumn } from 'quasar';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
 const { salvando: salvandoCliente, criar, editar } = useClientes();
-const { salvando: salvandoTabela, criar: criarTabela } = useTabelasPreco();
+const {
+  tabelas,
+  carregando: carregandoTabelas,
+  salvando: salvandoTabela,
+  carregar: carregarTabelas,
+  vincularCliente,
+} = useTabelasPreco();
 const { possuiPermissao } = useAuth();
 const { erro } = useNotificacao();
 const { mensagem } = useTratarErroFormulario();
 
 const formularioRef = ref<InstanceType<typeof ClienteFormulario> | null>(null);
-const formularioTabelaRef = ref<InstanceType<typeof TabelaPrecoFormulario> | null>(null);
 const formulario = ref<ClienteFormModel>(criarClienteFormVazio());
-const formTabela = ref<TabelaPrecoFormModel>(criarTabelaPrecoFormVazia(null));
-const cadastrarTabelaPreco = ref(false);
 const clienteCarregado = ref<ClienteDto | null>(null);
 const carregandoPagina = ref(true);
+const vincularTabelaPreco = ref(false);
+const tabelaSelecionadaId = ref<string | null>(null);
+const buscaTabela = ref('');
+let buscaTabelaTimer: ReturnType<typeof setTimeout> | null = null;
 
 const salvando = computed(() => salvandoCliente.value || salvandoTabela.value);
 
@@ -210,6 +287,48 @@ const clienteAtivo = computed(
   () => modo.value === 'editar' && clienteCarregado.value?.ativo === true,
 );
 
+const colunasTabelas: QTableColumn<TabelaPrecoResumoDto>[] = [
+  { name: 'selecao', label: '', field: 'id', align: 'left' },
+  { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
+  { name: 'vigencia', label: 'Vigência', field: 'vigenciaInicio', align: 'left' },
+  { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+];
+
+function formatarVigencia(tabela: TabelaPrecoResumoDto): string {
+  if (tabela.vigenciaFim) {
+    return `${tabela.vigenciaInicio} — ${tabela.vigenciaFim}`;
+  }
+
+  return `${tabela.vigenciaInicio} — em aberto`;
+}
+
+async function carregarListaTabelas(): Promise<void> {
+  await carregarTabelas({
+    ativo: true,
+    busca: buscaTabela.value.trim() || undefined,
+  });
+}
+
+function agendarBuscaTabelas(): void {
+  if (buscaTabelaTimer) {
+    clearTimeout(buscaTabelaTimer);
+  }
+
+  buscaTabelaTimer = setTimeout(() => {
+    void carregarListaTabelas();
+  }, 400);
+}
+
+watch(vincularTabelaPreco, (ativo) => {
+  if (!ativo) {
+    tabelaSelecionadaId.value = null;
+    return;
+  }
+
+  void carregarListaTabelas();
+});
+
 async function carregarCliente(): Promise<void> {
   if (!clienteId.value) {
     return;
@@ -231,8 +350,9 @@ async function inicializar(): Promise<void> {
     await carregarCliente();
   } else {
     formulario.value = criarClienteFormVazio();
-    formTabela.value = criarTabelaPrecoFormVazia(null);
-    cadastrarTabelaPreco.value = false;
+    vincularTabelaPreco.value = false;
+    tabelaSelecionadaId.value = null;
+    buscaTabela.value = '';
   }
 
   carregandoPagina.value = false;
@@ -250,12 +370,9 @@ async function salvar(): Promise<void> {
   }
 
   if (modo.value === 'criar') {
-    if (cadastrarTabelaPreco.value) {
-      const tabelaValida = (await formularioTabelaRef.value?.validar()) ?? false;
-
-      if (!tabelaValida) {
-        return;
-      }
+    if (vincularTabelaPreco.value && !tabelaSelecionadaId.value) {
+      erro('Selecione uma tabela de preço para vincular ao cliente.');
+      return;
     }
 
     const cliente = await criar(formulario.value);
@@ -264,17 +381,13 @@ async function salvar(): Promise<void> {
       return;
     }
 
-    if (cadastrarTabelaPreco.value) {
-      formTabela.value.clienteId = cliente.id;
-      const tabelaCriada = await criarTabela(formTabela.value);
+    if (vincularTabelaPreco.value && tabelaSelecionadaId.value) {
+      const vinculado = await vincularCliente(tabelaSelecionadaId.value, cliente.id);
 
-      if (!tabelaCriada) {
+      if (!vinculado) {
         await router.push({ name: 'cliente-editar', params: { id: cliente.id } });
         return;
       }
-
-      await router.push({ name: 'tabela-preco-editar', params: { id: tabelaCriada.id } });
-      return;
     }
 
     await router.push({ name: 'clientes' });
@@ -309,5 +422,14 @@ onMounted(() => {
   display: grid;
   gap: var(--spacing-4);
   margin-top: var(--spacing-6);
+}
+
+.cliente-form-page__tabela-lista {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.cliente-form-page__tabela {
+  width: 100%;
 }
 </style>

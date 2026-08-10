@@ -126,7 +126,7 @@
         <q-input
           v-model="formulario.prazoRecompra"
           outlined
-          label="Prazo de recompra (dias)"
+          label="Recorrencia (dias)"
           type="number"
           min="0"
           :readonly="somenteLeitura"

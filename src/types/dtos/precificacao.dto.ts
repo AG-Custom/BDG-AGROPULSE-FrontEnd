@@ -27,5 +27,5 @@ export interface TabelaPrecoPermitidaDto {
   ehPadrao: boolean;
   vigenciaInicio: string;
   vigenciaFim: string | null;
-  clienteId?: string | null;
+  clienteIds?: string[];
 }

@@ -10,7 +10,7 @@ import type {
 } from 'types/dtos/tabela-preco.dto';
 import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 
-export function criarTabelaPrecoFormVazia(clienteId: string | null = null): TabelaPrecoFormModel {
+export function criarTabelaPrecoFormVazia(clienteIds: string[] = []): TabelaPrecoFormModel {
   const hoje = new Date();
   const vigenciaInicio = [
     hoje.getFullYear(),
@@ -22,7 +22,7 @@ export function criarTabelaPrecoFormVazia(clienteId: string | null = null): Tabe
     nome: '',
     vigenciaInicio,
     vigenciaFim: '',
-    clienteId,
+    clienteIds: [...clienteIds],
     canalVenda: null,
     regiao: '',
   };
@@ -33,7 +33,7 @@ export function tabelaPrecoDtoParaForm(dto: TabelaPrecoDto): TabelaPrecoFormMode
     nome: dto.nome,
     vigenciaInicio: dto.vigenciaInicio,
     vigenciaFim: dto.vigenciaFim ?? '',
-    clienteId: dto.clienteId,
+    clienteIds: [...(dto.clienteIds ?? [])],
     canalVenda: dto.canalVenda,
     regiao: dto.regiao ?? '',
   };
@@ -54,7 +54,7 @@ export function formParaSalvarTabelaPrecoPayload(form: TabelaPrecoFormModel): Sa
     nome: form.nome.trim(),
     vigenciaInicio: form.vigenciaInicio.trim(),
     vigenciaFim: form.vigenciaFim.trim() || null,
-    clienteId: form.clienteId,
+    clienteIds: form.clienteIds,
     grupoComercial: null,
     canalVenda: form.canalVenda,
     regiao: form.regiao.trim() || null,

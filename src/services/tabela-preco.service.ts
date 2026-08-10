@@ -8,6 +8,7 @@ import type {
   TabelaPrecoItemDto,
   TabelaPrecoItemPayload,
   TabelaPrecoResumoDto,
+  VincularTabelaPrecoClientePayload,
 } from 'types/dtos/tabela-preco.dto';
 
 export const tabelaPrecoService = {
@@ -25,6 +26,19 @@ export const tabelaPrecoService = {
 
   editar(tabelaPrecoId: string, payload: SalvarTabelaPrecoPayload): Promise<TabelaPrecoDto> {
     return api.put<TabelaPrecoDto>(`/tabelas-preco/${tabelaPrecoId}`, payload).then((r) => r.data);
+  },
+
+  vincularCliente(
+    tabelaPrecoId: string,
+    payload: VincularTabelaPrecoClientePayload,
+  ): Promise<TabelaPrecoDto> {
+    return api
+      .post<TabelaPrecoDto>(`/tabelas-preco/${tabelaPrecoId}/clientes`, payload)
+      .then((r) => r.data);
+  },
+
+  desvincularCliente(tabelaPrecoId: string, clienteId: string): Promise<void> {
+    return api.delete(`/tabelas-preco/${tabelaPrecoId}/clientes/${clienteId}`);
   },
 
   inativar(tabelaPrecoId: string, justificativa: string): Promise<void> {

@@ -9,7 +9,7 @@ export interface TabelaPrecoResumoDto {
   vigenciaFim: string | null;
   ativo: boolean;
   ehPadrao?: boolean;
-  clienteId?: string | null;
+  clienteIds?: string[];
 }
 
 export interface TabelaPrecoItemDto {
@@ -20,7 +20,7 @@ export interface TabelaPrecoItemDto {
 }
 
 export interface TabelaPrecoDto extends TabelaPrecoResumoDto {
-  clienteId: string | null;
+  clienteIds: string[];
   grupoComercial: GrupoComercialValor | null;
   canalVenda: CanalVendaValor | null;
   regiao: string | null;
@@ -32,10 +32,14 @@ export interface SalvarTabelaPrecoPayload {
   nome: string;
   vigenciaInicio: string;
   vigenciaFim?: string | null;
-  clienteId?: string | null;
+  clienteIds?: string[];
   grupoComercial?: GrupoComercialValor | null;
   canalVenda?: CanalVendaValor | null;
   regiao?: string | null;
+}
+
+export interface VincularTabelaPrecoClientePayload {
+  clienteId: string;
 }
 
 export interface TabelaPrecoItemPayload {
@@ -52,13 +56,14 @@ export interface EditarTabelaPrecoItemPayload {
 export interface ListarTabelasPrecoParams {
   ativo?: boolean;
   busca?: string;
+  clienteId?: string;
 }
 
 export interface TabelaPrecoFormModel {
   nome: string;
   vigenciaInicio: string;
   vigenciaFim: string;
-  clienteId: string | null;
+  clienteIds: string[];
   canalVenda: CanalVendaValor | null;
   regiao: string;
 }

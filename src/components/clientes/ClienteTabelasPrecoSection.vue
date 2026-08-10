@@ -8,19 +8,19 @@
           color="primary"
           unelevated
           icon="add"
-          label="Adicionar tabela"
-          descricao="Cadastrar tabela de preço para este cliente"
-          @click="abrirDialogCriar"
+          label="Vincular tabela"
+          descricao="Vincular tabela de preço existente a este cliente"
+          @click="abrirDialogVincular"
         />
       </div>
     </template>
 
-    <agro-table-skeleton v-if="carregando && tabelasCliente.length === 0" :colunas="4" />
+    <agro-table-skeleton v-if="carregando && tabelasVinculadas.length === 0" :colunas="4" />
 
     <empty-state
-      v-else-if="!carregando && tabelasCliente.length === 0"
+      v-else-if="!carregando && tabelasVinculadas.length === 0"
       titulo="Nenhuma tabela vinculada"
-      descricao="Cadastre uma tabela de preço específica para este cliente."
+      descricao="Vincule uma tabela de preço existente a este cliente."
       icon="sell"
     />
 
@@ -31,8 +31,8 @@
       row-key="id"
       hide-pagination
       class="cliente-tabelas-preco__tabela"
-      :rows="tabelasCliente"
-      :columns="colunas"
+      :rows="tabelasVinculadas"
+      :columns="colunasVinculadas"
       :loading="carregando"
       :pagination="{ rowsPerPage: 0 }"
     >
@@ -68,35 +68,104 @@
     <q-dialog v-model="dialogAberto" persistent>
       <q-card class="cliente-tabelas-preco__dialog">
         <q-card-section>
-          <h4 class="cliente-tabelas-preco__dialog-titulo">Nova tabela de preço</h4>
+          <h4 class="cliente-tabelas-preco__dialog-titulo">Vincular tabela de preço</h4>
           <p class="cliente-tabelas-preco__dialog-subtitulo">
-            Cadastre uma nova tabela de preço comercial para este cliente.
+            Selecione uma tabela de preço existente para vincular a este cliente.
           </p>
         </q-card-section>
 
-        <q-card-section>
-          <tabela-preco-formulario
-            ref="formularioRef"
-            v-model:formulario="formTabela"
-            :cliente-id-fixo="clienteId"
+        <q-card-section class="cliente-tabelas-preco__dialog-corpo">
+          <div class="agro-filter-bar">
+            <q-input
+              v-model="buscaTabela"
+              outlined
+              dense
+              clearable
+              label="Buscar tabela"
+              :disable="salvando"
+              @update:model-value="agendarBuscaDisponiveis"
+            />
+          </div>
+
+          <agro-table-skeleton
+            v-if="carregandoDisponiveis && tabelasParaSelecao.length === 0"
+            :colunas="4"
           />
+
+          <empty-state
+            v-else-if="!carregandoDisponiveis && tabelasParaSelecao.length === 0"
+            titulo="Nenhuma tabela disponível"
+            descricao="Não há tabelas ativas para vincular ou ajuste a busca."
+            icon="sell"
+          />
+
+          <q-table
+            v-else
+            flat
+            bordered
+            row-key="id"
+            hide-pagination
+            :rows="tabelasParaSelecao"
+            :columns="colunasSelecao"
+            :loading="carregandoDisponiveis"
+            :pagination="{ rowsPerPage: 0 }"
+          >
+            <template #body-cell-selecao="props">
+              <q-td :props="props">
+                <q-radio
+                  v-model="tabelaSelecionadaId"
+                  :val="props.row.id"
+                  color="primary"
+                  :disable="salvando"
+                  :aria-label="`Selecionar ${props.row.nome}`"
+                />
+              </q-td>
+            </template>
+
+            <template #body-cell-vigencia="props">
+              <q-td :props="props">
+                {{ formatarVigencia(props.row) }}
+              </q-td>
+            </template>
+
+            <template #body-cell-ativo="props">
+              <q-td :props="props">
+                <agro-badge
+                  :label="props.row.ativo ? 'Ativo' : 'Inativo'"
+                  :variant="props.row.ativo ? 'success' : 'default'"
+                />
+              </q-td>
+            </template>
+
+            <template #body-cell-acoes="props">
+              <q-td :props="props">
+                <agro-acoes-menu
+                  :mostrar-editar="false"
+                  :mostrar-status="false"
+                  :visualizar-to="{ name: 'tabela-preco-visualizar', params: { id: props.row.id } }"
+                  visualizar-label="Visualizar tabela de preço"
+                />
+              </q-td>
+            </template>
+          </q-table>
         </q-card-section>
 
         <q-card-actions align="right">
           <agro-btn
             flat
             label="Cancelar"
-            descricao="Fechar sem salvar a tabela"
+            descricao="Fechar sem vincular a tabela"
             :disable="salvando"
             @click="fecharDialog"
           />
           <agro-btn
             color="primary"
             unelevated
-            label="Cadastrar"
-            descricao="Cadastrar tabela de preço para este cliente"
+            label="Vincular"
+            descricao="Vincular tabela de preço selecionada ao cliente"
             :loading="salvando"
-            @click="salvarTabela"
+            :disable="!tabelaSelecionadaId"
+            @click="salvarVinculo"
           />
         </q-card-actions>
       </q-card>
@@ -105,36 +174,58 @@
 </template>
 
 <script setup lang="ts">
-import TabelaPrecoFormulario from 'components/tabelas-preco/TabelaPrecoFormulario.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useNotificacao } from 'composables/useNotificacao';
 import { useTabelasPreco } from 'composables/useTabelasPreco';
 import type { TabelaPrecoResumoDto } from 'types/dtos/tabela-preco.dto';
-import { criarTabelaPrecoFormVazia } from 'utils/mappers/tabela-preco.mapper';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   clienteId: string;
   somenteLeitura?: boolean;
 }>();
 
-const router = useRouter();
-const { tabelas, carregando, salvando, carregar, criar } = useTabelasPreco();
+const {
+  tabelas: tabelasVinculadas,
+  carregando,
+  carregar: carregarVinculadas,
+} = useTabelasPreco();
+
+const {
+  tabelas: tabelasDisponiveis,
+  carregando: carregandoDisponiveis,
+  salvando,
+  carregar: carregarDisponiveis,
+  vincularCliente,
+} = useTabelasPreco();
+
+const { erro } = useNotificacao();
 
 const dialogAberto = ref(false);
-const formTabela = ref(criarTabelaPrecoFormVazia(props.clienteId));
-const formularioRef = ref<InstanceType<typeof TabelaPrecoFormulario> | null>(null);
+const tabelaSelecionadaId = ref<string | null>(null);
+const buscaTabela = ref('');
+let buscaTimer: ReturnType<typeof setTimeout> | null = null;
 
-const tabelasCliente = computed(() =>
-  tabelas.value.filter((tabela) => tabela.clienteId === props.clienteId),
+const idsVinculados = computed(() => new Set(tabelasVinculadas.value.map((tabela) => tabela.id)));
+
+const tabelasParaSelecao = computed(() =>
+  tabelasDisponiveis.value.filter((tabela) => !idsVinculados.value.has(tabela.id)),
 );
 
-const colunas: QTableColumn<TabelaPrecoResumoDto>[] = [
+const colunasVinculadas: QTableColumn<TabelaPrecoResumoDto>[] = [
+  { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
+  { name: 'vigencia', label: 'Vigência', field: 'vigenciaInicio', align: 'left' },
+  { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+];
+
+const colunasSelecao: QTableColumn<TabelaPrecoResumoDto>[] = [
+  { name: 'selecao', label: '', field: 'id', align: 'left' },
   { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
   { name: 'vigencia', label: 'Vigência', field: 'vigenciaInicio', align: 'left' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left' },
@@ -149,34 +240,55 @@ function formatarVigencia(tabela: TabelaPrecoResumoDto): string {
   return `${tabela.vigenciaInicio} — em aberto`;
 }
 
-function abrirDialogCriar(): void {
-  formTabela.value = criarTabelaPrecoFormVazia(props.clienteId);
+async function carregarListaVinculadas(): Promise<void> {
+  await carregarVinculadas({ clienteId: props.clienteId });
+}
+
+async function carregarListaDisponiveis(): Promise<void> {
+  await carregarDisponiveis({
+    ativo: true,
+    busca: buscaTabela.value.trim() || undefined,
+  });
+}
+
+function agendarBuscaDisponiveis(): void {
+  if (buscaTimer) {
+    clearTimeout(buscaTimer);
+  }
+
+  buscaTimer = setTimeout(() => {
+    void carregarListaDisponiveis();
+  }, 400);
+}
+
+async function abrirDialogVincular(): Promise<void> {
+  tabelaSelecionadaId.value = null;
+  buscaTabela.value = '';
   dialogAberto.value = true;
+  await carregarListaDisponiveis();
 }
 
 function fecharDialog(): void {
   dialogAberto.value = false;
+  tabelaSelecionadaId.value = null;
 }
 
-async function salvarTabela(): Promise<void> {
-  const valido = (await formularioRef.value?.validar()) ?? false;
-
-  if (!valido) {
+async function salvarVinculo(): Promise<void> {
+  if (!tabelaSelecionadaId.value) {
+    erro('Selecione uma tabela de preço para vincular ao cliente.');
     return;
   }
 
-  formTabela.value.clienteId = props.clienteId;
+  const sucesso = await vincularCliente(tabelaSelecionadaId.value, props.clienteId);
 
-  const criada = await criar(formTabela.value);
-
-  if (criada) {
+  if (sucesso) {
     fecharDialog();
-    await router.push({ name: 'tabela-preco-editar', params: { id: criada.id } });
+    await carregarListaVinculadas();
   }
 }
 
 onMounted(() => {
-  void carregar();
+  void carregarListaVinculadas();
 });
 </script>
 
@@ -215,5 +327,10 @@ onMounted(() => {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   margin: var(--spacing-2) 0 0;
+}
+
+.cliente-tabelas-preco__dialog-corpo {
+  display: grid;
+  gap: var(--spacing-4);
 }
 </style>
