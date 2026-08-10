@@ -1,5 +1,4 @@
 import {
-  GrupoComercial,
   PAIS_PADRAO,
   TipoCliente,
   TipoEnderecoCliente,
@@ -32,7 +31,6 @@ export function criarClienteFormVazio(): ClienteFormModel {
   return {
     tipoPessoa: TipoPessoaCliente.PessoaJuridica,
     tipoCliente: TipoCliente.Balcao,
-    grupoComercial: GrupoComercial.Standard,
     nomeRazao: '',
     nomeFantasia: '',
     documento: '',
@@ -50,7 +48,6 @@ export function clienteDtoParaForm(dto: ClienteDto): ClienteFormModel {
   return {
     tipoPessoa: dto.tipoPessoa,
     tipoCliente: dto.tipoCliente,
-    grupoComercial: dto.grupoComercial,
     nomeRazao: dto.nomeRazao,
     nomeFantasia: dto.nomeFantasia ?? '',
     documento: formatarDocumento(dto.tipoPessoa, dto.documento),
@@ -80,7 +77,7 @@ function montarPayloadBase(form: ClienteFormModel): CriarClientePayload {
   return {
     tipoPessoa: form.tipoPessoa,
     tipoCliente: form.tipoCliente,
-    grupoComercial: form.grupoComercial,
+    grupoComercial: null,
     nomeRazao: form.nomeRazao.trim(),
     nomeFantasia: ehPf ? null : form.nomeFantasia.trim() || null,
     documento: apenasDigitos(form.documento),

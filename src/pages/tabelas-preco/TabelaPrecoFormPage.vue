@@ -73,7 +73,7 @@ import {
   criarTabelaPrecoFormVazia,
   tabelaPrecoDtoParaForm,
 } from 'utils/mappers/tabela-preco.mapper';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -114,14 +114,14 @@ const tituloPagina = computed(() => {
 
 const subtituloPagina = computed(() => {
   if (modo.value === 'criar') {
-    return 'Cadastre uma nova tabela de preço comercial.';
+    return 'Cadastre a tabela e, em seguida, adicione os itens com preços.';
   }
 
   if (modo.value === 'visualizar') {
     return 'Consulte os dados da tabela selecionada.';
   }
 
-  return 'Atualize os dados da tabela selecionada.';
+  return 'Atualize os dados e gerencie os itens da tabela.';
 });
 
 const tabelaInativa = computed(
@@ -169,19 +169,30 @@ async function salvar(): Promise<void> {
     return;
   }
 
-  const sucesso =
-    modo.value === 'criar'
-      ? await criar(formulario.value)
-      : await editar(tabelaId.value!, formulario.value);
+  if (modo.value === 'criar') {
+    const criada = await criar(formulario.value);
+
+    if (criada) {
+      await router.replace({ name: 'tabela-preco-editar', params: { id: criada.id } });
+    }
+
+    return;
+  }
+
+  const sucesso = await editar(tabelaId.value!, formulario.value);
 
   if (sucesso) {
     await router.push({ name: 'tabelas-preco' });
   }
 }
 
-onMounted(() => {
-  void inicializar();
-});
+watch(
+  () => [route.name, route.params.id] as const,
+  () => {
+    void inicializar();
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>

@@ -23,6 +23,24 @@
         />
 
         <div
+          v-if="!carregandoPagina && modo === 'criar' && podeEditarTabelasPreco"
+          class="cliente-form-page__tabela-preco"
+        >
+          <q-toggle
+            v-model="cadastrarTabelaPreco"
+            label="Deseja cadastrar tabelas de preço vinculado ao cliente"
+            :disable="salvando"
+          />
+
+          <tabela-preco-formulario
+            v-if="cadastrarTabelaPreco"
+            ref="formularioTabelaRef"
+            v-model:formulario="formTabela"
+            cliente-id-fixo="pendente"
+          />
+        </div>
+
+        <div
           v-if="!carregandoPagina && modo !== 'visualizar' && !clienteInativo && podeEditarCliente"
           class="agro-form-actions"
         >
@@ -95,30 +113,40 @@ import ClienteEnderecosSection from 'components/clientes/ClienteEnderecosSection
 import ClienteFormulario from 'components/clientes/ClienteFormulario.vue';
 import ClienteTabelasPrecoSection from 'components/clientes/ClienteTabelasPrecoSection.vue';
 import ClientePerfil360Section from 'components/crm/ClientePerfil360Section.vue';
+import TabelaPrecoFormulario from 'components/tabelas-preco/TabelaPrecoFormulario.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useAuth } from 'composables/useAuth';
 import { useClientes } from 'composables/useClientes';
 import { useNotificacao } from 'composables/useNotificacao';
+import { useTabelasPreco } from 'composables/useTabelasPreco';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { Permissoes } from 'constants/permissoes';
 import { clienteService } from 'services/cliente.service';
 import type { ClienteDto, ClienteFormModel } from 'types/dtos/cliente.dto';
+import type { TabelaPrecoFormModel } from 'types/dtos/tabela-preco.dto';
 import { clienteDtoParaForm, criarClienteFormVazio } from 'utils/mappers/cliente.mapper';
+import { criarTabelaPrecoFormVazia } from 'utils/mappers/tabela-preco.mapper';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const { salvando, criar, editar } = useClientes();
+const { salvando: salvandoCliente, criar, editar } = useClientes();
+const { salvando: salvandoTabela, criar: criarTabela } = useTabelasPreco();
 const { possuiPermissao } = useAuth();
 const { erro } = useNotificacao();
 const { mensagem } = useTratarErroFormulario();
 
 const formularioRef = ref<InstanceType<typeof ClienteFormulario> | null>(null);
+const formularioTabelaRef = ref<InstanceType<typeof TabelaPrecoFormulario> | null>(null);
 const formulario = ref<ClienteFormModel>(criarClienteFormVazio());
+const formTabela = ref<TabelaPrecoFormModel>(criarTabelaPrecoFormVazia(null));
+const cadastrarTabelaPreco = ref(false);
 const clienteCarregado = ref<ClienteDto | null>(null);
 const carregandoPagina = ref(true);
+
+const salvando = computed(() => salvandoCliente.value || salvandoTabela.value);
 
 const podeVerTabelasPreco = computed(() =>
   possuiPermissao(Permissoes.TabelasPreco.Visualizar),
@@ -203,6 +231,8 @@ async function inicializar(): Promise<void> {
     await carregarCliente();
   } else {
     formulario.value = criarClienteFormVazio();
+    formTabela.value = criarTabelaPrecoFormVazia(null);
+    cadastrarTabelaPreco.value = false;
   }
 
   carregandoPagina.value = false;
@@ -219,10 +249,39 @@ async function salvar(): Promise<void> {
     return;
   }
 
-  const sucesso =
-    modo.value === 'criar'
-      ? await criar(formulario.value)
-      : await editar(clienteId.value!, formulario.value);
+  if (modo.value === 'criar') {
+    if (cadastrarTabelaPreco.value) {
+      const tabelaValida = (await formularioTabelaRef.value?.validar()) ?? false;
+
+      if (!tabelaValida) {
+        return;
+      }
+    }
+
+    const cliente = await criar(formulario.value);
+
+    if (!cliente) {
+      return;
+    }
+
+    if (cadastrarTabelaPreco.value) {
+      formTabela.value.clienteId = cliente.id;
+      const tabelaCriada = await criarTabela(formTabela.value);
+
+      if (!tabelaCriada) {
+        await router.push({ name: 'cliente-editar', params: { id: cliente.id } });
+        return;
+      }
+
+      await router.push({ name: 'tabela-preco-editar', params: { id: tabelaCriada.id } });
+      return;
+    }
+
+    await router.push({ name: 'clientes' });
+    return;
+  }
+
+  const sucesso = await editar(clienteId.value!, formulario.value);
 
   if (sucesso) {
     await router.push({ name: 'clientes' });
@@ -244,5 +303,11 @@ onMounted(() => {
   background: var(--color-warning-50);
   color: var(--color-warning-700);
   margin-bottom: var(--spacing-4);
+}
+
+.cliente-form-page__tabela-preco {
+  display: grid;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-6);
 }
 </style>

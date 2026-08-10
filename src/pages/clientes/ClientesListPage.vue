@@ -117,12 +117,6 @@
             </q-td>
           </template>
 
-          <template #body-cell-grupoComercial="props">
-            <q-td :props="props">
-              {{ rotuloGrupoComercial(props.row.grupoComercial) }}
-            </q-td>
-          </template>
-
           <template #body-cell-nomeFantasia="props">
             <q-td :props="props">
               {{ props.row.nomeFantasia || '—' }}
@@ -169,12 +163,10 @@ import { useClientes } from 'composables/useClientes';
 import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
-  GrupoComercialOpcoes,
   isPerfilCarteiraVendedor,
   TipoClienteOpcoes,
   UsuarioStatus,
   type ExportacaoFormatoValor,
-  type GrupoComercialValor,
   type TipoClienteValor,
 } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
@@ -238,7 +230,6 @@ const colunas: QTableColumn<ClienteResumoDto>[] = [
   { name: 'nomeRazao', label: 'Nome / Razão social', field: 'nomeRazao', align: 'left', sortable: true },
   { name: 'nomeFantasia', label: 'Nome fantasia', field: 'nomeFantasia', align: 'left', sortable: true },
   { name: 'tipoCliente', label: 'Tipo', field: 'tipoCliente', align: 'left', sortable: true },
-  { name: 'grupoComercial', label: 'Grupo', field: 'grupoComercial', align: 'left', sortable: true },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'left', sortable: true },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
@@ -274,10 +265,6 @@ function montarParams(): ListarClientesParams {
 
 function rotuloTipoCliente(tipo: TipoClienteValor): string {
   return TipoClienteOpcoes.find((opcao) => opcao.value === tipo)?.label ?? tipo;
-}
-
-function rotuloGrupoComercial(grupo: GrupoComercialValor): string {
-  return GrupoComercialOpcoes.find((opcao) => opcao.value === grupo)?.label ?? grupo;
 }
 
 async function recarregar(): Promise<void> {

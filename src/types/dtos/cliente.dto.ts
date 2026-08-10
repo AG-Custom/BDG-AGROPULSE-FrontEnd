@@ -13,7 +13,7 @@ export interface ClienteResumoDto {
   empresaId: string;
   tipoPessoa: TipoPessoaClienteValor;
   tipoCliente: TipoClienteValor;
-  grupoComercial: GrupoComercialValor;
+  grupoComercial: GrupoComercialValor | null;
   nomeRazao: string;
   nomeFantasia: string | null;
   documento: string;
@@ -54,7 +54,7 @@ export interface ClienteDto extends ClienteResumoDto {
 export interface CriarClientePayload {
   tipoPessoa: TipoPessoaClienteValor;
   tipoCliente: TipoClienteValor;
-  grupoComercial: GrupoComercialValor;
+  grupoComercial: GrupoComercialValor | null;
   nomeRazao: string;
   nomeFantasia?: string | null;
   documento: string;
@@ -95,7 +95,6 @@ export interface ListarClientesParams {
 export interface ClienteFormModel {
   tipoPessoa: TipoPessoaClienteValor;
   tipoCliente: TipoClienteValor;
-  grupoComercial: GrupoComercialValor;
   nomeRazao: string;
   nomeFantasia: string;
   documento: string;

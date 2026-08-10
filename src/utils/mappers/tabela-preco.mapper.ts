@@ -23,7 +23,6 @@ export function criarTabelaPrecoFormVazia(clienteId: string | null = null): Tabe
     vigenciaInicio,
     vigenciaFim: '',
     clienteId,
-    grupoComercial: null,
     canalVenda: null,
     regiao: '',
   };
@@ -35,7 +34,6 @@ export function tabelaPrecoDtoParaForm(dto: TabelaPrecoDto): TabelaPrecoFormMode
     vigenciaInicio: dto.vigenciaInicio,
     vigenciaFim: dto.vigenciaFim ?? '',
     clienteId: dto.clienteId,
-    grupoComercial: dto.grupoComercial,
     canalVenda: dto.canalVenda,
     regiao: dto.regiao ?? '',
   };
@@ -57,7 +55,7 @@ export function formParaSalvarTabelaPrecoPayload(form: TabelaPrecoFormModel): Sa
     vigenciaInicio: form.vigenciaInicio.trim(),
     vigenciaFim: form.vigenciaFim.trim() || null,
     clienteId: form.clienteId,
-    grupoComercial: form.grupoComercial,
+    grupoComercial: null,
     canalVenda: form.canalVenda,
     regiao: form.regiao.trim() || null,
   };

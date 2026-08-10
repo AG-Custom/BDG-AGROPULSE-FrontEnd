@@ -56,18 +56,6 @@
       </div>
       <div class="col-12 col-md-4">
         <q-select
-          v-model="formulario.grupoComercial"
-          outlined
-          label="Grupo comercial"
-          emit-value
-          map-options
-          clearable
-          :options="GrupoComercialOpcoes"
-          :readonly="somenteLeitura"
-        />
-      </div>
-      <div class="col-12 col-md-4">
-        <q-select
           v-model="formulario.canalVenda"
           outlined
           label="Canal de venda"
@@ -95,7 +83,7 @@
 <script setup lang="ts">
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
-import { CanalVendaOpcoes, GrupoComercialOpcoes } from 'constants/enums';
+import { CanalVendaOpcoes } from 'constants/enums';
 import type { QForm } from 'quasar';
 import type { TabelaPrecoFormModel } from 'types/dtos/tabela-preco.dto';
 import { obrigatorio } from 'utils/validators';

@@ -3,7 +3,7 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="cliente-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6">
         <q-select
           v-model="formulario.tipoPessoa"
           outlined
@@ -17,7 +17,7 @@
           :rules="[obrigatorio]"
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-6">
         <q-select
           v-model="formulario.tipoCliente"
           outlined
@@ -27,20 +27,6 @@
           map-options
           aria-required="true"
           :options="TipoClienteOpcoes"
-          :readonly="somenteLeitura"
-          :rules="[obrigatorio]"
-        />
-      </div>
-      <div class="col-12 col-md-4">
-        <q-select
-          v-model="formulario.grupoComercial"
-          outlined
-          label="Grupo comercial"
-          class="field-required"
-          emit-value
-          map-options
-          aria-required="true"
-          :options="GrupoComercialOpcoes"
           :readonly="somenteLeitura"
           :rules="[obrigatorio]"
         />
@@ -178,7 +164,6 @@ import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { usePerfilAtual } from 'composables/usePerfilAtual';
 import { useUsuarios } from 'composables/useUsuarios';
 import {
-  GrupoComercialOpcoes,
   isPerfilCarteiraVendedor,
   TipoClienteOpcoes,
   TipoPessoaCliente,

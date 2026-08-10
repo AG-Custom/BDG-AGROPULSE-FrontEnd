@@ -48,12 +48,12 @@ export function useTabelasPreco() {
     }
   }
 
-  async function criar(form: TabelaPrecoFormModel): Promise<boolean> {
+  async function criar(form: TabelaPrecoFormModel): Promise<TabelaPrecoDto | null> {
     salvando.value = true;
 
     try {
       const criada = await tabelaPrecoService.criar(formParaSalvarTabelaPrecoPayload(form));
-      sucesso('Tabela de preço cadastrada com sucesso.');
+      sucesso('Tabela cadastrada. Agora você pode adicionar os itens.');
       await carregar(ultimosParams.value);
 
       const resumo = tabelaDtoParaResumo(criada);
@@ -65,10 +65,10 @@ export function useTabelasPreco() {
         tabelas.value = [resumo, ...tabelas.value];
       }
 
-      return true;
+      return criada;
     } catch (e) {
       erro(mensagem(e));
-      return false;
+      return null;
     } finally {
       salvando.value = false;
     }

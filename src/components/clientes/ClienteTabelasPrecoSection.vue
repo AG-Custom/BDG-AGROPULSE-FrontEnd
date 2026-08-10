@@ -116,12 +116,14 @@ import type { TabelaPrecoResumoDto } from 'types/dtos/tabela-preco.dto';
 import { criarTabelaPrecoFormVazia } from 'utils/mappers/tabela-preco.mapper';
 import type { QTableColumn } from 'quasar';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   clienteId: string;
   somenteLeitura?: boolean;
 }>();
 
+const router = useRouter();
 const { tabelas, carregando, salvando, carregar, criar } = useTabelasPreco();
 
 const dialogAberto = ref(false);
@@ -165,10 +167,11 @@ async function salvarTabela(): Promise<void> {
 
   formTabela.value.clienteId = props.clienteId;
 
-  const sucesso = await criar(formTabela.value);
+  const criada = await criar(formTabela.value);
 
-  if (sucesso) {
+  if (criada) {
     fecharDialog();
+    await router.push({ name: 'tabela-preco-editar', params: { id: criada.id } });
   }
 }
 

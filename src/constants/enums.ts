@@ -193,14 +193,6 @@ export const GrupoComercial = {
 
 export type GrupoComercialValor = (typeof GrupoComercial)[keyof typeof GrupoComercial];
 
-export const GrupoComercialOpcoes = [
-  { label: 'Premium', value: GrupoComercial.Premium },
-  { label: 'Standard', value: GrupoComercial.Standard },
-  { label: 'Varejo', value: GrupoComercial.Varejo },
-  { label: 'Rural', value: GrupoComercial.Rural },
-  { label: 'Outro', value: GrupoComercial.Outro },
-];
-
 export const TipoEnderecoCliente = {
   Cobranca: 'Cobranca',
   Entrega: 'Entrega',

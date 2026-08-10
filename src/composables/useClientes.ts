@@ -7,6 +7,7 @@ import {
 import { messageService } from 'services/message.service';
 import { clienteService } from 'services/cliente.service';
 import type {
+  ClienteDto,
   ClienteFormModel,
   ClienteResumoDto,
   ListarClientesParams,
@@ -38,16 +39,16 @@ export function useClientes() {
     }
   }
 
-  async function criar(form: ClienteFormModel): Promise<boolean> {
+  async function criar(form: ClienteFormModel): Promise<ClienteDto | null> {
     salvando.value = true;
 
     try {
-      await clienteService.criar(formParaCriarPayload(form));
+      const cliente = await clienteService.criar(formParaCriarPayload(form));
       sucesso('Cliente cadastrado com sucesso.');
-      return true;
+      return cliente;
     } catch (e) {
       erro(mensagem(e));
-      return false;
+      return null;
     } finally {
       salvando.value = false;
     }

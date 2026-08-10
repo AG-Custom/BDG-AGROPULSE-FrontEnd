@@ -59,7 +59,6 @@ export interface TabelaPrecoFormModel {
   vigenciaInicio: string;
   vigenciaFim: string;
   clienteId: string | null;
-  grupoComercial: GrupoComercialValor | null;
   canalVenda: CanalVendaValor | null;
   regiao: string;
 }
