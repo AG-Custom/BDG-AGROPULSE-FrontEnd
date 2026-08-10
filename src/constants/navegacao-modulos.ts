@@ -695,6 +695,11 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           '/unidades',
           '/categorias-produto',
           '/unidades-medida',
+          '/fornecedores',
+          '/colaboradores',
+          '/logistica/veiculos',
+          '/logistica/transportadoras',
+          '/safras/fazendas',
         ],
         filhos: [
           {

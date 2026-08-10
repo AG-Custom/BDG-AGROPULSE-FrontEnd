@@ -11,7 +11,7 @@ import {
   type ModuloNavegacao,
 } from 'constants/navegacao-modulos';
 import { Permissoes } from 'constants/permissoes';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 export interface ModuloNavegacaoVisivel extends ModuloNavegacao {
@@ -27,12 +27,30 @@ export interface GrupoNavegacaoVisivel {
 
 export type BadgeTipoNegocio = 'revenda' | 'industria' | null;
 
+const moduloPreferidoId = ref<string | null>(null);
+
 function pathCorresponde(path: string, prefixo: string): boolean {
   if (prefixo === '/') {
     return path === '/' || path === '';
   }
 
   return path === prefixo || path.startsWith(`${prefixo}/`);
+}
+
+function melhorPrefixo(modulo: ModuloNavegacaoVisivel, path: string): string | null {
+  let melhor: string | null = null;
+
+  for (const prefixo of modulo.pathPrefixes) {
+    if (!pathCorresponde(path, prefixo)) {
+      continue;
+    }
+
+    if (!melhor || prefixo.length > melhor.length) {
+      melhor = prefixo;
+    }
+  }
+
+  return melhor;
 }
 
 export function useNavegacaoModulos() {
@@ -131,20 +149,55 @@ export function useNavegacaoModulos() {
     return lista;
   });
 
+  function definirModuloPreferido(id: string): void {
+    moduloPreferidoId.value = id;
+  }
+
   const moduloAtivo = computed<ModuloNavegacaoVisivel | null>(() => {
-    const candidatos = modulosVisiveis.value.flatMap((modulo) =>
-      modulo.pathPrefixes.map((prefixo) => ({ modulo, prefixo })),
+    const path = route.path;
+    const routeName = typeof route.name === 'string' ? route.name : null;
+
+    const candidatos = modulosVisiveis.value.filter((modulo) => {
+      const porPrefixo = modulo.pathPrefixes.some((prefixo) =>
+        pathCorresponde(path, prefixo),
+      );
+      const porFilho =
+        routeName != null &&
+        modulo.filhosVisiveis.some((filho) => filho.routeName === routeName);
+
+      return porPrefixo || porFilho;
+    });
+
+    if (candidatos.length === 0) {
+      return null;
+    }
+
+    const preferido = candidatos.find(
+      (modulo) => modulo.id === moduloPreferidoId.value,
     );
+    if (preferido) {
+      return preferido;
+    }
 
-    candidatos.sort((a, b) => b.prefixo.length - a.prefixo.length);
+    const semCadastros = candidatos.filter((modulo) => modulo.id !== 'cadastros');
+    const pool = semCadastros.length > 0 ? semCadastros : candidatos;
 
-    for (const { modulo, prefixo } of candidatos) {
-      if (pathCorresponde(route.path, prefixo)) {
-        return modulo;
+    let escolhido: ModuloNavegacaoVisivel | null = null;
+    let tamanhoPrefixo = -1;
+
+    for (const modulo of pool) {
+      const prefixo = melhorPrefixo(modulo, path);
+      if (!prefixo) {
+        continue;
+      }
+
+      if (prefixo.length > tamanhoPrefixo) {
+        tamanhoPrefixo = prefixo.length;
+        escolhido = modulo;
       }
     }
 
-    return null;
+    return escolhido ?? pool[0] ?? null;
   });
 
   const filhosVisiveis = computed(() => moduloAtivo.value?.filhosVisiveis ?? []);
@@ -209,6 +262,7 @@ export function useNavegacaoModulos() {
     filhosVisiveis,
     mostrarSubnav,
     filhoAtivo,
+    definirModuloPreferido,
     todosModulos: NAVEGACAO_MODULOS,
   };
 }

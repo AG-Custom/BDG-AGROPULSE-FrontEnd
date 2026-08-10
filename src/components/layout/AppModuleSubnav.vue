@@ -7,6 +7,7 @@
         :to="destinoItem(item)"
         class="app-module-subnav__link"
         :class="{ 'app-module-subnav__link--active': filhoAtivo(item) }"
+        @click="onFilhoClick"
       >
         {{ item.label }}
       </router-link>
@@ -19,7 +20,13 @@ import { useNavegacaoModulos } from 'composables/useNavegacaoModulos';
 import type { ItemNavegacao } from 'constants/navegacao-modulos';
 import type { RouteLocationRaw } from 'vue-router';
 
-const { filhosVisiveis, mostrarSubnav, filhoAtivo } = useNavegacaoModulos();
+const {
+  filhosVisiveis,
+  mostrarSubnav,
+  filhoAtivo,
+  moduloAtivo,
+  definirModuloPreferido,
+} = useNavegacaoModulos();
 
 function chaveItem(item: ItemNavegacao): string {
   if (!item.query) {
@@ -32,6 +39,12 @@ function destinoItem(item: ItemNavegacao): RouteLocationRaw {
   return item.query
     ? { name: item.routeName, query: item.query }
     : { name: item.routeName };
+}
+
+function onFilhoClick(): void {
+  if (moduloAtivo.value) {
+    definirModuloPreferido(moduloAtivo.value.id);
+  }
 }
 </script>
 

@@ -22,6 +22,7 @@
       class="app-sidebar__item"
       :class="{ 'app-sidebar__item--active': moduloAtivo?.id === 'dashboard' }"
       aria-label="Dashboard"
+      @click="definirModuloPreferido('dashboard')"
     >
       <q-item-section avatar class="app-sidebar__icon">
         <q-icon name="dashboard" size="20px" />
@@ -53,6 +54,7 @@
         class="app-sidebar__item"
         :class="{ 'app-sidebar__item--active': moduloAtivo?.id === modulo.id }"
         :aria-label="modulo.label"
+        @click="definirModuloPreferido(modulo.id)"
       >
         <q-item-section avatar class="app-sidebar__icon">
           <q-icon :name="modulo.icon" size="20px" />
@@ -80,6 +82,7 @@ const {
   dashboardVisivel,
   gruposVisiveis,
   moduloAtivo,
+  definirModuloPreferido,
 } = useNavegacaoModulos();
 </script>
 
