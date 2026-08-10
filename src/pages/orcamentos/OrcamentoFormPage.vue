@@ -37,6 +37,7 @@
                 v-model="formulario.tabelaPrecoId"
                 entidade="tabelaPreco"
                 label="Tabela de preço"
+                hint="Tabelas exclusivas do cliente só aparecem após selecionar o cliente"
                 clearable
                 :options="tabelaOpcoes"
                 :loading="carregandoTabelas"
@@ -148,7 +149,10 @@ import { useOrcamento } from 'composables/useOrcamento';
 import { useOrcamentos } from 'composables/useOrcamentos';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
-import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
+import {
+  mapearItensTabelaParaLinhas,
+  useProdutosPorTabelaPreco,
+} from 'composables/useProdutosPorTabelaPreco';
 import { useUsuarios } from 'composables/useUsuarios';
 import { isPerfilCarteiraVendedor, UsuarioStatus } from 'constants/enums';
 import type { OrcamentoFormModel, OrcamentoItemFormModel } from 'types/dtos/orcamento.dto';
@@ -193,6 +197,7 @@ const formulario = ref<OrcamentoFormModel>({
 const carregandoPagina = ref(false);
 
 const {
+  itensTabela,
   produtoOpcoes,
   carregandoItensTabela,
   produtoIdsPermitidos,
@@ -202,6 +207,8 @@ const {
 );
 
 const reResolverPrecosPendente = ref(false);
+const substituirItensPendente = ref(false);
+const tabelaPrecoAnteriorSync = ref<string | undefined>(undefined);
 
 const modo = computed(() => (route.name === 'orcamento-editar' ? 'editar' : 'criar'));
 const orcamentoId = computed(() => route.params.id as string | undefined);
@@ -229,6 +236,12 @@ const vendedorOpcoes = computed(() =>
 async function onClienteChange(clienteId: unknown): Promise<void> {
   const id = typeof clienteId === 'string' ? clienteId : '';
   await carregarTabelasPermitidas({ clienteId: id || null });
+
+  const tabelaAtual = formulario.value.tabelaPrecoId;
+  if (tabelaAtual && !tabelaOpcoes.value.some((opcao) => opcao.value === tabelaAtual)) {
+    formulario.value.tabelaPrecoId = '';
+  }
+
   if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }
@@ -254,6 +267,23 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
 
 async function sincronizarItensComTabela(): Promise<void> {
   if (carregandoItensTabela.value || carregandoPagina.value) {
+    return;
+  }
+
+  if (substituirItensPendente.value) {
+    substituirItensPendente.value = false;
+    reResolverPrecosPendente.value = false;
+
+    const linhas = mapearItensTabelaParaLinhas(itensTabela.value);
+    formulario.value.itens =
+      linhas.length > 0
+        ? linhas.map((linha) => ({
+            chave: crypto.randomUUID(),
+            produtoId: linha.produtoId,
+            quantidade: linha.quantidade,
+            precoUnitario: linha.precoUnitario,
+          }))
+        : [novoItem()];
     return;
   }
 
@@ -336,6 +366,7 @@ onMounted(async () => {
     };
     await carregarTabelasPermitidas({ clienteId: orcamento.value.clienteId });
     reResolverPrecosPendente.value = false;
+    substituirItensPendente.value = false;
     carregandoPagina.value = false;
   } else if (tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
@@ -344,14 +375,27 @@ onMounted(async () => {
 
 watch(
   [() => formulario.value.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela, carregandoPagina],
-  (atual, anterior) => {
-    const tabelaAtual = String(atual[0] ?? '');
-    const tabelaAnterior = String(anterior?.[0] ?? '');
+  () => {
+    const tabelaAtual = formulario.value.tabelaPrecoId?.trim() ?? '';
+    const tabelaAnterior = tabelaPrecoAnteriorSync.value;
 
-    if (anterior != null && tabelaAtual !== tabelaAnterior) {
-      reResolverPrecosPendente.value = true;
+    if (!carregandoPagina.value) {
+      if (tabelaAnterior !== undefined && tabelaAtual !== tabelaAnterior) {
+        if (tabelaAtual) {
+          substituirItensPendente.value = true;
+        } else {
+          substituirItensPendente.value = false;
+          reResolverPrecosPendente.value = false;
+        }
+      } else if (tabelaAnterior === undefined && tabelaAtual) {
+        const soVazios = formulario.value.itens.every((item) => !item.produtoId);
+        if (soVazios) {
+          substituirItensPendente.value = true;
+        }
+      }
     }
 
+    tabelaPrecoAnteriorSync.value = tabelaAtual;
     void sincronizarItensComTabela();
   },
 );

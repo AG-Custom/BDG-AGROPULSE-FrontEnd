@@ -43,7 +43,7 @@
             v-model="formulario.tabelaPrecoId"
             entidade="tabelaPreco"
             label="Tabela de preço"
-            hint="Opcional — resolve preço automático nos itens"
+            hint="Tabelas exclusivas do cliente só aparecem após selecionar o cliente"
             clearable
             :options="tabelaOpcoes"
             :loading="carregandoTabelas"
@@ -68,18 +68,18 @@
           />
         </div>
         <div class="col-12 col-md-6">
-          <q-select
+          <agro-select-cadastro
             v-model="formulario.condicaoPagamentoId"
-            outlined
+            entidade="condicaoPagamento"
             label="Condição de pagamento"
             class="field-required"
-            emit-value
-            map-options
             aria-required="true"
             :options="condicaoOpcoes"
             :loading="carregandoCondicoes"
             :rules="[obrigatorio]"
             :readonly="somenteLeitura"
+            :desabilitar-cadastro="somenteLeitura"
+            @atualizar="carregarCondicoes()"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -224,6 +224,12 @@ async function onClienteChange(clienteId: unknown): Promise<void> {
     carregarTabelasPermitidas({ clienteId: id || null }),
     carregarContratosCliente(id),
   ]);
+
+  const tabelaAtual = formulario.value.tabelaPrecoId;
+  if (tabelaAtual && !tabelaOpcoes.value.some((opcao) => opcao.value === tabelaAtual)) {
+    formulario.value.tabelaPrecoId = '';
+  }
+
   if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
     formulario.value.tabelaPrecoId = tabelaPadraoId.value;
   }
@@ -237,10 +243,21 @@ watch(
   () => formulario.value.clienteId,
   (clienteId) => {
     if (clienteId) {
-      void carregarTabelasPermitidas({ clienteId });
+      void carregarTabelasPermitidas({ clienteId }).then(() => {
+        const tabelaAtual = formulario.value.tabelaPrecoId;
+        if (tabelaAtual && !tabelaOpcoes.value.some((opcao) => opcao.value === tabelaAtual)) {
+          formulario.value.tabelaPrecoId = '';
+        }
+      });
       void carregarContratosCliente(clienteId);
     } else {
       contratosCliente.value = [];
+      void carregarTabelasPermitidas({ clienteId: null }).then(() => {
+        const tabelaAtual = formulario.value.tabelaPrecoId;
+        if (tabelaAtual && !tabelaOpcoes.value.some((opcao) => opcao.value === tabelaAtual)) {
+          formulario.value.tabelaPrecoId = '';
+        }
+      });
     }
   },
 );

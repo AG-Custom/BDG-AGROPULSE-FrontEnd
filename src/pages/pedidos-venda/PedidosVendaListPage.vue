@@ -203,7 +203,9 @@ import {
   variantePedidoVendaStatus,
 } from 'utils/pedido-venda.helpers';
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const { pedidos, carregando, exportando, carregar, exportar } = usePedidosVenda();
 const {
   clientes,
@@ -222,6 +224,17 @@ const filtroAte = ref('');
 const filtroCliente = ref<string | null>(null);
 const filtroStatus = ref<PedidoVendaStatusValor | null>(null);
 const filtroVendedor = ref<string | null>(null);
+
+function statusDaQuery(): PedidoVendaStatusValor | null {
+  const bruto = route.query.status;
+  const valor = typeof bruto === 'string' ? bruto : null;
+  if (!valor) {
+    return null;
+  }
+  return PedidoVendaStatusOpcoes.some((opcao) => opcao.value === valor)
+    ? (valor as PedidoVendaStatusValor)
+    : null;
+}
 
 const clienteOpcoes = computed(() =>
   clientes.value.map((cliente) => ({
@@ -348,7 +361,12 @@ watch(
 onMounted(() => {
   void carregarClientes();
   void carregarUsuarios();
-  void recarregar();
+  const status = statusDaQuery();
+  if (status) {
+    filtroStatus.value = status;
+  } else {
+    void recarregar();
+  }
 });
 </script>
 

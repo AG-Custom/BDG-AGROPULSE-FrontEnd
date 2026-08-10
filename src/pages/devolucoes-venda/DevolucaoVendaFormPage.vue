@@ -2,7 +2,7 @@
   <q-page class="agro-page agro-page--form-wide">
     <app-page-header
       titulo="Nova devolução"
-      subtitulo="Busque a NF de origem e informe destino do estoque e crédito."
+      subtitulo="Selecione o pedido de venda faturado e informe destino do estoque e crédito."
     />
 
     <section class="agro-section">
@@ -10,36 +10,33 @@
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md q-mb-md">
             <div class="col-12 col-md-6">
-              <q-input
-                v-model="formulario.buscaNf"
-                outlined
-                label="Número ou chave da NF-e"
-                hint="Busca o pedido de origem"
-              >
-                <template #append>
-                  <agro-btn
-                    flat
-                    dense
-                    icon="search"
-                    descricao="Buscar origem pela NF"
-                    :loading="buscandoOrigem"
-                    @click="buscarOrigem"
-                  />
-                </template>
-              </q-input>
-            </div>
-            <div class="col-12 col-md-6">
               <q-select
                 v-model="formulario.pedidoVendaId"
                 outlined
+                use-input
+                fill-input
+                hide-selected
+                input-debounce="300"
                 label="Pedido de venda"
                 emit-value
                 map-options
                 class="field-required"
-                :options="pedidoOpcoes"
-                :loading="carregandoPedidos"
+                :options="pedidoOpcoesFiltradas"
+                :loading="carregandoPedidos || carregandoOrigem"
+                :disable="!carregandoPedidos && pedidoOpcoes.length === 0"
+                :hint="hintPedidoVenda"
                 :rules="[obrigatorio]"
-              />
+                @filter="filtrarPedidos"
+                @update:model-value="onPedidoSelect"
+              >
+                <template #no-option>
+                  <q-item>
+                    <q-item-section class="devolucao-form__sem-pedido">
+                      {{ mensagemSemPedidos }}
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </div>
             <div class="col-12 col-md-6">
               <q-select
@@ -58,10 +55,10 @@
             </div>
           </div>
 
-          <q-banner v-if="origem" rounded class="devolucao-form__origem">
-            Origem: {{ origem.clienteNome ?? origem.clienteId }} · NF
-            {{ origem.notaFiscalNumero ?? '—' }} ·
-            {{ formatarMoeda(origem.valorTotal) }}
+          <q-banner v-if="pedidoOrigem" rounded class="devolucao-form__origem">
+            Origem: {{ rotuloCliente(pedidoOrigem.clienteId) }} ·
+            {{ formatarMoeda(pedidoOrigem.valorTotal) }} ·
+            {{ formatarData(pedidoOrigem.faturadoEm ?? pedidoOrigem.createdAt) }}
           </q-banner>
 
           <div class="header">
@@ -155,15 +152,19 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
+import { useClientes } from 'composables/useClientes';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
+import { usePedidoVenda } from 'composables/usePedidoVenda';
 import { usePedidosVenda } from 'composables/usePedidosVenda';
 import { useProdutos } from 'composables/useProdutos';
 import {
   DestinoCreditoDevolucaoOpcoes,
   DestinoDevolucao,
   DestinoDevolucaoOpcoes,
+  PedidoVendaStatus,
 } from 'constants/enums';
 import type { DevolucaoItemFormModel, DevolucaoVendaFormModel } from 'types/dtos/devolucao-venda.dto';
+import type { PedidoVendaDto } from 'types/dtos/pedido-venda.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
@@ -182,13 +183,15 @@ function novoItem(): DevolucaoItemFormModel {
 }
 
 const router = useRouter();
-const { salvando, buscandoOrigem, origem, criar, buscarOrigemPorNf } = useDevolucoesVenda();
+const { salvando, criar } = useDevolucoesVenda();
 const { produtos, carregar: carregarProdutos } = useProdutos();
+const { clientes, carregar: carregarClientes } = useClientes();
 const {
   pedidos,
   carregando: carregandoPedidos,
   carregar: carregarPedidos,
 } = usePedidosVenda();
+const { obter: obterPedido, pedido: pedidoDetalhe } = usePedidoVenda();
 
 const formulario = ref<DevolucaoVendaFormModel>({
   pedidoVendaId: '',
@@ -198,39 +201,109 @@ const formulario = ref<DevolucaoVendaFormModel>({
   itens: [novoItem()],
 });
 
+const pedidoOrigem = ref<PedidoVendaDto | null>(null);
+const carregandoOrigem = ref(false);
+const filtroPedido = ref('');
+
 const produtoOpcoes = computed(() =>
   produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
 );
 
+const mapaClientes = computed(() => {
+  const mapa = new Map<string, string>();
+  for (const cliente of clientes.value) {
+    mapa.set(cliente.id, cliente.nomeRazao);
+  }
+  return mapa;
+});
+
 const pedidoOpcoes = computed(() =>
   pedidos.value.map((p) => ({
-    label: `${p.id.slice(0, 8)}… · ${formatarMoeda(p.valorTotal)} · ${formatarData(p.createdAt)}`,
+    label: `${p.id.slice(0, 8)}… · ${rotuloCliente(p.clienteId)} · ${formatarMoeda(p.valorTotal)} · ${formatarData(p.createdAt)}`,
     value: p.id,
   })),
 );
+
+const pedidoOpcoesFiltradas = computed(() => {
+  const termo = filtroPedido.value.trim().toLowerCase();
+  if (!termo) {
+    return pedidoOpcoes.value;
+  }
+  return pedidoOpcoes.value.filter((opcao) => opcao.label.toLowerCase().includes(termo));
+});
+
+const mensagemSemPedidos = computed(() => {
+  if (carregandoPedidos.value) {
+    return 'Carregando pedidos…';
+  }
+
+  if (pedidoOpcoes.value.length === 0) {
+    return 'Nenhum pedido faturado disponível para devolução.';
+  }
+
+  return 'Nenhum pedido corresponde à busca.';
+});
+
+const hintPedidoVenda = computed(() => {
+  if (carregandoPedidos.value || pedidoOpcoes.value.length > 0) {
+    return 'Digite para filtrar pedidos faturados';
+  }
+
+  return 'Nenhum pedido faturado disponível para devolução';
+});
+
+function rotuloCliente(clienteId: string): string {
+  return mapaClientes.value.get(clienteId) ?? clienteId;
+}
+
+function filtrarPedidos(val: string, update: (fn: () => void) => void): void {
+  update(() => {
+    filtroPedido.value = val;
+  });
+}
 
 function adicionar(): void {
   formulario.value.itens.push(novoItem());
 }
 
-async function buscarOrigem(): Promise<void> {
-  const encontrada = await buscarOrigemPorNf(formulario.value.buscaNf);
-  if (!encontrada) {
+function preencherItensDoPedido(pedido: PedidoVendaDto): void {
+  if (pedido.itens.length === 0) {
+    formulario.value.itens = [novoItem()];
     return;
   }
 
-  formulario.value.pedidoVendaId = encontrada.pedidoVendaId;
-  if (encontrada.itens.length > 0) {
-    formulario.value.itens = encontrada.itens.map((item) => ({
-      chave: crypto.randomUUID(),
-      produtoId: item.produtoId,
-      quantidade: String(item.quantidade),
-      destino: DestinoDevolucao.Reposicao,
-      loteId: item.loteId ?? '',
-      numeroLote: item.numeroLote ?? '',
-      justificativaDescarte: '',
-    }));
+  formulario.value.itens = pedido.itens.map((item) => ({
+    chave: crypto.randomUUID(),
+    produtoId: item.produtoId,
+    quantidade: String(item.quantidade),
+    destino: DestinoDevolucao.Reposicao,
+    loteId: '',
+    numeroLote: '',
+    justificativaDescarte: '',
+  }));
+}
+
+async function onPedidoSelect(valor: unknown): Promise<void> {
+  const pedidoId = typeof valor === 'string' ? valor : '';
+
+  if (!pedidoId) {
+    pedidoOrigem.value = null;
+    formulario.value.itens = [novoItem()];
+    return;
   }
+
+  carregandoOrigem.value = true;
+  const ok = await obterPedido(pedidoId);
+  carregandoOrigem.value = false;
+
+  if (!ok || !pedidoDetalhe.value) {
+    pedidoOrigem.value = null;
+    formulario.value.itens = [novoItem()];
+    return;
+  }
+
+  pedidoOrigem.value = pedidoDetalhe.value;
+  preencherItensDoPedido(pedidoDetalhe.value);
 }
 
 async function salvar(): Promise<void> {
@@ -240,7 +313,8 @@ async function salvar(): Promise<void> {
 
 onMounted(() => {
   void carregarProdutos();
-  void carregarPedidos();
+  void carregarClientes({ ativo: true });
+  void carregarPedidos({ status: PedidoVendaStatus.Faturado });
 });
 </script>
 
@@ -257,7 +331,10 @@ onMounted(() => {
   font-size: var(--font-size-lg);
 }
 .devolucao-form__origem {
-  background: var(--color-surface-muted, var(--color-surface-default));
   margin-bottom: var(--spacing-4);
+  background: var(--color-bg-subtle);
+}
+.devolucao-form__sem-pedido {
+  color: var(--color-text-secondary);
 }
 </style>

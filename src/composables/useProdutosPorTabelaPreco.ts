@@ -3,7 +3,24 @@ import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { tabelaPrecoService } from 'services/tabela-preco.service';
 import type { ProdutoResumoDto } from 'types/dtos/produto.dto';
 import type { TabelaPrecoItemDto } from 'types/dtos/tabela-preco.dto';
+import { formatarMoedaParaInput } from 'utils/formatters';
 import { computed, ref, watch } from 'vue';
+
+export interface LinhaItemTabelaPreco {
+  produtoId: string;
+  quantidade: string;
+  precoUnitario: string;
+}
+
+export function mapearItensTabelaParaLinhas(
+  itens: readonly TabelaPrecoItemDto[],
+): LinhaItemTabelaPreco[] {
+  return itens.map((item) => ({
+    produtoId: item.produtoId,
+    quantidade: '1',
+    precoUnitario: formatarMoedaParaInput(item.preco),
+  }));
+}
 
 export function useProdutosPorTabelaPreco(
   tabelaPrecoId: () => string | null | undefined,

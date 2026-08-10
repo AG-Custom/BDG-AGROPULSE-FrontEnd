@@ -6,7 +6,14 @@
       <agro-card>
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
+            <div class="col-12">
+              <q-checkbox
+                v-model="consumidorSemCadastro"
+                label="Consumidor sem cadastro"
+                @update:model-value="onConsumidorSemCadastroChange"
+              />
+            </div>
+            <div v-if="!consumidorSemCadastro" class="col-12 col-md-6">
               <agro-select-cadastro
                 v-model="formulario.clienteId"
                 entidade="cliente"
@@ -28,32 +35,35 @@
                 v-model="formulario.tabelaPrecoId"
                 entidade="tabelaPreco"
                 label="Tabela de preço"
+                hint="Tabelas exclusivas do cliente só aparecem após selecionar o cliente"
                 clearable
                 :options="tabelaOpcoes"
                 :loading="carregandoTabelas"
                 @atualizar="carregarTabelasPermitidas({ clienteId: formulario.clienteId || null })"
               />
             </div>
-            <div class="col-12 col-md-4">
-              <q-input
-                v-model="formulario.clienteDocumentoAvulso"
-                outlined
-                label="CPF/CNPJ avulso"
-                hint="Consumidor sem cadastro — CPF ou CNPJ"
-                :mask="mascaraDocumentoAtual"
-                :maxlength="tamanhoDocumentoAtual"
-                inputmode="numeric"
-                :rules="[documentoValidator]"
-              />
-            </div>
-            <div class="col-12 col-md-4">
-              <q-input
-                v-model="formulario.clienteNomeAvulso"
-                outlined
-                label="Nome avulso"
-                hint="Opcional se informado CPF"
-              />
-            </div>
+            <template v-if="consumidorSemCadastro">
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.clienteDocumentoAvulso"
+                  outlined
+                  label="CPF/CNPJ avulso"
+                  hint="Consumidor sem cadastro — CPF ou CNPJ"
+                  :mask="mascaraDocumentoAtual"
+                  :maxlength="tamanhoDocumentoAtual"
+                  inputmode="numeric"
+                  :rules="[documentoValidator]"
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <q-input
+                  v-model="formulario.clienteNomeAvulso"
+                  outlined
+                  label="Nome avulso"
+                  hint="Opcional se informado CPF"
+                />
+              </div>
+            </template>
             <div class="col-12 col-md-4">
               <q-toggle v-model="formulario.aPrazo" label="Venda a prazo" />
             </div>
@@ -198,7 +208,10 @@ import { useNotificacao } from 'composables/useNotificacao';
 import { usePdv } from 'composables/usePdv';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
-import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
+import {
+  mapearItensTabelaParaLinhas,
+  useProdutosPorTabelaPreco,
+} from 'composables/useProdutosPorTabelaPreco';
 import { FormaPagamento, FormaPagamentoPdvOpcoes } from 'constants/enums';
 import { mascaraDocumento, tamanhoFormatadoDocumento } from 'constants/masks';
 import type {
@@ -244,6 +257,8 @@ const {
 } = usePrecificacao();
 const { erro } = useNotificacao();
 
+const consumidorSemCadastro = ref(false);
+
 const formulario = ref<PdvVendaFormModel>({
   clienteId: '',
   clienteBusca: '',
@@ -264,6 +279,7 @@ const tamanhoDocumentoAtual = computed(() =>
 );
 
 const {
+  itensTabela,
   produtoOpcoes,
   carregandoItensTabela,
   produtoIdsPermitidos,
@@ -273,6 +289,8 @@ const {
 );
 
 const reResolverPrecosPendente = ref(false);
+const substituirItensPendente = ref(false);
+const tabelaPrecoAnteriorSync = ref<string | undefined>(undefined);
 const filtroCliente = ref('');
 
 const clienteOpcoes = computed(() =>
@@ -313,15 +331,49 @@ function filtrarClientes(val: string, update: (fn: () => void) => void): void {
   });
 }
 
+async function aplicarTabelasDoCliente(clienteId: string | null): Promise<void> {
+  await carregarTabelasPermitidas({ clienteId });
+
+  const tabelaAtual = formulario.value.tabelaPrecoId;
+  if (tabelaAtual && !tabelaOpcoes.value.some((opcao) => opcao.value === tabelaAtual)) {
+    formulario.value.tabelaPrecoId = '';
+  }
+
+  if (!formulario.value.tabelaPrecoId && tabelaPadraoId.value) {
+    formulario.value.tabelaPrecoId = tabelaPadraoId.value;
+  }
+}
+
+function onConsumidorSemCadastroChange(valor: boolean | null): void {
+  if (valor) {
+    formulario.value.clienteId = '';
+    void aplicarTabelasDoCliente(null);
+    return;
+  }
+
+  formulario.value.clienteNomeAvulso = '';
+  formulario.value.clienteDocumentoAvulso = '';
+}
+
 function onClienteSelect(valor: unknown): void {
   const clienteId = typeof valor === 'string' ? valor : '';
 
   if (clienteId) {
     formulario.value.clienteNomeAvulso = '';
     formulario.value.clienteDocumentoAvulso = '';
-    void carregarTabelasPermitidas({ clienteId });
   }
 }
+
+watch(
+  () => formulario.value.clienteId,
+  (clienteId) => {
+    if (consumidorSemCadastro.value) {
+      return;
+    }
+
+    void aplicarTabelasDoCliente(clienteId || null);
+  },
+);
 
 function adicionarItem(): void {
   formulario.value.itens.push(novoItem());
@@ -363,6 +415,25 @@ async function onProdutoItem(index: number, produtoId: string): Promise<void> {
 
 async function sincronizarItensComTabela(): Promise<void> {
   if (carregandoItensTabela.value) {
+    return;
+  }
+
+  if (substituirItensPendente.value) {
+    substituirItensPendente.value = false;
+    reResolverPrecosPendente.value = false;
+
+    const linhas = mapearItensTabelaParaLinhas(itensTabela.value);
+    formulario.value.itens =
+      linhas.length > 0
+        ? linhas.map((linha) => ({
+            chave: crypto.randomUUID(),
+            produtoId: linha.produtoId,
+            quantidade: linha.quantidade,
+            precoUnitario: linha.precoUnitario,
+            numeroLote: '',
+            loteId: '',
+          }))
+        : [novoItem()];
     return;
   }
 
@@ -413,14 +484,25 @@ watch(tabelaPadraoId, (id) => {
 
 watch(
   [() => formulario.value.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
-  (atual, anterior) => {
-    const tabelaAtual = String(atual[0] ?? '');
-    const tabelaAnterior = String(anterior?.[0] ?? '');
+  () => {
+    const tabelaAtual = formulario.value.tabelaPrecoId?.trim() ?? '';
+    const tabelaAnterior = tabelaPrecoAnteriorSync.value;
 
-    if (anterior != null && tabelaAtual !== tabelaAnterior) {
-      reResolverPrecosPendente.value = true;
+    if (tabelaAnterior !== undefined && tabelaAtual !== tabelaAnterior) {
+      if (tabelaAtual) {
+        substituirItensPendente.value = true;
+      } else {
+        substituirItensPendente.value = false;
+        reResolverPrecosPendente.value = false;
+      }
+    } else if (tabelaAnterior === undefined && tabelaAtual) {
+      const soVazios = formulario.value.itens.every((item) => !item.produtoId);
+      if (soVazios) {
+        substituirItensPendente.value = true;
+      }
     }
 
+    tabelaPrecoAnteriorSync.value = tabelaAtual;
     void sincronizarItensComTabela();
   },
 );

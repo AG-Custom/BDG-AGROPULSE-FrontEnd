@@ -170,7 +170,10 @@ import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
-import { useProdutosPorTabelaPreco } from 'composables/useProdutosPorTabelaPreco';
+import {
+  mapearItensTabelaParaLinhas,
+  useProdutosPorTabelaPreco,
+} from 'composables/useProdutosPorTabelaPreco';
 import type { QForm, QTableColumn } from 'quasar';
 import type { PedidoVendaItemFormModel } from 'types/dtos/pedido-venda.dto';
 import { formatarDecimal, formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
@@ -200,6 +203,7 @@ const {
 const { resolvendoPreco, resolverPreco } = usePrecificacao();
 
 const {
+  itensTabela,
   produtoOpcoes,
   carregandoItensTabela,
   produtoIdsPermitidos,
@@ -209,6 +213,8 @@ const {
 );
 
 const reResolverPrecosPendente = ref(false);
+const substituirItensPendente = ref(false);
+const tabelaPrecoAnteriorSync = ref<string | undefined>(undefined);
 const dialogAberto = ref(false);
 const indiceEdicao = ref<number | null>(null);
 const itemForm = ref<PedidoVendaItemFormModel>(criarItemFormVazio());
@@ -274,6 +280,21 @@ async function onProdutoSelecionado(valor: unknown): Promise<void> {
 
 async function sincronizarItensComTabela(): Promise<void> {
   if (carregandoItensTabela.value || props.somenteLeitura) {
+    return;
+  }
+
+  if (substituirItensPendente.value) {
+    substituirItensPendente.value = false;
+    reResolverPrecosPendente.value = false;
+
+    const linhas = mapearItensTabelaParaLinhas(itensTabela.value);
+    itens.value = linhas.map((linha) => ({
+      chave: criarChaveItem(),
+      produtoId: linha.produtoId,
+      quantidade: linha.quantidade,
+      precoUnitario: linha.precoUnitario,
+      descontoPercentual: '0',
+    }));
     return;
   }
 
@@ -374,14 +395,25 @@ async function salvarItem(): Promise<void> {
 
 watch(
   [() => props.tabelaPrecoId, produtoIdsPermitidos, carregandoItensTabela],
-  (atual, anterior) => {
-    const tabelaAtual = String(atual[0] ?? '');
-    const tabelaAnterior = String(anterior?.[0] ?? '');
+  () => {
+    const tabelaAtual = props.tabelaPrecoId?.trim() ?? '';
+    const tabelaAnterior = tabelaPrecoAnteriorSync.value;
 
-    if (anterior != null && tabelaAtual !== tabelaAnterior) {
-      reResolverPrecosPendente.value = true;
+    if (tabelaAnterior !== undefined && tabelaAtual !== tabelaAnterior) {
+      if (tabelaAtual) {
+        substituirItensPendente.value = true;
+      } else {
+        substituirItensPendente.value = false;
+        reResolverPrecosPendente.value = false;
+      }
+    } else if (tabelaAnterior === undefined && tabelaAtual) {
+      const soVazios = itens.value.every((item) => !item.produtoId);
+      if (soVazios) {
+        substituirItensPendente.value = true;
+      }
     }
 
+    tabelaPrecoAnteriorSync.value = tabelaAtual;
     void sincronizarItensComTabela();
   },
 );

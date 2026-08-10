@@ -21,7 +21,8 @@ function formParaPayload(form: DevolucaoVendaFormModel): CriarDevolucaoVendaPayl
     pedidoVendaId: form.pedidoVendaId,
     observacao: form.observacao.trim() || null,
     destinoCredito: (form.destinoCredito || null) as DestinoCreditoDevolucaoValor | null,
-    notaFiscalNumero: form.buscaNf.trim() || null,
+    notaFiscalNumero: null,
+    notaFiscalChave: null,
     itens: form.itens.map((item) => ({
       produtoId: item.produtoId,
       quantidade: Number(item.quantidade),

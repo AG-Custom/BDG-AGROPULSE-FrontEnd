@@ -17,12 +17,17 @@ export function usePrecificacao() {
   const { mensagem } = useTratarErroFormulario();
 
   const tabelaOpcoes = computed(() =>
-    tabelasPermitidas.value.map((tabela) => ({
-      label: tabela.ehPadrao
-        ? `${tabela.nome} (padrão)`
-        : `${tabela.nome}`,
-      value: tabela.id,
-    })),
+    tabelasPermitidas.value.map((tabela) => {
+      if (tabela.ehPadrao) {
+        return { label: `${tabela.nome} (padrão)`, value: tabela.id };
+      }
+
+      if (tabela.clienteId) {
+        return { label: `${tabela.nome} (cliente)`, value: tabela.id };
+      }
+
+      return { label: tabela.nome, value: tabela.id };
+    }),
   );
 
   const tabelaPadraoId = computed(

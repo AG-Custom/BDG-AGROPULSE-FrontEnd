@@ -100,13 +100,12 @@
         </q-card-section>
         <q-card-section class="row q-col-gutter-md">
           <div class="col-12">
-            <q-select
+            <agro-select-cadastro
               v-model="converterForm.condicaoPagamentoId"
-              outlined
+              entidade="condicaoPagamento"
               label="Condição de pagamento"
-              emit-value
-              map-options
               :options="condicaoOpcoes"
+              @atualizar="carregarCondicoes()"
             />
           </div>
           <div class="col-12">
@@ -140,6 +139,7 @@
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useClientes } from 'composables/useClientes';
 import { useCondicoesPagamento } from 'composables/useCondicoesPagamento';
 import { useOrcamento } from 'composables/useOrcamento';

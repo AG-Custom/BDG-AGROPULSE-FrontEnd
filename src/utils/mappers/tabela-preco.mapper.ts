@@ -11,9 +11,16 @@ import type {
 import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 
 export function criarTabelaPrecoFormVazia(clienteId: string | null = null): TabelaPrecoFormModel {
+  const hoje = new Date();
+  const vigenciaInicio = [
+    hoje.getFullYear(),
+    String(hoje.getMonth() + 1).padStart(2, '0'),
+    String(hoje.getDate()).padStart(2, '0'),
+  ].join('-');
+
   return {
     nome: '',
-    vigenciaInicio: '',
+    vigenciaInicio,
     vigenciaFim: '',
     clienteId,
     grupoComercial: null,

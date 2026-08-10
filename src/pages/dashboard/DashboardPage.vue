@@ -41,10 +41,10 @@
         </div>
 
         <div
-          v-if="podeVerAprovacoes"
+          v-if="podeVerAprovacoes || podeVerPendentesEstoque"
           class="row q-col-gutter-md q-mb-md"
         >
-          <div class="col-12 col-md-6 col-lg-4">
+          <div v-if="podeVerAprovacoes" class="col-12 col-md-6 col-lg-4">
             <agro-card>
               <div class="secao-header">
                 <div class="text-subtitle1">Fila de aprovações</div>
@@ -62,6 +62,27 @@
                 :value="String(filaAprovacoes.length)"
                 icon="rule"
                 :accent="filaAprovacoes.length > 0"
+              />
+            </agro-card>
+          </div>
+          <div v-if="podeVerPendentesEstoque" class="col-12 col-md-6 col-lg-4">
+            <agro-card>
+              <div class="secao-header">
+                <div class="text-subtitle1">Pendentes de estoque</div>
+                <agro-btn
+                  flat
+                  dense
+                  color="primary"
+                  label="Ver pedidos"
+                  descricao="Ir para pedidos pendentes de estoque"
+                  :to="{ name: 'pedidos-venda', query: { status: PedidoVendaStatus.PendenteEstoque } }"
+                />
+              </div>
+              <metric-tile
+                label="Aguardando estoque"
+                :value="String(pedidosPendentesEstoque.length)"
+                icon="inventory_2"
+                :accent="pedidosPendentesEstoque.length > 0"
               />
             </agro-card>
           </div>
@@ -187,9 +208,11 @@ import MetricTile from 'components/ui/MetricTile.vue';
 import { useAprovacoes } from 'composables/useAprovacoes';
 import { useAuth } from 'composables/useAuth';
 import { useDashboard } from 'composables/useDashboard';
+import { usePedidosVenda } from 'composables/usePedidosVenda';
 import { useRelatorios } from 'composables/useRelatorios';
 import { useVerCustos } from 'composables/useVerCustos';
 import type { ExportacaoFormatoValor } from 'constants/enums';
+import { PedidoVendaStatus } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
 import type { QTableColumn } from 'quasar';
 import { filtrarAlertasGerenciaisPorPolitica } from 'utils/alerta-politica';
@@ -200,11 +223,19 @@ const { usuario, possuiPermissao } = useAuth();
 const { kpis, ranking, alertas, carregando, carregar } = useDashboard();
 const { exportando: exportandoRanking, exportarRankingUnidades } = useRelatorios();
 const { fila: filaAprovacoes, carregar: carregarAprovacoes } = useAprovacoes();
+const {
+  pedidos: pedidosPendentesEstoque,
+  carregar: carregarPendentesEstoque,
+} = usePedidosVenda();
 const { verCustos } = useVerCustos();
 const dias = ref('30');
 
 const podeVerAprovacoes = computed(() =>
   possuiPermissao(Permissoes.Aprovacoes.Visualizar),
+);
+
+const podeVerPendentesEstoque = computed(() =>
+  possuiPermissao(Permissoes.PedidosVenda.Visualizar),
 );
 
 const alertasResumo = computed(() =>
@@ -300,6 +331,9 @@ async function atualizar(): Promise<void> {
   await carregar({ dias: Number(dias.value) || 30 });
   if (podeVerAprovacoes.value) {
     void carregarAprovacoes();
+  }
+  if (podeVerPendentesEstoque.value) {
+    void carregarPendentesEstoque({ status: PedidoVendaStatus.PendenteEstoque });
   }
 }
 

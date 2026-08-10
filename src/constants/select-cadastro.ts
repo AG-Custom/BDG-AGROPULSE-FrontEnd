@@ -8,6 +8,7 @@ export const SelectCadastroEntidade = {
   Talhao: 'talhao',
   Cnpj: 'cnpj',
   TabelaPreco: 'tabelaPreco',
+  CondicaoPagamento: 'condicaoPagamento',
   Usuario: 'usuario',
   Colaborador: 'colaborador',
   Fazenda: 'fazenda',
@@ -67,6 +68,10 @@ export const SelectCadastroEntidadeConfig: Record<
   [SelectCadastroEntidade.TabelaPreco]: {
     rotulo: 'tabela de preço',
     routeName: 'tabela-preco-novo',
+  },
+  [SelectCadastroEntidade.CondicaoPagamento]: {
+    rotulo: 'condição de pagamento',
+    routeName: 'condicoes-pagamento',
   },
   [SelectCadastroEntidade.Usuario]: {
     rotulo: 'usuário',
