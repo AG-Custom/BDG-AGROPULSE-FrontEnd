@@ -3,6 +3,7 @@ import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { messageService } from 'services/message.service';
 import { fornecedorService } from 'services/fornecedor.service';
 import type {
+  FornecedorDto,
   FornecedorFormModel,
   FornecedorResumoDto,
   ListarFornecedoresParams,
@@ -38,16 +39,19 @@ export function useFornecedores() {
     }
   }
 
-  async function criar(form: FornecedorFormModel): Promise<boolean> {
+  async function criar(
+    form: FornecedorFormModel,
+    opcoes?: { mensagemSucesso?: string },
+  ): Promise<FornecedorDto | null> {
     salvando.value = true;
 
     try {
-      await fornecedorService.criar(formParaCriarPayload(form));
-      sucesso('Fornecedor cadastrado com sucesso.');
-      return true;
+      const criado = await fornecedorService.criar(formParaCriarPayload(form));
+      sucesso(opcoes?.mensagemSucesso ?? 'Fornecedor cadastrado com sucesso.');
+      return criado;
     } catch (e) {
       erro(mensagem(e));
-      return false;
+      return null;
     } finally {
       salvando.value = false;
     }

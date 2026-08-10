@@ -155,31 +155,112 @@ export interface ComprasConfigDto {
   fluxoCompletoHabilitado: boolean;
 }
 
+export interface PreviewRecebimentoXmlItemTributacaoDto {
+  origem: string | null;
+  cstIcms: string | null;
+  csosn: string | null;
+  baseIcms: number | null;
+  aliquotaIcms: number | null;
+  valorIcms: number | null;
+  valorIcmsDesonerado: number | null;
+  cstIpi: string | null;
+  valorIpi: number | null;
+  cstPis: string | null;
+  cstCofins: string | null;
+  baseDifal: number | null;
+  valorDifal: number | null;
+}
+
 export interface PreviewRecebimentoXmlItemDto {
   codigoProdutoXml: string;
   descricaoProdutoXml: string | null;
   produtoId: string | null;
   produtoDescricao: string | null;
+  ncm: string | null;
+  cfop: string | null;
+  unidade: string | null;
+  ean: string | null;
   quantidade: number;
   custoUnitario: number;
+  valorTotal: number | null;
   numeroLote: string | null;
   dataValidade: string | null;
+  informacaoAdicional: string | null;
+  tributacao: PreviewRecebimentoXmlItemTributacaoDto;
+}
+
+export interface PreviewRecebimentoXmlEmitenteDto {
+  documento: string | null;
+  razaoSocial: string | null;
+  nomeFantasia: string | null;
+  inscricaoEstadual: string | null;
+  inscricaoMunicipal: string | null;
+  telefone: string | null;
+  logradouro: string | null;
+  numero: string | null;
+  complemento: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  uf: string | null;
+  cep: string | null;
+}
+
+export interface PreviewRecebimentoXmlFaturaDto {
+  numero: string | null;
+  valorOriginal: number | null;
+  valorDesconto: number | null;
+  valorLiquido: number | null;
+}
+
+export interface PreviewRecebimentoXmlPagamentoDto {
+  indicadorPagamento: string | null;
+  formaPagamento: string | null;
+  valor: number | null;
+}
+
+export interface PreviewRecebimentoXmlTotaisDto {
+  totalProdutos: number | null;
+  totalDesconto: number | null;
+  totalNota: number | null;
+  totalFrete: number | null;
+  totalSeguro: number | null;
+  totalOutras: number | null;
+  totalBaseIcms: number | null;
+  totalValorIcms: number | null;
+  totalIcmsDesonerado: number | null;
+  totalBaseIcmsSt: number | null;
+  totalValorIcmsSt: number | null;
+  totalIpi: number | null;
+  totalBaseDifal: number | null;
+  totalValorDifal: number | null;
+  tipoFrete: string | null;
 }
 
 export interface DuplicataRecebimentoDto {
   numero: string | null;
   vencimento: string;
   valor: number;
+  formaPagamento?: string | null;
+  centroCustoId?: string | null;
+  planoContas?: string | null;
 }
 
 export interface PreviewRecebimentoXmlDto {
   fornecedorId: string | null;
   fornecedorNome: string | null;
+  emitente: PreviewRecebimentoXmlEmitenteDto | null;
   chaveAcesso: string | null;
   numeroNota: string | null;
   serie: string | null;
+  naturezaOperacao: string | null;
+  dataEmissao: string | null;
+  totais: PreviewRecebimentoXmlTotaisDto;
+  fatura: PreviewRecebimentoXmlFaturaDto | null;
+  informacoesComplementares: string | null;
+  informacoesFisco: string | null;
   itens: PreviewRecebimentoXmlItemDto[];
   duplicatas: DuplicataRecebimentoDto[];
+  pagamentos: PreviewRecebimentoXmlPagamentoDto[];
 }
 
 export interface RecebimentoCompraItemDto {
@@ -215,6 +296,7 @@ export interface RecebimentoCompraDto {
   createdAt: string;
   itens: RecebimentoCompraItemDto[];
   divergencias: RecebimentoCompraDivergenciaDto[];
+  dadosNfe?: PreviewRecebimentoXmlDto | null;
 }
 
 export interface HistoricoCompraDto {
@@ -371,10 +453,25 @@ export interface DuplicataRecebimentoPayload {
   numero?: string | null;
   vencimento: string;
   valor: number;
+  formaPagamento?: string | null;
+  centroCustoId?: string | null;
+  planoContas?: string | null;
+}
+
+export interface PrecificacaoItemRecebimentoPayload {
+  produtoId: string;
+  tipoCusto?: string | null;
+  custoUnitario?: number | null;
+  margemLucroPercentual?: number | null;
+  precoVenda?: number | null;
 }
 
 export interface ConfirmarRecebimentoPayload {
   duplicatas?: DuplicataRecebimentoPayload[] | null;
+  precificacoes?: PrecificacaoItemRecebimentoPayload[] | null;
+  informacaoComplementarEntrada?: string | null;
+  centroCustoId?: string | null;
+  planoContas?: string | null;
 }
 
 export interface ListarSolicitacoesCompraParams {

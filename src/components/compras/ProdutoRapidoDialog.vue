@@ -49,6 +49,7 @@
             class="field-required"
             :options="unidadeMedidaOpcoes"
             :loading="carregandoUnidadesMedida"
+            :hint="hintUnidadeXml"
             :rules="[obrigatorio]"
           />
 
@@ -58,6 +59,22 @@
             class="field-required"
             :rules="[obrigatorio]"
           />
+
+          <div class="xml-bloco">
+            <h5 class="xml-bloco__titulo">Dados do XML</h5>
+            <div class="xml-bloco__grid">
+              <q-input v-model="ncm" outlined label="NCM" mask="########" fill-mask="" />
+              <q-input v-model="cfop" outlined label="CFOP" mask="####" fill-mask="" />
+              <q-input v-model="ean" outlined label="EAN" />
+              <q-input
+                :model-value="unidadeXml?.trim() || '—'"
+                outlined
+                readonly
+                label="UN (XML)"
+                hint="Usada para sugerir a unidade de medida"
+              />
+            </div>
+          </div>
 
           <div class="agro-form-actions">
             <agro-btn flat label="Cancelar" descricao="Fechar" @click="emit('update:modelValue', false)" />
@@ -98,6 +115,10 @@ const props = defineProps<{
   descricaoProdutoXml?: string;
   codigoProdutoXml?: string;
   precoSugerido?: number | null;
+  ncmXml?: string | null;
+  cfopXml?: string | null;
+  eanXml?: string | null;
+  unidadeXml?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -106,6 +127,9 @@ const emit = defineEmits<{
 }>();
 
 const form = ref<ProdutoFormModel>(criarProdutoFormVazio());
+const ncm = ref('');
+const cfop = ref('');
+const ean = ref('');
 const { criar, salvando } = useProdutos();
 
 const {
@@ -140,37 +164,122 @@ const unidadeMedidaOpcoes = computed(() =>
     })),
 );
 
+const hintUnidadeXml = computed(() => {
+  const un = props.unidadeXml?.trim();
+  if (!un) return undefined;
+  if (form.value.unidadeMedidaId) {
+    return `Sugerida a partir da UN do XML: ${un}`;
+  }
+  return `UN do XML: ${un} — selecione a unidade correspondente`;
+});
+
+function normalizarUnidade(valor: string): string {
+  return valor.trim().toUpperCase().replace(/\./g, '');
+}
+
+function aliasesUnidade(valor: string): string[] {
+  const base = normalizarUnidade(valor);
+  const mapa: Record<string, string[]> = {
+    LT: ['LT', 'L', 'LITRO', 'LITROS'],
+    L: ['L', 'LT', 'LITRO', 'LITROS'],
+    KG: ['KG', 'KILO', 'QUILO', 'QUILOS'],
+    G: ['G', 'GR', 'GRAMA', 'GRAMAS'],
+    UN: ['UN', 'UND', 'UNID', 'UNIDADE'],
+    CX: ['CX', 'CAIXA'],
+    PCT: ['PCT', 'PC', 'PACOTE'],
+    SC: ['SC', 'SACO'],
+    M: ['M', 'MT', 'METRO'],
+    ML: ['ML', 'MILILITRO'],
+  };
+  return mapa[base] ?? [base];
+}
+
+function resolverUnidadeMedidaId(unidadeXml: string | null | undefined): string | null {
+  const unXml = unidadeXml?.trim();
+  if (!unXml) return null;
+
+  const candidatos = aliasesUnidade(unXml);
+  const ativas = unidadesMedida.value.filter((u) => u.ativo);
+
+  const porCodigo = ativas.find((u) => candidatos.includes(normalizarUnidade(u.codigo)));
+  if (porCodigo) return porCodigo.id;
+
+  const porDescricao = ativas.find((u) =>
+    candidatos.some((alias) => normalizarUnidade(u.descricao).includes(alias)),
+  );
+  return porDescricao?.id ?? null;
+}
+
+function preencherFormulario(): void {
+  form.value = {
+    ...criarProdutoFormVazio(),
+    descricao: props.descricaoProdutoXml?.trim() ?? '',
+    precoVenda: formatarMoedaParaInput(props.precoSugerido ?? 0),
+    unidadeMedidaId: resolverUnidadeMedidaId(props.unidadeXml),
+  };
+  ncm.value = props.ncmXml?.trim() ?? '';
+  cfop.value = props.cfopXml?.trim() ?? '';
+  ean.value = props.eanXml?.trim() ?? '';
+}
+
 watch(
   () => props.modelValue,
-  (open) => {
-    if (!open) {
-      return;
-    }
+  async (open) => {
+    if (!open) return;
 
     void carregarCategorias();
-    void carregarUnidadesMedida();
-
-    form.value = {
-      ...criarProdutoFormVazio(),
-      descricao: props.descricaoProdutoXml?.trim() ?? '',
-      precoVenda: formatarMoedaParaInput(props.precoSugerido ?? 0),
-    };
+    await carregarUnidadesMedida({ ativo: true });
+    preencherFormulario();
   },
 );
 
+watch(unidadesMedida, () => {
+  if (!props.modelValue || form.value.unidadeMedidaId) return;
+  form.value.unidadeMedidaId = resolverUnidadeMedidaId(props.unidadeXml);
+});
+
 async function salvar(): Promise<void> {
   const codigoXml = props.codigoProdutoXml?.trim();
+  const eanValor = ean.value.trim();
+  const ncmValor = ncm.value.trim();
+  const cfopValor = cfop.value.trim();
   const complementos = criarComplementosFormVazio();
+  const codigos: ReturnType<typeof codigoFormParaDtoLocal>[] = [];
 
   if (codigoXml) {
-    complementos.codigos = [
+    codigos.push(
       codigoFormParaDtoLocal({
         ...criarCodigoFormVazio(),
         tipo: TipoCodigoProduto.SKU,
         valor: codigoXml,
         principal: true,
       }),
-    ];
+    );
+  }
+
+  if (eanValor) {
+    codigos.push(
+      codigoFormParaDtoLocal({
+        ...criarCodigoFormVazio(),
+        tipo: TipoCodigoProduto.EAN,
+        valor: eanValor,
+        principal: !codigoXml,
+      }),
+    );
+  }
+
+  complementos.codigos = codigos;
+
+  if (ncmValor || cfopValor) {
+    const cfopInterno = cfopValor.startsWith('5') ? cfopValor : '';
+    const cfopExterno = cfopValor.startsWith('6') || (!cfopInterno && cfopValor) ? cfopValor : '';
+
+    complementos.fiscal = {
+      ...complementos.fiscal,
+      ncm: ncmValor,
+      cfopPadraoInterno: cfopInterno,
+      cfopPadraoExterno: cfopExterno,
+    };
   }
 
   const produto = await criar(form.value, complementos, {
@@ -188,7 +297,7 @@ async function salvar(): Promise<void> {
 
 <style scoped>
 .dialog {
-  width: min(560px, 100vw);
+  width: min(640px, 100vw);
 }
 .titulo {
   margin: 0;
@@ -204,5 +313,31 @@ async function salvar(): Promise<void> {
 .agro-formulario {
   display: grid;
   gap: var(--spacing-4);
+}
+.xml-bloco {
+  display: grid;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
+}
+.xml-bloco__titulo {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+.xml-bloco__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+@media (max-width: 600px) {
+  .xml-bloco__grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
