@@ -6,11 +6,18 @@ const cacheVerCustos = ref<boolean | null>(null);
 const cacheCarregando = ref(false);
 
 export function useVerCustos() {
-  const { usuario } = useAuth();
+  const { usuario, isSuperHost } = useAuth();
   const carregando = cacheCarregando;
-  const verCustos = computed(() => cacheVerCustos.value === true);
+  const verCustos = computed(
+    () => isSuperHost.value || cacheVerCustos.value === true,
+  );
 
   async function carregar(): Promise<boolean> {
+    if (isSuperHost.value) {
+      cacheVerCustos.value = true;
+      return true;
+    }
+
     const usuarioId = usuario.value?.id;
 
     if (!usuarioId) {
@@ -41,6 +48,11 @@ export function useVerCustos() {
   }
 
   onMounted(() => {
+    if (isSuperHost.value) {
+      cacheVerCustos.value = true;
+      return;
+    }
+
     if (cacheVerCustos.value === null) {
       void carregar();
     }
