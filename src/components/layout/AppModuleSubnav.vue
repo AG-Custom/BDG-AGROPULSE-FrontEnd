@@ -51,8 +51,12 @@ function onFilhoClick(): void {
 <style scoped>
 .app-module-subnav {
   background: var(--color-surface-default);
-  border-bottom: var(--border-width-thin) solid var(--color-border-default);
-  padding: 0 var(--page-padding);
+  border-bottom: var(--border-width-thin) solid var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-2) var(--page-padding);
+  position: sticky;
+  top: var(--header-height);
+  z-index: var(--z-index-sticky);
 }
 
 .app-module-subnav__scroll {
@@ -63,33 +67,25 @@ function onFilhoClick(): void {
 }
 
 .app-module-subnav__link {
+  border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   flex-shrink: 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
-  padding: var(--spacing-3) var(--spacing-3);
-  position: relative;
+  padding: var(--spacing-2) var(--spacing-3);
   text-decoration: none;
-  transition: var(--transition-color);
+  transition: var(--transition-color), background-color var(--duration-fast) ease;
   white-space: nowrap;
 }
 
 .app-module-subnav__link:hover {
+  background: var(--color-bg-subtle);
   color: var(--color-text-primary);
 }
 
 .app-module-subnav__link--active {
-  color: var(--color-primary-600);
-}
-
-.app-module-subnav__link--active::after {
-  background: var(--color-primary-500);
-  bottom: 0;
-  content: '';
-  height: var(--border-width-accent);
-  left: var(--spacing-2);
-  position: absolute;
-  right: var(--spacing-2);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-semibold);
 }
 </style>

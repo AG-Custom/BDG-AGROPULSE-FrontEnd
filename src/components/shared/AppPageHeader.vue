@@ -1,7 +1,7 @@
 <template>
   <header class="app-page-header">
     <div class="app-page-header__text">
-      <h1 class="app-page-header__title text-h2">{{ titulo }}</h1>
+      <h1 class="app-page-header__title text-h1">{{ titulo }}</h1>
       <p v-if="subtitulo" class="app-page-header__subtitle text-body-md text-secondary">
         {{ subtitulo }}
       </p>

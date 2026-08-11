@@ -165,7 +165,7 @@ const {
 }
 
 .app-sidebar__label {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
 }
 
