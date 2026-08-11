@@ -1,13 +1,13 @@
 import { api } from 'services/api';
 import type {
+  ListaAuditoriaPaginadaDto,
   ListarAuditoriaParams,
-  LogAuditoriaDto,
 } from 'types/dtos/auditoria.dto';
 
 export const auditoriaService = {
-  listar(params?: ListarAuditoriaParams): Promise<LogAuditoriaDto[]> {
+  listar(params?: ListarAuditoriaParams): Promise<ListaAuditoriaPaginadaDto> {
     return api
-      .get<LogAuditoriaDto[]>('/auditoria', { params })
+      .get<ListaAuditoriaPaginadaDto>('/auditoria', { params })
       .then((r) => r.data);
   },
 };

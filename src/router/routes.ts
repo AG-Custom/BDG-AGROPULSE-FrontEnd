@@ -1951,6 +1951,15 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'auditoria',
+        name: 'auditoria',
+        component: () => import('pages/auditoria/AuditoriaListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.auditoria',
+          permissao: Permissoes.Auditoria.Visualizar,
+        },
+      },
+      {
         path: 'usuarios/novo',
         name: 'usuario-novo',
         component: () => import('pages/usuarios/UsuarioFormPage.vue'),

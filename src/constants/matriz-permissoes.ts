@@ -144,6 +144,7 @@ export const OverridesSlugPorPerfil: Partial<
   Record<PerfilUsuarioValor, readonly string[]>
 > = {
   [PerfilUsuario.Vendedor]: [Permissoes.Clientes.Editar],
+  [PerfilUsuario.Gerente]: [Permissoes.Auditoria.Visualizar],
 };
 
 export function nivelAreaDoPerfil(
