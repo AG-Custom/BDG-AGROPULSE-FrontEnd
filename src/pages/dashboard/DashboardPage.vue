@@ -99,7 +99,7 @@
                   color="primary"
                   label="Ver todos"
                   descricao="Ir para alertas"
-                  :to="{ name: 'relatorios', query: { aba: 'alertas' } }"
+                  :to="{ name: 'relatorios' }"
                 />
               </div>
               <empty-state

@@ -4,12 +4,14 @@ import type {
   AlertaGerencialDto,
   ComissaoRepasseItemDto,
   ComissoesRepasseParams,
+  ContasFinanceirasDto,
   CurvaAbcLucratividadeItemDto,
   CurvaAbcLucratividadeParams,
   DashboardKpisDto,
   DashboardParams,
   DesempenhoEquipeItemDto,
   DesempenhoEquipeParams,
+  DespesaCentroCustoItemDto,
   DreDto,
   DreParams,
   GiroEstoqueItemDto,
@@ -19,6 +21,7 @@ import type {
   MargemPorLoteParams,
   RankingUnidadeItemDto,
   RankingUnidadesParams,
+  RelatorioBarterDto,
   RentabilidadeItemDto,
   RentabilidadeParams,
 } from 'types/dtos/relatorio.dto';
@@ -131,6 +134,25 @@ export const relatorioService = {
 
   inadimplencia(): Promise<InadimplenciaDto> {
     return api.get<InadimplenciaDto>('/relatorios/inadimplencia').then((r) => r.data);
+  },
+
+  barter(): Promise<RelatorioBarterDto> {
+    return api.get<RelatorioBarterDto>('/relatorios/barter').then((r) => r.data);
+  },
+
+  despesasCentroCusto(params?: {
+    de?: string;
+    ate?: string;
+  }): Promise<DespesaCentroCustoItemDto[]> {
+    return api
+      .get<DespesaCentroCustoItemDto[]>('/relatorios/despesas-centro-custo', { params })
+      .then((r) => r.data);
+  },
+
+  contasFinanceiras(): Promise<ContasFinanceirasDto> {
+    return api
+      .get<ContasFinanceirasDto>('/relatorios/contas-financeiras')
+      .then((r) => r.data);
   },
 
   desempenhoEquipe(params?: DesempenhoEquipeParams): Promise<DesempenhoEquipeItemDto[]> {

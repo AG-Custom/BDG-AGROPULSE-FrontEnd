@@ -2,123 +2,169 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Relatórios"
-      subtitulo="Análises gerenciais, margem, DRE, rentabilidade e exportações."
+      subtitulo="Catálogo de análises gerenciais, comerciais e financeiras."
     />
 
     <section class="agro-section">
-      <agro-card>
-        <q-tabs
-          v-model="aba"
-          dense
-          outside-arrows
-          mobile-arrows
-          class="text-primary relatorios-tabs"
-          active-color="primary"
-          indicator-color="primary"
-        >
-          <q-tab v-for="item in abasVisiveis" :key="item.name" :name="item.name" :label="item.label" />
-        </q-tabs>
-        <q-separator />
+      <div class="agro-filter-bar relatorios-hub__filtro">
+        <q-btn-toggle
+          v-model="categoria"
+          unelevated
+          toggle-color="primary"
+          :options="toggleOpcoes"
+        />
+      </div>
 
-        <curva-abc-tab v-if="aba === 'abc'" />
-        <comissoes-tab v-else-if="aba === 'comissoes'" />
-        <giro-estoque-tab v-else-if="aba === 'giro'" />
-        <margem-por-lote-tab v-else-if="aba === 'margem'" />
-        <dre-tab v-else-if="aba === 'dre'" />
-        <ranking-unidades-tab v-else-if="aba === 'ranking'" />
-        <rentabilidade-tab v-else-if="aba === 'rentabilidade'" />
-        <inadimplencia-tab v-else-if="aba === 'inadimplencia'" />
-        <desempenho-equipe-tab v-else-if="aba === 'desempenho'" />
-        <alertas-tab v-else-if="aba === 'alertas'" />
-      </agro-card>
+      <div class="relatorios-hub__grid">
+        <button
+          v-for="item in itensVisiveis"
+          :key="item.id"
+          type="button"
+          class="relatorios-hub__card"
+          @click="abrir(item.routeName)"
+        >
+          <div class="relatorios-hub__card-topo">
+            <q-icon :name="item.icon" size="28px" class="relatorios-hub__icon" />
+            <q-badge
+              v-if="item.exigeVerCustos"
+              outline
+              color="primary"
+              label="Custos"
+            />
+          </div>
+          <h3 class="relatorios-hub__titulo">{{ item.titulo }}</h3>
+          <p class="relatorios-hub__descricao">{{ item.descricao }}</p>
+          <span class="relatorios-hub__acao">Abrir relatório</span>
+        </button>
+      </div>
+
+      <empty-state
+        v-if="itensVisiveis.length === 0"
+        titulo="Nenhum relatório disponível"
+        descricao="Não há relatórios nesta categoria para o seu perfil."
+        icon="assessment"
+      />
     </section>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import AlertasTab from 'components/relatorios/AlertasTab.vue';
-import ComissoesTab from 'components/relatorios/ComissoesTab.vue';
-import CurvaAbcTab from 'components/relatorios/CurvaAbcTab.vue';
-import DesempenhoEquipeTab from 'components/relatorios/DesempenhoEquipeTab.vue';
-import DreTab from 'components/relatorios/DreTab.vue';
-import GiroEstoqueTab from 'components/relatorios/GiroEstoqueTab.vue';
-import InadimplenciaTab from 'components/relatorios/InadimplenciaTab.vue';
-import MargemPorLoteTab from 'components/relatorios/MargemPorLoteTab.vue';
-import RankingUnidadesTab from 'components/relatorios/RankingUnidadesTab.vue';
-import RentabilidadeTab from 'components/relatorios/RentabilidadeTab.vue';
-import AgroCard from 'components/ui/AgroCard.vue';
+import EmptyState from 'components/ui/EmptyState.vue';
 import { useVerCustos } from 'composables/useVerCustos';
-import { computed, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-
-type AbaRelatorio =
-  | 'abc'
-  | 'comissoes'
-  | 'giro'
-  | 'margem'
-  | 'dre'
-  | 'ranking'
-  | 'rentabilidade'
-  | 'inadimplencia'
-  | 'desempenho'
-  | 'alertas';
-
-const ABAS_VALIDAS: AbaRelatorio[] = [
-  'abc',
-  'comissoes',
-  'giro',
-  'margem',
-  'dre',
-  'ranking',
-  'rentabilidade',
-  'inadimplencia',
-  'desempenho',
-  'alertas',
-];
+import {
+  REDIRECT_ABA_RELATORIO,
+  RELATORIOS_CATALOGO,
+  RelatorioCategoria,
+  RelatorioCategoriaOpcoes,
+  type RelatorioCategoriaValor,
+} from 'constants/relatorios-catalogo';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
 const { verCustos } = useVerCustos();
 
-const abasVisiveis = computed(() => {
-  const todas: { name: AbaRelatorio; label: string; sensivel?: boolean }[] = [
-    { name: 'abc', label: 'Curva ABC' },
-    { name: 'comissoes', label: 'Comissões' },
-    { name: 'giro', label: 'Giro' },
-    { name: 'margem', label: 'Margem por lote', sensivel: true },
-    { name: 'dre', label: 'DRE', sensivel: true },
-    { name: 'ranking', label: 'Ranking' },
-    { name: 'rentabilidade', label: 'Rentabilidade', sensivel: true },
-    { name: 'inadimplencia', label: 'Inadimplência', sensivel: true },
-    { name: 'desempenho', label: 'Desempenho', sensivel: true },
-    { name: 'alertas', label: 'Alertas' },
-  ];
+const categoria = ref<RelatorioCategoriaValor>(
+  RelatorioCategoria.GerenciaisComerciais,
+);
 
-  return todas.filter((abaItem) => !(abaItem.sensivel && !verCustos.value));
-});
+const toggleOpcoes = RelatorioCategoriaOpcoes.map((op) => ({
+  label: op.label,
+  value: op.value,
+}));
 
-function abaInicial(): AbaRelatorio {
-  const query = route.query.aba;
-  if (typeof query === 'string' && ABAS_VALIDAS.includes(query as AbaRelatorio)) {
-    return query as AbaRelatorio;
-  }
-  return 'abc';
+const itensVisiveis = computed(() =>
+  RELATORIOS_CATALOGO.filter(
+    (item) =>
+      item.categoria === categoria.value &&
+      !(item.exigeVerCustos && !verCustos.value),
+  ),
+);
+
+function abrir(routeName: string): void {
+  void router.push({ name: routeName });
 }
 
-const aba = ref<AbaRelatorio>(abaInicial());
+onMounted(() => {
+  const aba = route.query.aba;
+  if (typeof aba !== 'string' || !aba) {
+    return;
+  }
 
-watch(
-  abasVisiveis,
-  (lista) => {
-    if (!lista.some((item) => item.name === aba.value)) {
-      aba.value = lista[0]?.name ?? 'abc';
-    }
-  },
-  { immediate: true },
-);
+  const destino = REDIRECT_ABA_RELATORIO[aba] ?? 'relatorios';
+  if (destino === 'relatorios') {
+    void router.replace({ name: 'relatorios' });
+    return;
+  }
+
+  void router.replace({ name: destino });
+});
 </script>
 
-<style scoped>
-.relatorios-tabs {
-  overflow-x: auto;
+<style scoped lang="scss">
+.relatorios-hub__filtro {
+  margin-bottom: var(--spacing-6);
+}
+
+.relatorios-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.relatorios-hub__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  padding: var(--spacing-5);
+  text-align: left;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.relatorios-hub__card:hover {
+  border-color: var(--color-primary-500);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.relatorios-hub__card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: var(--spacing-1);
+}
+
+.relatorios-hub__icon {
+  color: var(--color-primary-500);
+}
+
+.relatorios-hub__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.relatorios-hub__descricao {
+  margin: 0;
+  flex: 1;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.relatorios-hub__acao {
+  margin-top: var(--spacing-2);
+  color: var(--color-primary-600, var(--color-primary-500));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 </style>

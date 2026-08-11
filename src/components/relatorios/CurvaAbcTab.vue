@@ -1,6 +1,16 @@
 <template>
   <div class="painel">
     <div class="agro-filter-bar">
+      <q-select
+        v-model="dimensao"
+        outlined
+        dense
+        label="Dimensão"
+        emit-value
+        map-options
+        :options="DimensaoCurvaAbcOpcoes"
+        class="filtro-dimensao"
+      />
       <q-input v-model="dias" outlined dense label="Dias" type="number" class="filtro" />
       <agro-btn
         color="primary"
@@ -53,7 +63,12 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useRelatorios } from 'composables/useRelatorios';
 import { useVerCustos } from 'composables/useVerCustos';
-import type { ExportacaoFormatoValor } from 'constants/enums';
+import {
+  DimensaoCurvaAbc,
+  DimensaoCurvaAbcOpcoes,
+  type DimensaoCurvaAbcValor,
+  type ExportacaoFormatoValor,
+} from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { CurvaAbcLucratividadeItemDto } from 'types/dtos/relatorio.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
@@ -62,11 +77,12 @@ import { computed, onMounted, ref } from 'vue';
 const { curvaAbc, carregando, exportando, carregarCurvaAbc, exportarCurvaAbc } = useRelatorios();
 const { verCustos } = useVerCustos();
 const dias = ref('30');
+const dimensao = ref<DimensaoCurvaAbcValor>(DimensaoCurvaAbc.Produto);
 
 const colunas = computed(() => {
   const base: QTableColumn<CurvaAbcLucratividadeItemDto>[] = [
     { name: 'produtoCodigo', label: 'Código', field: 'produtoCodigo', align: 'left' },
-    { name: 'produtoDescricao', label: 'Produto', field: 'produtoDescricao', align: 'left' },
+    { name: 'produtoDescricao', label: 'Nome', field: 'produtoDescricao', align: 'left' },
     { name: 'classeAbc', label: 'Classe', field: 'classeAbc', align: 'left' },
     { name: 'receita', label: 'Receita', field: 'receita', align: 'right' },
     { name: 'lucro', label: 'Lucro', field: 'lucro', align: 'right' },
@@ -81,7 +97,10 @@ const colunas = computed(() => {
 });
 
 function params() {
-  return { dias: Number(dias.value) || undefined };
+  return {
+    dias: Number(dias.value) || undefined,
+    dimensao: dimensao.value,
+  };
 }
 
 async function atualizar(): Promise<void> {
@@ -103,5 +122,8 @@ onMounted(() => {
 }
 .filtro {
   min-width: 140px;
+}
+.filtro-dimensao {
+  min-width: 160px;
 }
 </style>

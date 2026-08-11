@@ -936,6 +936,7 @@ export const RentabilidadeDimensao = {
   Cliente: 'Cliente',
   Canal: 'Canal',
   Regiao: 'Regiao',
+  Categoria: 'Categoria',
 } as const;
 
 export type RentabilidadeDimensaoValor =
@@ -943,9 +944,25 @@ export type RentabilidadeDimensaoValor =
 
 export const RentabilidadeDimensaoOpcoes = [
   { label: 'Produto', value: RentabilidadeDimensao.Produto },
+  { label: 'Categoria', value: RentabilidadeDimensao.Categoria },
   { label: 'Cliente', value: RentabilidadeDimensao.Cliente },
   { label: 'Canal', value: RentabilidadeDimensao.Canal },
   { label: 'Região', value: RentabilidadeDimensao.Regiao },
+];
+
+export const DimensaoCurvaAbc = {
+  Produto: 'Produto',
+  Cliente: 'Cliente',
+  Fornecedor: 'Fornecedor',
+} as const;
+
+export type DimensaoCurvaAbcValor =
+  (typeof DimensaoCurvaAbc)[keyof typeof DimensaoCurvaAbc];
+
+export const DimensaoCurvaAbcOpcoes = [
+  { label: 'Produto', value: DimensaoCurvaAbc.Produto },
+  { label: 'Cliente', value: DimensaoCurvaAbc.Cliente },
+  { label: 'Fornecedor', value: DimensaoCurvaAbc.Fornecedor },
 ];
 
 export const OrcamentoStatus = {

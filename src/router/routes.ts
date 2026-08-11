@@ -1905,6 +1905,106 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'relatorios/curva-abc',
+        name: 'relatorio-curva-abc',
+        component: () => import('pages/relatorios/RelatorioCurvaAbcPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioCurvaAbc',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/rentabilidade',
+        name: 'relatorio-rentabilidade',
+        component: () => import('pages/relatorios/RelatorioRentabilidadePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioRentabilidade',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/desempenho-rtv',
+        name: 'relatorio-desempenho-rtv',
+        component: () => import('pages/relatorios/RelatorioDesempenhoRtvPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioDesempenhoRtv',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/barter',
+        name: 'relatorio-barter',
+        component: () => import('pages/relatorios/RelatorioBarterPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioBarter',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/giro-estoque',
+        name: 'relatorio-giro-estoque',
+        component: () => import('pages/relatorios/RelatorioGiroEstoquePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioGiroEstoque',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/fluxo-caixa',
+        name: 'relatorio-fluxo-caixa',
+        component: () => import('pages/relatorios/RelatorioFluxoCaixaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioFluxoCaixa',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/contas',
+        name: 'relatorio-contas',
+        component: () => import('pages/relatorios/RelatorioContasPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioContas',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/inadimplencia',
+        name: 'relatorio-inadimplencia',
+        component: () => import('pages/relatorios/RelatorioInadimplenciaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioInadimplencia',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/dre',
+        name: 'relatorio-dre',
+        component: () => import('pages/relatorios/RelatorioDrePage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioDre',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
+        path: 'relatorios/centro-custo',
+        name: 'relatorio-centro-custo',
+        component: () => import('pages/relatorios/RelatorioCentroCustoPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.relatorioCentroCusto',
+          breadcrumbPais: ['navegacao.relatorios'],
+          permissao: Permissoes.Relatorios.Visualizar,
+        },
+      },
+      {
         path: 'metas-vendedor',
         name: 'metas-vendedor',
         component: () => import('pages/metas-vendedor/MetasVendedorListPage.vue'),

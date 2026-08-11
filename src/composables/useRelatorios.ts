@@ -9,10 +9,12 @@ import type {
   AlertaGerencialDto,
   ComissaoRepasseItemDto,
   ComissoesRepasseParams,
+  ContasFinanceirasDto,
   CurvaAbcLucratividadeItemDto,
   CurvaAbcLucratividadeParams,
   DesempenhoEquipeItemDto,
   DesempenhoEquipeParams,
+  DespesaCentroCustoItemDto,
   DreDto,
   DreParams,
   GiroEstoqueItemDto,
@@ -22,6 +24,7 @@ import type {
   MargemPorLoteParams,
   RankingUnidadeItemDto,
   RankingUnidadesParams,
+  RelatorioBarterDto,
   RentabilidadeItemDto,
   RentabilidadeParams,
 } from 'types/dtos/relatorio.dto';
@@ -39,6 +42,9 @@ export function useRelatorios() {
   const inadimplencia = ref<InadimplenciaDto | null>(null);
   const desempenhoEquipe = ref<DesempenhoEquipeItemDto[]>([]);
   const alertas = ref<AlertaGerencialDto[]>([]);
+  const barter = ref<RelatorioBarterDto | null>(null);
+  const despesasCentroCusto = ref<DespesaCentroCustoItemDto[]>([]);
+  const contasFinanceiras = ref<ContasFinanceirasDto | null>(null);
   const carregando = ref(false);
   const exportando = ref(false);
   const { erro, sucesso } = useNotificacao();
@@ -128,6 +134,45 @@ export function useRelatorios() {
       inadimplencia.value = await relatorioService.inadimplencia();
     } catch (e) {
       inadimplencia.value = null;
+      erro(mensagem(e));
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function carregarBarter(): Promise<void> {
+    carregando.value = true;
+    try {
+      barter.value = await relatorioService.barter();
+    } catch (e) {
+      barter.value = null;
+      erro(mensagem(e));
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function carregarDespesasCentroCusto(params?: {
+    de?: string;
+    ate?: string;
+  }): Promise<void> {
+    carregando.value = true;
+    try {
+      despesasCentroCusto.value = await relatorioService.despesasCentroCusto(params);
+    } catch (e) {
+      despesasCentroCusto.value = [];
+      erro(mensagem(e));
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function carregarContasFinanceiras(): Promise<void> {
+    carregando.value = true;
+    try {
+      contasFinanceiras.value = await relatorioService.contasFinanceiras();
+    } catch (e) {
+      contasFinanceiras.value = null;
       erro(mensagem(e));
     } finally {
       carregando.value = false;
@@ -250,6 +295,9 @@ export function useRelatorios() {
     inadimplencia,
     desempenhoEquipe,
     alertas,
+    barter,
+    despesasCentroCusto,
+    contasFinanceiras,
     carregando,
     exportando,
     carregarCurvaAbc,
@@ -260,6 +308,9 @@ export function useRelatorios() {
     carregarRankingUnidades,
     carregarRentabilidade,
     carregarInadimplencia,
+    carregarBarter,
+    carregarDespesasCentroCusto,
+    carregarContasFinanceiras,
     carregarDesempenhoEquipe,
     carregarAlertas,
     exportarCurvaAbc,

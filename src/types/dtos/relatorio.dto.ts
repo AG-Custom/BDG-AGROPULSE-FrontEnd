@@ -30,6 +30,7 @@ export interface ComissaoRepasseItemDto {
 export interface CurvaAbcLucratividadeParams {
   dias?: number;
   produtoId?: string;
+  dimensao?: string;
   exportar?: ExportacaoFormatoValor;
 }
 
@@ -173,6 +174,66 @@ export interface InadimplenciaDto {
   de61a90: AgingBucketDto;
   acima90: AgingBucketDto;
   porVendedor: InadimplenciaPorVendedorDto[];
+  porCliente: InadimplenciaClienteRiscoDto[];
+}
+
+export interface InadimplenciaClienteRiscoDto {
+  clienteId: string;
+  clienteNome: string;
+  saldoInadimplente: number;
+  maiorAtrasoDias: number;
+  limiteCredito: number;
+  utilizado: number;
+  disponivel: number;
+  comprometimentoPct: number;
+}
+
+export interface RelatorioBarterItemDto {
+  contratoId: string;
+  clienteId: string;
+  clienteNome: string;
+  status: string;
+  valorInsumos: number;
+  quantidadeGrao: number;
+  saldoGrao: number;
+  ajusteFinanceiro: number | null;
+  valorFinanceiro: number | null;
+  safraId: string | null;
+}
+
+export interface RelatorioBarterDto {
+  valorInsumosTotal: number;
+  quantidadeGraoTotal: number;
+  saldoGraoTotal: number;
+  ajusteFinanceiroTotal: number;
+  valorFinanceiroTotal: number;
+  quantidadeContratos: number;
+  contratos: RelatorioBarterItemDto[];
+}
+
+export interface DespesaCentroCustoItemDto {
+  centroCustoId: string | null;
+  codigo: string;
+  nome: string;
+  valorPago: number;
+  quantidadeTitulos: number;
+}
+
+export interface ContasFinanceirasFaixaDto {
+  quantidade: number;
+  valor: number;
+  saldo: number;
+}
+
+export interface ContasFinanceirasBlocoDto {
+  aberto: ContasFinanceirasFaixaDto;
+  baixado: ContasFinanceirasFaixaDto;
+  renegociado: ContasFinanceirasFaixaDto;
+}
+
+export interface ContasFinanceirasDto {
+  receber: ContasFinanceirasBlocoDto;
+  pagar: ContasFinanceirasBlocoDto;
 }
 
 export interface DesempenhoEquipeItemDto {

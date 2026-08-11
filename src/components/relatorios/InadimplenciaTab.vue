@@ -57,6 +57,52 @@
         </template>
       </q-table>
 
+      <h3 class="secao-titulo">Por cliente (risco de crédito)</h3>
+      <agro-table-skeleton v-if="carregando && porCliente.length === 0" :colunas="6" />
+      <empty-state
+        v-else-if="porCliente.length === 0"
+        titulo="Sem clientes inadimplentes"
+        descricao="Não há clientes com atraso no período."
+        icon="person_off"
+      />
+      <q-table
+        v-else
+        flat
+        bordered
+        row-key="clienteId"
+        class="q-mb-md"
+        :rows="porCliente"
+        :columns="colunasCliente"
+        :loading="carregando"
+        :rows-per-page-options="[10, 25, 50]"
+      >
+        <template #body-cell-saldoInadimplente="props">
+          <q-td :props="props" class="text-metric">
+            {{ formatarMoeda(props.row.saldoInadimplente) }}
+          </q-td>
+        </template>
+        <template #body-cell-limiteCredito="props">
+          <q-td :props="props" class="text-metric">
+            {{ formatarMoeda(props.row.limiteCredito) }}
+          </q-td>
+        </template>
+        <template #body-cell-utilizado="props">
+          <q-td :props="props" class="text-metric">
+            {{ formatarMoeda(props.row.utilizado) }}
+          </q-td>
+        </template>
+        <template #body-cell-disponivel="props">
+          <q-td :props="props" class="text-metric">
+            {{ formatarMoeda(props.row.disponivel) }}
+          </q-td>
+        </template>
+        <template #body-cell-comprometimentoPct="props">
+          <q-td :props="props" class="text-metric">
+            {{ formatarDecimal(props.row.comprometimentoPct) }}%
+          </q-td>
+        </template>
+      </q-table>
+
       <h3 class="secao-titulo">Por vendedor</h3>
       <agro-table-skeleton v-if="carregando && porVendedor.length === 0" :colunas="3" />
       <empty-state
@@ -93,7 +139,10 @@ import EmptyState from 'components/ui/EmptyState.vue';
 import MetricTile from 'components/ui/MetricTile.vue';
 import { useRelatorios } from 'composables/useRelatorios';
 import type { QTableColumn } from 'quasar';
-import type { InadimplenciaPorVendedorDto } from 'types/dtos/relatorio.dto';
+import type {
+  InadimplenciaClienteRiscoDto,
+  InadimplenciaPorVendedorDto,
+} from 'types/dtos/relatorio.dto';
 import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted } from 'vue';
 
@@ -112,6 +161,7 @@ const aging = computed(() => {
 });
 
 const porVendedor = computed(() => inadimplencia.value?.porVendedor ?? []);
+const porCliente = computed(() => inadimplencia.value?.porCliente ?? []);
 
 const colunasAging: QTableColumn[] = [
   { name: 'faixa', label: 'Faixa', field: 'faixa', align: 'left' },
@@ -123,6 +173,21 @@ const colunasVendedor: QTableColumn<InadimplenciaPorVendedorDto>[] = [
   { name: 'vendedorUsuarioId', label: 'Vendedor', field: 'vendedorUsuarioId', align: 'left' },
   { name: 'quantidade', label: 'Qtd.', field: 'quantidade', align: 'right' },
   { name: 'total', label: 'Total', field: 'total', align: 'right' },
+];
+
+const colunasCliente: QTableColumn<InadimplenciaClienteRiscoDto>[] = [
+  { name: 'clienteNome', label: 'Cliente', field: 'clienteNome', align: 'left' },
+  { name: 'maiorAtrasoDias', label: 'Maior atraso', field: 'maiorAtrasoDias', align: 'right' },
+  { name: 'saldoInadimplente', label: 'Saldo atrasado', field: 'saldoInadimplente', align: 'right' },
+  { name: 'limiteCredito', label: 'Limite', field: 'limiteCredito', align: 'right' },
+  { name: 'utilizado', label: 'Utilizado', field: 'utilizado', align: 'right' },
+  { name: 'disponivel', label: 'Disponível', field: 'disponivel', align: 'right' },
+  {
+    name: 'comprometimentoPct',
+    label: 'Comprometido %',
+    field: 'comprometimentoPct',
+    align: 'right',
+  },
 ];
 
 async function atualizar(): Promise<void> {
