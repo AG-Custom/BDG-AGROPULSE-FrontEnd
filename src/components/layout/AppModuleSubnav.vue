@@ -55,7 +55,7 @@ function onFilhoClick(): void {
   box-shadow: var(--shadow-sm);
   padding: var(--spacing-2) var(--page-padding);
   position: sticky;
-  top: var(--header-height);
+  top: var(--subnav-sticky-top, var(--header-height));
   z-index: var(--z-index-sticky);
 }
 

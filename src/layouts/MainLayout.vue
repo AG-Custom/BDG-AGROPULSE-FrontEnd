@@ -1,6 +1,10 @@
 <template>
-  <q-layout view="hHh Lpr lFf" class="main-layout">
-    <q-header class="main-layout__header">
+  <q-layout
+    view="hHh Lpr lFf"
+    class="main-layout"
+    :style="estiloLayout"
+  >
+    <q-header ref="headerRef" class="main-layout__header">
       <super-host-banner v-if="isSuperHost" :tem-empresa="temEmpresa" />
       <q-toolbar class="main-layout__toolbar">
         <agro-btn
@@ -116,7 +120,7 @@ import AgroLogo from 'components/shared/AgroLogo.vue';
 import { useAuth } from 'composables/useAuth';
 import { useNotificacoes } from 'composables/useNotificacoes';
 import { Permissoes } from 'constants/permissoes';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from 'vue';
 import { useRouter } from 'vue-router';
 
 const INTERVALO_POLLING_MS = 60_000;
@@ -124,6 +128,8 @@ const STORAGE_SIDEBAR_COLLAPSED = 'agropulse.sidebar.collapsed';
 
 const drawer = ref(true);
 const sidebarCollapsed = ref(false);
+const headerRef = ref<ComponentPublicInstance | HTMLElement | null>(null);
+const alturaHeaderPx = ref(56);
 const router = useRouter();
 const { sair: sairAuth, usuario, unidadeId, possuiPermissao, isSuperHost, temEmpresa } = useAuth();
 const { carregar: carregarNotificacoes } = useNotificacoes();
@@ -135,6 +141,47 @@ const podeVerNotificacoes = computed(() =>
 const drawerWidth = computed(() =>
   sidebarCollapsed.value ? 72 : 260,
 );
+const estiloLayout = computed(() => ({
+  '--subnav-sticky-top': `${alturaHeaderPx.value}px`,
+}));
+
+let headerObserver: ResizeObserver | undefined;
+
+function elementoHeader(): HTMLElement | null {
+  const alvo = headerRef.value;
+  if (!alvo) return null;
+  if (alvo instanceof HTMLElement) return alvo;
+  const el = alvo.$el;
+  return el instanceof HTMLElement ? el : null;
+}
+
+function atualizarAlturaHeader(): void {
+  const el = elementoHeader();
+  if (!el) return;
+  const altura = Math.round(el.getBoundingClientRect().height);
+  if (altura > 0) {
+    alturaHeaderPx.value = altura;
+  }
+}
+
+function iniciarObserverHeader(): void {
+  pararObserverHeader();
+  const el = elementoHeader();
+  if (!el || typeof ResizeObserver === 'undefined') {
+    atualizarAlturaHeader();
+    return;
+  }
+  headerObserver = new ResizeObserver(() => {
+    atualizarAlturaHeader();
+  });
+  headerObserver.observe(el);
+  atualizarAlturaHeader();
+}
+
+function pararObserverHeader(): void {
+  headerObserver?.disconnect();
+  headerObserver = undefined;
+}
 
 function lerCollapsePersistido(): boolean {
   try {
@@ -197,10 +244,19 @@ onMounted(() => {
   if (podeVerNotificacoes.value) {
     iniciarPolling();
   }
+  void nextTick(() => {
+    iniciarObserverHeader();
+  });
 });
 
 onUnmounted(() => {
   pararPolling();
+  pararObserverHeader();
+});
+
+watch(isSuperHost, async () => {
+  await nextTick();
+  iniciarObserverHeader();
 });
 </script>
 
