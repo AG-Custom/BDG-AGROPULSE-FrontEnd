@@ -1,5 +1,11 @@
 <template>
-  <article class="item-card" :class="{ 'item-card--alerta': !produtoVinculado && modo === 'form' }">
+  <article
+    class="item-card"
+    :class="{
+      'item-card--alerta': !produtoVinculado && modo === 'form' && !embutido,
+      'item-card--embutido': embutido,
+    }"
+  >
     <header class="item-card__header">
       <div class="item-card__ident">
         <span class="item-card__indice text-metric">{{ String(indice).padStart(2, '0') }}</span>
@@ -23,7 +29,7 @@
           @click="emit('cadastrar')"
         />
         <agro-btn
-          v-if="modo === 'form' && podeRemover"
+          v-if="modo === 'form' && podeRemover && !embutido"
           flat
           round
           dense
@@ -198,6 +204,7 @@ const props = withDefaults(
     readonly?: boolean;
     podeRemover?: boolean;
     mostrarPrecificacao?: boolean;
+    embutido?: boolean;
   }>(),
   {
     produtoOpcoes: () => [],
@@ -205,6 +212,7 @@ const props = withDefaults(
     readonly: false,
     podeRemover: true,
     mostrarPrecificacao: false,
+    embutido: false,
   },
 );
 
@@ -318,6 +326,13 @@ const camposTributacao = computed(() => [
   border: var(--border-width-thin) solid var(--color-border-default);
   border-radius: var(--radius-md);
   background: var(--color-surface-default);
+}
+
+.item-card--embutido {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .item-card--alerta {

@@ -35,15 +35,18 @@ const aberto = defineModel<boolean>({ default: true });
 </script>
 
 <style scoped>
+.secao-expansivel :deep(.agro-card__body) {
+  padding: 0;
+}
+
 .secao-expansivel__cabecalho {
   display: flex;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3);
-  margin: calc(var(--card-padding) * -1);
-  margin-bottom: 0;
-  padding: var(--card-padding);
+  margin: 0;
+  padding: var(--spacing-4) var(--card-padding);
   border: none;
   background: transparent;
   text-align: left;
@@ -78,9 +81,11 @@ const aberto = defineModel<boolean>({ default: true });
   flex-shrink: 0;
   color: var(--color-text-secondary);
   font-size: 1.5rem;
+  line-height: 1;
 }
 
 .secao-expansivel__corpo {
-  padding-top: var(--spacing-4);
+  padding: 0 var(--card-padding) var(--card-padding);
+  border-top: var(--border-width-thin) solid var(--color-border-default);
 }
 </style>

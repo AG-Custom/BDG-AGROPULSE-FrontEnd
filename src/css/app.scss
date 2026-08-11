@@ -104,12 +104,19 @@ body {
 .agro-page--form .agro-section,
 .agro-page--form-wide .agro-section,
 .agro-page--form-xl .agro-section,
+.agro-page--form-fluid .agro-section,
 .agro-page--form .app-page-header,
 .agro-page--form-wide .app-page-header,
-.agro-page--form-xl .app-page-header {
+.agro-page--form-xl .app-page-header,
+.agro-page--form-fluid .app-page-header {
   max-width: var(--page-form-width);
   margin-inline: auto;
   width: 100%;
+}
+
+.agro-page--form-fluid .agro-section,
+.agro-page--form-fluid .app-page-header {
+  max-width: none;
 }
 
 .agro-section {

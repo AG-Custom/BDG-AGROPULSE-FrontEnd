@@ -1,5 +1,5 @@
 <template>
-  <q-page class="agro-page agro-page--form-xl">
+  <q-page class="agro-page agro-page--form-fluid">
     <app-page-header
       titulo="Novo recebimento"
       subtitulo="Importe o XML da NF-e ou registre manualmente."
@@ -90,47 +90,12 @@
           titulo="Produtos"
           :subtitulo="subtituloProdutos"
         >
-          <div class="itens-toolbar">
-            <agro-btn flat icon="add" label="Item" descricao="Adicionar item" @click="adicionarItem" />
-          </div>
-
-          <div v-if="itensSemProduto.length > 0" class="banner-faltantes" role="status">
-            <div class="banner-faltantes__titulo">Produtos do XML não cadastrados nesta unidade</div>
-            <p class="banner-faltantes__texto">
-              A NF-e tem itens que não bateram 100% com o cadastro. Cadastre-os aqui para continuar.
-            </p>
-            <ul class="banner-faltantes__lista">
-              <li v-for="item in itensSemProduto" :key="item.chave">
-                <span class="banner-faltantes__item" :title="rotuloItemXml(item)">
-                  {{ rotuloItemXmlCurto(item) }}
-                </span>
-                <agro-btn
-                  unelevated
-                  dense
-                  color="warning"
-                  icon="add"
-                  label="Cadastrar produto"
-                  descricao="Cadastrar produto do XML"
-                  @click="abrirCadastroRapido(item)"
-                />
-              </li>
-            </ul>
-          </div>
-
-          <div class="itens-lista">
-            <RecebimentoNfeItemCard
-              v-for="(item, index) in itens"
-              :key="item.chave"
-              v-model:item="itens[index]"
-              :indice="index + 1"
-              modo="form"
-              :produto-opcoes="produtoOpcoes"
-              :pode-remover="itens.length > 1"
-              @cadastrar="abrirCadastroRapido(item)"
-              @remover="itens.splice(index, 1)"
-              @atualizar-produtos="carregarProdutos({ ativo: true })"
-            />
-          </div>
+          <RecebimentoItensSection
+            v-model:itens="itens"
+            :produto-opcoes="produtoOpcoes"
+            @cadastrar="abrirCadastroRapido"
+            @atualizar-produtos="carregarProdutos({ ativo: true })"
+          />
         </RecebimentoSecaoExpansivel>
 
         <RecebimentoSecaoExpansivel
@@ -159,38 +124,49 @@
         </RecebimentoSecaoExpansivel>
 
         <RecebimentoSecaoExpansivel
-          v-if="mostrarComplementar"
           v-model="secoes.complementar"
           titulo="Informações complementares"
-          subtitulo="Observações da NF e da entrada"
+          subtitulo="Texto da NF-e e observação da entrada"
         >
-          <q-input
-            v-if="informacoesComplementares"
-            :model-value="informacoesComplementares"
-            outlined
-            readonly
-            type="textarea"
-            autogrow
-            label="Inf. complementar da NF"
-            class="q-mb-md"
-          />
-          <q-input
-            v-if="informacoesFisco"
-            :model-value="informacoesFisco"
-            outlined
-            readonly
-            type="textarea"
-            autogrow
-            label="Inf. ao fisco"
-            class="q-mb-md"
-          />
-          <q-input
-            v-model="informacaoComplementarEntrada"
-            outlined
-            type="textarea"
-            autogrow
-            label="Informação complementar da entrada"
-          />
+          <div class="complementar">
+            <div
+              v-if="informacoesComplementares || informacoesFisco"
+              class="complementar__bloco"
+            >
+              <h4 class="complementar__titulo">Texto da NF-e</h4>
+              <p class="complementar__hint">Somente leitura — conteúdo importado do XML</p>
+
+              <div class="complementar__nf-grid">
+                <div v-if="informacoesComplementares" class="complementar__campo">
+                  <span class="complementar__label">Inf. complementar</span>
+                  <div class="complementar__texto" tabindex="0">
+                    {{ informacoesComplementares }}
+                  </div>
+                </div>
+                <div v-if="informacoesFisco" class="complementar__campo">
+                  <span class="complementar__label">Inf. ao fisco</span>
+                  <div class="complementar__texto" tabindex="0">
+                    {{ informacoesFisco }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="complementar__bloco"
+              :class="{ 'complementar__bloco--entrada': informacoesComplementares || informacoesFisco }"
+            >
+              <h4 class="complementar__titulo">Observação da entrada</h4>
+              <p class="complementar__hint">Campo editável para registrar o que for relevante na conferência</p>
+              <q-input
+                v-model="informacaoComplementarEntrada"
+                outlined
+                type="textarea"
+                autogrow
+                label="Informação complementar da entrada"
+              />
+            </div>
+          </div>
         </RecebimentoSecaoExpansivel>
 
         <div class="agro-form-actions">
@@ -216,6 +192,13 @@
       :cfop-xml="itemCadastroRapido?.cfop"
       :ean-xml="itemCadastroRapido?.ean"
       :unidade-xml="itemCadastroRapido?.unidade"
+      :origem-xml="itemCadastroRapido?.origem"
+      :cst-icms-xml="itemCadastroRapido?.cstIcms"
+      :csosn-xml="itemCadastroRapido?.csosn"
+      :aliquota-icms-xml="itemCadastroRapido?.aliquotaIcms"
+      :informacao-adicional-xml="itemCadastroRapido?.informacaoAdicional"
+      :numero-lote-xml="itemCadastroRapido?.numeroLote"
+      :data-validade-xml="itemCadastroRapido?.dataValidade"
       @criado="onProdutoCriado"
     />
 
@@ -230,9 +213,9 @@
 <script setup lang="ts">
 import FornecedorRapidoDialog from 'components/compras/FornecedorRapidoDialog.vue';
 import ProdutoRapidoDialog from 'components/compras/ProdutoRapidoDialog.vue';
-import RecebimentoNfeItemCard, {
-  type RecebimentoNfeItemFormModel,
-} from 'components/compras/RecebimentoNfeItemCard.vue';
+import RecebimentoItensSection, {
+  type RecebimentoItemForm,
+} from 'components/compras/RecebimentoItensSection.vue';
 import RecebimentoNfePagamentosCard, {
   type ParcelaRecebimentoForm,
 } from 'components/compras/RecebimentoNfePagamentosCard.vue';
@@ -257,10 +240,6 @@ import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-interface ItemForm extends RecebimentoNfeItemFormModel {
-  chave: string;
-}
 
 const route = useRoute();
 const router = useRouter();
@@ -289,17 +268,17 @@ const informacaoComplementarEntrada = ref('');
 const centroCustoId = ref<string | null>(null);
 const planoContas = ref('');
 const parcelas = ref<ParcelaRecebimentoForm[]>([]);
-const itens = ref<ItemForm[]>([criarItemVazio()]);
+const itens = ref<RecebimentoItemForm[]>([criarItemVazio()]);
 const dialogProdutoAberto = ref(false);
 const dialogFornecedorAberto = ref(false);
-const itemCadastroRapido = ref<ItemForm | null>(null);
+const itemCadastroRapido = ref<RecebimentoItemForm | null>(null);
 
 const secoes = reactive({
   xml: true,
   gerais: true,
   produtos: true,
   pagamentos: true,
-  totais: true,
+  totais: false,
   complementar: false,
 });
 
@@ -328,12 +307,6 @@ const precoSugeridoCadastro = computed(() => {
   if (!item) return 0;
   return parseMascaraMoeda(item.custoUnitario) ?? 0;
 });
-const mostrarComplementar = computed(
-  () =>
-    Boolean(informacoesComplementares.value)
-    || Boolean(informacoesFisco.value)
-    || informacaoComplementarEntrada.value !== '',
-);
 const subtituloGerais = computed(() => {
   const partes: string[] = [];
   if (numeroNota.value) partes.push(`NF ${numeroNota.value}`);
@@ -350,7 +323,7 @@ const subtituloPagamentos = computed(() => {
   return `${parcelas.value.length} parcela(s)`;
 });
 
-function criarItemVazio(): ItemForm {
+function criarItemVazio(): RecebimentoItemForm {
   return {
     chave: crypto.randomUUID(),
     produtoId: '',
@@ -409,24 +382,7 @@ function mapearFormaPagamento(tPag: string | null | undefined): string | null {
   }
 }
 
-function rotuloItemXml(item: ItemForm): string {
-  const codigo = item.codigoProdutoXml?.trim();
-  const descricao = item.descricaoProdutoXml?.trim();
-  if (codigo && descricao) return `${codigo} — ${descricao}`;
-  return descricao || codigo || 'Item sem identificação';
-}
-
-function rotuloItemXmlCurto(item: ItemForm): string {
-  const completo = rotuloItemXml(item);
-  if (completo.length <= 80) return completo;
-  return `${completo.slice(0, 77)}...`;
-}
-
-function adicionarItem(): void {
-  itens.value.push(criarItemVazio());
-}
-
-function abrirCadastroRapido(item: ItemForm): void {
+function abrirCadastroRapido(item: RecebimentoItemForm): void {
   itemCadastroRapido.value = item;
   dialogProdutoAberto.value = true;
 }
@@ -487,7 +443,7 @@ async function analisarXml(): Promise<void> {
   totais.value = preview.totais;
   informacoesComplementares.value = preview.informacoesComplementares ?? '';
   informacoesFisco.value = preview.informacoesFisco ?? '';
-  informacaoComplementarEntrada.value = preview.informacoesComplementares ?? '';
+  informacaoComplementarEntrada.value = '';
 
   const formaPadrao = mapearFormaPagamento(
     preview.duplicatas[0]?.formaPagamento ?? preview.pagamentos[0]?.formaPagamento,
@@ -542,12 +498,17 @@ async function analisarXml(): Promise<void> {
   secoes.gerais = true;
   secoes.produtos = true;
   secoes.pagamentos = true;
-  secoes.totais = true;
+  secoes.totais = false;
 }
 
 async function salvar(): Promise<void> {
   if (fornecedorNaoCadastrado.value) {
     erro('Cadastre o fornecedor do XML antes de criar o recebimento.');
+    return;
+  }
+
+  if (itens.value.length === 0 || itens.value.some((item) => !item.produtoId)) {
+    erro('Vincule todos os produtos antes de criar o recebimento.');
     return;
   }
 
@@ -598,17 +559,8 @@ onMounted(async () => {
   display: grid;
   gap: var(--spacing-4);
 }
-.itens-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--spacing-3);
-}
-.itens-lista {
-  display: grid;
-  gap: var(--spacing-4);
-}
 .banner-faltantes {
-  margin: 0 0 var(--spacing-4);
+  margin: var(--spacing-4) 0 0;
   padding: var(--spacing-4);
   border: var(--border-width-thin) solid var(--color-warning-500);
   border-left: var(--border-width-accent) solid var(--color-warning-500);
@@ -627,27 +579,67 @@ onMounted(async () => {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
-.banner-faltantes__lista {
+
+.complementar {
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.complementar__bloco {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.complementar__bloco--entrada {
+  padding-top: var(--spacing-4);
+  border-top: var(--border-width-thin) solid var(--color-border-default);
+}
+
+.complementar__titulo {
   margin: 0;
-  padding: 0;
-  list-style: none;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.complementar__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.complementar__nf-grid {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+}
+
+.complementar__campo {
   display: grid;
   gap: var(--spacing-2);
-}
-.banner-faltantes__lista li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-2);
-}
-.banner-faltantes__item {
-  flex: 1;
   min-width: 0;
+}
+
+.complementar__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.complementar__texto {
+  max-height: 12rem;
+  overflow: auto;
+  padding: var(--spacing-3);
+  border: var(--border-width-thin) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-50);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>

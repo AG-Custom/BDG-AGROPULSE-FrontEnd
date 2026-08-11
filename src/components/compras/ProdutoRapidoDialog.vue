@@ -8,7 +8,7 @@
         </p>
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section class="dialog__corpo">
         <q-form greedy class="agro-formulario" @submit.prevent="salvar">
           <q-input
             v-model="form.descricao"
@@ -18,53 +18,88 @@
             :rules="[obrigatorio]"
           />
 
-          <agro-select-cadastro
-            v-model="form.categoriaProdutoId"
-            entidade="categoriaProduto"
-            label="Categoria"
-            class="field-required"
-            :options="categoriaOpcoes"
-            :loading="carregandoCategorias"
-            :rules="[obrigatorio]"
-            @atualizar="carregarCategorias()"
-          />
+          <div class="form-grid-2">
+            <agro-select-cadastro
+              v-model="form.categoriaProdutoId"
+              entidade="categoriaProduto"
+              label="Categoria"
+              class="field-required"
+              :options="categoriaOpcoes"
+              :loading="carregandoCategorias"
+              :rules="[obrigatorio]"
+              @atualizar="carregarCategorias()"
+            />
 
-          <q-select
-            v-model="form.tipoProduto"
-            outlined
-            label="Tipo"
-            emit-value
-            map-options
-            class="field-required"
-            :options="TipoProdutoOpcoes"
-            :rules="[obrigatorio]"
-          />
+            <q-select
+              v-model="form.tipoProduto"
+              outlined
+              label="Tipo"
+              emit-value
+              map-options
+              class="field-required"
+              :options="TipoProdutoOpcoes"
+              :rules="[obrigatorio]"
+            />
+          </div>
 
-          <q-select
-            v-model="form.unidadeMedidaId"
-            outlined
-            label="Unidade de medida"
-            emit-value
-            map-options
-            class="field-required"
-            :options="unidadeMedidaOpcoes"
-            :loading="carregandoUnidadesMedida"
-            :hint="hintUnidadeXml"
-            :rules="[obrigatorio]"
-          />
+          <div class="form-grid-2">
+            <q-select
+              v-model="form.unidadeMedidaId"
+              outlined
+              label="Unidade de medida"
+              emit-value
+              map-options
+              class="field-required"
+              :options="unidadeMedidaOpcoes"
+              :loading="carregandoUnidadesMedida"
+              :hint="hintUnidadeXml"
+              :rules="[obrigatorio]"
+            />
 
-          <AgroMoneyInput
-            v-model="form.precoVenda"
-            label="Preço de venda"
-            class="field-required"
-            :rules="[obrigatorio]"
-          />
+            <AgroMoneyInput
+              v-model="form.precoVenda"
+              label="Preço de venda"
+              class="field-required"
+              :hint="hintPreco"
+              :rules="[obrigatorio]"
+            />
+          </div>
+
+          <div class="form-flags">
+            <q-toggle v-model="form.exigeLote" label="Exige lote" color="primary" />
+            <q-toggle v-model="form.exigeValidade" label="Exige validade" color="primary" />
+            <q-toggle v-model="form.exigeFabricacao" label="Exige fabricação" color="primary" />
+          </div>
 
           <div class="xml-bloco">
-            <h5 class="xml-bloco__titulo">Dados do XML</h5>
+            <h5 class="xml-bloco__titulo">Dados fiscais do XML</h5>
             <div class="xml-bloco__grid">
-              <q-input v-model="ncm" outlined label="NCM" mask="########" fill-mask="" />
-              <q-input v-model="cfop" outlined label="CFOP" mask="####" fill-mask="" />
+              <q-input
+                v-model="fiscal.ncm"
+                outlined
+                label="NCM"
+                mask="########"
+                fill-mask=""
+                :rules="regrasNcm"
+              />
+              <q-select
+                v-model="fiscal.origemMercadoria"
+                outlined
+                emit-value
+                map-options
+                label="Origem da mercadoria"
+                :options="OrigemMercadoriaOpcoes"
+              />
+              <q-input v-model="fiscal.csosn" outlined label="CSOSN" maxlength="10" />
+              <q-input v-model="fiscal.cstIcms" outlined label="CST ICMS" maxlength="10" />
+              <q-input
+                v-model="fiscal.aliquotaIcms"
+                outlined
+                label="Alíquota ICMS (%)"
+                inputmode="decimal"
+              />
+              <q-input v-model="fiscal.cfopPadraoInterno" outlined label="CFOP interno" mask="####" fill-mask="" />
+              <q-input v-model="fiscal.cfopPadraoExterno" outlined label="CFOP externo" mask="####" fill-mask="" />
               <q-input v-model="ean" outlined label="EAN" />
               <q-input
                 :model-value="unidadeXml?.trim() || '—'"
@@ -74,6 +109,14 @@
                 hint="Usada para sugerir a unidade de medida"
               />
             </div>
+            <q-input
+              v-model="fiscal.observacoesFiscais"
+              outlined
+              type="textarea"
+              autogrow
+              label="Observações fiscais"
+              class="q-mt-md"
+            />
           </div>
 
           <div class="agro-form-actions">
@@ -98,17 +141,26 @@ import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
 import { useProdutos } from 'composables/useProdutos';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
-import { TipoCodigoProduto, TipoProdutoOpcoes } from 'constants/enums';
-import type { ProdutoDto, ProdutoFormModel } from 'types/dtos/produto.dto';
+import {
+  OrigemMercadoria,
+  OrigemMercadoriaOpcoes,
+  TipoCodigoProduto,
+  TipoProdutoOpcoes,
+} from 'constants/enums';
+import type { ProdutoDto, ProdutoFiscalFormModel, ProdutoFormModel } from 'types/dtos/produto.dto';
+import { formatarMoeda, formatarMoedaParaInput, apenasDigitos } from 'utils/formatters';
+import { mapearOrigemMercadoriaNfe } from 'utils/mappers/nfe-origem.mapper';
 import {
   codigoFormParaDtoLocal,
   criarCodigoFormVazio,
   criarComplementosFormVazio,
+  criarFiscalFormVazio,
   criarProdutoFormVazio,
+  fiscalFormTemDados,
 } from 'utils/mappers/produto.mapper';
-import { formatarMoedaParaInput } from 'utils/formatters';
-import { obrigatorio } from 'utils/validators';
+import { ncm as ncmValidator, obrigatorio } from 'utils/validators';
 import { computed, ref, watch } from 'vue';
+import { useNotificacao } from 'composables/useNotificacao';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -119,6 +171,13 @@ const props = defineProps<{
   cfopXml?: string | null;
   eanXml?: string | null;
   unidadeXml?: string | null;
+  origemXml?: string | null;
+  cstIcmsXml?: string | null;
+  csosnXml?: string | null;
+  aliquotaIcmsXml?: number | null;
+  informacaoAdicionalXml?: string | null;
+  numeroLoteXml?: string | null;
+  dataValidadeXml?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -127,10 +186,10 @@ const emit = defineEmits<{
 }>();
 
 const form = ref<ProdutoFormModel>(criarProdutoFormVazio());
-const ncm = ref('');
-const cfop = ref('');
+const fiscal = ref<ProdutoFiscalFormModel>(criarFiscalFormVazio());
 const ean = ref('');
 const { criar, salvando } = useProdutos();
+const { erro } = useNotificacao();
 
 const {
   categorias,
@@ -173,6 +232,18 @@ const hintUnidadeXml = computed(() => {
   return `UN do XML: ${un} — selecione a unidade correspondente`;
 });
 
+const hintPreco = computed(() => {
+  if (props.precoSugerido == null || props.precoSugerido <= 0) return undefined;
+  return `Custo unitário da NF: ${formatarMoeda(props.precoSugerido)}`;
+});
+
+const regrasNcm = computed(() => {
+  if (!fiscalFormTemDados(fiscal.value) && !fiscal.value.ncm.trim()) {
+    return undefined;
+  }
+  return [obrigatorio, ncmValidator];
+});
+
 function normalizarUnidade(valor: string): string {
   return valor.trim().toUpperCase().replace(/\./g, '');
 }
@@ -210,15 +281,42 @@ function resolverUnidadeMedidaId(unidadeXml: string | null | undefined): string 
   return porDescricao?.id ?? null;
 }
 
+function distribuirCfop(cfopValor: string): { interno: string; externo: string } {
+  if (!cfopValor) return { interno: '', externo: '' };
+  if (cfopValor.startsWith('5')) return { interno: cfopValor, externo: '' };
+  if (cfopValor.startsWith('6')) return { interno: '', externo: cfopValor };
+  return { interno: '', externo: cfopValor };
+}
+
 function preencherFormulario(): void {
+  const cfop = distribuirCfop(props.cfopXml?.trim() ?? '');
+  const origem =
+    mapearOrigemMercadoriaNfe(props.origemXml) ?? OrigemMercadoria.Nacional;
+
   form.value = {
     ...criarProdutoFormVazio(),
     descricao: props.descricaoProdutoXml?.trim() ?? '',
     precoVenda: formatarMoedaParaInput(props.precoSugerido ?? 0),
     unidadeMedidaId: resolverUnidadeMedidaId(props.unidadeXml),
+    exigeLote: Boolean(props.numeroLoteXml?.trim()),
+    exigeValidade: Boolean(props.dataValidadeXml?.trim()),
   };
-  ncm.value = props.ncmXml?.trim() ?? '';
-  cfop.value = props.cfopXml?.trim() ?? '';
+
+  fiscal.value = {
+    ...criarFiscalFormVazio(),
+    ncm: props.ncmXml?.trim() ?? '',
+    origemMercadoria: origem,
+    csosn: props.csosnXml?.trim() ?? '',
+    cstIcms: props.cstIcmsXml?.trim() ?? '',
+    aliquotaIcms:
+      props.aliquotaIcmsXml != null && Number.isFinite(props.aliquotaIcmsXml)
+        ? String(props.aliquotaIcmsXml)
+        : '',
+    cfopPadraoInterno: cfop.interno,
+    cfopPadraoExterno: cfop.externo,
+    observacoesFiscais: props.informacaoAdicionalXml?.trim() ?? '',
+  };
+
   ean.value = props.eanXml?.trim() ?? '';
 }
 
@@ -241,8 +339,6 @@ watch(unidadesMedida, () => {
 async function salvar(): Promise<void> {
   const codigoXml = props.codigoProdutoXml?.trim();
   const eanValor = ean.value.trim();
-  const ncmValor = ncm.value.trim();
-  const cfopValor = cfop.value.trim();
   const complementos = criarComplementosFormVazio();
   const codigos: ReturnType<typeof codigoFormParaDtoLocal>[] = [];
 
@@ -269,17 +365,11 @@ async function salvar(): Promise<void> {
   }
 
   complementos.codigos = codigos;
+  complementos.fiscal = { ...fiscal.value };
 
-  if (ncmValor || cfopValor) {
-    const cfopInterno = cfopValor.startsWith('5') ? cfopValor : '';
-    const cfopExterno = cfopValor.startsWith('6') || (!cfopInterno && cfopValor) ? cfopValor : '';
-
-    complementos.fiscal = {
-      ...complementos.fiscal,
-      ncm: ncmValor,
-      cfopPadraoInterno: cfopInterno,
-      cfopPadraoExterno: cfopExterno,
-    };
+  if (fiscalFormTemDados(complementos.fiscal) && apenasDigitos(complementos.fiscal.ncm).length !== 8) {
+    erro('Informe um NCM válido com 8 dígitos para salvar os dados fiscais.');
+    return;
   }
 
   const produto = await criar(form.value, complementos, {
@@ -297,23 +387,44 @@ async function salvar(): Promise<void> {
 
 <style scoped>
 .dialog {
-  width: min(640px, 100vw);
+  width: min(760px, 100vw);
 }
+
+.dialog__corpo {
+  max-height: min(75vh, 800px);
+  overflow: auto;
+}
+
 .titulo {
   margin: 0;
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
   color: var(--color-text-primary);
 }
+
 .subtitulo {
   margin: var(--spacing-2) 0 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
 .agro-formulario {
   display: grid;
   gap: var(--spacing-4);
 }
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+
+.form-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
 .xml-bloco {
   display: grid;
   gap: var(--spacing-3);
@@ -322,6 +433,7 @@ async function salvar(): Promise<void> {
   border-radius: var(--radius-md);
   background: var(--color-neutral-50);
 }
+
 .xml-bloco__titulo {
   margin: 0;
   font-size: var(--font-size-sm);
@@ -330,12 +442,15 @@ async function salvar(): Promise<void> {
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
 }
+
 .xml-bloco__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-3);
 }
+
 @media (max-width: 600px) {
+  .form-grid-2,
   .xml-bloco__grid {
     grid-template-columns: 1fr;
   }
