@@ -86,6 +86,5 @@ const aberto = defineModel<boolean>({ default: true });
 
 .secao-expansivel__corpo {
   padding: 0 var(--card-padding) var(--card-padding);
-  border-top: var(--border-width-thin) solid var(--color-border-default);
 }
 </style>

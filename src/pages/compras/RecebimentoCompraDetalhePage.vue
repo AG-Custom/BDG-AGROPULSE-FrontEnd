@@ -110,7 +110,7 @@
           titulo="Totalizadores"
           subtitulo="Totais e tributos da NF-e"
         >
-          <RecebimentoNfeTotaisCard embutido :totais="totais" />
+          <RecebimentoNfeTotaisCard embutido v-model:totais="totais" readonly />
         </RecebimentoSecaoExpansivel>
 
         <RecebimentoSecaoExpansivel

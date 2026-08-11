@@ -41,7 +41,15 @@
       </div>
     </header>
 
-    <div class="item-card__meta">
+    <div v-if="modo === 'form'" class="item-card__meta item-card__meta--form">
+      <q-input v-model="item.codigoProdutoXml" outlined dense label="Cód. XML" />
+      <q-input v-model="item.descricaoProdutoXml" outlined dense label="Descrição XML" />
+      <q-input v-model="item.ncm" outlined dense label="NCM" />
+      <q-input v-model="item.cfop" outlined dense label="CFOP" />
+      <q-input v-model="item.unidade" outlined dense label="UN" />
+      <q-input v-model="item.ean" outlined dense label="EAN" />
+    </div>
+    <div v-else class="item-card__meta">
       <div v-for="chip in chipsMeta" :key="chip.label" class="meta-chip">
         <span class="meta-chip__label">{{ chip.label }}</span>
         <span class="meta-chip__valor text-metric">{{ chip.valor }}</span>
@@ -102,11 +110,11 @@
           :readonly="readonly"
         />
         <q-input
-          v-if="item.informacaoAdicional"
-          :model-value="item.informacaoAdicional"
+          v-if="modo === 'form' || item.informacaoAdicional"
+          v-model="item.informacaoAdicional"
           outlined
-          readonly
           label="Info. adicional do item"
+          :readonly="readonly || modo === 'detalhe'"
         />
       </div>
     </section>
@@ -401,6 +409,12 @@ const camposTributacao = computed(() => [
   gap: var(--spacing-2);
 }
 
+.item-card__meta--form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-3);
+}
+
 .meta-chip {
   display: inline-flex;
   flex-direction: column;
@@ -516,14 +530,16 @@ const camposTributacao = computed(() => [
 
 @media (max-width: 900px) {
   .item-card__grid--3,
-  .item-card__grid--4 {
+  .item-card__grid--4,
+  .item-card__meta--form {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 600px) {
   .item-card__grid--3,
-  .item-card__grid--4 {
+  .item-card__grid--4,
+  .item-card__meta--form {
     grid-template-columns: 1fr;
   }
 }

@@ -1,52 +1,101 @@
 <template>
   <component :is="embutido ? 'div' : AgroCard" class="totais">
     <h3 v-if="!embutido" class="titulo">Totalizadores</h3>
-    <div class="totais-grid">
-      <div v-for="item in linhas" :key="item.label" class="totais-item">
+
+    <div v-if="readonly" class="totais-grid">
+      <div v-for="item in linhasLeitura" :key="item.label" class="totais-item">
         <div class="text-caption">{{ item.label }}</div>
         <div class="text-metric">{{ item.valor }}</div>
       </div>
+    </div>
+
+    <div v-else class="totais-grid totais-grid--form">
+      <AgroMoneyInput
+        v-for="campo in camposMoeda"
+        :key="campo.key"
+        :model-value="valorMoeda(campo.key)"
+        :label="campo.label"
+        dense
+        @update:model-value="atualizarMoeda(campo.key, $event)"
+      />
+      <q-input
+        v-model="tipoFrete"
+        outlined
+        dense
+        label="Tipo frete"
+      />
     </div>
   </component>
 </template>
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import type { PreviewRecebimentoXmlTotaisDto } from 'types/dtos/compras.dto';
-import { formatarMoeda } from 'utils/formatters';
+import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
 import { computed } from 'vue';
 
-const props = withDefaults(
+type CampoMoedaKey = Exclude<keyof PreviewRecebimentoXmlTotaisDto, 'tipoFrete'>;
+
+withDefaults(
   defineProps<{
-    totais: PreviewRecebimentoXmlTotaisDto;
+    readonly?: boolean;
     embutido?: boolean;
   }>(),
   {
+    readonly: false,
     embutido: false,
   },
 );
 
-const linhas = computed(() => {
-  const t = props.totais;
+const totais = defineModel<PreviewRecebimentoXmlTotaisDto>('totais', { required: true });
+
+const camposMoeda: Array<{ key: CampoMoedaKey; label: string }> = [
+  { key: 'totalProdutos', label: 'Total produtos' },
+  { key: 'totalDesconto', label: 'Total desconto' },
+  { key: 'totalNota', label: 'Total nota' },
+  { key: 'totalFrete', label: 'Total frete' },
+  { key: 'totalSeguro', label: 'Total seguro' },
+  { key: 'totalOutras', label: 'Total outras' },
+  { key: 'totalBaseIcms', label: 'Base ICMS' },
+  { key: 'totalValorIcms', label: 'Valor ICMS' },
+  { key: 'totalIcmsDesonerado', label: 'ICMS desonerado' },
+  { key: 'totalBaseIcmsSt', label: 'Base ICMS ST' },
+  { key: 'totalValorIcmsSt', label: 'Valor ICMS ST' },
+  { key: 'totalIpi', label: 'Total IPI' },
+  { key: 'totalBaseDifal', label: 'Base DIFAL' },
+  { key: 'totalValorDifal', label: 'Valor DIFAL' },
+];
+
+const linhasLeitura = computed(() => {
+  const t = totais.value;
   const moeda = (v: number | null | undefined) => (v == null ? '—' : formatarMoeda(v));
   return [
-    { label: 'Total produtos', valor: moeda(t.totalProdutos) },
-    { label: 'Total desconto', valor: moeda(t.totalDesconto) },
-    { label: 'Total nota', valor: moeda(t.totalNota) },
-    { label: 'Total frete', valor: moeda(t.totalFrete) },
-    { label: 'Total seguro', valor: moeda(t.totalSeguro) },
-    { label: 'Total outras', valor: moeda(t.totalOutras) },
-    { label: 'Base ICMS', valor: moeda(t.totalBaseIcms) },
-    { label: 'Valor ICMS', valor: moeda(t.totalValorIcms) },
-    { label: 'ICMS desonerado', valor: moeda(t.totalIcmsDesonerado) },
-    { label: 'Base ICMS ST', valor: moeda(t.totalBaseIcmsSt) },
-    { label: 'Valor ICMS ST', valor: moeda(t.totalValorIcmsSt) },
-    { label: 'Total IPI', valor: moeda(t.totalIpi) },
-    { label: 'Base DIFAL', valor: moeda(t.totalBaseDifal) },
-    { label: 'Valor DIFAL', valor: moeda(t.totalValorDifal) },
+    ...camposMoeda.map((campo) => ({
+      label: campo.label,
+      valor: moeda(t[campo.key]),
+    })),
     { label: 'Tipo frete', valor: t.tipoFrete ?? '—' },
   ];
 });
+
+const tipoFrete = computed({
+  get: () => totais.value.tipoFrete ?? '',
+  set: (valor: string) => {
+    totais.value = { ...totais.value, tipoFrete: valor.trim() || null };
+  },
+});
+
+function valorMoeda(key: CampoMoedaKey): string {
+  return formatarMoedaParaInput(totais.value[key]);
+}
+
+function atualizarMoeda(key: CampoMoedaKey, valor: string): void {
+  totais.value = {
+    ...totais.value,
+    [key]: parseMascaraMoeda(valor),
+  };
+}
 </script>
 
 <style scoped>
@@ -59,6 +108,9 @@ const linhas = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: var(--spacing-3);
+}
+.totais-grid--form {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
 .totais-item {
   display: grid;

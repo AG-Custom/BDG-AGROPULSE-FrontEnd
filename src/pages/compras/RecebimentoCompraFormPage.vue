@@ -61,11 +61,16 @@
             <div class="col-12 col-sm-6 col-md-4 col-lg-2">
               <q-input v-model="serie" outlined label="Série" />
             </div>
-            <div v-if="naturezaOperacao" class="col-12 col-md-6 col-lg-4">
-              <q-input :model-value="naturezaOperacao" outlined readonly label="Natureza da operação" />
+            <div class="col-12 col-md-6 col-lg-4">
+              <q-input v-model="naturezaOperacao" outlined label="Natureza da operação" />
             </div>
-            <div v-if="dataEmissao" class="col-12 col-md-6 col-lg-4">
-              <q-input :model-value="dataEmissao" outlined readonly label="Data de emissão" />
+            <div class="col-12 col-md-6 col-lg-4">
+              <q-input
+                v-model="dataEmissao"
+                outlined
+                type="date"
+                label="Data de emissão"
+              />
             </div>
           </div>
 
@@ -120,7 +125,7 @@
           titulo="Totalizadores"
           subtitulo="Totais e tributos da NF-e"
         >
-          <RecebimentoNfeTotaisCard embutido :totais="totais" />
+          <RecebimentoNfeTotaisCard embutido v-model:totais="totais" />
         </RecebimentoSecaoExpansivel>
 
         <RecebimentoSecaoExpansivel
@@ -129,35 +134,31 @@
           subtitulo="Texto da NF-e e observação da entrada"
         >
           <div class="complementar">
-            <div
-              v-if="informacoesComplementares || informacoesFisco"
-              class="complementar__bloco"
-            >
+            <div class="complementar__bloco">
               <h4 class="complementar__titulo">Texto da NF-e</h4>
-              <p class="complementar__hint">Somente leitura — conteúdo importado do XML</p>
+              <p class="complementar__hint">Preenchido pelo XML — pode ajustar se necessário</p>
 
               <div class="complementar__nf-grid">
-                <div v-if="informacoesComplementares" class="complementar__campo">
-                  <span class="complementar__label">Inf. complementar</span>
-                  <div class="complementar__texto" tabindex="0">
-                    {{ informacoesComplementares }}
-                  </div>
-                </div>
-                <div v-if="informacoesFisco" class="complementar__campo">
-                  <span class="complementar__label">Inf. ao fisco</span>
-                  <div class="complementar__texto" tabindex="0">
-                    {{ informacoesFisco }}
-                  </div>
-                </div>
+                <q-input
+                  v-model="informacoesComplementares"
+                  outlined
+                  type="textarea"
+                  autogrow
+                  label="Inf. complementar"
+                />
+                <q-input
+                  v-model="informacoesFisco"
+                  outlined
+                  type="textarea"
+                  autogrow
+                  label="Inf. ao fisco"
+                />
               </div>
             </div>
 
-            <div
-              class="complementar__bloco"
-              :class="{ 'complementar__bloco--entrada': informacoesComplementares || informacoesFisco }"
-            >
+            <div class="complementar__bloco complementar__bloco--entrada">
               <h4 class="complementar__titulo">Observação da entrada</h4>
-              <p class="complementar__hint">Campo editável para registrar o que for relevante na conferência</p>
+              <p class="complementar__hint">Registro adicional da conferência nesta unidade</p>
               <q-input
                 v-model="informacaoComplementarEntrada"
                 outlined
@@ -382,6 +383,12 @@ function mapearFormaPagamento(tPag: string | null | undefined): string | null {
   }
 }
 
+function normalizarDataEmissao(valor: string | null | undefined): string {
+  if (!valor) return '';
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec(valor);
+  return match?.[1] ?? valor;
+}
+
 function abrirCadastroRapido(item: RecebimentoItemForm): void {
   itemCadastroRapido.value = item;
   dialogProdutoAberto.value = true;
@@ -438,7 +445,7 @@ async function analisarXml(): Promise<void> {
   numeroNota.value = preview.numeroNota ?? '';
   serie.value = preview.serie ?? '';
   naturezaOperacao.value = preview.naturezaOperacao ?? '';
-  dataEmissao.value = preview.dataEmissao ?? '';
+  dataEmissao.value = normalizarDataEmissao(preview.dataEmissao);
   fatura.value = preview.fatura;
   totais.value = preview.totais;
   informacoesComplementares.value = preview.informacoesComplementares ?? '';
@@ -613,33 +620,5 @@ onMounted(async () => {
   display: grid;
   gap: var(--spacing-4);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
-}
-
-.complementar__campo {
-  display: grid;
-  gap: var(--spacing-2);
-  min-width: 0;
-}
-
-.complementar__label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-}
-
-.complementar__texto {
-  max-height: 12rem;
-  overflow: auto;
-  padding: var(--spacing-3);
-  border: var(--border-width-thin) solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background: var(--color-neutral-50);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 </style>
