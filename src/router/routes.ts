@@ -82,6 +82,17 @@ export const routes: RouteRecordRaw[] = [
           plataforma: true,
         },
       },
+      {
+        path: 'empresas/:id',
+        name: 'plataforma-empresa-editar',
+        component: () => import('pages/plataforma/PlataformaEmpresaFormPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.plataformaEditarEmpresa',
+          breadcrumbPais: ['navegacao.plataforma'],
+          requerSuperHost: true,
+          plataforma: true,
+        },
+      },
     ],
   },
   {
@@ -1827,6 +1838,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.planejamentoSafras',
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1837,6 +1849,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.safraNova',
           breadcrumbPais: ['navegacao.planejamentoSafras'],
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1847,6 +1860,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.safraEditar',
           breadcrumbPais: ['navegacao.planejamentoSafras'],
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1857,6 +1871,7 @@ export const routes: RouteRecordRaw[] = [
           breadcrumb: 'navegacao.safraVisualizar',
           breadcrumbPais: ['navegacao.planejamentoSafras'],
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1866,6 +1881,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.ordensServicoAgricola',
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1875,6 +1891,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.custeioSafra',
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {
@@ -1884,6 +1901,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           breadcrumb: 'navegacao.oeeCampo',
           permissao: Permissoes.Rastreabilidade.Visualizar,
+          requerIndustria: true,
         },
       },
       {

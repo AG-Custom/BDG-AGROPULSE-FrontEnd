@@ -25,7 +25,7 @@ export interface ModuloNavegacao {
    * Prefixos mais específicos têm prioridade na resolução.
    */
   pathPrefixes: string[];
-  /** Oculta o módulo inteiro (ex.: Produção só indústria). */
+  /** Oculta o módulo inteiro (ex.: Produção e Beneficiamento só indústria). */
   flag?: FlagNavegacao;
   filhos: ItemNavegacao[];
 }
@@ -336,21 +336,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             flag: 'industria',
           },
           {
-            label: 'Talhões',
-            routeName: 'talhoes',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
-            label: 'Aplicações',
-            routeName: 'aplicacoes',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
-            label: 'Diário de Campo',
-            routeName: 'safras-diario-campo',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
             label: 'Ordens de Serviço',
             routeName: 'safras-ordens-servico',
             permissao: Permissoes.Rastreabilidade.Visualizar,
@@ -369,6 +354,38 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             flag: 'industria',
           },
           {
+            label: 'Visitas Técnicas',
+            routeName: 'safras-visitas-tecnicas',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'revenda',
+          },
+          {
+            label: 'Recomendações',
+            routeName: 'safras-recomendacoes',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+            flag: 'revenda',
+          },
+          {
+            label: 'Histórico aplicações',
+            routeName: 'safras-historico-aplicacoes',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Talhões',
+            routeName: 'talhoes',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Aplicações',
+            routeName: 'aplicacoes',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
+            label: 'Diário de Campo',
+            routeName: 'safras-diario-campo',
+            permissao: Permissoes.Rastreabilidade.Visualizar,
+          },
+          {
             label: 'Fazendas',
             routeName: 'safras-fazendas',
             permissao: Permissoes.Rastreabilidade.Visualizar,
@@ -379,20 +396,9 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Rastreabilidade.Visualizar,
           },
           {
-            label: 'Histórico aplicações',
-            routeName: 'safras-historico-aplicacoes',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
             label: 'Histórico produtividade',
             routeName: 'safras-historico-produtividade',
             permissao: Permissoes.Rastreabilidade.Visualizar,
-          },
-          {
-            label: 'Recomendações',
-            routeName: 'safras-recomendacoes',
-            permissao: Permissoes.Rastreabilidade.Visualizar,
-            flag: 'revenda',
           },
         ],
       },

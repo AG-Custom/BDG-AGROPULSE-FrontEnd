@@ -66,15 +66,23 @@
 
           <template #body-cell-acoes="props">
             <q-td :props="props">
-              <agro-btn
-                color="primary"
-                unelevated
-                dense
-                label="Acessar"
-                descricao="Entrar na empresa selecionada"
-                :loading="acessandoId === props.row.id"
-                @click="acessar(props.row.id)"
-              />
+              <div class="plataforma-lista__acoes">
+                <agro-btn
+                  flat
+                  label="Editar"
+                  descricao="Editar dados fiscais e documentos da empresa"
+                  :to="{ name: 'plataforma-empresa-editar', params: { id: props.row.id } }"
+                />
+                <agro-btn
+                  color="primary"
+                  unelevated
+                  dense
+                  label="Acessar"
+                  descricao="Entrar na empresa selecionada"
+                  :loading="acessandoId === props.row.id"
+                  @click="acessar(props.row.id)"
+                />
+              </div>
             </q-td>
           </template>
 
@@ -139,3 +147,12 @@ onMounted(() => {
   void carregar();
 });
 </script>
+
+<style scoped>
+.plataforma-lista__acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+</style>

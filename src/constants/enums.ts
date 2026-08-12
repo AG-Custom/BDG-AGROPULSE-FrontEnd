@@ -1043,6 +1043,19 @@ export const RegimeTributarioOpcoes = [
   { label: 'Produtor Rural', value: RegimeTributario.ProdutorRural },
 ];
 
+export const TipoCertificadoDigital = {
+  A1: 'A1',
+  A3: 'A3',
+} as const;
+
+export type TipoCertificadoDigitalValor =
+  (typeof TipoCertificadoDigital)[keyof typeof TipoCertificadoDigital];
+
+export const TipoCertificadoDigitalOpcoes = [
+  { label: 'A1', value: TipoCertificadoDigital.A1 },
+  { label: 'A3', value: TipoCertificadoDigital.A3 },
+];
+
 export const StatusNotaFiscal = {
   Rascunho: 'Rascunho',
   Emitida: 'Emitida',
