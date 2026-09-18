@@ -36,6 +36,7 @@ export const usePlataformaStore = defineStore('plataforma', {
 
     async obterEmpresa(empresaId: string) {
       this.carregando = true;
+      this.detalhe = null;
 
       try {
         this.detalhe = await plataformaService.obterEmpresa(empresaId);

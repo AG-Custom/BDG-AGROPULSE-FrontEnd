@@ -1,6 +1,6 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
-import { fiscalGestaoService } from 'services/fiscal-gestao.service';
+import { fiscalGestaoService, type EmitirNfePayload } from 'services/fiscal-gestao.service';
 import type {
   CancelarNotaFormModel,
   CceFormModel,
@@ -49,11 +49,11 @@ export function useNotasFiscais() {
     }
   }
 
-  async function emitirNfe(pedidoId: string): Promise<boolean> {
+  async function emitirNfe(pedidoId: string, payload: EmitirNfePayload): Promise<boolean> {
     salvando.value = true;
     try {
-      await fiscalGestaoService.emitirNfe(pedidoId);
-      sucesso('NF-e emitida.');
+      const nota = await fiscalGestaoService.emitirNfe(pedidoId, payload);
+      sucesso(`NF-e: ${nota.status}. ${nota.mensagemErro ?? ''}`);
       await carregar();
       return true;
     } catch (e) {
@@ -171,9 +171,7 @@ export function useNotasFiscais() {
         motivo: form.motivo.trim(),
       });
       sucesso(
-        result.reverterEstoque
-          ? 'Nota cancelada (reversão de estoque stub).'
-          : 'Nota cancelada.',
+        result.status === 'Cancelada' ? 'Cancelamento confirmado pela Focus.' : `Cancelamento ainda não confirmado. ${result.mensagemErro ?? 'Consulte novamente.'}`,
       );
       await carregar();
       return true;
@@ -222,15 +220,7 @@ export function useNotasFiscais() {
 
   async function abrirDanfe(id: string): Promise<boolean> {
     try {
-      const danfe = await fiscalGestaoService.obterDanfe(id);
-      const janela = window.open('', '_blank');
-      if (janela) {
-        janela.document.write(danfe.html);
-        janela.document.close();
-      } else {
-        const blob = new Blob([danfe.html], { type: 'text/html;charset=utf-8' });
-        baixarArquivo(blob, `danfe-${id}.html`);
-      }
+      baixarArquivo(await fiscalGestaoService.arquivoOficial(id, 'pdf'), `danfe-${id}.pdf`);
       return true;
     } catch (e) {
       erro(mensagem(e));
@@ -240,8 +230,7 @@ export function useNotasFiscais() {
 
   async function baixarXml(id: string): Promise<boolean> {
     try {
-      const xml = await fiscalGestaoService.obterXml(id);
-      const blob = new Blob([xml.xml], { type: 'application/xml;charset=utf-8' });
+      const blob = await fiscalGestaoService.arquivoOficial(id, 'xml');
       baixarArquivo(blob, `nota-${id}.xml`);
       sucesso('XML baixado.');
       return true;

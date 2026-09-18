@@ -10,6 +10,9 @@ import type {
 } from 'constants/enums';
 
 export interface NotaFiscalGestaoDto {
+  homologacao?: boolean | null;
+  codigoSefaz?: string | null;
+  protocoloCancelamento?: string | null;
   id: string;
   pedidoVendaId: string | null;
   pdvVendaId: string | null;

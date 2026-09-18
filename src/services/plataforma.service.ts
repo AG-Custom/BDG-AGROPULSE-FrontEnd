@@ -12,6 +12,9 @@ import type {
 import type { TipoCertificadoDigitalValor } from 'constants/enums';
 
 export const plataformaService = {
+  async excluirEmpresa(empresaId: string): Promise<void> {
+    await api.delete(`/plataforma/empresas/${empresaId}`);
+  },
   listarEmpresas(): Promise<ListarEmpresasPlataformaResponseDto> {
     return api
       .get<ListarEmpresasPlataformaResponseDto>('/plataforma/empresas')
