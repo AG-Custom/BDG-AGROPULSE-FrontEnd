@@ -31,6 +31,7 @@ export interface ClienteContatoDto {
 }
 
 export interface ClienteEnderecoDto {
+  codigoMunicipio?: string | null;
   id: string;
   tipo: TipoEnderecoClienteValor;
   endereco: EnderecoDto;
@@ -39,6 +40,8 @@ export interface ClienteEnderecoDto {
 }
 
 export interface ClienteDto extends ClienteResumoDto {
+  indicadorInscricaoEstadual?: number | null;
+  inscricaoEstadual?: string | null;
   responsavel: string | null;
   telefone: string | null;
   email: string | null;

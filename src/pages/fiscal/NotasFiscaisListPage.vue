@@ -1,6 +1,9 @@
 ﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Notas fiscais" subtitulo="Consulta de documentos fiscais." />
+    <agro-btn class="q-mb-md" color="primary" label="Emitir NF-e de pedido" descricao="Selecionar pedido e dados fiscais para emissão" @click="dialogEmissao = true" />
+    <emitir-nfe-dialog v-model="dialogEmissao" @emitida="aplicarFiltro" />
+    <cancelar-nota-dialog v-model="dialogCancelar" :loading="salvando" @confirm="onCancelar" />
 
     <section class="agro-section">
       <agro-card>
@@ -82,15 +85,18 @@
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
+                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="consultarFocus(props.row.id)"><q-item-section>Consultar na Focus</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="abrirDanfe(props.row.id)"><q-item-section>DANFE oficial (PDF)</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null && props.row.status === 'Emitida'" v-close-popup clickable @click="notaSelecionada = props.row; dialogCancelar = true"><q-item-section>Cancelar NF-e</q-item-section></q-item>
                 <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="baixarXml(props.row.id)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="code" size="16px" /></span></q-item-section>
                   <q-item-section>XML</q-item-section>
                 </q-item>
-                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCce(props.row)">
+                <q-item v-if="props.row.modeloDocumento !== 'NFe'" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCce(props.row)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="edit_note" size="16px" /></span></q-item-section>
                   <q-item-section>CC-e</q-item-section>
                 </q-item>
-                <q-item v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirComplementar(props.row)">
+                <q-item v-if="props.row.modeloDocumento !== 'NFe'" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirComplementar(props.row)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="add_circle" size="16px" /></span></q-item-section>
                   <q-item-section>Complementar</q-item-section>
                 </q-item>
@@ -115,6 +121,8 @@
         </q-card-section>
         <q-card-section>
           <q-form class="agro-formulario agro-formulario--bloqueado">
+            <q-banner v-if="notaVisualizar?.mensagemErro" class="bg-orange-1 q-mb-md">{{ notaVisualizar.codigoSefaz }} {{ notaVisualizar.mensagemErro }}</q-banner>
+            <p v-if="notaVisualizar?.homologacao != null">Ambiente: {{ notaVisualizar.homologacao ? 'Homologação' : 'Produção' }}. Protocolo: {{ notaVisualizar.protocoloAutorizacao ?? 'Aguardando autorização' }}</p>
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-4">
                 <q-input
@@ -203,6 +211,12 @@
 </template>
 
 <script setup lang="ts">
+import EmitirNfeDialog from 'components/fiscal/EmitirNfeDialog.vue';
+import CancelarNotaDialog from 'components/fiscal/CancelarNotaDialog.vue';
+import { fiscalGestaoService } from 'services/fiscal-gestao.service';
+import { useNotificacao } from 'composables/useNotificacao';
+import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
+import type { CancelarNotaFormModel } from 'types/dtos/fiscal-gestao.dto';
 import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
 import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
@@ -233,7 +247,20 @@ const {
   registrarCce,
   complementar,
   baixarXml,
+  abrirDanfe,
+  cancelar,
 } = useNotasFiscais();
+const dialogEmissao = ref(false);
+const dialogCancelar = ref(false);
+const { erro } = useNotificacao();
+const { mensagem } = useTratarErroFormulario();
+async function consultarFocus(id: string): Promise<void> {
+  try { notaVisualizar.value = await fiscalGestaoService.consultarFocus(id); dialogVisualizar.value = true; await aplicarFiltro(); }
+  catch (e) { erro(mensagem(e)); }
+}
+async function onCancelar(form: CancelarNotaFormModel): Promise<void> {
+  if (notaSelecionada.value && await cancelar(notaSelecionada.value.id, form)) dialogCancelar.value = false;
+}
 
 const filtro = reactive({
   status: null as string | null,
@@ -253,6 +280,7 @@ const colunas: QTableColumn<NotaFiscalGestaoDto>[] = [
   { name: 'numero', label: 'Número', field: 'numero', align: 'left' },
   { name: 'serie', label: 'Série', field: 'serie', align: 'left' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
+  { name: 'ambiente', label: 'Ambiente', field: row => row.homologacao == null ? 'Legado' : row.homologacao ? 'Homologação' : 'Produção', align: 'left' },
   { name: 'valorTotal', label: 'Valor', field: 'valorTotal', align: 'right' },
   { name: 'emitidaEm', label: 'Emitida em', field: 'emitidaEm', align: 'left' },
   { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },

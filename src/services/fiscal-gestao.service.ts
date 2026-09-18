@@ -45,7 +45,18 @@ import type {
   XmlNotaDto,
 } from 'types/dtos/fiscal-gestao.dto';
 
+export interface EmitirNfePayload {
+  homologacao: boolean; enderecoId: string; indicadorInscricaoEstadual: number;
+  codigoMunicipioDestinatario: string; inscricaoEstadualDestinatario: string | null;
+  consumidorFinal: boolean; presencaComprador: number; naturezaOperacao: string; formaPagamento: string;
+}
 export const fiscalGestaoService = {
+  consultarFocus(id: string): Promise<NotaFiscalGestaoDto> {
+    return api.post<NotaFiscalGestaoDto>(`/notas-fiscais/${id}/consultar-focus`).then(r => r.data);
+  },
+  arquivoOficial(id: string, tipo: 'pdf' | 'xml' | 'cancelamento'): Promise<Blob> {
+    return api.get<Blob>(`/notas-fiscais/${id}/arquivo/${tipo}`, { responseType: 'blob' }).then(r => r.data);
+  },
   listarNotas(params?: ListarNotasFiscaisParams): Promise<NotaFiscalGestaoDto[]> {
     return api.get<NotaFiscalGestaoDto[]>('/notas-fiscais', { params }).then((r) => r.data);
   },
@@ -54,9 +65,9 @@ export const fiscalGestaoService = {
     return api.get<NotaFiscalGestaoDto>(`/notas-fiscais/${id}`).then((r) => r.data);
   },
 
-  emitirNfe(pedidoId: string): Promise<NotaFiscalGestaoDto> {
+  emitirNfe(pedidoId: string, payload: EmitirNfePayload): Promise<NotaFiscalGestaoDto> {
     return api
-      .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfe/${pedidoId}`)
+      .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfe/${pedidoId}`, payload)
       .then((r) => r.data);
   },
 

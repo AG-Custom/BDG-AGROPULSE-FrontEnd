@@ -1057,6 +1057,9 @@ export const TipoCertificadoDigitalOpcoes = [
 ];
 
 export const StatusNotaFiscal = {
+  Processando: 'Processando',
+  Rejeitada: 'Rejeitada',
+  ResultadoDesconhecido: 'ResultadoDesconhecido',
   Rascunho: 'Rascunho',
   Emitida: 'Emitida',
   Cancelada: 'Cancelada',
@@ -1068,6 +1071,9 @@ export const StatusNotaFiscal = {
 export type StatusNotaFiscalValor = (typeof StatusNotaFiscal)[keyof typeof StatusNotaFiscal];
 
 export const StatusNotaFiscalOpcoes = [
+  { label: 'Processando na Focus', value: StatusNotaFiscal.Processando },
+  { label: 'Rejeitada', value: StatusNotaFiscal.Rejeitada },
+  { label: 'Resultado desconhecido', value: StatusNotaFiscal.ResultadoDesconhecido },
   { label: 'Rascunho', value: StatusNotaFiscal.Rascunho },
   { label: 'Emitida', value: StatusNotaFiscal.Emitida },
   { label: 'Cancelada', value: StatusNotaFiscal.Cancelada },

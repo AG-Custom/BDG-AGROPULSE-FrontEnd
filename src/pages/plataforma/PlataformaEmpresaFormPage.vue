@@ -107,11 +107,15 @@
         </q-stepper>
       </agro-card>
     </section>
+    <section v-if="editando && detalhe && !carregandoDetalhe" class="agro-section">
+      <configuracao-nfe-empresa :key="detalhe.id" :empresa-id="detalhe.id" />
+    </section>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import DiretorEmpresaStep from 'components/plataforma/DiretorEmpresaStep.vue';
+import ConfiguracaoNfeEmpresa from 'components/plataforma/ConfiguracaoNfeEmpresa.vue';
 import DocumentosEmpresaStep from 'components/plataforma/DocumentosEmpresaStep.vue';
 import TributacaoEmpresaStep from 'components/plataforma/TributacaoEmpresaStep.vue';
 import EmpresaStep from 'components/onboarding/EmpresaStep.vue';

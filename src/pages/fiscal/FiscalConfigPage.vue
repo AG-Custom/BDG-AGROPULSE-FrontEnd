@@ -6,6 +6,7 @@
     />
 
     <section class="agro-section fiscal">
+      <configuracao-nfe-empresa />
       <agro-card>
         <h3 class="titulo">Configuração</h3>
         <agro-form-skeleton v-if="carregando && !configuracao" :campos="3" />
@@ -26,6 +27,8 @@
             <div class="col-12 col-md-6">
               <q-input
                 v-model="formulario.focusNfeToken"
+                type="password"
+                autocomplete="new-password"
                 outlined
                 label="Token Focus NFe"
                 :hint="configuracao?.possuiTokenFocus ? 'Token já cadastrado — informe para substituir' : undefined"
@@ -105,6 +108,7 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import ConfiguracaoNfeEmpresa from 'components/plataforma/ConfiguracaoNfeEmpresa.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import { useFiscal } from 'composables/useFiscal';
 import { RegimeTributarioOpcoes } from 'constants/enums';
