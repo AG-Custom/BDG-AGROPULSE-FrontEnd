@@ -15,7 +15,7 @@
           </div>
           <q-input v-model="form.naturezaOperacao" outlined label="Natureza da operação" maxlength="60" :rules="[obrigatorio]" />
           <q-select v-model="form.presencaComprador" outlined label="Presença do comprador" :options="[{label:'Presencial',value:1},{label:'Internet',value:2},{label:'Teleatendimento',value:3},{label:'Outros, não presencial',value:9}]" emit-value map-options />
-          <q-select v-model="form.formaPagamento" outlined label="Pagamento informado na nota" :options="[{label:'Dinheiro',value:'01'},{label:'Cheque',value:'02'},{label:'Duplicata mercantil',value:'14'},{label:'Boleto',value:'15'},{label:'Depósito bancário',value:'16'},{label:'PIX dinâmico',value:'17'},{label:'Transferência / PIX estático',value:'18'}]" emit-value map-options :rules="[obrigatorio]" />
+          <q-select v-model="form.formaPagamento" outlined label="Pagamento informado na nota" :options="[{label:'Dinheiro',value:'01'},{label:'Cheque',value:'02'},{label:'Duplicata mercantil',value:'14'},{label:'Boleto',value:'15'},{label:'Depósito bancário',value:'16'},{label:'PIX dinâmico',value:'17'},{label:'Transferência bancária / carteira digital',value:'18'},{label:'PIX estático',value:'20'},{label:'Pagamento posterior',value:'91'}]" emit-value map-options :rules="[obrigatorio]" />
           <q-checkbox v-model="form.consumidorFinal" label="Destinatário é consumidor final" />
           <q-banner class="bg-blue-1">Os itens e valores vêm do pedido. Confira CFOP, ICMS e PIS/COFINS cadastrados com sua contabilidade. Este fluxo usa operação sem transporte; regras sem parametrização serão apontadas antes do envio.</q-banner>
           <q-banner v-if="resultado" :class="resultado.status === 'Emitida' ? 'bg-green-1' : 'bg-orange-1'">
