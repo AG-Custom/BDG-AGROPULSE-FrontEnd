@@ -10,7 +10,7 @@
         A NF-e tem itens que não bateram 100% com o cadastro. Cadastre-os aqui para continuar.
       </p>
       <ul class="banner-faltantes__lista">
-        <li v-for="item in itensSemProduto" :key="item.chave">
+        <li v-for="item in produtosFaltantes" :key="chaveProdutoXml(item)">
           <span class="banner-faltantes__item" :title="rotuloItemXml(item)">
             {{ rotuloItemXmlCurto(item) }}
           </span>
@@ -188,6 +188,24 @@ const formRef = ref<QForm | null>(null);
 const itensSemProduto = computed(() =>
   itens.value.filter((item) => !item.produtoId && (!!item.codigoProdutoXml || !!item.descricaoProdutoXml)),
 );
+
+function chaveProdutoXml(item: RecebimentoItemForm): string {
+  const codigo = item.codigoProdutoXml?.trim();
+  if (codigo) return `c:${codigo.toLowerCase()}`;
+  return `d:${item.descricaoProdutoXml?.trim().toLowerCase() ?? item.chave}`;
+}
+
+const produtosFaltantes = computed(() => {
+  const vistos = new Set<string>();
+  const unicos: RecebimentoItemForm[] = [];
+  for (const item of itensSemProduto.value) {
+    const chave = chaveProdutoXml(item);
+    if (vistos.has(chave)) continue;
+    vistos.add(chave);
+    unicos.push(item);
+  }
+  return unicos;
+});
 
 const mapaProdutos = computed(() => {
   const mapa = new Map<string, string>();

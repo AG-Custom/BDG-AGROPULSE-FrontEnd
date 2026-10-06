@@ -10,9 +10,6 @@ export const nfeEmpresaService = {
   async obter(empresaId?: string, unidadeId?: string): Promise<NfeEmpresaDto> {
     return (await api.get<NfeEmpresaDto>(caminho(empresaId), { params: { unidadeId } })).data;
   },
-  async salvarTokenPrincipal(token: string): Promise<void> {
-    await api.put('/plataforma/focus/token', { token });
-  },
   async sincronizar(unidadeId: string, certificado: File | null, senha: string, empresaId?: string): Promise<NfeEmpresaDto> {
     const form = new FormData();
     if (certificado) { form.append('certificado', certificado); form.append('senha', senha); }

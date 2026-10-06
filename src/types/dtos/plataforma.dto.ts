@@ -121,6 +121,7 @@ export interface CriarEmpresaPlataformaPayload extends CadastroFiscalEmpresaPayl
 export interface AtualizarEmpresaPlataformaPayload extends CadastroFiscalEmpresaPayload {
   razaoSocial: string;
   nomeFantasia: string;
+  cnpj: string;
   tipoOperacao: TipoOperacaoEmpresaValor;
 }
 
@@ -233,16 +234,18 @@ export function montarPayloadFiscal(tributacao: TributacaoEmpresaFormModel): Cad
       aliquotaInterna: parseAliquota(linha.aliquotaInterna),
       aliquotaInterestadual: parseAliquota(linha.aliquotaInterestadual),
     })),
-    pisCofinsNcm: tributacao.pisCofinsNcm.map((linha) => ({
-      ncm: linha.ncm.replace(/\D/g, ''),
-      cstPis: linha.cstPis.trim(),
-      cstCofins: linha.cstCofins.trim(),
-      aliquotaPis: parseAliquota(linha.aliquotaPis),
-      aliquotaCofins: parseAliquota(linha.aliquotaCofins),
-      suspenso: linha.suspenso,
-      vigenciaInicio: linha.vigenciaInicio,
-      vigenciaFim: linha.vigenciaFim.trim() || null,
-    })),
+    pisCofinsNcm: tributacao.pisCofinsNcm
+      .filter((linha) => linha.ncm.replace(/\D/g, '') || linha.cstPis.trim() || linha.cstCofins.trim() || linha.aliquotaPis.trim() || linha.aliquotaCofins.trim())
+      .map((linha) => ({
+        ncm: linha.ncm.replace(/\D/g, ''),
+        cstPis: linha.cstPis.trim(),
+        cstCofins: linha.cstCofins.trim(),
+        aliquotaPis: parseAliquota(linha.aliquotaPis),
+        aliquotaCofins: parseAliquota(linha.aliquotaCofins),
+        suspenso: linha.suspenso,
+        vigenciaInicio: linha.vigenciaInicio,
+        vigenciaFim: linha.vigenciaFim.trim() || null,
+      })),
   };
 }
 

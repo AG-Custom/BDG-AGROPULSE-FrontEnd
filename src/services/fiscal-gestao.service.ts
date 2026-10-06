@@ -54,7 +54,7 @@ export const fiscalGestaoService = {
   consultarFocus(id: string): Promise<NotaFiscalGestaoDto> {
     return api.post<NotaFiscalGestaoDto>(`/notas-fiscais/${id}/consultar-focus`).then(r => r.data);
   },
-  arquivoOficial(id: string, tipo: 'pdf' | 'xml' | 'cancelamento'): Promise<Blob> {
+  arquivoOficial(id: string, tipo: 'pdf' | 'html' | 'xml' | 'cancelamento'): Promise<Blob> {
     return api.get<Blob>(`/notas-fiscais/${id}/arquivo/${tipo}`, { responseType: 'blob' }).then(r => r.data);
   },
   listarNotas(params?: ListarNotasFiscaisParams): Promise<NotaFiscalGestaoDto[]> {
@@ -68,6 +68,12 @@ export const fiscalGestaoService = {
   emitirNfe(pedidoId: string, payload: EmitirNfePayload): Promise<NotaFiscalGestaoDto> {
     return api
       .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfe/${pedidoId}`, payload)
+      .then((r) => r.data);
+  },
+
+  emitirNfcePedido(pedidoId: string, payload: EmitirNfePayload): Promise<NotaFiscalGestaoDto> {
+    return api
+      .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfce-pedido/${pedidoId}`, payload)
       .then((r) => r.data);
   },
 

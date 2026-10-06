@@ -397,7 +397,16 @@ function abrirCadastroRapido(item: RecebimentoItemForm): void {
 async function onProdutoCriado(produto: ProdutoDto): Promise<void> {
   const item = itemCadastroRapido.value;
   await carregarProdutos({ ativo: true });
-  if (item) item.produtoId = produto.id;
+  if (item) {
+    const codigo = item.codigoProdutoXml.trim();
+    const descricao = item.descricaoProdutoXml.trim();
+    for (const linha of itens.value) {
+      if (linha.produtoId) continue;
+      const mesmoCodigo = Boolean(codigo) && linha.codigoProdutoXml.trim().toLowerCase() === codigo.toLowerCase();
+      const mesmaDescricao = !codigo && Boolean(descricao) && linha.descricaoProdutoXml.trim().toLowerCase() === descricao.toLowerCase();
+      if (mesmoCodigo || mesmaDescricao) linha.produtoId = produto.id;
+    }
+  }
   itemCadastroRapido.value = null;
 }
 

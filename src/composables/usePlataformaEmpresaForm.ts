@@ -132,6 +132,7 @@ export function usePlataformaEmpresaForm(refs: {
       {
         razaoSocial: empresa.value.razaoSocial.trim(),
         nomeFantasia: empresa.value.nomeFantasia.trim(),
+        cnpj: apenasDigitos(empresa.value.cnpj),
         tipoOperacao: empresa.value.tipoOperacao,
         ...montarPayloadFiscal(tributacao.value),
       },

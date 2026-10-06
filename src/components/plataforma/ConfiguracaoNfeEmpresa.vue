@@ -1,11 +1,7 @@
 <template>
   <agro-card>
     <h3>NF-e da empresa</h3>
-    <p>Configure o estabelecimento emitente e as credenciais de cada ambiente.</p>
-    <div v-if="empresaId" class="q-mb-lg q-gutter-sm">
-      <q-input v-model="tokenPrincipal" type="password" autocomplete="new-password" outlined label="Token principal da conta Focus" hint="Uso exclusivo da administração. Não é devolvido pela API." />
-      <agro-btn label="Validar e salvar token principal" descricao="Configurar integração da plataforma" :loading="salvando" :disable="!tokenPrincipal" @click="salvarPrincipal" />
-    </div>
+    <p>Configure o estabelecimento emitente e as credenciais de cada ambiente. O token de produção é a credencial principal da empresa na Focus.</p>
     <agro-form-skeleton v-if="carregando" :campos="8" />
     <q-banner v-else-if="falha" class="bg-red-1 text-negative">
       {{ falha }}
@@ -27,12 +23,24 @@
         <div class="col-12 col-md-6"><q-input v-model="dados.inscricaoMunicipal" outlined label="Inscrição municipal (obrigatória com CNAE)" maxlength="15" :rules="[v => Boolean(v) === Boolean(dados.cnae) || 'Informe CNAE e inscrição municipal juntos']" /></div>
         <div class="col-12 col-md-6"><q-input v-model.number="dados.serieHomologacao" type="number" min="1" max="999" outlined label="Série em homologação" :rules="[serieValida]" /></div>
         <div class="col-12 col-md-6"><q-input v-model.number="dados.serieProducao" type="number" min="1" max="999" outlined label="Série em produção" :rules="[serieValida]" /></div>
-        <div class="col-12 col-md-6"><q-input v-model="tokenHomologacao" type="password" autocomplete="new-password" outlined label="Token de homologação" maxlength="500"
-          :hint="config.possuiTokenHomologacao ? 'Cadastrado. Deixe vazio para manter.' : 'Ainda não cadastrado.'" /></div>
-        <div class="col-12 col-md-6"><q-input v-model="tokenProducao" type="password" autocomplete="new-password" outlined label="Token de produção" maxlength="500"
-          :hint="config.possuiTokenProducao ? 'Cadastrado. Deixe vazio para manter.' : 'Ainda não cadastrado.'" /></div>
+        <div class="col-12 col-md-6">
+          <q-input v-model="tokenHomologacao" :type="mostrarHomologacao ? 'text' : 'password'" autocomplete="new-password" outlined label="Token de homologação" maxlength="500"
+            :hint="tokenHomologacao ? 'Somente para testes de emissão.' : 'Somente para testes de emissão. Ainda não cadastrado.'">
+            <template #append>
+              <agro-icon-btn :name="mostrarHomologacao ? 'visibility_off' : 'visibility'" :descricao="mostrarHomologacao ? 'Ocultar token de homologação' : 'Mostrar token de homologação'" :aria-label="mostrarHomologacao ? 'Ocultar token de homologação' : 'Mostrar token de homologação'" @click="mostrarHomologacao = !mostrarHomologacao" />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-12 col-md-6">
+          <q-input v-model="tokenProducao" :type="mostrarProducao ? 'text' : 'password'" autocomplete="new-password" outlined label="Token de produção" maxlength="500"
+            :hint="tokenProducao ? 'Credencial principal da empresa na Focus.' : 'Credencial principal da empresa. Ainda não cadastrada.'">
+            <template #append>
+              <agro-icon-btn :name="mostrarProducao ? 'visibility_off' : 'visibility'" :descricao="mostrarProducao ? 'Ocultar token de produção' : 'Mostrar token de produção'" :aria-label="mostrarProducao ? 'Ocultar token de produção' : 'Mostrar token de produção'" @click="mostrarProducao = !mostrarProducao" />
+            </template>
+          </q-input>
+        </div>
       </div>
-      <p class="text-caption">O certificado e o emitente também precisam estar habilitados na Focus. Salvar esta configuração não confirma a habilitação para emissão.</p>
+      <p class="text-caption">A sincronização consulta e cadastra o CNPJ na Focus com o token da aplicação. O certificado e o emitente também precisam estar habilitados na Focus. Salvar esta configuração não confirma a habilitação para emissão.</p>
       <agro-btn type="submit" color="primary" label="Salvar configuração de NF-e" descricao="Salvar dados fiscais desta empresa" :loading="salvando" :disable="!emitente" />
       <q-separator />
       <p>{{ config.sincronizadoEm ? `Sincronizado com a Focus em ${new Date(config.sincronizadoEm).toLocaleString('pt-BR')}` : 'Dados ainda não sincronizados com a Focus.' }}</p>
@@ -48,6 +56,7 @@
 import { computed, ref, watch } from 'vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
+import AgroIconBtn from 'components/ui/AgroIconBtn.vue';
 import { nfeEmpresaService } from 'services/nfe-empresa.service';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
@@ -61,7 +70,8 @@ const config = ref<NfeEmpresaDto | null>(null);
 const dados = ref<DadosEmissaoNfe>(vazio());
 const tokenHomologacao = ref('');
 const tokenProducao = ref('');
-const tokenPrincipal = ref('');
+const mostrarHomologacao = ref(false);
+const mostrarProducao = ref(false);
 const certificado = ref<File | null>(null);
 const senhaCertificado = ref('');
 const carregando = ref(false);
@@ -82,18 +92,24 @@ function vazio(): DadosEmissaoNfe {
 function serieValida(v: unknown): boolean | string {
   return Number.isInteger(Number(v)) && Number(v) >= 1 && Number(v) <= 999 || 'Informe uma série de 1 a 999';
 }
+function aplicarTokens(resposta: NfeEmpresaDto): void {
+  if (resposta.tokenHomologacao) tokenHomologacao.value = resposta.tokenHomologacao;
+  if (resposta.tokenProducao) tokenProducao.value = resposta.tokenProducao;
+}
 async function carregar(unidadeId?: string): Promise<void> {
   const atual = ++requisicao;
   carregando.value = true;
   config.value = null;
   dados.value = vazio();
   tokenHomologacao.value = tokenProducao.value = '';
+  mostrarHomologacao.value = mostrarProducao.value = false;
   falha.value = '';
   try {
     const resposta = await nfeEmpresaService.obter(props.empresaId, unidadeId);
     if (atual !== requisicao) return;
     config.value = resposta;
     dados.value = resposta.dados ?? { ...vazio(), unidadeEmitenteId: unidadeId ?? resposta.emitentes[0]?.unidadeId ?? '' };
+    aplicarTokens(resposta);
   } catch (e) { if (atual === requisicao) falha.value = mensagem(e); }
   finally { if (atual === requisicao) carregando.value = false; }
 }
@@ -101,16 +117,12 @@ async function trocarUnidade(id: string): Promise<void> {
   certificado.value = null; senhaCertificado.value = '';
   await carregar(id);
 }
-async function salvarPrincipal(): Promise<void> {
-  salvando.value = true;
-  try { await nfeEmpresaService.salvarTokenPrincipal(tokenPrincipal.value); tokenPrincipal.value = ''; sucesso('Token principal validado e salvo.'); }
-  catch (e) { erro(mensagem(e)); }
-  finally { salvando.value = false; }
-}
 async function sincronizar(): Promise<void> {
   salvando.value = true;
   try {
-    config.value = await nfeEmpresaService.sincronizar(dados.value.unidadeEmitenteId, certificado.value, senhaCertificado.value, props.empresaId);
+    const resposta = await nfeEmpresaService.sincronizar(dados.value.unidadeEmitenteId, certificado.value, senhaCertificado.value, props.empresaId);
+    config.value = resposta;
+    aplicarTokens(resposta);
     certificado.value = null; senhaCertificado.value = '';
     sucesso('Emitente sincronizado com a Focus.');
   } catch (e) { erro(mensagem(e)); }
@@ -127,7 +139,7 @@ async function salvar(): Promise<void> {
     }, props.empresaId);
     if (atual !== requisicao) return;
     config.value = resposta;
-    tokenHomologacao.value = tokenProducao.value = '';
+    aplicarTokens(resposta);
     sucesso('Configuração de NF-e salva para esta empresa.');
   } catch (e) { if (atual === requisicao) erro(mensagem(e)); }
   finally { salvando.value = false; }

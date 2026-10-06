@@ -218,9 +218,13 @@ export function useNotasFiscais() {
     }
   }
 
-  async function abrirDanfe(id: string): Promise<boolean> {
+  async function abrirDanfe(id: string, modelo?: string): Promise<boolean> {
+    const nfce = modelo === 'NFCe';
     try {
-      baixarArquivo(await fiscalGestaoService.arquivoOficial(id, 'pdf'), `danfe-${id}.pdf`);
+      baixarArquivo(
+        await fiscalGestaoService.arquivoOficial(id, nfce ? 'html' : 'pdf'),
+        nfce ? `danfce-${id}.html` : `danfe-${id}.pdf`,
+      );
       return true;
     } catch (e) {
       erro(mensagem(e));

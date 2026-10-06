@@ -27,6 +27,8 @@ export interface NfeEmpresaDto {
   dados: DadosEmissaoNfe | null;
   possuiTokenHomologacao: boolean;
   possuiTokenProducao: boolean;
+  tokenHomologacao?: string | null;
+  tokenProducao?: string | null;
   emitentes: EmitenteNfeDto[];
   focusEmpresaId?: number | null;
   certificadoValidoAte?: string | null;

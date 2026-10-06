@@ -1,7 +1,7 @@
 ﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Notas fiscais" subtitulo="Consulta de documentos fiscais." />
-    <agro-btn class="q-mb-md" color="primary" label="Emitir NF-e de pedido" descricao="Selecionar pedido e dados fiscais para emissão" @click="dialogEmissao = true" />
+    <agro-btn class="q-mb-md" color="primary" label="Emitir NFC-e de pedido" descricao="Selecionar pedido e dados fiscais para emissão" @click="dialogEmissao = true" />
     <emitir-nfe-dialog v-model="dialogEmissao" @emitida="aplicarFiltro" />
     <cancelar-nota-dialog v-model="dialogCancelar" :loading="salvando" @confirm="onCancelar" />
 
@@ -86,8 +86,8 @@
             <q-td :props="props">
               <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="consultarFocus(props.row.id)"><q-item-section>Consultar na Focus</q-item-section></q-item>
-                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="abrirDanfe(props.row.id)"><q-item-section>DANFE oficial (PDF)</q-item-section></q-item>
-                <q-item v-if="props.row.homologacao != null && props.row.status === 'Emitida'" v-close-popup clickable @click="notaSelecionada = props.row; dialogCancelar = true"><q-item-section>Cancelar NF-e</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="abrirDanfe(props.row.id, String(props.row.modeloDocumento))"><q-item-section>{{ props.row.modeloDocumento === 'NFCe' ? 'DANFCe oficial (HTML)' : 'DANFE oficial (PDF)' }}</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null && props.row.status === 'Emitida'" v-close-popup clickable @click="notaSelecionada = props.row; dialogCancelar = true"><q-item-section>{{ props.row.modeloDocumento === 'NFCe' ? 'Cancelar NFC-e' : 'Cancelar NF-e' }}</q-item-section></q-item>
                 <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="baixarXml(props.row.id)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="code" size="16px" /></span></q-item-section>
                   <q-item-section>XML</q-item-section>

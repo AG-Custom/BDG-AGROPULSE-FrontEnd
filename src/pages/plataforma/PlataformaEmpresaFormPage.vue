@@ -14,7 +14,7 @@
       <agro-card v-else>
         <q-stepper v-model="passo" flat animated color="primary" class="plataforma-form__stepper">
           <q-step :name="1" title="Empresa" icon="business" :done="passo > 1">
-            <empresa-step ref="empresaStepRef" v-model:empresa="empresa" :cnpj-somente-leitura="editando" />
+            <empresa-step ref="empresaStepRef" v-model:empresa="empresa" />
             <q-stepper-navigation class="agro-form-actions">
               <agro-btn flat label="Cancelar" descricao="Voltar à lista de empresas" :to="{ name: 'plataforma' }" />
               <agro-btn

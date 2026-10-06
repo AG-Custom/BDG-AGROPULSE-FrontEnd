@@ -8,10 +8,7 @@
       emit-value
       map-options
       label="Estados de operação"
-      class="field-required"
-      aria-required="true"
       :options="ufsOpcoes"
-      :rules="[obrigatorioLista]"
     />
 
     <div class="text-h6">Alíquotas de ICMS por UF</div>
@@ -37,9 +34,7 @@
             v-model="linha.aliquotaInterna"
             outlined
             label="Alíquota interna (%)"
-            class="field-required"
             inputmode="decimal"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-12 col-md-5">
@@ -47,9 +42,7 @@
             v-model="linha.aliquotaInterestadual"
             outlined
             label="Alíquota interestadual (%)"
-            class="field-required"
             inputmode="decimal"
-            :rules="[obrigatorio]"
           />
         </div>
       </div>
@@ -61,16 +54,11 @@
 import EmptyState from 'components/ui/EmptyState.vue';
 import { UFS_BRASIL } from 'constants/ufs';
 import type { TributacaoEmpresaFormModel } from 'types/dtos/plataforma.dto';
-import { obrigatorio } from 'utils/validators';
 import { watch } from 'vue';
 
 const tributacao = defineModel<TributacaoEmpresaFormModel>('tributacao', { required: true });
 
 const ufsOpcoes = [...UFS_BRASIL];
-
-function obrigatorioLista(valor: string[] | null): true | string {
-  return valor && valor.length > 0 ? true : 'Selecione ao menos um estado.';
-}
 
 watch(
   () => [...tributacao.value.estadosOperacao],
