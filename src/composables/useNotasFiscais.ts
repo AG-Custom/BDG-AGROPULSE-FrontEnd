@@ -4,16 +4,29 @@ import { fiscalGestaoService, type EmitirNfePayload } from 'services/fiscal-gest
 import type {
   CancelarNotaFormModel,
   CceFormModel,
-  ComplementarFormModel,
   EmitirCteFormModel,
   EmitirMdfeFormModel,
-  EmitirNfprFormModel,
+  ParteTransporteFormModel,
   ListarNotasFiscaisParams,
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { baixarArquivo } from 'utils/download';
 import { parseMascaraMoeda } from 'utils/formatters';
 import { ref } from 'vue';
+
+function parte(form: ParteTransporteFormModel) {
+  return {
+    documento: form.documento.trim(),
+    nome: form.nome.trim(),
+    logradouro: form.logradouro.trim(),
+    numero: form.numero.trim(),
+    bairro: form.bairro.trim(),
+    cep: form.cep.trim(),
+    codigoMunicipio: form.codigoMunicipio.trim(),
+    municipio: form.municipio.trim(),
+    uf: form.uf.trim(),
+  };
+}
 
 export function useNotasFiscais() {
   const notas = ref<NotaFiscalGestaoDto[]>([]);
@@ -83,10 +96,22 @@ export function useNotasFiscais() {
     salvando.value = true;
     try {
       await fiscalGestaoService.emitirCte({
-        remetente: form.remetente.trim(),
-        destinatario: form.destinatario.trim(),
-        valor: parseMascaraMoeda(form.valor) ?? 0,
-        ufDestino: form.ufDestino.trim() || null,
+        naturezaOperacao: form.naturezaOperacao.trim(),
+        cfop: form.cfop.trim(),
+        codigoMunicipioEnvio: form.codigoMunicipioEnvio.trim(),
+        municipioEnvio: form.municipioEnvio.trim(),
+        ufEnvio: form.ufEnvio.trim(),
+        codigoMunicipioInicio: form.codigoMunicipioInicio.trim(),
+        municipioInicio: form.municipioInicio.trim(),
+        ufInicio: form.ufInicio.trim(),
+        codigoMunicipioFim: form.codigoMunicipioFim.trim(),
+        municipioFim: form.municipioFim.trim(),
+        ufFim: form.ufFim.trim(),
+        remetente: parte(form.remetente),
+        destinatario: parte(form.destinatario),
+        valorServico: parseMascaraMoeda(form.valorServico) ?? 0,
+        aliquotaIcms: Number(form.aliquotaIcms.replace(',', '.')) || 0,
+        valorIcms: parseMascaraMoeda(form.valorIcms) ?? 0,
       });
       sucesso('CT-e emitido.');
       await carregar();
@@ -103,38 +128,21 @@ export function useNotasFiscais() {
     salvando.value = true;
     try {
       await fiscalGestaoService.emitirMdfe({
-        veiculo: form.veiculo.trim(),
         ufInicio: form.ufInicio.trim(),
         ufFim: form.ufFim.trim(),
+        codigoMunicipioCarregamento: form.codigoMunicipioCarregamento.trim(),
+        municipioCarregamento: form.municipioCarregamento.trim(),
+        codigoMunicipioDescarregamento: form.codigoMunicipioDescarregamento.trim(),
+        municipioDescarregamento: form.municipioDescarregamento.trim(),
+        placa: form.placa.trim(),
+        tara: Number(form.tara) || 0,
+        condutorNome: form.condutorNome.trim(),
+        condutorCpf: form.condutorCpf.trim(),
         valorCarga: parseMascaraMoeda(form.valorCarga) ?? 0,
+        pesoBruto: Number(form.pesoBruto.replace(',', '.')) || 0,
+        chaves: form.chaves.split(/[\s,;]+/).map((chave) => chave.trim()).filter(Boolean),
       });
       sucesso('MDF-e emitido.');
-      await carregar();
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
-  async function emitirNfpr(form: EmitirNfprFormModel): Promise<boolean> {
-    salvando.value = true;
-    try {
-      await fiscalGestaoService.emitirNfpr({
-        clienteId: form.clienteId.trim(),
-        itens: [
-          {
-            produtoId: form.produtoId.trim(),
-            quantidade: Number(form.quantidade),
-            valor: parseMascaraMoeda(form.valor) ?? 0,
-          },
-        ],
-        cultura: form.cultura.trim() || null,
-        safra: form.safra.trim() || null,
-      });
-      sucesso('NFPR emitida.');
       await carregar();
       return true;
     } catch (e) {
@@ -200,24 +208,6 @@ export function useNotasFiscais() {
     }
   }
 
-  async function complementar(id: string, form: ComplementarFormModel): Promise<boolean> {
-    salvando.value = true;
-    try {
-      await fiscalGestaoService.emitirComplementar(id, {
-        valorAdicional: parseMascaraMoeda(form.valorAdicional) ?? 0,
-        motivo: form.motivo.trim(),
-      });
-      sucesso('Nota complementar emitida.');
-      await carregar();
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
   async function abrirDanfe(id: string, modelo?: string): Promise<boolean> {
     const nfce = modelo === 'NFCe';
     try {
@@ -255,11 +245,9 @@ export function useNotasFiscais() {
     emitirNfce,
     emitirCte,
     emitirMdfe,
-    emitirNfpr,
     emitirDevolucao,
     cancelar,
     registrarCce,
-    complementar,
     abrirDanfe,
     baixarXml,
   };

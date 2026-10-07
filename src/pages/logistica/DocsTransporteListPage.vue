@@ -2,7 +2,7 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Documentos de transporte"
-      subtitulo="CT-e e MDF-e (autorização stub SEFAZ)."
+      subtitulo="CT-e e MDF-e. A autorização é feita na emissão fiscal."
     >
       <agro-btn
         color="primary"
@@ -82,19 +82,6 @@
           <template #body-cell-acoes="props">
             <q-td :props="props">
               <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
-                <q-item
-                v-if="props.row.status === StatusDocTransporteLogistica.Rascunho"
-                  v-close-popup
-                  clickable
-                dense
-                  class="agro-acoes-menu__item"
-                  :disable="salvando"
-                @click="autorizarDocTransporte(props.row.id)"
-                >
-                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--success"><q-icon name="check_circle" size="16px" /></span></q-item-section>
-                  <q-item-section>Autorizar</q-item-section>
-                  <q-item-section v-if="salvando" side><q-spinner size="16px" color="primary" /></q-item-section>
-                </q-item>
                 <q-item
                 v-if="props.row.status !== StatusDocTransporteLogistica.Cancelado"
                   v-close-popup
@@ -244,7 +231,6 @@ const {
   salvando,
   carregarDocsTransporte,
   criarDocTransporte,
-  autorizarDocTransporte,
   cancelarDocTransporte,
 } = useLogistica();
 

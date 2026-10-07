@@ -7,6 +7,7 @@
   box-shadow: var(--shadow-lg);
   font-family: var(--font-family-base);
   padding: var(--spacing-6) var(--spacing-5);
+  user-select: text;
   width: min(100%, 420px);
 }
 
@@ -19,10 +20,15 @@
 
 .agro-swal__content {
   color: var(--color-text-secondary);
+  cursor: text;
   font-size: var(--font-size-md);
   line-height: var(--line-height-normal);
   margin-top: var(--spacing-2);
+  overflow-wrap: anywhere;
   padding: 0;
+  text-align: center;
+  user-select: text;
+  white-space: pre-line;
 }
 
 .agro-swal__icon {

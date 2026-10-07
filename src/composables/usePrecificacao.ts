@@ -13,6 +13,7 @@ export function usePrecificacao() {
   const tabelasPermitidas = ref<TabelaPrecoPermitidaDto[]>([]);
   const carregandoTabelas = ref(false);
   const resolvendoPreco = ref(false);
+  const ultimoErro = ref<string | null>(null);
   const { erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
@@ -58,12 +59,14 @@ export function usePrecificacao() {
     }
 
     resolvendoPreco.value = true;
+    ultimoErro.value = null;
 
     try {
       return await precificacaoService.resolver(params);
     } catch (e) {
+      ultimoErro.value = mensagem(e);
       if (!silencioso) {
-        erro(mensagem(e));
+        erro(ultimoErro.value);
       }
       return null;
     } finally {
@@ -77,6 +80,7 @@ export function usePrecificacao() {
     tabelaPadraoId,
     carregandoTabelas,
     resolvendoPreco,
+    ultimoErro,
     carregarTabelasPermitidas,
     resolverPreco,
   };
