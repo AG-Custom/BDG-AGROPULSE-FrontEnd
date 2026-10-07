@@ -30,7 +30,6 @@
       :mask="MASCARAS.CNPJ"
       :maxlength="TAMANHO_FORMATADO.CNPJ"
       inputmode="numeric"
-      :disable="cnpjSomenteLeitura"
       :rules="[obrigatorio, cnpj]"
     />
 
@@ -58,10 +57,6 @@ import { cnpj, obrigatorio } from 'utils/validators';
 import { ref } from 'vue';
 
 const empresa = defineModel<EmpresaFormModel>('empresa', { required: true });
-
-defineProps<{
-  cnpjSomenteLeitura?: boolean;
-}>();
 
 const formRef = ref<QForm | null>(null);
 

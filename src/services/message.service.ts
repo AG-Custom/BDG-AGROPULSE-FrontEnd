@@ -1,10 +1,17 @@
 import Swal, { type SweetAlertOptions } from 'sweetalert2';
 
+function manterFocoNoAviso(popup: HTMLElement): void {
+  popup.parentElement?.addEventListener('focusin', (evento) => {
+    evento.stopPropagation();
+  });
+}
+
 const CONFIG_PADRAO: SweetAlertOptions = {
   position: 'center',
   showConfirmButton: true,
   confirmButtonText: 'OK',
   buttonsStyling: false,
+  willOpen: manterFocoNoAviso,
   customClass: {
     container: 'agro-swal',
     popup: 'agro-swal__popup',

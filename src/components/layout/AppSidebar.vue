@@ -1,5 +1,12 @@
 <template>
   <nav class="app-sidebar" :class="{ 'app-sidebar--collapsed': collapsed }" aria-label="Módulos">
+    <app-sidebar-busca
+      v-model="termoBusca"
+      :collapsed="collapsed"
+      :grupos="gruposVisiveis"
+      :dashboard="dashboardVisivel"
+    />
+    <template v-if="!termoBusca.trim() || collapsed">
     <div
       v-if="badgeTipoNegocio && !collapsed"
       class="app-sidebar__badge"
@@ -67,15 +74,20 @@
         </q-tooltip>
       </q-item>
     </div>
+    </template>
   </nav>
 </template>
 
 <script setup lang="ts">
+import AppSidebarBusca from 'components/layout/AppSidebarBusca.vue';
 import { useNavegacaoModulos } from 'composables/useNavegacaoModulos';
+import { ref } from 'vue';
 
 defineProps<{
   collapsed?: boolean;
 }>();
+
+const termoBusca = ref('');
 
 const {
   badgeTipoNegocio,

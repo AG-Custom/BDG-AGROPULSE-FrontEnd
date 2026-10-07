@@ -23,22 +23,18 @@
             v-model="linha.ncm"
             outlined
             label="NCM"
-            class="field-required"
             maxlength="8"
             inputmode="numeric"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-6 col-md-2">
-          <q-input v-model="linha.cstPis" outlined label="CST PIS" class="field-required" :rules="[obrigatorio]" />
+          <q-input v-model="linha.cstPis" outlined label="CST PIS" />
         </div>
         <div class="col-6 col-md-2">
           <q-input
             v-model="linha.cstCofins"
             outlined
             label="CST COFINS"
-            class="field-required"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-6 col-md-2">
@@ -46,9 +42,7 @@
             v-model="linha.aliquotaPis"
             outlined
             label="Alíquota PIS"
-            class="field-required"
             inputmode="decimal"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-6 col-md-3">
@@ -56,9 +50,7 @@
             v-model="linha.aliquotaCofins"
             outlined
             label="Alíquota COFINS"
-            class="field-required"
             inputmode="decimal"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-6 col-md-3">
@@ -67,8 +59,6 @@
             outlined
             type="date"
             label="Vigência início"
-            class="field-required"
-            :rules="[obrigatorio]"
           />
         </div>
         <div class="col-6 col-md-3">
@@ -90,7 +80,7 @@
             </q-icon>
           </div>
           <agro-btn
-            v-if="tributacao.pisCofinsNcm.length > 1"
+            v-if="tributacao.pisCofinsNcm.length > 0"
             flat
             icon="delete"
             label="Remover"
@@ -106,7 +96,6 @@
 
 <script setup lang="ts">
 import { criarPisCofinsNcmVazio, type TributacaoEmpresaFormModel } from 'types/dtos/plataforma.dto';
-import { obrigatorio } from 'utils/validators';
 
 const tributacao = defineModel<TributacaoEmpresaFormModel>('tributacao', { required: true });
 

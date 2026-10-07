@@ -45,6 +45,23 @@ export interface NotaFiscalGestaoDto {
   mensagemStub?: string | null;
   reverterEstoque?: boolean | null;
   observacaoCancelamento?: string | null;
+  eventos?: NotaFiscalEventoDto[] | null;
+}
+
+export interface SugestaoModeloDocumentoDto {
+  modeloSugerido: 'NFe' | 'NFCe';
+  motivo: string;
+  nfceDisponivel: boolean;
+  motivoNfceIndisponivel?: string | null;
+}
+
+export interface NotaFiscalEventoDto {
+  em: string;
+  operacao: string;
+  situacao: string;
+  statusFocus?: string | null;
+  codigoSefaz?: string | null;
+  mensagem?: string | null;
 }
 
 export interface ListarNotasFiscaisParams {
@@ -55,32 +72,51 @@ export interface ListarNotasFiscaisParams {
   dataFim?: string;
 }
 
+export interface ParteTransportePayload {
+  documento: string;
+  nome: string;
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  cep: string;
+  codigoMunicipio: string;
+  municipio: string;
+  uf: string;
+}
+
 export interface EmitirCtePayload {
-  remetente: string;
-  destinatario: string;
-  valor: number;
-  ufDestino?: string | null;
+  naturezaOperacao: string;
+  cfop: string;
+  codigoMunicipioEnvio: string;
+  municipioEnvio: string;
+  ufEnvio: string;
+  codigoMunicipioInicio: string;
+  municipioInicio: string;
+  ufInicio: string;
+  codigoMunicipioFim: string;
+  municipioFim: string;
+  ufFim: string;
+  remetente: ParteTransportePayload;
+  destinatario: ParteTransportePayload;
+  valorServico: number;
+  aliquotaIcms: number;
+  valorIcms: number;
 }
 
 export interface EmitirMdfePayload {
-  veiculo: string;
   ufInicio: string;
   ufFim: string;
+  codigoMunicipioCarregamento: string;
+  municipioCarregamento: string;
+  codigoMunicipioDescarregamento: string;
+  municipioDescarregamento: string;
+  placa: string;
+  tara: number;
+  condutorNome: string;
+  condutorCpf: string;
   valorCarga: number;
-}
-
-export interface EmitirNfprItemPayload {
-  produtoId: string;
-  quantidade: number;
-  valor: number;
-}
-
-export interface EmitirNfprPayload {
-  clienteId: string;
-  itens: EmitirNfprItemPayload[];
-  cultura?: string | null;
-  safra?: string | null;
-  valorTotal?: number | null;
+  pesoBruto: number;
+  chaves: string[];
 }
 
 export interface CancelarNotaFiscalPayload {
@@ -91,16 +127,12 @@ export interface CartaCorrecaoPayload {
   textoCorrecao: string;
 }
 
-export interface NotaComplementarPayload {
-  valorAdicional: number;
-  motivo: string;
-}
-
 export interface CartaCorrecaoDto {
   id: string;
   notaFiscalId: string;
   sequencia: number;
   textoCorrecao: string;
+  protocolo: string | null;
   registradaEm: string;
 }
 
@@ -338,6 +370,10 @@ export interface GuiaGnreDto {
 
 export interface GerarGnrePayload {
   notaFiscalId: string;
+  ufFavorecida: string;
+  codigoReceita: string;
+  valor: number;
+  dataVencimento: string;
 }
 
 export interface ConfigFunruralDto {
@@ -440,27 +476,51 @@ export interface ManifestacaoDestinatarioDto {
   createdAt: string;
 }
 
+export interface ParteTransporteFormModel {
+  documento: string;
+  nome: string;
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  cep: string;
+  codigoMunicipio: string;
+  municipio: string;
+  uf: string;
+}
+
 export interface EmitirCteFormModel {
-  remetente: string;
-  destinatario: string;
-  valor: string;
-  ufDestino: string;
+  naturezaOperacao: string;
+  cfop: string;
+  codigoMunicipioEnvio: string;
+  municipioEnvio: string;
+  ufEnvio: string;
+  codigoMunicipioInicio: string;
+  municipioInicio: string;
+  ufInicio: string;
+  codigoMunicipioFim: string;
+  municipioFim: string;
+  ufFim: string;
+  remetente: ParteTransporteFormModel;
+  destinatario: ParteTransporteFormModel;
+  valorServico: string;
+  aliquotaIcms: string;
+  valorIcms: string;
 }
 
 export interface EmitirMdfeFormModel {
-  veiculo: string;
   ufInicio: string;
   ufFim: string;
+  codigoMunicipioCarregamento: string;
+  municipioCarregamento: string;
+  codigoMunicipioDescarregamento: string;
+  municipioDescarregamento: string;
+  placa: string;
+  tara: string;
+  condutorNome: string;
+  condutorCpf: string;
   valorCarga: string;
-}
-
-export interface EmitirNfprFormModel {
-  clienteId: string;
-  produtoId: string;
-  quantidade: string;
-  valor: string;
-  cultura: string;
-  safra: string;
+  pesoBruto: string;
+  chaves: string;
 }
 
 export interface CancelarNotaFormModel {
@@ -469,9 +529,4 @@ export interface CancelarNotaFormModel {
 
 export interface CceFormModel {
   textoCorrecao: string;
-}
-
-export interface ComplementarFormModel {
-  valorAdicional: string;
-  motivo: string;
 }

@@ -525,16 +525,6 @@ export function useLogistica() {
 
   const criarDocTransporte = (f: DocTransporteLogisticaFormModel) =>
     wrapSave(() => logisticaService.criarDocTransporte(docPayload(f)), 'Documento criado.');
-  async function autorizarDocTransporte(id: string): Promise<boolean> {
-    if (!(await confirmar('Autorizar', 'Autorizar documento (stub SEFAZ)?', 'Autorizar')))
-      return false;
-    const r = await wrapSave(
-      () => logisticaService.autorizarDocTransporte(id),
-      'Documento autorizado.',
-    );
-    if (r) await carregarDocsTransporte();
-    return !!r;
-  }
   async function cancelarDocTransporte(id: string): Promise<boolean> {
     if (!(await confirmar('Cancelar', 'Cancelar este documento?', 'Cancelar'))) return false;
     const r = await wrapSave(
@@ -592,7 +582,6 @@ export function useLogistica() {
     removerAbastecimento,
     carregarDocsTransporte,
     criarDocTransporte,
-    autorizarDocTransporte,
     cancelarDocTransporte,
     carregarCustos,
     carregarDashboard,

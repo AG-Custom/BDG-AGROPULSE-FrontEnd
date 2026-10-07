@@ -1,7 +1,7 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { fiscalGestaoService } from 'services/fiscal-gestao.service';
-import type { GuiaGnreDto } from 'types/dtos/fiscal-gestao.dto';
+import type { GerarGnrePayload, GuiaGnreDto } from 'types/dtos/fiscal-gestao.dto';
 import { ref } from 'vue';
 
 export function useGnre() {
@@ -23,14 +23,10 @@ export function useGnre() {
     }
   }
 
-  async function gerar(notaFiscalId: string): Promise<boolean> {
-    if (!notaFiscalId.trim()) {
-      erro('Informe o ID da nota fiscal.');
-      return false;
-    }
+  async function gerar(payload: GerarGnrePayload): Promise<boolean> {
     salvando.value = true;
     try {
-      await fiscalGestaoService.gerarGnre({ notaFiscalId: notaFiscalId.trim() });
+      await fiscalGestaoService.gerarGnre(payload);
       sucesso('GNRE gerada.');
       await carregar();
       return true;

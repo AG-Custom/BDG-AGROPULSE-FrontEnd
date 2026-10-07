@@ -210,7 +210,7 @@
           </template>
           <template #body-cell-status="props">
             <q-td :props="props">
-              <agro-badge :label="String(props.row.status)" variant="default" />
+              <nota-fiscal-status-badge :valor="String(props.row.status)" />
             </q-td>
           </template>
           <template #body-cell-acoes="props">
@@ -274,13 +274,9 @@
                   input-class="text-metric"
                 />
               </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="String(notaDetalhe.status)"
-                  outlined
-                  label="Status"
-                  readonly
-                />
+              <div class="col-12 col-md-4 campo-status">
+                <span class="campo-status__rotulo">Status</span>
+                <nota-fiscal-status-badge :valor="String(notaDetalhe.status)" />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
@@ -362,6 +358,7 @@
 </template>
 
 <script setup lang="ts">
+import NotaFiscalStatusBadge from 'components/fiscal/NotaFiscalStatusBadge.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
@@ -522,6 +519,16 @@ onMounted(() => {
 .periodo--disabled {
   opacity: 0.45;
   pointer-events: none;
+}
+.campo-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  justify-content: flex-end;
+}
+.campo-status__rotulo {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 .dialog-detalhe {
   min-width: min(640px, 94vw);

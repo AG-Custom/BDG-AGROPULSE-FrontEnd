@@ -239,12 +239,6 @@ export const logisticaService = {
       .then((r) => r.data);
   },
 
-  autorizarDocTransporte(id: string): Promise<DocTransporteLogisticaDto> {
-    return api
-      .post<DocTransporteLogisticaDto>(`/logistica/docs-transporte/${id}/autorizar`)
-      .then((r) => r.data);
-  },
-
   cancelarDocTransporte(id: string): Promise<DocTransporteLogisticaDto> {
     return api
       .post<DocTransporteLogisticaDto>(`/logistica/docs-transporte/${id}/cancelar`)

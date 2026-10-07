@@ -53,7 +53,7 @@
         <q-card-section>
           <q-form greedy class="agro-formulario" @submit.prevent="salvar">
             <q-select
-              v-model="notaFiscalId"
+              v-model="form.notaFiscalId"
               outlined
               label="Nota fiscal"
               emit-value
@@ -63,6 +63,10 @@
               :loading="carregandoNotas"
               :rules="[obrigatorio]"
             />
+            <q-input v-model="form.ufFavorecida" outlined label="UF favorecida" maxlength="2" class="field-required" :rules="[obrigatorio]" />
+            <q-input v-model="form.codigoReceita" outlined label="Código da receita" class="field-required" :rules="[obrigatorio]" />
+            <agro-money-input v-model="form.valor" label="Valor" class="field-required" :rules="[obrigatorio]" />
+            <q-input v-model="form.dataVencimento" outlined type="date" label="Vencimento" class="field-required" :rules="[obrigatorio]" />
             <div class="agro-form-actions">
               <agro-btn flat label="Cancelar" @click="dialog = false" />
               <agro-btn color="primary" unelevated label="Gerar" type="submit" :loading="salvando" />
@@ -76,13 +80,14 @@
 
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useGnre } from 'composables/useGnre';
 import { useNotasFiscais } from 'composables/useNotasFiscais';
 import type { QTableColumn } from 'quasar';
 import type { GuiaGnreDto } from 'types/dtos/fiscal-gestao.dto';
-import { formatarData, formatarMoeda } from 'utils/formatters';
+import { formatarData, formatarMoeda, parseMascaraMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
 import { computed, onMounted, ref } from 'vue';
 
@@ -93,7 +98,13 @@ const {
   carregar: carregarNotas,
 } = useNotasFiscais();
 const dialog = ref(false);
-const notaFiscalId = ref('');
+const form = ref({
+  notaFiscalId: '',
+  ufFavorecida: '',
+  codigoReceita: '',
+  valor: '',
+  dataVencimento: '',
+});
 
 const notaOpcoes = computed(() =>
   notas.value.map((n) => ({
@@ -120,10 +131,22 @@ const colunas: QTableColumn<GuiaGnreDto>[] = [
 ];
 
 async function salvar(): Promise<void> {
-  const ok = await gerar(notaFiscalId.value);
+  const ok = await gerar({
+    notaFiscalId: form.value.notaFiscalId.trim(),
+    ufFavorecida: form.value.ufFavorecida.trim(),
+    codigoReceita: form.value.codigoReceita.trim(),
+    valor: parseMascaraMoeda(form.value.valor) ?? 0,
+    dataVencimento: form.value.dataVencimento,
+  });
   if (ok) {
     dialog.value = false;
-    notaFiscalId.value = '';
+    form.value = {
+      notaFiscalId: '',
+      ufFavorecida: '',
+      codigoReceita: '',
+      valor: '',
+      dataVencimento: '',
+    };
   }
 }
 

@@ -1,7 +1,7 @@
 ﻿<template>
   <q-page class="agro-page">
     <app-page-header titulo="Notas fiscais" subtitulo="Consulta de documentos fiscais." />
-    <agro-btn class="q-mb-md" color="primary" label="Emitir NF-e de pedido" descricao="Selecionar pedido e dados fiscais para emissão" @click="dialogEmissao = true" />
+    <agro-btn class="q-mb-md" color="primary" label="Emitir nota do pedido" descricao="Selecionar pedido e dados fiscais para emissão" @click="dialogEmissao = true" />
     <emitir-nfe-dialog v-model="dialogEmissao" @emitida="aplicarFiltro" />
     <cancelar-nota-dialog v-model="dialogCancelar" :loading="salvando" @confirm="onCancelar" />
 
@@ -52,7 +52,7 @@
           </div>
         </div>
 
-        <agro-table-skeleton v-if="carregando && notas.length === 0" :colunas="7" />
+        <agro-table-skeleton v-if="carregando && notas.length === 0" :colunas="9" />
         <empty-state
           v-else-if="!carregando && notas.length === 0"
           titulo="Nenhuma nota fiscal"
@@ -74,7 +74,15 @@
           </template>
           <template #body-cell-status="props">
             <q-td :props="props">
-              <agro-badge :label="String(props.row.status)" variant="default" />
+              <nota-fiscal-status-badge :valor="String(props.row.status)" />
+            </q-td>
+          </template>
+          <template #body-cell-tipo="props">
+            <q-td :props="props">
+              <agro-badge
+                :label="props.row.tipo === TipoNotaFiscal.Entrada ? 'Entrada' : 'Saída'"
+                :variant="props.row.tipo === TipoNotaFiscal.Entrada ? 'success' : 'info'"
+              />
             </q-td>
           </template>
           <template #body-cell-emitidaEm="props">
@@ -86,19 +94,15 @@
             <q-td :props="props">
               <agro-acoes-menu :mostrar-editar="false" :mostrar-status="false" @visualizar="abrirDialogVisualizar(props.row)">
                 <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="consultarFocus(props.row.id)"><q-item-section>Consultar na Focus</q-item-section></q-item>
-                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="abrirDanfe(props.row.id)"><q-item-section>DANFE oficial (PDF)</q-item-section></q-item>
-                <q-item v-if="props.row.homologacao != null && props.row.status === 'Emitida'" v-close-popup clickable @click="notaSelecionada = props.row; dialogCancelar = true"><q-item-section>Cancelar NF-e</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null" v-close-popup clickable @click="abrirDanfe(props.row.id, String(props.row.modeloDocumento))"><q-item-section>{{ props.row.modeloDocumento === 'NFCe' ? 'DANFCe oficial (HTML)' : 'DANFE oficial (PDF)' }}</q-item-section></q-item>
+                <q-item v-if="props.row.homologacao != null && props.row.status === 'Emitida'" v-close-popup clickable @click="notaSelecionada = props.row; dialogCancelar = true"><q-item-section>{{ props.row.modeloDocumento === 'NFCe' ? 'Cancelar NFC-e' : 'Cancelar NF-e' }}</q-item-section></q-item>
                 <q-item v-close-popup clickable dense class="agro-acoes-menu__item" @click="baixarXml(props.row.id)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="code" size="16px" /></span></q-item-section>
                   <q-item-section>XML</q-item-section>
                 </q-item>
-                <q-item v-if="props.row.modeloDocumento !== 'NFe'" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirCce(props.row)">
+                <q-item v-if="props.row.modeloDocumento === 'NFe' && props.row.homologacao != null && props.row.status === StatusNotaFiscal.Emitida" v-close-popup clickable dense class="agro-acoes-menu__item" @click="abrirCce(props.row)">
                   <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="edit_note" size="16px" /></span></q-item-section>
                   <q-item-section>CC-e</q-item-section>
-                </q-item>
-                <q-item v-if="props.row.modeloDocumento !== 'NFe'" v-close-popup clickable dense class="agro-acoes-menu__item" :disable="props.row.status !== StatusNotaFiscal.Emitida" @click="abrirComplementar(props.row)">
-                  <q-item-section avatar><span class="agro-acoes-menu__icon agro-acoes-menu__icon--edit"><q-icon name="add_circle" size="16px" /></span></q-item-section>
-                  <q-item-section>Complementar</q-item-section>
                 </q-item>
               </agro-acoes-menu>
             </q-td>
@@ -108,119 +112,23 @@
     </section>
 
     <cce-nota-dialog v-model="dialogCce" :loading="salvando" @confirm="onCce" />
-    <complementar-nota-dialog
-      v-model="dialogComplementar"
-      :loading="salvando"
-      @confirm="onComplementar"
-    />
 
-    <q-dialog v-model="dialogVisualizar">
-      <q-card class="dialog-visualizar">
-        <q-card-section>
-          <h4 class="titulo">Visualizar nota fiscal</h4>
-        </q-card-section>
-        <q-card-section>
-          <q-form class="agro-formulario agro-formulario--bloqueado">
-            <q-banner v-if="notaVisualizar?.mensagemErro" class="bg-orange-1 q-mb-md">{{ notaVisualizar.codigoSefaz }} {{ notaVisualizar.mensagemErro }}</q-banner>
-            <p v-if="notaVisualizar?.homologacao != null">Ambiente: {{ notaVisualizar.homologacao ? 'Homologação' : 'Produção' }}. Protocolo: {{ notaVisualizar.protocoloAutorizacao ?? 'Aguardando autorização' }}</p>
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="notaVisualizar ? String(notaVisualizar.modeloDocumento) : ''"
-                  outlined
-                  label="Modelo"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="notaVisualizar?.numero ?? ''"
-                  outlined
-                  label="Número"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="notaVisualizar?.serie ?? ''"
-                  outlined
-                  label="Série"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="notaVisualizar ? String(notaVisualizar.status) : ''"
-                  outlined
-                  label="Status"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="notaVisualizar ? formatarMoeda(notaVisualizar.valorTotal) : ''"
-                  outlined
-                  label="Valor total"
-                  readonly
-                  input-class="text-metric"
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  :model-value="
-                    notaVisualizar?.emitidaEm ? formatarData(notaVisualizar.emitidaEm) : '—'
-                  "
-                  outlined
-                  label="Emitida em"
-                  readonly
-                />
-              </div>
-              <div class="col-12">
-                <q-input
-                  :model-value="notaVisualizar?.chaveAcesso ?? ''"
-                  outlined
-                  label="Chave de acesso"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  :model-value="notaVisualizar?.naturezaOperacao ?? ''"
-                  outlined
-                  label="Natureza da operação"
-                  readonly
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  :model-value="notaVisualizar?.cfop ?? ''"
-                  outlined
-                  label="CFOP"
-                  readonly
-                />
-              </div>
-            </div>
-            <div class="agro-form-actions">
-              <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <nota-fiscal-visualizar-dialog v-model="dialogVisualizar" :nota="notaVisualizar" />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import EmitirNfeDialog from 'components/fiscal/EmitirNfeDialog.vue';
 import CancelarNotaDialog from 'components/fiscal/CancelarNotaDialog.vue';
+import NotaFiscalVisualizarDialog from 'components/fiscal/NotaFiscalVisualizarDialog.vue';
 import { fiscalGestaoService } from 'services/fiscal-gestao.service';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import type { CancelarNotaFormModel } from 'types/dtos/fiscal-gestao.dto';
 import CceNotaDialog from 'components/fiscal/CceNotaDialog.vue';
-import ComplementarNotaDialog from 'components/fiscal/ComplementarNotaDialog.vue';
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
+import NotaFiscalStatusBadge from 'components/fiscal/NotaFiscalStatusBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -229,11 +137,11 @@ import {
   ModeloDocumentoFiscalOpcoes,
   StatusNotaFiscal,
   StatusNotaFiscalOpcoes,
+  TipoNotaFiscal,
 } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type {
   CceFormModel,
-  ComplementarFormModel,
   NotaFiscalGestaoDto,
 } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
@@ -245,7 +153,6 @@ const {
   salvando,
   carregar,
   registrarCce,
-  complementar,
   baixarXml,
   abrirDanfe,
   cancelar,
@@ -270,7 +177,6 @@ const filtro = reactive({
 });
 
 const dialogCce = ref(false);
-const dialogComplementar = ref(false);
 const dialogVisualizar = ref(false);
 const notaSelecionada = ref<NotaFiscalGestaoDto | null>(null);
 const notaVisualizar = ref<NotaFiscalGestaoDto | null>(null);
@@ -280,6 +186,7 @@ const colunas: QTableColumn<NotaFiscalGestaoDto>[] = [
   { name: 'numero', label: 'Número', field: 'numero', align: 'left' },
   { name: 'serie', label: 'Série', field: 'serie', align: 'left' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
+  { name: 'tipo', label: 'Tipo', field: 'tipo', align: 'left' },
   { name: 'ambiente', label: 'Ambiente', field: row => row.homologacao == null ? 'Legado' : row.homologacao ? 'Homologação' : 'Produção', align: 'left' },
   { name: 'valorTotal', label: 'Valor', field: 'valorTotal', align: 'right' },
   { name: 'emitidaEm', label: 'Emitida em', field: 'emitidaEm', align: 'left' },
@@ -300,21 +207,10 @@ function abrirCce(nota: NotaFiscalGestaoDto): void {
   dialogCce.value = true;
 }
 
-function abrirComplementar(nota: NotaFiscalGestaoDto): void {
-  notaSelecionada.value = nota;
-  dialogComplementar.value = true;
-}
-
 async function onCce(form: CceFormModel): Promise<void> {
   if (!notaSelecionada.value) return;
   const ok = await registrarCce(notaSelecionada.value.id, form);
   if (ok) dialogCce.value = false;
-}
-
-async function onComplementar(form: ComplementarFormModel): Promise<void> {
-  if (!notaSelecionada.value) return;
-  const ok = await complementar(notaSelecionada.value.id, form);
-  if (ok) dialogComplementar.value = false;
 }
 
 onMounted(() => {
@@ -326,14 +222,3 @@ function abrirDialogVisualizar(item: NotaFiscalGestaoDto): void {
   dialogVisualizar.value = true;
 }
 </script>
-
-<style scoped>
-.dialog-visualizar {
-  min-width: min(560px, 94vw);
-}
-.titulo {
-  margin: 0;
-  font-family: var(--font-family-display);
-  font-size: var(--font-size-lg);
-}
-</style>

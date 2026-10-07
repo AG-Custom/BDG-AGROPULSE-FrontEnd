@@ -11,7 +11,6 @@
           <q-tab name="devolucao" label="Devolução" />
           <q-tab name="cte" label="CT-e" />
           <q-tab name="mdfe" label="MDF-e" />
-          <q-tab name="nfpr" label="NFPR" />
         </q-tabs>
 
         <q-tab-panels v-model="aba" animated>
@@ -84,24 +83,66 @@
           <q-tab-panel name="cte" class="q-pa-none">
             <q-form greedy class="agro-formulario" @submit.prevent="emitCte">
               <div class="row q-col-gutter-md">
-                <div class="col-12 col-md-6">
-                  <q-input v-model="cte.remetente" outlined label="Remetente" class="field-required" :rules="[obrigatorio]" />
-                </div>
-                <div class="col-12 col-md-6">
-                  <q-input
-                    v-model="cte.destinatario"
-                    outlined
-                    label="Destinatário"
-                    class="field-required"
-                    :rules="[obrigatorio]"
-                  />
+                <div class="col-12 col-md-8">
+                  <q-input v-model="cte.naturezaOperacao" outlined label="Natureza da operação" class="field-required" :rules="[obrigatorio]" />
                 </div>
                 <div class="col-12 col-md-4">
-                  <AgroMoneyInput v-model="cte.valor" label="Valor" class="field-required" :rules="[obrigatorio]" />
+                  <q-input v-model="cte.cfop" outlined label="CFOP" maxlength="4" class="field-required" :rules="[obrigatorio]" />
                 </div>
                 <div class="col-12 col-md-4">
-                  <q-input v-model="cte.ufDestino" outlined label="UF destino" maxlength="2" />
+                  <q-input v-model="cte.codigoMunicipioEnvio" outlined label="IBGE envio" maxlength="7" class="field-required" :rules="[obrigatorio]" />
                 </div>
+                <div class="col-12 col-md-5">
+                  <q-input v-model="cte.municipioEnvio" outlined label="Município envio" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-3">
+                  <q-input v-model="cte.ufEnvio" outlined label="UF envio" maxlength="2" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <q-input v-model="cte.codigoMunicipioInicio" outlined label="IBGE início" maxlength="7" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-5">
+                  <q-input v-model="cte.municipioInicio" outlined label="Município início" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-3">
+                  <q-input v-model="cte.ufInicio" outlined label="UF início" maxlength="2" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <q-input v-model="cte.codigoMunicipioFim" outlined label="IBGE fim" maxlength="7" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-5">
+                  <q-input v-model="cte.municipioFim" outlined label="Município fim" class="field-required" :rules="[obrigatorio]" />
+                </div>
+                <div class="col-12 col-md-3">
+                  <q-input v-model="cte.ufFim" outlined label="UF fim" maxlength="2" class="field-required" :rules="[obrigatorio]" />
+                </div>
+              </div>
+              <h5 class="secao">Remetente</h5>
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-4"><q-input v-model="cte.remetente.documento" outlined label="CPF ou CNPJ" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-8"><q-input v-model="cte.remetente.nome" outlined label="Nome" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-6"><q-input v-model="cte.remetente.logradouro" outlined label="Logradouro" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-2"><q-input v-model="cte.remetente.numero" outlined label="Número" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="cte.remetente.bairro" outlined label="Bairro" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="cte.remetente.cep" outlined label="CEP" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="cte.remetente.codigoMunicipio" outlined label="IBGE" maxlength="7" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="cte.remetente.municipio" outlined label="Município" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-2"><q-input v-model="cte.remetente.uf" outlined label="UF" maxlength="2" class="field-required" :rules="[obrigatorio]" /></div>
+              </div>
+              <h5 class="secao">Destinatário</h5>
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-4"><q-input v-model="cte.destinatario.documento" outlined label="CPF ou CNPJ" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-8"><q-input v-model="cte.destinatario.nome" outlined label="Nome" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-6"><q-input v-model="cte.destinatario.logradouro" outlined label="Logradouro" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-2"><q-input v-model="cte.destinatario.numero" outlined label="Número" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="cte.destinatario.bairro" outlined label="Bairro" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="cte.destinatario.cep" outlined label="CEP" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="cte.destinatario.codigoMunicipio" outlined label="IBGE" maxlength="7" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="cte.destinatario.municipio" outlined label="Município" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-2"><q-input v-model="cte.destinatario.uf" outlined label="UF" maxlength="2" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><AgroMoneyInput v-model="cte.valorServico" label="Valor do serviço" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="cte.aliquotaIcms" outlined label="Alíquota ICMS" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><AgroMoneyInput v-model="cte.valorIcms" label="Valor ICMS" class="field-required" :rules="[obrigatorio]" /></div>
               </div>
               <div class="agro-form-actions">
                 <agro-btn flat label="Fechar" @click="emit('update:modelValue', false)" />
@@ -113,94 +154,25 @@
           <q-tab-panel name="mdfe" class="q-pa-none">
             <q-form greedy class="agro-formulario" @submit.prevent="emitMdfe">
               <div class="row q-col-gutter-md">
-                <div class="col-12 col-md-6">
-                  <q-input v-model="mdfe.veiculo" outlined label="Veículo" class="field-required" :rules="[obrigatorio]" />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-input
-                    v-model="mdfe.ufInicio"
-                    outlined
-                    label="UF início"
-                    maxlength="2"
-                    class="field-required"
-                    :rules="[obrigatorio]"
-                  />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-input
-                    v-model="mdfe.ufFim"
-                    outlined
-                    label="UF fim"
-                    maxlength="2"
-                    class="field-required"
-                    :rules="[obrigatorio]"
-                  />
-                </div>
-                <div class="col-12 col-md-4">
-                  <AgroMoneyInput
-                    v-model="mdfe.valorCarga"
-                    label="Valor carga"
-                    class="field-required"
-                    :rules="[obrigatorio]"
-                  />
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.ufInicio" outlined label="UF início" maxlength="2" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.ufFim" outlined label="UF fim" maxlength="2" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.codigoMunicipioCarregamento" outlined label="IBGE carregamento" maxlength="7" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.municipioCarregamento" outlined label="Município carregamento" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.codigoMunicipioDescarregamento" outlined label="IBGE descarregamento" maxlength="7" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.municipioDescarregamento" outlined label="Município descarregamento" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.placa" outlined label="Placa" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-3"><q-input v-model="mdfe.tara" outlined label="Tara (kg)" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-6"><q-input v-model="mdfe.condutorNome" outlined label="Condutor" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="mdfe.condutorCpf" outlined label="CPF do condutor" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><AgroMoneyInput v-model="mdfe.valorCarga" label="Valor da carga" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12 col-md-4"><q-input v-model="mdfe.pesoBruto" outlined label="Peso bruto (kg)" class="field-required" :rules="[obrigatorio]" /></div>
+                <div class="col-12">
+                  <q-input v-model="mdfe.chaves" outlined type="textarea" autogrow label="Chaves dos documentos" class="field-required" :rules="[obrigatorio]" />
                 </div>
               </div>
               <div class="agro-form-actions">
                 <agro-btn flat label="Fechar" @click="emit('update:modelValue', false)" />
                 <agro-btn color="primary" unelevated label="Emitir MDF-e" type="submit" :loading="loading" />
-              </div>
-            </q-form>
-          </q-tab-panel>
-
-          <q-tab-panel name="nfpr" class="q-pa-none">
-            <q-form greedy class="agro-formulario" @submit.prevent="emitNfpr">
-              <div class="row q-col-gutter-md">
-                <div class="col-12 col-md-6">
-                  <agro-select-cadastro
-                    v-model="nfpr.clienteId"
-                    entidade="cliente"
-                    label="Cliente"
-                    class="field-required"
-                    :options="clienteOpcoes"
-                    :loading="carregandoClientes"
-                    :rules="[obrigatorio]"
-                    @atualizar="carregarClientes()"
-                  />
-                </div>
-                <div class="col-12 col-md-6">
-                  <agro-select-cadastro
-                    v-model="nfpr.produtoId"
-                    entidade="produto"
-                    label="Produto"
-                    class="field-required"
-                    :options="produtoOpcoes"
-                    :loading="carregandoProdutos"
-                    :rules="[obrigatorio]"
-                    @atualizar="carregarProdutos()"
-                  />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-input
-                    v-model="nfpr.quantidade"
-                    outlined
-                    label="Quantidade"
-                    class="field-required"
-                    :rules="[obrigatorio]"
-                  />
-                </div>
-                <div class="col-12 col-md-3">
-                  <AgroMoneyInput v-model="nfpr.valor" label="Valor" class="field-required" :rules="[obrigatorio]" />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-input v-model="nfpr.cultura" outlined label="Cultura" />
-                </div>
-                <div class="col-12 col-md-3">
-                  <q-input v-model="nfpr.safra" outlined label="Safra" />
-                </div>
-              </div>
-              <div class="agro-form-actions">
-                <agro-btn flat label="Fechar" @click="emit('update:modelValue', false)" />
-                <agro-btn color="primary" unelevated label="Emitir NFPR" type="submit" :loading="loading" />
               </div>
             </q-form>
           </q-tab-panel>
@@ -212,16 +184,13 @@
 
 <script setup lang="ts">
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
-import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
-import { useClientes } from 'composables/useClientes';
 import { useDevolucoesVenda } from 'composables/useDevolucoesVenda';
 import { usePdv } from 'composables/usePdv';
 import { usePedidosVenda } from 'composables/usePedidosVenda';
-import { useProdutos } from 'composables/useProdutos';
 import type {
   EmitirCteFormModel,
   EmitirMdfeFormModel,
-  EmitirNfprFormModel,
+  ParteTransporteFormModel,
 } from 'types/dtos/fiscal-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { obrigatorio } from 'utils/validators';
@@ -239,19 +208,8 @@ const emit = defineEmits<{
   devolucao: [devolucaoId: string];
   cte: [form: EmitirCteFormModel];
   mdfe: [form: EmitirMdfeFormModel];
-  nfpr: [form: EmitirNfprFormModel];
 }>();
 
-const {
-  clientes,
-  carregando: carregandoClientes,
-  carregar: carregarClientes,
-} = useClientes();
-const {
-  produtos,
-  carregando: carregandoProdutos,
-  carregar: carregarProdutos,
-} = useProdutos();
 const {
   pedidos,
   carregando: carregandoPedidos,
@@ -268,41 +226,57 @@ const {
   carregar: carregarDevolucoes,
 } = useDevolucoesVenda();
 
-const aba = ref<'nfe' | 'nfce' | 'devolucao' | 'cte' | 'mdfe' | 'nfpr'>('nfe');
+function parteVazia(): ParteTransporteFormModel {
+  return {
+    documento: '',
+    nome: '',
+    logradouro: '',
+    numero: '',
+    bairro: '',
+    cep: '',
+    codigoMunicipio: '',
+    municipio: '',
+    uf: '',
+  };
+}
+
+const aba = ref<'nfe' | 'nfce' | 'devolucao' | 'cte' | 'mdfe'>('nfe');
 const pedidoId = ref('');
 const pdvVendaId = ref('');
 const devolucaoId = ref('');
 const cte = reactive<EmitirCteFormModel>({
-  remetente: '',
-  destinatario: '',
-  valor: '',
-  ufDestino: '',
+  naturezaOperacao: '',
+  cfop: '',
+  codigoMunicipioEnvio: '',
+  municipioEnvio: '',
+  ufEnvio: '',
+  codigoMunicipioInicio: '',
+  municipioInicio: '',
+  ufInicio: '',
+  codigoMunicipioFim: '',
+  municipioFim: '',
+  ufFim: '',
+  remetente: parteVazia(),
+  destinatario: parteVazia(),
+  valorServico: '',
+  aliquotaIcms: '',
+  valorIcms: '',
 });
 const mdfe = reactive<EmitirMdfeFormModel>({
-  veiculo: '',
   ufInicio: '',
   ufFim: '',
+  codigoMunicipioCarregamento: '',
+  municipioCarregamento: '',
+  codigoMunicipioDescarregamento: '',
+  municipioDescarregamento: '',
+  placa: '',
+  tara: '',
+  condutorNome: '',
+  condutorCpf: '',
   valorCarga: '',
+  pesoBruto: '',
+  chaves: '',
 });
-const nfpr = reactive<EmitirNfprFormModel>({
-  clienteId: '',
-  produtoId: '',
-  quantidade: '',
-  valor: '',
-  cultura: '',
-  safra: '',
-});
-
-const clienteOpcoes = computed(() =>
-  clientes.value.map((c) => ({
-    label: c.nomeFantasia || c.nomeRazao,
-    value: c.id,
-  })),
-);
-
-const produtoOpcoes = computed(() =>
-  produtos.value.map((p) => ({ label: `${p.descricao}`, value: p.id })),
-);
 
 const pedidoOpcoes = computed(() =>
   pedidos.value.map((p) => ({
@@ -330,8 +304,6 @@ watch(
   (open) => {
     if (!open) return;
     aba.value = 'nfe';
-    void carregarClientes();
-    void carregarProdutos();
     void carregarPedidos();
     void carregarPdv();
     void carregarDevolucoes();
@@ -357,19 +329,23 @@ function emitCte(): void {
 function emitMdfe(): void {
   emit('mdfe', { ...mdfe });
 }
-
-function emitNfpr(): void {
-  emit('nfpr', { ...nfpr });
-}
 </script>
 
 <style scoped>
 .dialog {
-  min-width: min(640px, 96vw);
+  min-width: min(880px, 96vw);
 }
-.titulo {
+.titulo,
+.secao {
   margin: 0;
   font-family: var(--font-family-display);
+}
+.titulo {
   font-size: var(--font-size-lg);
+}
+.secao {
+  margin-top: var(--spacing-4);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
 }
 </style>

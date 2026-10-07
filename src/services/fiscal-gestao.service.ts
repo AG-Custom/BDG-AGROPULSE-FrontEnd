@@ -19,27 +19,22 @@ import type {
   EditarNcmPisCofinsPayload,
   EmitirCtePayload,
   EmitirMdfePayload,
-  EmitirNfprPayload,
-  EnviarEscritorioFiscalPayload,
-  EnvioEscritorioFiscalDto,
   FilaContingenciaDto,
   FunruralCalculoDto,
   GerarGnrePayload,
   GuiaGnreDto,
   InutilizacaoPayload,
   ListarNotasFiscaisParams,
-  ListarSpedParams,
   ManifestacaoDestinatarioDto,
   ManifestarDestinatarioPayload,
   MvaNcmUfDto,
   NcmPisCofinsDto,
-  NotaComplementarPayload,
   NotaFiscalGestaoDto,
   NumeracaoInutilizadaDto,
   RegimeTributarioCnpjDto,
   RegimeTributarioCnpjPayload,
   ReprocessarContingenciaDto,
-  SpedLinhasDto,
+  SugestaoModeloDocumentoDto,
   SugerirCompletoParams,
   SugestaoTributacaoCompletaDto,
   XmlNotaDto,
@@ -54,7 +49,7 @@ export const fiscalGestaoService = {
   consultarFocus(id: string): Promise<NotaFiscalGestaoDto> {
     return api.post<NotaFiscalGestaoDto>(`/notas-fiscais/${id}/consultar-focus`).then(r => r.data);
   },
-  arquivoOficial(id: string, tipo: 'pdf' | 'xml' | 'cancelamento'): Promise<Blob> {
+  arquivoOficial(id: string, tipo: 'pdf' | 'html' | 'xml' | 'cancelamento'): Promise<Blob> {
     return api.get<Blob>(`/notas-fiscais/${id}/arquivo/${tipo}`, { responseType: 'blob' }).then(r => r.data);
   },
   listarNotas(params?: ListarNotasFiscaisParams): Promise<NotaFiscalGestaoDto[]> {
@@ -65,9 +60,21 @@ export const fiscalGestaoService = {
     return api.get<NotaFiscalGestaoDto>(`/notas-fiscais/${id}`).then((r) => r.data);
   },
 
+  sugerirModelo(pedidoId: string, enderecoId: string): Promise<SugestaoModeloDocumentoDto> {
+    return api
+      .get<SugestaoModeloDocumentoDto>(`/notas-fiscais/sugerir-modelo/${pedidoId}`, { params: { enderecoId } })
+      .then((r) => r.data);
+  },
+
   emitirNfe(pedidoId: string, payload: EmitirNfePayload): Promise<NotaFiscalGestaoDto> {
     return api
       .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfe/${pedidoId}`, payload)
+      .then((r) => r.data);
+  },
+
+  emitirNfcePedido(pedidoId: string, payload: EmitirNfePayload): Promise<NotaFiscalGestaoDto> {
+    return api
+      .post<NotaFiscalGestaoDto>(`/notas-fiscais/emitir-nfce-pedido/${pedidoId}`, payload)
       .then((r) => r.data);
   },
 
@@ -84,12 +91,6 @@ export const fiscalGestaoService = {
   emitirMdfe(payload: EmitirMdfePayload): Promise<NotaFiscalGestaoDto> {
     return api
       .post<NotaFiscalGestaoDto>('/notas-fiscais/emitir-mdfe', payload)
-      .then((r) => r.data);
-  },
-
-  emitirNfpr(payload: EmitirNfprPayload): Promise<NotaFiscalGestaoDto> {
-    return api
-      .post<NotaFiscalGestaoDto>('/notas-fiscais/emitir-nfpr', payload)
       .then((r) => r.data);
   },
 
@@ -111,15 +112,6 @@ export const fiscalGestaoService = {
   registrarCce(id: string, payload: CartaCorrecaoPayload): Promise<CartaCorrecaoDto> {
     return api
       .post<CartaCorrecaoDto>(`/notas-fiscais/${id}/cce`, payload)
-      .then((r) => r.data);
-  },
-
-  emitirComplementar(
-    id: string,
-    payload: NotaComplementarPayload,
-  ): Promise<NotaFiscalGestaoDto> {
-    return api
-      .post<NotaFiscalGestaoDto>(`/notas-fiscais/${id}/complementar`, payload)
       .then((r) => r.data);
   },
 
@@ -266,32 +258,6 @@ export const fiscalGestaoService = {
   ): Promise<RegimeTributarioCnpjDto> {
     return api
       .put<RegimeTributarioCnpjDto>(`/fiscal/regimes-cnpj/${id}`, payload)
-      .then((r) => r.data);
-  },
-
-  spedEfdIcmsIpi(params: ListarSpedParams): Promise<SpedLinhasDto> {
-    return api.get<SpedLinhasDto>('/fiscal/sped/efd-icms-ipi', { params }).then((r) => r.data);
-  },
-
-  spedEfdContribuicoes(params: ListarSpedParams): Promise<SpedLinhasDto> {
-    return api
-      .get<SpedLinhasDto>('/fiscal/sped/efd-contribuicoes', { params })
-      .then((r) => r.data);
-  },
-
-  spedContabil(params: ListarSpedParams): Promise<SpedLinhasDto> {
-    return api.get<SpedLinhasDto>('/fiscal/sped/contabil', { params }).then((r) => r.data);
-  },
-
-  spedEfdReinf(params: ListarSpedParams): Promise<SpedLinhasDto> {
-    return api.get<SpedLinhasDto>('/fiscal/sped/efd-reinf', { params }).then((r) => r.data);
-  },
-
-  enviarEscritorio(
-    payload: EnviarEscritorioFiscalPayload,
-  ): Promise<EnvioEscritorioFiscalDto> {
-    return api
-      .post<EnvioEscritorioFiscalDto>('/fiscal/sped/enviar-escritorio', payload)
       .then((r) => r.data);
   },
 

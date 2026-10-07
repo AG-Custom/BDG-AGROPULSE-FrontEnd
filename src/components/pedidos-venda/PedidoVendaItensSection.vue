@@ -107,6 +107,15 @@
                   @atualizar="carregarProdutos({ ativo: true })"
                   @update:model-value="onProdutoSelecionado"
                 />
+                <div v-if="avisoInclusaoPreco" class="pedido-venda-itens__aviso">
+                  <p>{{ avisoInclusaoPreco }}</p>
+                  <p>
+                    Para incluir o item avulso, cadastre o preço do produto na tabela vinculada ao cliente.
+                  </p>
+                  <router-link class="pedido-venda-itens__caminho" :to="destinoTabela">
+                    Cadastros Gerais → Tabelas de Preço<span v-if="nomeTabelaDestino"> → {{ nomeTabelaDestino }}</span>
+                  </router-link>
+                </div>
               </div>
               <div class="col-12 col-md-6">
                 <q-input
@@ -168,6 +177,7 @@ import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
+import { useNotificacao } from 'composables/useNotificacao';
 import { usePrecificacao } from 'composables/usePrecificacao';
 import { useProdutos } from 'composables/useProdutos';
 import {
@@ -200,7 +210,14 @@ const {
   carregar: carregarProdutos,
 } = useProdutos();
 
-const { resolvendoPreco, resolverPreco } = usePrecificacao();
+const { erro } = useNotificacao();
+const {
+  resolvendoPreco,
+  resolverPreco,
+  ultimoErro,
+  tabelasPermitidas,
+  carregarTabelasPermitidas,
+} = usePrecificacao();
 
 const {
   itensTabela,
@@ -216,6 +233,7 @@ const reResolverPrecosPendente = ref(false);
 const substituirItensPendente = ref(false);
 const tabelaPrecoAnteriorSync = ref<string | undefined>(undefined);
 const dialogAberto = ref(false);
+const avisoInclusaoPreco = ref('');
 const indiceEdicao = ref<number | null>(null);
 const itemForm = ref<PedidoVendaItemFormModel>(criarItemFormVazio());
 const formRef = ref<QForm | null>(null);
@@ -231,6 +249,34 @@ const mapaProdutos = computed(() => {
 });
 
 const totalPreview = computed(() => totalPedidoPreview(itens.value));
+
+const tabelaDestino = computed(() => {
+  const clienteId = props.clienteId?.trim().toLowerCase() ?? '';
+  const vinculadas = tabelasPermitidas.value.filter((tabela) =>
+    clienteId && tabela.clienteIds?.some((id) => id.toLowerCase() === clienteId),
+  );
+
+  if (vinculadas.length > 0) {
+    return vinculadas[0];
+  }
+
+  const selecionada = props.tabelaPrecoId?.trim().toLowerCase() ?? '';
+  if (selecionada) {
+    return tabelasPermitidas.value.find((tabela) => tabela.id.toLowerCase() === selecionada) ?? null;
+  }
+
+  return tabelasPermitidas.value.find((tabela) => tabela.ehPadrao) ?? null;
+});
+
+const nomeTabelaDestino = computed(() => tabelaDestino.value?.nome ?? '');
+
+const destinoTabela = computed(() => {
+  if (tabelaDestino.value) {
+    return { name: 'tabela-preco-editar', params: { id: tabelaDestino.value.id } };
+  }
+
+  return { name: 'tabelas-preco' };
+});
 
 const colunas = computed(() => {
   const base: QTableColumn<PedidoVendaItemFormModel>[] = [
@@ -258,8 +304,18 @@ function rotuloProduto(produtoId: string): string {
   return mapaProdutos.value.get(produtoId) ?? produtoId;
 }
 
+function ehBloqueioPrecoTabela(texto: string): boolean {
+  const normalizado = texto
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase();
+
+  return normalizado.includes('preco de tabela') || normalizado.includes('preco na tabela');
+}
+
 async function onProdutoSelecionado(valor: unknown): Promise<void> {
   const produtoId = typeof valor === 'string' ? valor : '';
+  avisoInclusaoPreco.value = '';
 
   if (!produtoId) {
     return;
@@ -267,15 +323,35 @@ async function onProdutoSelecionado(valor: unknown): Promise<void> {
 
   itemForm.value.precoUnitario = '';
 
-  const resolvido = await resolverPreco({
-    produtoId,
-    clienteId: props.clienteId || null,
-    tabelaPrecoId: props.tabelaPrecoId || null,
-  });
+  const resolvido = await resolverPreco(
+    {
+      produtoId,
+      clienteId: props.clienteId || null,
+      tabelaPrecoId: props.tabelaPrecoId || null,
+    },
+    true,
+  );
 
   if (resolvido) {
     itemForm.value.precoUnitario = formatarMoedaParaInput(resolvido.preco);
+    return;
   }
+
+  const texto = ultimoErro.value ?? '';
+  if (!texto) {
+    return;
+  }
+
+  if (ehBloqueioPrecoTabela(texto)) {
+    avisoInclusaoPreco.value = texto;
+    const destino = nomeTabelaDestino.value
+      ? `Cadastros Gerais → Tabelas de Preço → ${nomeTabelaDestino.value}`
+      : 'Cadastros Gerais → Tabelas de Preço';
+    erro(`${texto}\n\nPara incluir o item avulso, cadastre o preço em ${destino}.`);
+    return;
+  }
+
+  erro(texto);
 }
 
 async function sincronizarItensComTabela(): Promise<void> {
@@ -364,6 +440,7 @@ function abrirDialogEditar(item: PedidoVendaItemFormModel): void {
 function fecharDialog(): void {
   dialogAberto.value = false;
   indiceEdicao.value = null;
+  avisoInclusaoPreco.value = '';
 }
 
 function removerItem(chave: string): void {
@@ -420,7 +497,15 @@ watch(
 
 onMounted(() => {
   void carregarProdutos({ ativo: true });
+  void carregarTabelasPermitidas({ clienteId: props.clienteId || null });
 });
+
+watch(
+  () => props.clienteId,
+  (clienteId) => {
+    void carregarTabelasPermitidas({ clienteId: clienteId || null });
+  },
+);
 </script>
 
 <style scoped>
@@ -463,5 +548,24 @@ onMounted(() => {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   margin: 0;
+}
+
+.pedido-venda-itens__aviso {
+  color: var(--color-text-secondary);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-sm);
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-2);
+}
+
+.pedido-venda-itens__aviso p {
+  margin: 0;
+}
+
+.pedido-venda-itens__caminho {
+  color: var(--color-primary-500);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
 }
 </style>
