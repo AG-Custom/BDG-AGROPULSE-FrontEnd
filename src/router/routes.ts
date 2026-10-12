@@ -1027,6 +1027,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'fiscal/cfops',
+        name: 'fiscal-cfops',
+        component: () => import('pages/fiscal/CfopListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cfops',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
         path: 'fiscal/ncm-pis-cofins',
         name: 'fiscal-ncm-pis-cofins',
         component: () => import('pages/fiscal/NcmPisCofinsListPage.vue'),

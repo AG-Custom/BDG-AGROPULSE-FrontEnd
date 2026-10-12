@@ -12,6 +12,7 @@ export interface ProdutoResumoDto {
   empresaId: string;
   unidadeId: string;
   codigo: string;
+  numero: number;
   descricao: string;
   categoriaProdutoId: string;
   tipoProduto: TipoProdutoValor;
@@ -146,7 +147,8 @@ export interface EditarProdutoConversaoPayload {
 
 export interface ListarProdutosParams {
   ativo?: boolean;
-  busca?: string;
+  numero?: string;
+  nome?: string;
   categoriaProdutoId?: string;
   exportar?: ExportacaoFormatoValor;
 }

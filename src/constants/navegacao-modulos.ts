@@ -503,6 +503,11 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
+            label: 'CFOP',
+            routeName: 'fiscal-cfops',
+            permissao: Permissoes.Fiscal.Visualizar,
+          },
+          {
             label: 'PIS/COFINS NCM',
             routeName: 'fiscal-ncm-pis-cofins',
             permissao: Permissoes.Fiscal.Visualizar,

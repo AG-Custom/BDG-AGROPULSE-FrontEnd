@@ -22,7 +22,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && saldos.length === 0" :colunas="2" />
+        <agro-table-skeleton v-if="carregando && saldos.length === 0" :colunas="colunas.length" />
 
         <empty-state
           v-else-if="!carregando && saldos.length === 0"
@@ -53,6 +53,30 @@
               <span class="text-metric">{{ formatarDecimal(props.row.saldo) }}</span>
             </q-td>
           </template>
+
+          <template #body-cell-custo="props">
+            <q-td :props="props">
+              <span class="text-metric">{{ formatarValor(props.row.custo) }}</span>
+            </q-td>
+          </template>
+
+          <template #body-cell-totalCusto="props">
+            <q-td :props="props">
+              <span class="text-metric">{{ formatarValor(props.row.totalCusto) }}</span>
+            </q-td>
+          </template>
+
+          <template #body-cell-precoVenda="props">
+            <q-td :props="props">
+              <span class="text-metric">{{ formatarValor(props.row.precoVenda) }}</span>
+            </q-td>
+          </template>
+
+          <template #body-cell-totalVenda="props">
+            <q-td :props="props">
+              <span class="text-metric">{{ formatarValor(props.row.totalVenda) }}</span>
+            </q-td>
+          </template>
         </q-table>
       </agro-card>
     </section>
@@ -65,9 +89,10 @@ import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useEstoqueSaldos } from 'composables/useEstoqueSaldos';
 import { useProdutoOpcoesEstoque } from 'composables/useProdutoOpcoesEstoque';
+import { useVerCustos } from 'composables/useVerCustos';
 import type { QTableColumn } from 'quasar';
 import type { SaldoProdutoDto } from 'types/dtos/estoque.dto';
-import { formatarDecimal } from 'utils/formatters';
+import { formatarDecimal, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref, watch } from 'vue';
 
 const { saldos, carregando, carregar } = useEstoqueSaldos();
@@ -77,12 +102,34 @@ const {
   rotuloProduto,
 } = useProdutoOpcoesEstoque();
 
+const { verCustos } = useVerCustos();
+
 const filtroProduto = ref<string | null>(null);
 
-const colunas: QTableColumn<SaldoProdutoDto>[] = [
-  { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
-  { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right', sortable: true },
-];
+const colunas = computed<QTableColumn<SaldoProdutoDto>[]>(() => {
+  const base: QTableColumn<SaldoProdutoDto>[] = [
+    { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
+    { name: 'saldo', label: 'Saldo', field: 'saldo', align: 'right', sortable: true },
+  ];
+
+  if (verCustos.value) {
+    base.push(
+      { name: 'custo', label: 'Custo', field: 'custo', align: 'right', sortable: true },
+      { name: 'totalCusto', label: 'Total custo', field: 'totalCusto', align: 'right', sortable: true },
+    );
+  }
+
+  base.push(
+    { name: 'precoVenda', label: 'Preço venda', field: 'precoVenda', align: 'right', sortable: true },
+    { name: 'totalVenda', label: 'Total venda', field: 'totalVenda', align: 'right', sortable: true },
+  );
+
+  return base;
+});
+
+function formatarValor(valor: number | null): string {
+  return valor == null ? '—' : formatarMoeda(valor);
+}
 
 const descricaoVazia = computed(() =>
   filtroProduto.value

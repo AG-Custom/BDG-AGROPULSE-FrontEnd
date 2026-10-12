@@ -3,7 +3,16 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="produto-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12">
+      <div v-if="numero != null" class="col-12 col-md-3">
+        <q-input
+          outlined
+          readonly
+          label="Código"
+          class="text-metric"
+          :model-value="String(numero)"
+        />
+      </div>
+      <div class="col-12" :class="{ 'col-md-9': numero != null }">
         <q-input
           v-model="formulario.descricao"
           outlined
@@ -194,6 +203,7 @@ defineProps<{
   modo: 'criar' | 'editar';
   somenteLeitura?: boolean;
   custoMedioPonderado?: number | null;
+  numero?: number | null;
 }>();
 
 const formulario = defineModel<ProdutoFormModel>('formulario', { required: true });

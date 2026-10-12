@@ -36,13 +36,25 @@
       <agro-card>
         <div class="agro-filter-bar">
           <q-input
-            v-model="busca"
+            v-model="filtroCodigo"
             outlined
             dense
-            label="Buscar"
-            hint="Código ou descrição"
+            label="Código"
             clearable
-            class="produtos-list__busca"
+            class="produtos-list__codigo"
+          >
+            <template #prepend>
+              <q-icon name="tag" />
+            </template>
+          </q-input>
+
+          <q-input
+            v-model="filtroNome"
+            outlined
+            dense
+            label="Nome"
+            clearable
+            class="produtos-list__nome"
           >
             <template #prepend>
               <q-icon name="search" />
@@ -74,7 +86,7 @@
           />
         </div>
 
-        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="5" />
+        <agro-table-skeleton v-if="carregando && produtos.length === 0" :colunas="6" />
 
         <empty-state
           v-else-if="!carregando && produtos.length === 0"
@@ -83,7 +95,7 @@
           icon="inventory_2"
         >
           <agro-btn
-            v-if="!busca && !filtroCategoria && filtroAtivo === 'ativos'"
+            v-if="!filtroCodigo && !filtroNome && !filtroCategoria && filtroAtivo === 'ativos'"
             color="primary"
             unelevated
             label="Cadastrar produto"
@@ -103,6 +115,12 @@
           :loading="carregando"
           :rows-per-page-options="[10, 25, 50]"
         >
+          <template #body-cell-numero="props">
+            <q-td :props="props" class="text-metric">
+              {{ props.row.numero }}
+            </q-td>
+          </template>
+
           <template #body-cell-tipoProduto="props">
             <q-td :props="props">
               {{ rotuloTipoProduto(props.row.tipoProduto) }}
@@ -185,7 +203,8 @@ const {
   rotuloCategoria,
 } = useCategoriasProduto();
 
-const busca = ref('');
+const filtroCodigo = ref('');
+const filtroNome = ref('');
 const filtroAtivo = ref<'ativos' | 'inativos' | 'todos'>('ativos');
 const filtroCategoria = ref<string | null>(null);
 
@@ -203,6 +222,7 @@ const categoriaOpcoes = computed(() =>
 );
 
 const colunas: QTableColumn<ProdutoResumoDto>[] = [
+  { name: 'numero', label: 'Código', field: 'numero', align: 'left', sortable: true },
   { name: 'descricao', label: 'Nome', field: 'descricao', align: 'left', sortable: true },
   { name: 'tipoProduto', label: 'Tipo', field: 'tipoProduto', align: 'left', sortable: true },
   { name: 'categoriaProdutoId', label: 'Categoria', field: 'categoriaProdutoId', align: 'left' },
@@ -212,7 +232,7 @@ const colunas: QTableColumn<ProdutoResumoDto>[] = [
 ];
 
 const descricaoVazia = computed(() => {
-  if (busca.value || filtroCategoria.value || filtroAtivo.value !== 'ativos') {
+  if (filtroCodigo.value || filtroNome.value || filtroCategoria.value || filtroAtivo.value !== 'ativos') {
     return 'Nenhum produto corresponde aos filtros aplicados.';
   }
 
@@ -237,9 +257,14 @@ function montarParams(): ListarProdutosParams {
     params.ativo = false;
   }
 
-  const termo = busca.value.trim();
-  if (termo) {
-    params.busca = termo;
+  const codigo = filtroCodigo.value.trim();
+  if (codigo) {
+    params.numero = codigo;
+  }
+
+  const nome = filtroNome.value.trim();
+  if (nome) {
+    params.nome = nome;
   }
 
   if (filtroCategoria.value) {
@@ -267,7 +292,7 @@ async function exportarLista(formato: ExportacaoFormatoValor): Promise<void> {
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-watch([busca, filtroAtivo, filtroCategoria], () => {
+watch([filtroCodigo, filtroNome, filtroAtivo, filtroCategoria], () => {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     void recarregar();
@@ -288,9 +313,13 @@ onMounted(() => {
   gap: var(--spacing-2);
 }
 
-.produtos-list__busca {
+.produtos-list__codigo {
+  width: 160px;
+}
+
+.produtos-list__nome {
   flex: 1;
-  min-width: 240px;
+  min-width: 220px;
 }
 
 .produtos-list__categoria {

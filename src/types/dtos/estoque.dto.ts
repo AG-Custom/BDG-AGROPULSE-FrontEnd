@@ -64,6 +64,10 @@ export interface ListarLocaisEstoqueParams {
 export interface SaldoProdutoDto {
   produtoId: string;
   saldo: number;
+  custo: number | null;
+  totalCusto: number | null;
+  precoVenda: number | null;
+  totalVenda: number | null;
 }
 
 export interface MovimentacaoEstoqueDto {

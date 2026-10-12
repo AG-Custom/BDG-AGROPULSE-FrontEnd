@@ -7,6 +7,7 @@ import type {
   CancelarNotaFiscalPayload,
   CartaCorrecaoDto,
   CartaCorrecaoPayload,
+  CfopDto,
   CfopOverrideLogDto,
   CfopOverridePayload,
   ConfigFunruralDto,
@@ -36,6 +37,7 @@ import type {
   NumeracaoInutilizadaDto,
   RegimeTributarioCnpjDto,
   RegimeTributarioCnpjPayload,
+  RelacionarCfopSaidaPayload,
   ReprocessarContingenciaDto,
   SugestaoModeloDocumentoDto,
   SugerirCompletoParams,
@@ -189,6 +191,14 @@ export const fiscalGestaoService = {
 
   listarNcmPisCofins(): Promise<NcmPisCofinsDto[]> {
     return api.get<NcmPisCofinsDto[]>('/fiscal/ncm-pis-cofins').then((r) => r.data);
+  },
+
+  listarCfops(): Promise<CfopDto[]> {
+    return api.get<CfopDto[]>('/fiscal/cfops').then((r) => r.data);
+  },
+
+  relacionarCfopSaida(codigo: string, payload: RelacionarCfopSaidaPayload): Promise<CfopDto> {
+    return api.put<CfopDto>(`/fiscal/cfops/${codigo}/saida`, payload).then((r) => r.data);
   },
 
   criarNcmPisCofins(payload: CriarNcmPisCofinsPayload): Promise<NcmPisCofinsDto> {

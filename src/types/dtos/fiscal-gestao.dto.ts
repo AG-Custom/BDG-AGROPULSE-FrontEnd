@@ -238,6 +238,17 @@ export interface InutilizacaoPayload {
   modeloDocumento: ModeloDocumentoFiscalValor;
 }
 
+export interface CfopDto {
+  codigo: string;
+  descricao: string;
+  cfopSaida: string | null;
+  cfopSaidaDescricao: string | null;
+}
+
+export interface RelacionarCfopSaidaPayload {
+  cfopSaida: string | null;
+}
+
 export interface NcmPisCofinsDto {
   id: string;
   ncm: string;
