@@ -27,6 +27,9 @@ import type {
   ListarNotasFiscaisParams,
   ManifestacaoDestinatarioDto,
   ManifestarDestinatarioPayload,
+  FiltroNfeRecebida,
+  NfeRecebidaDto,
+  SincronizarNfesRecebidasDto,
   MvaNcmUfDto,
   NcmPisCofinsDto,
   NotaFiscalGestaoDto,
@@ -264,6 +267,18 @@ export const fiscalGestaoService = {
   manifestar(payload: ManifestarDestinatarioPayload): Promise<ManifestacaoDestinatarioDto> {
     return api
       .post<ManifestacaoDestinatarioDto>('/fiscal/sefaz/manifestar', payload)
+      .then((r) => r.data);
+  },
+
+  listarNfesRecebidas(filtro: FiltroNfeRecebida): Promise<NfeRecebidaDto[]> {
+    return api
+      .get<NfeRecebidaDto[]>('/fiscal/nfes-recebidas', { params: { filtro } })
+      .then((r) => r.data);
+  },
+
+  sincronizarNfesRecebidas(): Promise<SincronizarNfesRecebidasDto> {
+    return api
+      .post<SincronizarNfesRecebidasDto>('/fiscal/nfes-recebidas/sincronizar')
       .then((r) => r.data);
   },
 };

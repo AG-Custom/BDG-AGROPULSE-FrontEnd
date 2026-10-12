@@ -530,3 +530,29 @@ export interface CancelarNotaFormModel {
 export interface CceFormModel {
   textoCorrecao: string;
 }
+
+export type FiltroNfeRecebida = 'Todas' | 'Pendente' | 'SemCiencia';
+
+export interface NfeRecebidaDto {
+  id: string;
+  nomeEmitente: string;
+  documentoEmitente: string;
+  cnpjDestinatario: string;
+  chaveNfe: string;
+  valorTotal: number;
+  dataEmissao: string | null;
+  situacao: string;
+  manifestacaoDestinatario: string | null;
+  nfeCompleta: boolean;
+  tipoNfe: number | null;
+  versao: number;
+  numeroCartaCorrecao: string | null;
+  cartaCorrecao: string | null;
+  dataCartaCorrecao: string | null;
+  dataCancelamento: string | null;
+  justificativaCancelamento: string | null;
+}
+
+export interface SincronizarNfesRecebidasDto {
+  quantidade: number;
+}

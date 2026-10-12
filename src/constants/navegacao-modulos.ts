@@ -493,6 +493,11 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             permissao: Permissoes.Fiscal.Visualizar,
           },
           {
+            label: 'NF-e recebidas',
+            routeName: 'fiscal-nfes-recebidas',
+            permissao: Permissoes.Fiscal.Visualizar,
+          },
+          {
             label: 'Notas Entrada/Saída',
             routeName: 'fiscal-notas-entrada-saida',
             permissao: Permissoes.Fiscal.Visualizar,

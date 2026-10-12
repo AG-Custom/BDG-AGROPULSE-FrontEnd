@@ -1007,6 +1007,16 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'fiscal/nfes-recebidas',
+        name: 'fiscal-nfes-recebidas',
+        component: () => import('pages/fiscal/NfeRecebidasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.nfesRecebidas',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
         path: 'fiscal/notas-entrada-saida',
         name: 'fiscal-notas-entrada-saida',
         component: () => import('pages/fiscal/NotasEntradaSaidaListPage.vue'),
