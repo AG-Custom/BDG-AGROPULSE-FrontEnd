@@ -1,86 +1,129 @@
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="emit('update:modelValue', $event)">
     <q-card class="dialog">
-      <q-card-section>
+      <q-card-section class="dialog__cabecalho">
         <h4 class="titulo">Cadastrar produto</h4>
+        <p class="subtitulo">
+          NCM e origem da mercadoria são obrigatórios. Sem eles no cadastro, a entrada da nota não pode ser criada.
+        </p>
         <p v-if="codigoProdutoXml" class="subtitulo">
           SKU do XML: <span class="text-metric">{{ codigoProdutoXml }}</span>
         </p>
       </q-card-section>
 
+      <q-form class="dialog__form" greedy @submit.prevent="salvar" @validation-error="abrirSecoes">
       <q-card-section class="dialog__corpo">
-        <q-form greedy class="agro-formulario" @submit.prevent="salvar">
-          <q-input
-            v-model="form.descricao"
-            outlined
-            label="Descrição"
-            class="field-required"
-            :rules="[obrigatorio]"
-          />
-
-          <div class="form-grid-2">
-            <agro-select-cadastro
-              v-model="form.categoriaProdutoId"
-              entidade="categoriaProduto"
-              label="Categoria"
-              class="field-required"
-              :options="categoriaOpcoes"
-              :loading="carregandoCategorias"
-              :rules="[obrigatorio]"
-              @atualizar="carregarCategorias()"
-            />
-
-            <q-select
-              v-model="form.tipoProduto"
+        <div class="agro-formulario">
+          <recebimento-secao-expansivel
+            v-model="secaoProdutoAberta"
+            compacta
+            titulo="Dados do produto"
+            :subtitulo="subtituloProduto"
+          >
+          <div class="secao">
+            <q-input
+              v-model="form.descricao"
               outlined
-              label="Tipo"
-              emit-value
-              map-options
+              label="Descrição"
               class="field-required"
-              :options="TipoProdutoOpcoes"
-              :rules="[obrigatorio]"
-            />
-          </div>
-
-          <div class="form-grid-2">
-            <q-select
-              v-model="form.unidadeMedidaId"
-              outlined
-              label="Unidade de medida"
-              emit-value
-              map-options
-              class="field-required"
-              :options="unidadeMedidaOpcoes"
-              :loading="carregandoUnidadesMedida"
-              :hint="hintUnidadeXml"
               :rules="[obrigatorio]"
             />
 
-            <AgroMoneyInput
-              v-model="form.precoVenda"
-              label="Preço de venda"
-              class="field-required"
-              :hint="hintPreco"
-              :rules="[obrigatorio]"
-            />
-          </div>
+            <div class="form-grid-2">
+              <agro-select-cadastro
+                v-model="form.categoriaProdutoId"
+                entidade="categoriaProduto"
+                label="Categoria"
+                class="field-required"
+                :options="categoriaOpcoes"
+                :loading="carregandoCategorias"
+                :rules="[obrigatorio]"
+                @atualizar="carregarCategorias()"
+              />
 
-          <div class="form-flags">
-            <q-toggle v-model="form.exigeLote" label="Exige lote" color="primary" />
-            <q-toggle v-model="form.exigeValidade" label="Exige validade" color="primary" />
-            <q-toggle v-model="form.exigeFabricacao" label="Exige fabricação" color="primary" />
-          </div>
+              <q-select
+                v-model="form.tipoProduto"
+                outlined
+                label="Tipo"
+                emit-value
+                map-options
+                class="field-required"
+                :options="TipoProdutoOpcoes"
+                :rules="[obrigatorio]"
+              />
+            </div>
 
-          <div class="xml-bloco">
-            <h5 class="xml-bloco__titulo">Dados fiscais do XML</h5>
-            <div class="xml-bloco__grid">
+            <div class="form-grid-3">
+              <q-select
+                v-model="form.unidadeMedidaId"
+                outlined
+                label="Unidade de medida"
+                emit-value
+                map-options
+                class="field-required"
+                :options="unidadeMedidaOpcoes"
+                :loading="carregandoUnidadesMedida"
+                :hint="hintUnidadeXml"
+                :rules="[obrigatorio]"
+              />
+
+              <q-input
+                :model-value="unidadeXml?.trim() || '—'"
+                outlined
+                readonly
+                label="UN (XML)"
+                hint="Unidade comercial da nota"
+              />
+
+              <AgroMoneyInput
+                v-model="form.precoVenda"
+                label="Preço de venda"
+                class="field-required"
+                :hint="hintPreco"
+                :rules="[obrigatorio]"
+              />
+            </div>
+
+            <div class="form-grid-2">
+              <q-input v-model="ean" outlined label="EAN" hint="Código de barras da nota, se houver" />
+              <q-input
+                v-model="form.fatorDivisaoNfe"
+                outlined
+                label="Fator divisão"
+                type="number"
+                min="0"
+                step="any"
+                hint="Multiplica a quantidade da nota na entrada"
+                :rules="[fatorMaiorQueZero]"
+              />
+            </div>
+
+            <div class="form-flags">
+              <q-toggle v-model="form.exigeLote" label="Exige lote" color="primary" />
+              <q-toggle v-model="form.exigeValidade" label="Exige validade" color="primary" />
+              <q-toggle v-model="form.exigeFabricacao" label="Exige fabricação" color="primary" />
+            </div>
+          </div>
+          </recebimento-secao-expansivel>
+
+          <recebimento-secao-expansivel
+            v-model="secaoFiscalAberta"
+            compacta
+            titulo="Dados fiscais"
+            :subtitulo="subtituloFiscal"
+          >
+          <div class="secao">
+
+            <div class="form-grid-3">
               <q-input
                 v-model="fiscal.ncm"
                 outlined
                 label="NCM"
+                class="field-required"
                 mask="########"
-                fill-mask=""
-                :rules="regrasNcm"
+                hint="8 dígitos"
+                inputmode="numeric"
+                :rules="[obrigatorio, ncmValidator]"
               />
               <q-select
                 v-model="fiscal.origemMercadoria"
@@ -88,38 +131,65 @@
                 emit-value
                 map-options
                 label="Origem da mercadoria"
+                class="field-required"
                 :options="OrigemMercadoriaOpcoes"
+                :rules="[obrigatorio]"
               />
-              <q-input v-model="fiscal.csosn" outlined label="CSOSN" maxlength="10" />
-              <q-input v-model="fiscal.cstIcms" outlined label="CST ICMS" maxlength="10" />
+              <q-input
+                v-model="fiscal.cest"
+                outlined
+                label="CEST"
+                mask="#######"
+                hint="7 dígitos, se houver"
+                inputmode="numeric"
+                :rules="[cestValidator]"
+              />
+            </div>
+
+            <div class="form-grid-3">
+              <q-input v-model="fiscal.csosn" outlined label="CSOSN" maxlength="10" :hint="hintCsosn" />
+              <q-input v-model="fiscal.cstIcms" outlined label="CST ICMS" maxlength="10" :hint="hintCstIcms" />
               <q-input
                 v-model="fiscal.aliquotaIcms"
                 outlined
                 label="Alíquota ICMS (%)"
                 inputmode="decimal"
               />
-              <q-input v-model="fiscal.cfopPadraoInterno" outlined label="CFOP interno" mask="####" fill-mask="" />
-              <q-input v-model="fiscal.cfopPadraoExterno" outlined label="CFOP externo" mask="####" fill-mask="" />
-              <q-input v-model="ean" outlined label="EAN" />
+            </div>
+
+            <div class="form-grid-2">
               <q-input
-                :model-value="unidadeXml?.trim() || '—'"
+                v-model="fiscal.cfopPadraoInterno"
                 outlined
-                readonly
-                label="UN (XML)"
-                hint="Usada para sugerir a unidade de medida"
+                label="CFOP interno"
+                mask="####"
+                :hint="hintCfopInterno"
+                inputmode="numeric"
+                :rules="[cfopValidator]"
+              />
+              <q-input
+                v-model="fiscal.cfopPadraoExterno"
+                outlined
+                label="CFOP externo"
+                mask="####"
+                :hint="hintCfopExterno"
+                inputmode="numeric"
+                :rules="[cfopValidator]"
               />
             </div>
+
             <q-input
               v-model="fiscal.observacoesFiscais"
               outlined
               type="textarea"
               autogrow
               label="Observações fiscais"
-              class="q-mt-md"
             />
           </div>
-
-          <div class="agro-form-actions">
+          </recebimento-secao-expansivel>
+        </div>
+      </q-card-section>
+          <div class="agro-form-actions dialog__acoes">
             <agro-btn flat label="Cancelar" descricao="Fechar" @click="emit('update:modelValue', false)" />
             <agro-btn
               color="primary"
@@ -129,16 +199,18 @@
               :loading="salvando"
             />
           </div>
-        </q-form>
-      </q-card-section>
+      </q-form>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
+import RecebimentoSecaoExpansivel from 'components/compras/RecebimentoSecaoExpansivel.vue';
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
+import { useCfops } from 'composables/useCfops';
+import { useIcms } from 'composables/useIcms';
 import { useProdutos } from 'composables/useProdutos';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
 import {
@@ -148,7 +220,9 @@ import {
   TipoProdutoOpcoes,
 } from 'constants/enums';
 import type { ProdutoDto, ProdutoFiscalFormModel, ProdutoFormModel } from 'types/dtos/produto.dto';
-import { formatarMoeda, formatarMoedaParaInput, apenasDigitos } from 'utils/formatters';
+import { resolverCfopSaidaDaNota } from 'utils/cfop-saida-produto';
+import { formatarMoeda, formatarMoedaParaInput } from 'utils/formatters';
+import { resolverIcmsSaidaDaNota } from 'utils/icms-saida-produto';
 import { mapearOrigemMercadoriaNfe } from 'utils/mappers/nfe-origem.mapper';
 import {
   codigoFormParaDtoLocal,
@@ -156,11 +230,10 @@ import {
   criarComplementosFormVazio,
   criarFiscalFormVazio,
   criarProdutoFormVazio,
-  fiscalFormTemDados,
 } from 'utils/mappers/produto.mapper';
-import { ncm as ncmValidator, obrigatorio } from 'utils/validators';
-import { computed, ref, watch } from 'vue';
-import { useNotificacao } from 'composables/useNotificacao';
+import { resolverUnidadeMedidaIdPorXml } from 'utils/unidade-medida-nfe';
+import { cest as cestValidator, cfop as cfopValidator, ncm as ncmValidator, obrigatorio } from 'utils/validators';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -168,9 +241,11 @@ const props = defineProps<{
   codigoProdutoXml?: string;
   precoSugerido?: number | null;
   ncmXml?: string | null;
+  cestXml?: string | null;
   cfopXml?: string | null;
   eanXml?: string | null;
   unidadeXml?: string | null;
+  unidadeMedidaId?: string | null;
   origemXml?: string | null;
   cstIcmsXml?: string | null;
   csosnXml?: string | null;
@@ -187,9 +262,10 @@ const emit = defineEmits<{
 
 const form = ref<ProdutoFormModel>(criarProdutoFormVazio());
 const fiscal = ref<ProdutoFiscalFormModel>(criarFiscalFormVazio());
+const secaoProdutoAberta = ref(true);
+const secaoFiscalAberta = ref(true);
 const ean = ref('');
 const { criar, salvando } = useProdutos();
-const { erro } = useNotificacao();
 
 const {
   categorias,
@@ -204,6 +280,9 @@ const {
   carregar: carregarUnidadesMedida,
   rotuloUnidadeMedida,
 } = useUnidadesMedida();
+
+const { itens: cfops, carregar: carregarCfops } = useCfops();
+const { itens: icms, carregar: carregarIcms } = useIcms();
 
 const categoriaOpcoes = computed(() =>
   categorias.value
@@ -237,67 +316,79 @@ const hintPreco = computed(() => {
   return `Custo unitário da NF: ${formatarMoeda(props.precoSugerido)}`;
 });
 
-const regrasNcm = computed(() => {
-  if (!fiscalFormTemDados(fiscal.value) && !fiscal.value.ncm.trim()) {
-    return undefined;
-  }
-  return [obrigatorio, ncmValidator];
+function resolverUnidadeMedidaId(unidadeXml: string | null | undefined): string | null {
+  const idApi = props.unidadeMedidaId?.trim();
+  if (idApi) return idApi;
+  return resolverUnidadeMedidaIdPorXml(unidadeXml, unidadesMedida.value);
+}
+
+const relacaoCfop = computed(() => resolverCfopSaidaDaNota(props.cfopXml, cfops.value));
+
+const relacaoCstIcms = computed(() => resolverIcmsSaidaDaNota(props.cstIcmsXml, 'Cst', icms.value));
+
+const relacaoCsosn = computed(() => resolverIcmsSaidaDaNota(props.csosnXml, 'Csosn', icms.value));
+
+const subtituloProduto = computed(() => form.value.descricao.trim() || 'Descrição, unidade e preço');
+
+const subtituloFiscal = computed(() => {
+  const ncm = fiscal.value.ncm.replace(/\D/g, '');
+  if (ncm.length === 8) return `NCM ${ncm}`;
+  return 'NCM e origem obrigatórios';
 });
 
-function normalizarUnidade(valor: string): string {
-  return valor.trim().toUpperCase().replace(/\./g, '');
+function fatorMaiorQueZero(valor: string): true | string {
+  const texto = valor.trim();
+  if (!texto) return true;
+  const numero = Number(texto.replace(',', '.'));
+  if (!Number.isFinite(numero) || numero <= 0) return 'Informe um fator maior que zero';
+  return true;
 }
 
-function aliasesUnidade(valor: string): string[] {
-  const base = normalizarUnidade(valor);
-  const mapa: Record<string, string[]> = {
-    LT: ['LT', 'L', 'LITRO', 'LITROS'],
-    L: ['L', 'LT', 'LITRO', 'LITROS'],
-    KG: ['KG', 'KILO', 'QUILO', 'QUILOS'],
-    G: ['G', 'GR', 'GRAMA', 'GRAMAS'],
-    UN: ['UN', 'UND', 'UNID', 'UNIDADE'],
-    CX: ['CX', 'CAIXA'],
-    PCT: ['PCT', 'PC', 'PACOTE'],
-    SC: ['SC', 'SACO'],
-    M: ['M', 'MT', 'METRO'],
-    ML: ['ML', 'MILILITRO'],
-  };
-  return mapa[base] ?? [base];
+function abrirSecoes(): void {
+  secaoProdutoAberta.value = true;
+  secaoFiscalAberta.value = true;
 }
 
-function resolverUnidadeMedidaId(unidadeXml: string | null | undefined): string | null {
-  const unXml = unidadeXml?.trim();
-  if (!unXml) return null;
-
-  const candidatos = aliasesUnidade(unXml);
-  const ativas = unidadesMedida.value.filter((u) => u.ativo);
-
-  const porCodigo = ativas.find((u) => candidatos.includes(normalizarUnidade(u.codigo)));
-  if (porCodigo) return porCodigo.id;
-
-  const porDescricao = ativas.find((u) =>
-    candidatos.some((alias) => normalizarUnidade(u.descricao).includes(alias)),
-  );
-  return porDescricao?.id ?? null;
+function hintRelacao(codigoCampo: string, padrao: string): string {
+  const relacao = relacaoCfop.value;
+  const codigo = codigoCampo.replace(/\D/g, '');
+  if (!relacao.entrada || (codigo !== relacao.interno && codigo !== relacao.externo)) return padrao;
+  return `Saída relacionada ao CFOP ${relacao.entrada} da nota`;
 }
 
-function distribuirCfop(cfopValor: string): { interno: string; externo: string } {
-  if (!cfopValor) return { interno: '', externo: '' };
-  if (cfopValor.startsWith('5')) return { interno: cfopValor, externo: '' };
-  if (cfopValor.startsWith('6')) return { interno: '', externo: cfopValor };
-  return { interno: '', externo: cfopValor };
-}
+const hintCstIcms = computed(() => {
+  const relacao = relacaoCstIcms.value;
+  if (!relacao.entrada || fiscal.value.cstIcms.trim() !== relacao.codigo) return undefined;
+  return `Saída relacionada ao CST ${relacao.entrada} da nota`;
+});
 
-function preencherFormulario(): void {
-  const cfop = distribuirCfop(props.cfopXml?.trim() ?? '');
+const hintCsosn = computed(() => {
+  const relacao = relacaoCsosn.value;
+  if (!relacao.entrada || fiscal.value.csosn.trim() !== relacao.codigo) return 'Simples Nacional';
+  return `Saída relacionada ao CSOSN ${relacao.entrada} da nota`;
+});
+
+const hintCfopInterno = computed(() =>
+  hintRelacao(fiscal.value.cfopPadraoInterno, '4 dígitos, venda interna'),
+);
+
+const hintCfopExterno = computed(() =>
+  hintRelacao(fiscal.value.cfopPadraoExterno, '4 dígitos, venda interestadual'),
+);
+
+async function preencherFormulario(): Promise<void> {
+  const cfop = resolverCfopSaidaDaNota(props.cfopXml, cfops.value);
+  const cstIcms = resolverIcmsSaidaDaNota(props.cstIcmsXml, 'Cst', icms.value);
+  const csosn = resolverIcmsSaidaDaNota(props.csosnXml, 'Csosn', icms.value);
   const origem =
     mapearOrigemMercadoriaNfe(props.origemXml) ?? OrigemMercadoria.Nacional;
+  const unidadeMedidaId = resolverUnidadeMedidaId(props.unidadeXml);
 
   form.value = {
     ...criarProdutoFormVazio(),
     descricao: props.descricaoProdutoXml?.trim() ?? '',
     precoVenda: formatarMoedaParaInput(props.precoSugerido ?? 0),
-    unidadeMedidaId: resolverUnidadeMedidaId(props.unidadeXml),
+    unidadeMedidaId: null,
     exigeLote: Boolean(props.numeroLoteXml?.trim()),
     exigeValidade: Boolean(props.dataValidadeXml?.trim()),
   };
@@ -305,9 +396,10 @@ function preencherFormulario(): void {
   fiscal.value = {
     ...criarFiscalFormVazio(),
     ncm: props.ncmXml?.trim() ?? '',
+    cest: props.cestXml?.trim() ?? '',
     origemMercadoria: origem,
-    csosn: props.csosnXml?.trim() ?? '',
-    cstIcms: props.cstIcmsXml?.trim() ?? '',
+    csosn: csosn.codigo,
+    cstIcms: cstIcms.codigo,
     aliquotaIcms:
       props.aliquotaIcmsXml != null && Number.isFinite(props.aliquotaIcmsXml)
         ? String(props.aliquotaIcmsXml)
@@ -318,16 +410,47 @@ function preencherFormulario(): void {
   };
 
   ean.value = props.eanXml?.trim() ?? '';
+
+  await nextTick();
+  if (!props.modelValue) return;
+  form.value.unidadeMedidaId = unidadeMedidaId;
 }
+
+let abertura = 0;
 
 watch(
   () => props.modelValue,
-  async (open) => {
+  (open) => {
     if (!open) return;
 
+    const ticket = ++abertura;
+    secaoProdutoAberta.value = true;
+    secaoFiscalAberta.value = true;
     void carregarCategorias();
-    await carregarUnidadesMedida({ ativo: true });
-    preencherFormulario();
+    void carregarUnidadesMedida({ ativo: true });
+    void preencherFormulario().then(() => {
+      const interno = fiscal.value.cfopPadraoInterno;
+      const externo = fiscal.value.cfopPadraoExterno;
+      void carregarCfops().then(() => {
+        if (ticket !== abertura || !props.modelValue) return;
+        if (fiscal.value.cfopPadraoInterno !== interno || fiscal.value.cfopPadraoExterno !== externo) return;
+        const cfop = resolverCfopSaidaDaNota(props.cfopXml, cfops.value);
+        fiscal.value.cfopPadraoInterno = cfop.interno;
+        fiscal.value.cfopPadraoExterno = cfop.externo;
+      });
+
+      const csosnAplicado = fiscal.value.csosn;
+      const cstIcmsAplicado = fiscal.value.cstIcms;
+      void carregarIcms().then(() => {
+        if (ticket !== abertura || !props.modelValue) return;
+        if (fiscal.value.csosn === csosnAplicado) {
+          fiscal.value.csosn = relacaoCsosn.value.codigo;
+        }
+        if (fiscal.value.cstIcms === cstIcmsAplicado) {
+          fiscal.value.cstIcms = relacaoCstIcms.value.codigo;
+        }
+      });
+    });
   },
 );
 
@@ -367,11 +490,6 @@ async function salvar(): Promise<void> {
   complementos.codigos = codigos;
   complementos.fiscal = { ...fiscal.value };
 
-  if (fiscalFormTemDados(complementos.fiscal) && apenasDigitos(complementos.fiscal.ncm).length !== 8) {
-    erro('Informe um NCM válido com 8 dígitos para salvar os dados fiscais.');
-    return;
-  }
-
   const produto = await criar(form.value, complementos, {
     mensagemSucesso: 'Produto cadastrado. Item vinculado ao recebimento.',
   });
@@ -386,12 +504,28 @@ async function salvar(): Promise<void> {
 </script>
 
 <style scoped>
-.dialog {
-  width: min(760px, 100vw);
+.dialog.q-card {
+  width: min(1240px, 94vw);
+  max-width: min(1240px, 94vw);
+  max-height: min(92vh, 920px);
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog__form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dialog__cabecalho {
+  border-bottom: var(--border-width-thin) solid var(--color-border-default);
 }
 
 .dialog__corpo {
-  max-height: min(75vh, 800px);
+  flex: 1;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -410,13 +544,26 @@ async function salvar(): Promise<void> {
 
 .agro-formulario {
   display: grid;
+  gap: var(--spacing-3);
+}
+
+.secao {
+  display: grid;
   gap: var(--spacing-4);
 }
 
-.form-grid-2 {
+.form-grid-2,
+.form-grid-3 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-3);
+}
+
+.form-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .form-flags {
@@ -425,33 +572,20 @@ async function salvar(): Promise<void> {
   gap: var(--spacing-4);
 }
 
-.xml-bloco {
-  display: grid;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4);
-  border: var(--border-width-thin) solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background: var(--color-neutral-50);
+.dialog__acoes {
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-surface-default);
+  border-top: var(--border-width-thin) solid var(--color-border-default);
 }
 
-.xml-bloco__titulo {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-}
-
-.xml-bloco__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-3);
+@media (max-width: 800px) {
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
-  .form-grid-2,
-  .xml-bloco__grid {
+  .form-grid-2 {
     grid-template-columns: 1fr;
   }
 }

@@ -16,6 +16,15 @@ export interface ItemNavegacao {
   query?: Record<string, string>;
 }
 
+export interface SecaoNavegacao {
+  id: string;
+  label: string;
+  icon: string;
+  filhos: ItemNavegacao[];
+  /** Rotas sem aba que pertencem à seção (ex.: telas acessadas por atalho). */
+  rotasRelacionadas?: string[];
+}
+
 export interface ModuloNavegacao {
   id: string;
   label: string;
@@ -28,6 +37,8 @@ export interface ModuloNavegacao {
   /** Oculta o módulo inteiro (ex.: Produção e Beneficiamento só indústria). */
   flag?: FlagNavegacao;
   filhos: ItemNavegacao[];
+  /** Quando presente, a sidebar agrupa os filhos e a subnav mostra só a seção ativa. */
+  secoes?: SecaoNavegacao[];
 }
 
 export interface GrupoNavegacao {
@@ -35,6 +46,117 @@ export interface GrupoNavegacao {
   label: string;
   modulos: ModuloNavegacao[];
 }
+
+function filhosDasSecoes(secoes: SecaoNavegacao[]): ItemNavegacao[] {
+  return secoes.flatMap((secao) => secao.filhos);
+}
+
+const SECOES_FISCAL: SecaoNavegacao[] = [
+  {
+    id: 'fiscal-notas',
+    label: 'Notas',
+    icon: 'receipt',
+    filhos: [
+      {
+        label: 'Notas fiscais',
+        routeName: 'fiscal-notas-fiscais',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'NF-e recebidas',
+        routeName: 'fiscal-nfes-recebidas',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Notas Entrada/Saída',
+        routeName: 'fiscal-notas-entrada-saida',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'fiscal-documentos',
+    label: 'Documentos',
+    icon: 'description',
+    filhos: [
+      {
+        label: 'Livro fiscal',
+        routeName: 'fiscal-livro-fiscal',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Obrigações fiscais',
+        routeName: 'fiscal-obrigacoes',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Plano de contas',
+        routeName: 'fiscal-plano-contas',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'fiscal-apuracao',
+    label: 'Apuração',
+    icon: 'calculate',
+    filhos: [
+      {
+        label: 'Apuração de ICMS',
+        routeName: 'fiscal-apuracao-icms',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Apuração de IPI',
+        routeName: 'fiscal-apuracao-ipi',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'fiscal-cadastros',
+    label: 'Cadastros',
+    icon: 'tune',
+    rotasRelacionadas: ['fiscal-calculo-impostos'],
+    filhos: [
+      {
+        label: 'CFOP',
+        routeName: 'fiscal-cfops',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'ICMS',
+        routeName: 'fiscal-icms',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'PIS/COFINS NCM',
+        routeName: 'fiscal-ncm-pis-cofins',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'MVA NCM/UF',
+        routeName: 'fiscal-mva-ncm-uf',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Funrural',
+        routeName: 'fiscal-funrural',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Regimes por CNPJ',
+        routeName: 'fiscal-regimes-cnpj',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+      {
+        label: 'Configuração fiscal',
+        routeName: 'fiscal-config',
+        permissao: Permissoes.Fiscal.Visualizar,
+      },
+    ],
+  },
+];
 
 /** Dashboard fora dos grupos — igual ao legado. */
 export const NAVEGACAO_DASHBOARD: ModuloNavegacao = {
@@ -130,11 +252,6 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           {
             label: 'Lotes',
             routeName: 'estoque-lotes',
-            permissao: Permissoes.Estoque.Visualizar,
-          },
-          {
-            label: 'Locais',
-            routeName: 'estoque-locais',
             permissao: Permissoes.Estoque.Visualizar,
           },
           {
@@ -486,53 +603,8 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         label: 'Fiscal e Tributário',
         icon: 'receipt_long',
         pathPrefixes: ['/fiscal'],
-        filhos: [
-          {
-            label: 'Notas fiscais',
-            routeName: 'fiscal-notas-fiscais',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'NF-e recebidas',
-            routeName: 'fiscal-nfes-recebidas',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'Notas Entrada/Saída',
-            routeName: 'fiscal-notas-entrada-saida',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'CFOP',
-            routeName: 'fiscal-cfops',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'PIS/COFINS NCM',
-            routeName: 'fiscal-ncm-pis-cofins',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'MVA NCM/UF',
-            routeName: 'fiscal-mva-ncm-uf',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'Funrural',
-            routeName: 'fiscal-funrural',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'Regimes por CNPJ',
-            routeName: 'fiscal-regimes-cnpj',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-          {
-            label: 'Configuração fiscal',
-            routeName: 'fiscal-config',
-            permissao: Permissoes.Fiscal.Visualizar,
-          },
-        ],
+        secoes: SECOES_FISCAL,
+        filhos: filhosDasSecoes(SECOES_FISCAL),
       },
       {
         id: 'cobranca',
@@ -710,6 +782,7 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
           '/tabelas-preco',
           '/unidades',
           '/categorias-produto',
+          '/galpoes',
           '/unidades-medida',
           '/fornecedores',
           '/colaboradores',
@@ -763,6 +836,11 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
             label: 'Categorias',
             routeName: 'categorias-produto',
             permissao: Permissoes.CategoriasProduto.Visualizar,
+          },
+          {
+            label: 'Galpões',
+            routeName: 'galpoes',
+            permissao: Permissoes.Produtos.Visualizar,
           },
           {
             label: 'Unid. de medida',

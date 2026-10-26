@@ -1,7 +1,7 @@
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { estoqueService } from 'services/estoque.service';
-import type { ListarLotesParams, LoteDto } from 'types/dtos/estoque.dto';
+import type { GarantirLoteProdutoPayload, ListarLotesParams, LoteDto } from 'types/dtos/estoque.dto';
 import type { GenealogiaLoteDto } from 'types/dtos/producao.dto';
 import { ref } from 'vue';
 
@@ -25,6 +25,15 @@ export function useEstoqueLotes() {
     }
   }
 
+  async function garantirLote(payload: GarantirLoteProdutoPayload): Promise<LoteDto | null> {
+    try {
+      return await estoqueService.garantirLote(payload);
+    } catch (e) {
+      erro(mensagem(e));
+      return null;
+    }
+  }
+
   async function obterGenealogia(loteId: string): Promise<boolean> {
     carregandoGenealogia.value = true;
     try {
@@ -45,6 +54,7 @@ export function useEstoqueLotes() {
     carregando,
     carregandoGenealogia,
     carregar,
+    garantirLote,
     obterGenealogia,
   };
 }

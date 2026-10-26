@@ -21,6 +21,7 @@ export interface ProdutoResumoDto {
   custoMedioPonderado: number | null;
   margemMinimaPercentual: number | null;
   ativo: boolean;
+  galpaoId: string | null;
 }
 
 export interface ProdutoFiscalDto {
@@ -77,6 +78,7 @@ export interface ProdutoDto extends Omit<ProdutoResumoDto, 'precoVenda' | 'custo
   precoVenda: number;
   custoMedioPonderado: number | null;
   fatorDivisaoNfe: number;
+  marca: string | null;
   margemMinimaPercentual: number | null;
   comissaoPercentual: number | null;
   fiscal: ProdutoFiscalDto | null;
@@ -91,12 +93,14 @@ export interface CriarProdutoPayload {
   categoriaProdutoId: string;
   tipoProduto: TipoProdutoValor;
   unidadeMedidaId: string;
+  galpaoId?: string | null;
   exigeLote: boolean;
   exigeValidade: boolean;
   exigeFabricacao: boolean;
   diasAlertaValidade?: number | null;
   precoVenda: number;
   fatorDivisaoNfe?: number;
+  marca?: string | null;
   margemMinimaPercentual?: number | null;
   comissaoPercentual?: number | null;
 }
@@ -156,6 +160,7 @@ export interface ListarProdutosParams {
 export interface ProdutoFormModel {
   descricao: string;
   categoriaProdutoId: string | null;
+  galpaoId: string | null;
   tipoProduto: TipoProdutoValor;
   unidadeMedidaId: string | null;
   exigeLote: boolean;
@@ -164,6 +169,7 @@ export interface ProdutoFormModel {
   diasAlertaValidade: string;
   precoVenda: string;
   fatorDivisaoNfe: string;
+  marca: string;
   margemMinimaPercentual: string;
   comissaoPercentual: string;
   metodoCusteio: MetodoCusteioValor | null;

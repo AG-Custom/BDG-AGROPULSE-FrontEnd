@@ -24,6 +24,7 @@ import type {
   FunruralCalculoDto,
   GerarGnrePayload,
   GuiaGnreDto,
+  IcmsDto,
   InutilizacaoPayload,
   ListarNotasFiscaisParams,
   ManifestacaoDestinatarioDto,
@@ -38,10 +39,12 @@ import type {
   RegimeTributarioCnpjDto,
   RegimeTributarioCnpjPayload,
   RelacionarCfopSaidaPayload,
+  RelacionarIcmsSaidaPayload,
   ReprocessarContingenciaDto,
   SugestaoModeloDocumentoDto,
   SugerirCompletoParams,
   SugestaoTributacaoCompletaDto,
+  TipoCodigoIcms,
   XmlNotaDto,
 } from 'types/dtos/fiscal-gestao.dto';
 
@@ -199,6 +202,18 @@ export const fiscalGestaoService = {
 
   relacionarCfopSaida(codigo: string, payload: RelacionarCfopSaidaPayload): Promise<CfopDto> {
     return api.put<CfopDto>(`/fiscal/cfops/${codigo}/saida`, payload).then((r) => r.data);
+  },
+
+  listarIcms(): Promise<IcmsDto[]> {
+    return api.get<IcmsDto[]>('/fiscal/icms').then((r) => r.data);
+  },
+
+  relacionarIcmsSaida(
+    tipo: TipoCodigoIcms,
+    codigo: string,
+    payload: RelacionarIcmsSaidaPayload,
+  ): Promise<IcmsDto> {
+    return api.put<IcmsDto>(`/fiscal/icms/${tipo}/${codigo}/saida`, payload).then((r) => r.data);
   },
 
   criarNcmPisCofins(payload: CriarNcmPisCofinsPayload): Promise<NcmPisCofinsDto> {

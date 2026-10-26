@@ -35,11 +35,16 @@
         />
       </div>
       <div class="col-12 col-md-6">
-        <q-input
-          v-model="planoContas"
+        <q-select
+          :model-value="planoContas || null"
           outlined
+          emit-value
+          map-options
+          clearable
           label="Plano de contas"
+          :options="planoContasOpcoes"
           :readonly="readonly"
+          @update:model-value="planoContas = $event ?? ''"
         />
       </div>
     </div>
@@ -88,12 +93,17 @@
         />
       </div>
       <div class="col-12 col-md-3">
-        <q-input
-          v-model="parcela.planoContas"
+        <q-select
+          :model-value="parcela.planoContas || null"
           outlined
           dense
+          emit-value
+          map-options
+          clearable
           label="Plano de contas (parcela)"
+          :options="planoContasOpcoes"
           :readonly="readonly"
+          @update:model-value="parcela.planoContas = $event ?? ''"
         />
       </div>
       <div v-if="!readonly" class="col-12">
@@ -133,6 +143,7 @@ withDefaults(
   defineProps<{
     fatura?: PreviewRecebimentoXmlFaturaDto | null;
     centroCustoOpcoes: Array<{ label: string; value: string }>;
+    planoContasOpcoes: Array<{ label: string; value: string }>;
     readonly?: boolean;
     embutido?: boolean;
   }>(),

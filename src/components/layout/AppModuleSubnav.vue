@@ -2,7 +2,7 @@
   <nav v-if="mostrarSubnav" class="app-module-subnav" aria-label="Subnavegação do módulo">
     <div class="app-module-subnav__scroll">
       <router-link
-        v-for="item in filhosVisiveis"
+        v-for="item in filhosSubnav"
         :key="chaveItem(item)"
         :to="destinoItem(item)"
         class="app-module-subnav__link"
@@ -21,7 +21,7 @@ import type { ItemNavegacao } from 'constants/navegacao-modulos';
 import type { RouteLocationRaw } from 'vue-router';
 
 const {
-  filhosVisiveis,
+  filhosSubnav,
   mostrarSubnav,
   filhoAtivo,
   moduloAtivo,

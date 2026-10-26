@@ -26,6 +26,10 @@ import type {
   ListarRecebimentosCompraParams,
   ListarSolicitacoesCompraParams,
   PedidoCompraDto,
+  CompararFiscalEntradaDto,
+  CompararFiscalEntradaPayload,
+  ConverterQuantidadeNfeDto,
+  ConverterQuantidadeNfePayload,
   PreviewRecebimentoXmlDto,
   PreviewXmlRecebimentoPayload,
   RecebimentoCompraDto,
@@ -219,6 +223,22 @@ export const comprasService = {
   ): Promise<PreviewRecebimentoXmlDto> {
     return api
       .post<PreviewRecebimentoXmlDto>('/compras/recebimentos/preview-xml', payload)
+      .then((r) => r.data);
+  },
+
+  compararFiscalRecebimento(
+    payload: CompararFiscalEntradaPayload,
+  ): Promise<CompararFiscalEntradaDto> {
+    return api
+      .post<CompararFiscalEntradaDto>('/compras/recebimentos/comparar-fiscal', payload)
+      .then((r) => r.data);
+  },
+
+  converterQuantidadeNfe(
+    payload: ConverterQuantidadeNfePayload,
+  ): Promise<ConverterQuantidadeNfeDto> {
+    return api
+      .post<ConverterQuantidadeNfeDto>('/compras/recebimentos/converter-quantidade', payload)
       .then((r) => r.data);
   },
 

@@ -1,5 +1,5 @@
 <template>
-  <agro-card class="secao-expansivel">
+  <agro-card class="secao-expansivel" :class="{ 'secao-expansivel--compacta': compacta }">
     <button
       type="button"
       class="secao-expansivel__cabecalho"
@@ -26,10 +26,16 @@
 <script setup lang="ts">
 import AgroCard from 'components/ui/AgroCard.vue';
 
-defineProps<{
-  titulo: string;
-  subtitulo?: string;
-}>();
+withDefaults(
+  defineProps<{
+    titulo: string;
+    subtitulo?: string;
+    compacta?: boolean;
+  }>(),
+  {
+    compacta: false,
+  },
+);
 
 const aberto = defineModel<boolean>({ default: true });
 </script>
@@ -86,5 +92,36 @@ const aberto = defineModel<boolean>({ default: true });
 
 .secao-expansivel__corpo {
   padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.secao-expansivel--compacta .secao-expansivel__cabecalho {
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.secao-expansivel--compacta .secao-expansivel__textos {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-3);
+}
+
+.secao-expansivel--compacta .secao-expansivel__titulo {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.secao-expansivel--compacta .secao-expansivel__subtitulo {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.secao-expansivel--compacta .secao-expansivel__icone {
+  font-size: 1.25rem;
+}
+
+.secao-expansivel--compacta .secao-expansivel__corpo {
+  padding: 0 var(--spacing-4) var(--spacing-3);
 }
 </style>

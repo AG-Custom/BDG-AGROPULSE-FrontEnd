@@ -249,6 +249,20 @@ export interface RelacionarCfopSaidaPayload {
   cfopSaida: string | null;
 }
 
+export type TipoCodigoIcms = 'Cst' | 'Csosn';
+
+export interface IcmsDto {
+  tipo: TipoCodigoIcms;
+  codigo: string;
+  descricao: string;
+  icmsSaida: string | null;
+  icmsSaidaDescricao: string | null;
+}
+
+export interface RelacionarIcmsSaidaPayload {
+  icmsSaida: string | null;
+}
+
 export interface NcmPisCofinsDto {
   id: string;
   ncm: string;

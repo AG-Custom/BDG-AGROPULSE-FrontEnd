@@ -91,6 +91,7 @@ export function criarProdutoFormVazio(): ProdutoFormModel {
   return {
     descricao: '',
     categoriaProdutoId: null,
+    galpaoId: null,
     tipoProduto: TipoProduto.InsumoAgricola,
     unidadeMedidaId: null,
     exigeLote: false,
@@ -99,6 +100,7 @@ export function criarProdutoFormVazio(): ProdutoFormModel {
     diasAlertaValidade: '',
     precoVenda: '',
     fatorDivisaoNfe: '1',
+    marca: '',
     margemMinimaPercentual: '',
     comissaoPercentual: '',
     metodoCusteio: null,
@@ -110,6 +112,7 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
   return {
     descricao: dto.descricao,
     categoriaProdutoId: dto.categoriaProdutoId,
+    galpaoId: dto.galpaoId,
     tipoProduto: dto.tipoProduto,
     unidadeMedidaId: dto.unidadeMedidaId,
     exigeLote: dto.exigeLote,
@@ -121,6 +124,7 @@ export function produtoDtoParaForm(dto: ProdutoDto): ProdutoFormModel {
         : '',
     precoVenda: formatarMoedaParaInput(dto.precoVenda),
     fatorDivisaoNfe: String(dto.fatorDivisaoNfe),
+    marca: dto.marca ?? '',
     margemMinimaPercentual:
       dto.margemMinimaPercentual !== null ? String(dto.margemMinimaPercentual) : '',
     comissaoPercentual: dto.comissaoPercentual !== null ? String(dto.comissaoPercentual) : '',
@@ -147,6 +151,7 @@ function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
   return {
     descricao: form.descricao.trim(),
     categoriaProdutoId: form.categoriaProdutoId!,
+    galpaoId: form.galpaoId,
     tipoProduto: form.tipoProduto,
     unidadeMedidaId: form.unidadeMedidaId!,
     exigeLote: form.exigeLote,
@@ -155,6 +160,7 @@ function montarPayloadBase(form: ProdutoFormModel): CriarProdutoPayload {
     diasAlertaValidade: parseNumeroOpcional(form.diasAlertaValidade),
     precoVenda: parseMascaraMoeda(form.precoVenda) ?? 0,
     fatorDivisaoNfe: parseNumeroOpcional(form.fatorDivisaoNfe) ?? 1,
+    marca: form.marca.trim() || null,
     margemMinimaPercentual: parseNumeroOpcional(form.margemMinimaPercentual),
     comissaoPercentual: parseNumeroOpcional(form.comissaoPercentual),
   };
