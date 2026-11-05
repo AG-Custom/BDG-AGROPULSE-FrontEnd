@@ -5,7 +5,7 @@
         <h4 class="titulo">Operação não realizada</h4>
       </q-card-section>
       <q-card-section>
-        <p v-if="quantidade > 1" class="quantidade">
+        <p v-if="(quantidade ?? 0) > 1" class="quantidade">
           A justificativa será registrada nas {{ quantidade }} notas selecionadas.
         </p>
         <q-form greedy class="agro-formulario" @submit.prevent="confirmar">
