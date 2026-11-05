@@ -21,6 +21,7 @@
           :modo="modoFormulario"
           :somente-leitura="somenteLeitura || produtoInativo"
           :custo-medio-ponderado="produtoCarregado?.custoMedioPonderado"
+          :numero="produtoCarregado?.numero"
         />
 
         <div

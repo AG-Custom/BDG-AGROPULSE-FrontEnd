@@ -7,6 +7,7 @@ import type {
   CancelarNotaFiscalPayload,
   CartaCorrecaoDto,
   CartaCorrecaoPayload,
+  CfopDto,
   CfopOverrideLogDto,
   CfopOverridePayload,
   ConfigFunruralDto,
@@ -23,20 +24,27 @@ import type {
   FunruralCalculoDto,
   GerarGnrePayload,
   GuiaGnreDto,
+  IcmsDto,
   InutilizacaoPayload,
   ListarNotasFiscaisParams,
   ManifestacaoDestinatarioDto,
   ManifestarDestinatarioPayload,
+  FiltroNfeRecebida,
+  NfeRecebidaDto,
+  SincronizarNfesRecebidasDto,
   MvaNcmUfDto,
   NcmPisCofinsDto,
   NotaFiscalGestaoDto,
   NumeracaoInutilizadaDto,
   RegimeTributarioCnpjDto,
   RegimeTributarioCnpjPayload,
+  RelacionarCfopSaidaPayload,
+  RelacionarIcmsSaidaPayload,
   ReprocessarContingenciaDto,
   SugestaoModeloDocumentoDto,
   SugerirCompletoParams,
   SugestaoTributacaoCompletaDto,
+  TipoCodigoIcms,
   XmlNotaDto,
 } from 'types/dtos/fiscal-gestao.dto';
 
@@ -188,6 +196,26 @@ export const fiscalGestaoService = {
     return api.get<NcmPisCofinsDto[]>('/fiscal/ncm-pis-cofins').then((r) => r.data);
   },
 
+  listarCfops(): Promise<CfopDto[]> {
+    return api.get<CfopDto[]>('/fiscal/cfops').then((r) => r.data);
+  },
+
+  relacionarCfopSaida(codigo: string, payload: RelacionarCfopSaidaPayload): Promise<CfopDto> {
+    return api.put<CfopDto>(`/fiscal/cfops/${codigo}/saida`, payload).then((r) => r.data);
+  },
+
+  listarIcms(): Promise<IcmsDto[]> {
+    return api.get<IcmsDto[]>('/fiscal/icms').then((r) => r.data);
+  },
+
+  relacionarIcmsSaida(
+    tipo: TipoCodigoIcms,
+    codigo: string,
+    payload: RelacionarIcmsSaidaPayload,
+  ): Promise<IcmsDto> {
+    return api.put<IcmsDto>(`/fiscal/icms/${tipo}/${codigo}/saida`, payload).then((r) => r.data);
+  },
+
   criarNcmPisCofins(payload: CriarNcmPisCofinsPayload): Promise<NcmPisCofinsDto> {
     return api.post<NcmPisCofinsDto>('/fiscal/ncm-pis-cofins', payload).then((r) => r.data);
   },
@@ -264,6 +292,18 @@ export const fiscalGestaoService = {
   manifestar(payload: ManifestarDestinatarioPayload): Promise<ManifestacaoDestinatarioDto> {
     return api
       .post<ManifestacaoDestinatarioDto>('/fiscal/sefaz/manifestar', payload)
+      .then((r) => r.data);
+  },
+
+  listarNfesRecebidas(filtro: FiltroNfeRecebida): Promise<NfeRecebidaDto[]> {
+    return api
+      .get<NfeRecebidaDto[]>('/fiscal/nfes-recebidas', { params: { filtro } })
+      .then((r) => r.data);
+  },
+
+  sincronizarNfesRecebidas(): Promise<SincronizarNfesRecebidasDto> {
+    return api
+      .post<SincronizarNfesRecebidasDto>('/fiscal/nfes-recebidas/sincronizar')
       .then((r) => r.data);
   },
 };

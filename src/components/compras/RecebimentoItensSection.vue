@@ -7,7 +7,7 @@
     <div v-if="itensSemProduto.length > 0" class="banner-faltantes" role="status">
       <div class="banner-faltantes__titulo">Produtos do XML não cadastrados nesta unidade</div>
       <p class="banner-faltantes__texto">
-        A NF-e tem itens que não bateram 100% com o cadastro. Cadastre-os aqui para continuar.
+        A NF-e tem itens que não bateram 100% com o cadastro. Cadastre o produto com NCM e origem para continuar.
       </p>
       <ul class="banner-faltantes__lista">
         <li v-for="item in produtosFaltantes" :key="chaveProdutoXml(item)">
@@ -22,6 +22,30 @@
             label="Cadastrar produto"
             descricao="Cadastrar produto do XML"
             @click="emit('cadastrar', item)"
+          />
+        </li>
+      </ul>
+    </div>
+
+    <div v-if="itensComDivergenciaFiscal.length > 0" class="banner-faltantes" role="status">
+      <div class="banner-faltantes__titulo">Dados fiscais da nota diferem do cadastro</div>
+      <p class="banner-faltantes__texto">
+        Estes produtos já existem no sistema e alguma tag fiscal da NF-e está diferente. Revise os campos marcados. O cadastro não é alterado sozinho.
+        <span v-if="itensSemNcmCadastro.length"> Sem NCM no cadastro, a entrada do recebimento fica bloqueada.</span>
+      </p>
+      <ul class="banner-faltantes__lista">
+        <li v-for="item in itensComDivergenciaFiscal" :key="item.chave">
+          <span class="banner-faltantes__item" :title="rotuloItemXml(item)">
+            {{ rotuloItemXmlCurto(item) }}
+            · {{ rotulosDivergencia(item) }}
+          </span>
+          <agro-btn
+            unelevated
+            dense
+            color="warning"
+            label="Editar"
+            descricao="Editar dados fiscais do item"
+            @click="abrirDialogEditar(item)"
           />
         </li>
       </ul>
@@ -70,10 +94,17 @@
 
       <template #body-cell-status="props">
         <q-td :props="props">
-          <agro-badge
-            :label="props.row.produtoId ? 'Vinculado' : 'Sem cadastro'"
-            :variant="props.row.produtoId ? 'success' : 'warning'"
-          />
+          <div class="recebimento-itens__status">
+            <agro-badge
+              :label="props.row.produtoId ? 'Vinculado' : 'Sem cadastro'"
+              :variant="props.row.produtoId ? 'success' : 'warning'"
+            />
+            <agro-badge
+              v-if="props.row.divergenciasFiscais.length > 0"
+              label="Revisar fiscal"
+              variant="warning"
+            />
+          </div>
         </q-td>
       </template>
 
@@ -107,7 +138,7 @@
             :mostrar-visualizar="false"
             :mostrar-status="false"
             :mostrar-excluir="itens.length > 1"
-            editar-label="Editar item"
+            :editar-label="props.row.divergenciasFiscais.length > 0 ? 'Editar fiscal' : 'Editar item'"
             excluir-label="Remover item"
             @editar="abrirDialogEditar(props.row)"
             @excluir="removerItem(props.row.chave)"
@@ -133,8 +164,10 @@
               modo="form"
               :produto-opcoes="produtoOpcoes"
               :pode-remover="false"
+              :atualizando-fiscal="salvandoFiscal"
               @cadastrar="emit('cadastrar', itemForm)"
               @atualizar-produtos="emit('atualizarProdutos')"
+              @atualizar-fiscal="atualizarFiscalCadastro"
             />
           </q-form>
         </q-card-section>
@@ -161,9 +194,12 @@ import RecebimentoNfeItemCard, {
 import AgroAcoesMenu from 'components/ui/AgroAcoesMenu.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
+import { useProdutoFiscal } from 'composables/useProdutoFiscal';
+import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import type { QForm, QTableColumn } from 'quasar';
 import { formatarMoeda, formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
-import { computed, ref } from 'vue';
+import { produtoSemNcmNoCadastro } from 'utils/recebimento-fiscal';
+import { computed, ref, watch } from 'vue';
 
 export interface RecebimentoItemForm extends RecebimentoNfeItemFormModel {
   chave: string;
@@ -180,6 +216,9 @@ const emit = defineEmits<{
   atualizarProdutos: [];
 }>();
 
+const { lembrarFiscal, invalidarFiscal, sincronizarDivergenciasFiscais } = useRecebimentosCompra();
+const { salvando: salvandoFiscal, aplicarDaNota } = useProdutoFiscal(() => itemForm.value.produtoId);
+
 const dialogAberto = ref(false);
 const indiceEdicao = ref<number | null>(null);
 const itemForm = ref<RecebimentoItemForm>(criarItemVazio());
@@ -188,6 +227,16 @@ const formRef = ref<QForm | null>(null);
 const itensSemProduto = computed(() =>
   itens.value.filter((item) => !item.produtoId && (!!item.codigoProdutoXml || !!item.descricaoProdutoXml)),
 );
+
+const itensComDivergenciaFiscal = computed(() =>
+  itens.value.filter((item) => item.produtoId && item.divergenciasFiscais.length > 0),
+);
+
+const itensSemNcmCadastro = computed(() => itens.value.filter(produtoSemNcmNoCadastro));
+
+function rotulosDivergencia(item: RecebimentoItemForm): string {
+  return item.divergenciasFiscais.map((diferenca) => diferenca.rotulo).join(', ');
+}
 
 function chaveProdutoXml(item: RecebimentoItemForm): string {
   const codigo = item.codigoProdutoXml?.trim();
@@ -245,8 +294,10 @@ function criarItemVazio(): RecebimentoItemForm {
     codigoProdutoXml: '',
     descricaoProdutoXml: '',
     ncm: '',
+    cest: '',
     cfop: '',
     unidade: '',
+    unidadeMedidaId: '',
     ean: '',
     origem: '',
     cstIcms: '',
@@ -266,6 +317,11 @@ function criarItemVazio(): RecebimentoItemForm {
     quantidadeNota: '1',
     quantidadeRecebida: '1',
     custoUnitario: formatarMoedaParaInput(0),
+    fatorDivisaoNfe: 1,
+    quantidadeEstoque: null,
+    custoUnitarioEstoque: null,
+    marcaXml: '',
+    divergenciasFiscais: [],
     numeroLote: '',
     dataValidade: '',
     tipoCusto: null,
@@ -322,8 +378,59 @@ function abrirDialogNovo(): void {
 function abrirDialogEditar(item: RecebimentoItemForm): void {
   const indice = itens.value.findIndex((atual) => atual.chave === item.chave);
   indiceEdicao.value = indice >= 0 ? indice : null;
-  itemForm.value = { ...item };
+  itemForm.value = { ...item, divergenciasFiscais: [...item.divergenciasFiscais] };
+  lembrarFiscal(itemForm.value);
   dialogAberto.value = true;
+}
+
+let fiscalTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(
+  () =>
+    dialogAberto.value
+      ? `${itemForm.value.chave}|${itemForm.value.produtoId}|${itemForm.value.ncm}|${itemForm.value.cest}|${itemForm.value.origem}|${itemForm.value.cstIcms}|${itemForm.value.csosn}|${itemForm.value.aliquotaIcms}`
+      : '',
+  () => {
+    if (!dialogAberto.value) return;
+    clearTimeout(fiscalTimer);
+    fiscalTimer = setTimeout(() => {
+      void sincronizarDivergenciasFiscais([itemForm.value]);
+    }, 400);
+  },
+);
+
+async function atualizarFiscalCadastro(): Promise<void> {
+  const item = itemForm.value;
+  const ok = await aplicarDaNota({
+    ncm: item.ncm,
+    cest: item.cest,
+    origem: item.origem,
+    cstIcms: item.cstIcms,
+    csosn: item.csosn,
+    aliquotaIcms: item.aliquotaIcms,
+    campos: item.divergenciasFiscais.map((diferenca) => diferenca.campo),
+  });
+  if (!ok) return;
+
+  invalidarFiscal(item.chave);
+  await sincronizarDivergenciasFiscais([item]);
+
+  if (indiceEdicao.value === null) return;
+  const atualizados = [...itens.value];
+  const atual = atualizados[indiceEdicao.value];
+  if (!atual) return;
+  atualizados[indiceEdicao.value] = {
+    ...atual,
+    ncm: item.ncm,
+    cest: item.cest,
+    origem: item.origem,
+    cstIcms: item.cstIcms,
+    csosn: item.csosn,
+    aliquotaIcms: item.aliquotaIcms,
+    divergenciasFiscais: [...item.divergenciasFiscais],
+  };
+  itens.value = atualizados;
+  lembrarFiscal(itens.value[indiceEdicao.value]);
 }
 
 function fecharDialog(): void {
@@ -406,6 +513,12 @@ async function salvarItem(): Promise<void> {
 .recebimento-itens__dialog-corpo {
   max-height: min(70vh, 720px);
   overflow: auto;
+}
+
+.recebimento-itens__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
 }
 
 .banner-faltantes {

@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+import { TributoApuracao } from 'constants/enums';
 import { Permissoes } from 'constants/permissoes';
 
 export const routes: RouteRecordRaw[] = [
@@ -314,6 +315,15 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'galpoes',
+        name: 'galpoes',
+        component: () => import('pages/galpoes/GalpoesListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.galpoes',
+          permissao: Permissoes.Produtos.Visualizar,
+        },
+      },
+      {
         path: 'categorias-produto',
         name: 'categorias-produto',
         component: () => import('pages/categorias-produto/CategoriasProdutoListPage.vue'),
@@ -385,15 +395,6 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('pages/estoque/LotesListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.estoqueLotes',
-          permissao: Permissoes.Estoque.Visualizar,
-        },
-      },
-      {
-        path: 'estoque/locais',
-        name: 'estoque-locais',
-        component: () => import('pages/estoque/LocaisEstoquePage.vue'),
-        meta: {
-          breadcrumb: 'navegacao.estoqueLocais',
           permissao: Permissoes.Estoque.Visualizar,
         },
       },
@@ -1007,11 +1008,93 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'fiscal/nfes-recebidas',
+        name: 'fiscal-nfes-recebidas',
+        component: () => import('pages/fiscal/NfeRecebidasListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.nfesRecebidas',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/livro-fiscal',
+        name: 'fiscal-livro-fiscal',
+        component: () => import('pages/fiscal/LivroFiscalPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.livroFiscal',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/plano-contas',
+        name: 'fiscal-plano-contas',
+        component: () => import('pages/fiscal/PlanoContasPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.planoContas',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/apuracao-icms',
+        name: 'fiscal-apuracao-icms',
+        component: () => import('pages/fiscal/ApuracaoFiscalPage.vue'),
+        props: { tributo: TributoApuracao.Icms },
+        meta: {
+          breadcrumb: 'navegacao.apuracaoIcms',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/apuracao-ipi',
+        name: 'fiscal-apuracao-ipi',
+        component: () => import('pages/fiscal/ApuracaoFiscalPage.vue'),
+        props: { tributo: TributoApuracao.Ipi },
+        meta: {
+          breadcrumb: 'navegacao.apuracaoIpi',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/obrigacoes',
+        name: 'fiscal-obrigacoes',
+        component: () => import('pages/fiscal/ObrigacoesFiscaisPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.obrigacoesFiscais',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
         path: 'fiscal/notas-entrada-saida',
         name: 'fiscal-notas-entrada-saida',
         component: () => import('pages/fiscal/NotasEntradaSaidaListPage.vue'),
         meta: {
           breadcrumb: 'navegacao.notasEntradaSaida',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/cfops',
+        name: 'fiscal-cfops',
+        component: () => import('pages/fiscal/CfopListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.cfops',
+          breadcrumbPais: ['navegacao.fiscal'],
+          permissao: Permissoes.Fiscal.Visualizar,
+        },
+      },
+      {
+        path: 'fiscal/icms',
+        name: 'fiscal-icms',
+        component: () => import('pages/fiscal/IcmsListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.icms',
           breadcrumbPais: ['navegacao.fiscal'],
           permissao: Permissoes.Fiscal.Visualizar,
         },

@@ -28,6 +28,7 @@ export const LABELS_MODELO_AUDITORIA: Record<string, string> = {
   NotaFiscal: 'Nota fiscal',
   Lote: 'Lote',
   LocalEstoque: 'Local de estoque',
+  Galpao: 'Galpão',
   UsuarioEmpresa: 'Vínculo de usuário',
   Colaborador: 'Colaborador',
   TabelaPreco: 'Tabela de preço',

@@ -1,7 +1,6 @@
 import type {
   AtalhoPeriodoEstoqueValor,
   InventarioStatusValor,
-  NivelLocalEstoqueValor,
   OrigemMovimentacaoEstoqueValor,
   TipoMovimentacaoEstoqueValor,
 } from 'constants/enums';
@@ -16,54 +15,28 @@ export interface LoteDto {
   dataFabricacao: string | null;
   custoUnitario: number;
   quantidade: number;
-  deposito: string | null;
-  galpao: string | null;
-  corredor: string | null;
-  prateleira: string | null;
-  localEstoqueId: string | null;
   notaFiscalOrigemId: string | null;
   ativo: boolean;
+  localizacao?: string | null;
+  numeroLoteEntrada?: string | null;
 }
 
-export interface LocalEstoqueDto {
-  id: string;
-  empresaId: string;
-  unidadeId: string;
-  parentId: string | null;
-  nivel: NivelLocalEstoqueValor;
-  codigo: string;
-  nome: string;
-  ativo: boolean;
-  caminho: string;
-}
-
-export interface LocalEstoqueNoDto extends LocalEstoqueDto {
-  filhos: LocalEstoqueNoDto[];
-}
-
-export interface CriarLocalEstoquePayload {
-  parentId?: string | null;
-  nivel: NivelLocalEstoqueValor;
-  codigo: string;
-  nome: string;
-}
-
-export interface EditarLocalEstoquePayload {
-  codigo: string;
-  nome: string;
-}
-
-export interface ListarLocaisEstoqueParams {
-  ativo?: boolean;
-  nivel?: NivelLocalEstoqueValor;
-  parentId?: string;
-  apenasRaizes?: boolean;
-  formato?: 'flat' | 'tree';
+export interface GarantirLoteProdutoPayload {
+  produtoId: string;
+  numeroLote: string;
+  dataValidade?: string | null;
+  dataFabricacao?: string | null;
+  custoUnitario?: number | null;
+  localizacaoEstoque?: string | null;
 }
 
 export interface SaldoProdutoDto {
   produtoId: string;
   saldo: number;
+  custo: number | null;
+  totalCusto: number | null;
+  precoVenda: number | null;
+  totalVenda: number | null;
 }
 
 export interface MovimentacaoEstoqueDto {
@@ -107,11 +80,6 @@ export interface InventarioDto {
   iniciadoEm: string;
   concluidoEm: string | null;
   categoriaProdutoId: string | null;
-  deposito: string | null;
-  galpao: string | null;
-  corredor: string | null;
-  prateleira: string | null;
-  localEstoqueId: string | null;
   itens: InventarioItemDto[];
 }
 
@@ -161,11 +129,6 @@ export interface EntradaEstoquePayload {
   dataFabricacao?: string | null;
   custoUnitario?: number | null;
   quantidade: number;
-  deposito?: string | null;
-  galpao?: string | null;
-  corredor?: string | null;
-  prateleira?: string | null;
-  localEstoqueId?: string | null;
   notaFiscalOrigemId?: string | null;
 }
 
@@ -179,11 +142,6 @@ export interface SaidaEstoquePayload {
 
 export interface IniciarInventarioPayload {
   categoriaProdutoId?: string | null;
-  deposito?: string | null;
-  galpao?: string | null;
-  corredor?: string | null;
-  prateleira?: string | null;
-  localEstoqueId?: string | null;
 }
 
 export interface CriarTransferenciaEstoquePayload {
@@ -197,10 +155,6 @@ export interface CriarTransferenciaEstoquePayload {
     dataValidade?: string | null;
     dataFabricacao?: string | null;
     custoUnitario?: number | null;
-    deposito?: string | null;
-    galpao?: string | null;
-    corredor?: string | null;
-    prateleira?: string | null;
   }>;
 }
 
@@ -273,11 +227,6 @@ export interface EntradaEstoqueFormModel {
   dataFabricacao: string;
   custoUnitario: string;
   quantidade: string;
-  deposito: string;
-  galpao: string;
-  corredor: string;
-  prateleira: string;
-  localEstoqueId: string | null;
 }
 
 export interface SaidaEstoqueFormModel {

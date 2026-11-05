@@ -50,29 +50,51 @@
       <div v-if="!collapsed" class="app-sidebar__grupo-label">
         {{ grupo.label }}
       </div>
-      <q-item
-        v-for="modulo in grupo.modulos"
-        :key="modulo.id"
-        clickable
-        v-ripple
-        :to="modulo.routeNameDestino ? { name: modulo.routeNameDestino } : undefined"
-        active-class=""
-        exact-active-class=""
-        class="app-sidebar__item"
-        :class="{ 'app-sidebar__item--active': moduloAtivo?.id === modulo.id }"
-        :aria-label="modulo.label"
-        @click="definirModuloPreferido(modulo.id)"
-      >
-        <q-item-section avatar class="app-sidebar__icon">
-          <q-icon :name="modulo.icon" size="20px" />
-        </q-item-section>
-        <q-item-section v-if="!collapsed" class="app-sidebar__label">
-          {{ modulo.label }}
-        </q-item-section>
-        <q-tooltip v-if="collapsed" anchor="center right" self="center left" :offset="[8, 0]">
-          {{ modulo.label }}
-        </q-tooltip>
-      </q-item>
+      <template v-for="modulo in grupo.modulos" :key="modulo.id">
+        <q-item
+          clickable
+          v-ripple
+          :to="destinoModulo(modulo, collapsed)"
+          active-class=""
+          exact-active-class=""
+          class="app-sidebar__item"
+          :class="{ 'app-sidebar__item--active': moduloAtivo?.id === modulo.id }"
+          :aria-label="modulo.label"
+          @click="definirModuloPreferido(modulo.id)"
+        >
+          <q-item-section avatar class="app-sidebar__icon">
+            <q-icon :name="modulo.icon" size="20px" />
+          </q-item-section>
+          <q-item-section v-if="!collapsed" class="app-sidebar__label">
+            {{ modulo.label }}
+          </q-item-section>
+          <q-tooltip v-if="collapsed" anchor="center right" self="center left" :offset="[8, 0]">
+            {{ modulo.label }}
+          </q-tooltip>
+          <q-menu
+            v-if="collapsed && modulo.secoesVisiveis.length > 0"
+            anchor="center right"
+            self="center left"
+            :offset="[8, 0]"
+            content-class="sidebar-secoes-menu"
+          >
+            <app-sidebar-secoes
+              flutuante
+              :secoes="modulo.secoesVisiveis"
+              :secao-ativa-id="moduloAtivo?.id === modulo.id ? (secaoAtiva?.id ?? null) : null"
+              :rotulo-modulo="modulo.label"
+              @selecionar="definirModuloPreferido(modulo.id)"
+            />
+          </q-menu>
+        </q-item>
+        <app-sidebar-secoes
+          v-if="!collapsed && moduloAtivo?.id === modulo.id && modulo.secoesVisiveis.length > 0"
+          :secoes="modulo.secoesVisiveis"
+          :secao-ativa-id="secaoAtiva?.id ?? null"
+          :rotulo-modulo="modulo.label"
+          @selecionar="definirModuloPreferido(modulo.id)"
+        />
+      </template>
     </div>
     </template>
   </nav>
@@ -80,8 +102,13 @@
 
 <script setup lang="ts">
 import AppSidebarBusca from 'components/layout/AppSidebarBusca.vue';
-import { useNavegacaoModulos } from 'composables/useNavegacaoModulos';
+import AppSidebarSecoes from 'components/layout/AppSidebarSecoes.vue';
+import {
+  useNavegacaoModulos,
+  type ModuloNavegacaoVisivel,
+} from 'composables/useNavegacaoModulos';
 import { ref } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 defineProps<{
   collapsed?: boolean;
@@ -94,8 +121,19 @@ const {
   dashboardVisivel,
   gruposVisiveis,
   moduloAtivo,
+  secaoAtiva,
   definirModuloPreferido,
 } = useNavegacaoModulos();
+
+function destinoModulo(
+  modulo: ModuloNavegacaoVisivel,
+  recolhida: boolean | undefined,
+): RouteLocationRaw | undefined {
+  if (recolhida && modulo.secoesVisiveis.length > 0) {
+    return undefined;
+  }
+  return modulo.routeNameDestino ? { name: modulo.routeNameDestino } : undefined;
+}
 </script>
 
 <style scoped>
@@ -207,5 +245,14 @@ const {
 :deep(.app-sidebar__item--active) .q-icon,
 .app-sidebar__item--active :deep(.q-icon) {
   color: var(--color-sidebar-accent);
+}
+</style>
+
+<style>
+.sidebar-secoes-menu {
+  background: var(--color-sidebar-bg);
+  border: var(--border-width-thin) solid var(--color-sidebar-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 </style>

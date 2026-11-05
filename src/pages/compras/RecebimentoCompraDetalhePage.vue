@@ -63,14 +63,35 @@
               <div class="text-caption">Chave de acesso</div>
               <div class="text-metric chave">{{ recebimento.chaveAcesso || '—' }}</div>
             </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <q-input
+                v-model="localizacaoEstoque"
+                outlined
+                label="Localização estoque"
+                maxlength="200"
+                hint="Opcional. Gravada nos lotes desta entrada"
+                :disable="!podeEditar"
+              />
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 flex items-center">
+              <q-toggle
+                v-model="gerarLancamentosEfdContribuicoes"
+                color="primary"
+                label="Gerar lançamentos EFD Contribuições"
+                :disable="!podeEditar"
+              />
+            </div>
           </div>
         </RecebimentoSecaoExpansivel>
 
         <RecebimentoSecaoExpansivel
           v-model="secoes.produtos"
           titulo="Produtos"
-          :subtitulo="`${itensForm.length} item(ns) na conferência`"
+          :subtitulo="subtituloProdutos"
         >
+          <p v-if="itensSemNcmCadastro.length > 0" class="aviso-fiscal">
+            Cadastre o NCM desses produtos antes de confirmar. Sem esse dado, a entrada fica bloqueada.
+          </p>
           <div class="itens-lista">
             <RecebimentoNfeItemCard
               v-for="(item, index) in itensForm"
@@ -81,8 +102,10 @@
               :produto-label="rotuloProduto(item.produtoId)"
               :readonly="!podeEditar"
               :mostrar-precificacao="podeEditar"
+              :atualizando-fiscal="atualizandoFiscalChave === item.chave"
               @margem-change="onMargemChange(item)"
               @preco-change="onPrecoChange(item)"
+              @atualizar-fiscal="atualizarFiscalCadastro(item)"
             />
           </div>
         </RecebimentoSecaoExpansivel>
@@ -98,6 +121,7 @@
             v-model:parcelas="parcelas"
             :fatura="fatura"
             :centro-custo-opcoes="centroCustoOpcoes"
+            :plano-contas-opcoes="planoContasOpcoes"
             v-model:centro-custo-id="centroCustoId"
             v-model:plano-contas="planoContas"
             :readonly="!podeEditar"
@@ -224,7 +248,10 @@ import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useCentrosCusto } from 'composables/useCentrosCusto';
+import { usePlanoContas } from 'composables/usePlanoContas';
 import { useFornecedores } from 'composables/useFornecedores';
+import { useNotificacao } from 'composables/useNotificacao';
+import { useProdutoFiscal } from 'composables/useProdutoFiscal';
 import { useProdutos } from 'composables/useProdutos';
 import { useRecebimentosCompra } from 'composables/useRecebimentosCompra';
 import { FormaPagamento, RecebimentoCompraStatusOpcoes } from 'constants/enums';
@@ -235,15 +262,18 @@ import type {
   RecebimentoCompraDivergenciaDto,
 } from 'types/dtos/compras.dto';
 import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
+import { produtoSemNcmNoCadastro } from 'utils/recebimento-fiscal';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 interface ItemForm extends RecebimentoNfeItemFormModel {
   itemId: string;
+  chave: string;
 }
 
 const route = useRoute();
 const router = useRouter();
+const { erro } = useNotificacao();
 const {
   recebimento,
   carregando,
@@ -252,12 +282,21 @@ const {
   atualizarItens,
   registrarDivergencia,
   confirmar,
+  lembrarConversao,
+  sincronizarConversoes,
+  lembrarFiscal,
+  invalidarFiscal,
+  sincronizarDivergenciasFiscais,
 } = useRecebimentosCompra();
+const produtoFiscalId = ref<string | undefined>();
+const { aplicarDaNota } = useProdutoFiscal(() => produtoFiscalId.value);
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { centroOpcoes: centroCustoOpcoes, carregar: carregarCentros } = useCentrosCusto();
+const { contaOpcoes: planoContasOpcoes, carregar: carregarPlanoContas } = usePlanoContas();
 
 const dialogDivergencia = ref(false);
+const atualizandoFiscalChave = ref<string | null>(null);
 const itensForm = ref<ItemForm[]>([]);
 const parcelas = ref<ParcelaRecebimentoForm[]>([]);
 const fatura = ref<PreviewRecebimentoXmlFaturaDto | null>(null);
@@ -267,6 +306,9 @@ const informacoesFisco = ref('');
 const informacaoComplementarEntrada = ref('');
 const centroCustoId = ref<string | null>(null);
 const planoContas = ref('');
+const localizacaoEstoque = ref('');
+const gerarLancamentosEfdContribuicoes = ref(false);
+const dadosEntradaCarregadosId = ref<string | null>(null);
 const divergencia = reactive({
   tipo: 'Quantidade',
   descricao: '',
@@ -284,6 +326,12 @@ const secoes = reactive({
 
 const id = computed(() => route.params.id as string);
 const podeEditar = computed(() => recebimento.value?.status === 'EmConferencia');
+const itensSemNcmCadastro = computed(() => itensForm.value.filter(produtoSemNcmNoCadastro));
+const subtituloProdutos = computed(() => {
+  const base = `${itensForm.value.length} item(ns) na conferência`;
+  if (itensSemNcmCadastro.value.length === 0) return base;
+  return `${base} · ${itensSemNcmCadastro.value.length} sem NCM no cadastro`;
+});
 const subtitulo = computed(() =>
   recebimento.value ? `Status: ${rotuloStatus(recebimento.value.status)}` : 'Carregando...',
 );
@@ -383,6 +431,7 @@ function sincronizarDadosNfe(): void {
 }
 
 function sincronizarItens(): void {
+  const entradaXml = recebimento.value?.origem === 'Xml';
   const nfeItens = recebimento.value?.dadosNfe?.itens ?? [];
   itensForm.value = (recebimento.value?.itens ?? []).map((item, index) => {
     const nfe = nfeItens.find((candidato) => candidato.codigoProdutoXml === item.codigoProdutoXml)
@@ -396,12 +445,15 @@ function sincronizarItens(): void {
 
     return {
       itemId: item.id,
+      chave: item.id,
       produtoId: item.produtoId,
       codigoProdutoXml: item.codigoProdutoXml ?? nfe?.codigoProdutoXml ?? '',
       descricaoProdutoXml: nfe?.descricaoProdutoXml ?? '',
       ncm: nfe?.ncm ?? '',
+      cest: nfe?.cest ?? '',
       cfop: nfe?.cfop ?? '',
       unidade: nfe?.unidade ?? '',
+      unidadeMedidaId: nfe?.unidadeMedidaId ?? '',
       ean: nfe?.ean ?? '',
       origem: nfe?.tributacao?.origem ?? '',
       cstIcms: nfe?.tributacao?.cstIcms ?? '',
@@ -421,6 +473,20 @@ function sincronizarItens(): void {
       quantidadeNota: String(item.quantidadeNota),
       quantidadeRecebida: String(item.quantidadeRecebida),
       custoUnitario: formatarMoedaParaInput(item.custoUnitario),
+      fatorDivisaoNfe: entradaXml ? (nfe?.fatorDivisaoNfe ?? 1) : 1,
+      quantidadeEstoque: entradaXml
+        ? nfe && nfe.produtoId === item.produtoId && nfe.quantidade === item.quantidadeRecebida
+          ? nfe.quantidadeEstoque
+          : null
+        : item.quantidadeRecebida,
+      custoUnitarioEstoque: entradaXml
+        ? nfe && nfe.produtoId === item.produtoId && nfe.quantidade === item.quantidadeRecebida
+          ? nfe.custoUnitarioEstoque
+          : null
+        : item.custoUnitario,
+      marcaXml: nfe?.marcaXml ?? '',
+      divergenciasFiscais:
+        nfe && nfe.produtoId === item.produtoId ? (nfe.divergenciasFiscais ?? []) : [],
       numeroLote: item.numeroLote ?? '',
       dataValidade: item.dataValidade ?? '',
       tipoCusto: null,
@@ -428,6 +494,44 @@ function sincronizarItens(): void {
       precoVenda: formatarMoedaParaInput(preco),
     };
   });
+
+  for (const item of itensForm.value) {
+    if (item.quantidadeEstoque == null) {
+      continue;
+    }
+    lembrarConversao(
+      item.chave,
+      item.produtoId,
+      Number(item.quantidadeRecebida),
+      parseMascaraMoeda(item.custoUnitario) ?? 0,
+    );
+  }
+
+  for (const item of itensForm.value) {
+    lembrarFiscal(item);
+  }
+}
+
+async function atualizarFiscalCadastro(item: ItemForm): Promise<void> {
+  produtoFiscalId.value = item.produtoId;
+  atualizandoFiscalChave.value = item.chave;
+  try {
+    const ok = await aplicarDaNota({
+      ncm: item.ncm,
+      cest: item.cest,
+      origem: item.origem,
+      cstIcms: item.cstIcms,
+      csosn: item.csosn,
+      aliquotaIcms: item.aliquotaIcms,
+      campos: item.divergenciasFiscais.map((diferenca) => diferenca.campo),
+    });
+    if (!ok) return;
+    invalidarFiscal(item.chave);
+    await sincronizarDivergenciasFiscais([item]);
+    lembrarFiscal(item);
+  } finally {
+    atualizandoFiscalChave.value = null;
+  }
 }
 
 function onMargemChange(item: ItemForm): void {
@@ -444,12 +548,56 @@ function onPrecoChange(item: ItemForm): void {
   item.margemLucro = String((((preco / custo) - 1) * 100).toFixed(2));
 }
 
-watch(recebimento, () => {
+watch(recebimento, (atual) => {
   sincronizarItens();
   sincronizarDadosNfe();
+  if (atual && dadosEntradaCarregadosId.value !== atual.id) {
+    localizacaoEstoque.value = atual.localizacaoEstoque ?? '';
+    gerarLancamentosEfdContribuicoes.value = Boolean(atual.gerarLancamentosEfdContribuicoes);
+    dadosEntradaCarregadosId.value = atual.id;
+  }
 }, { immediate: true });
 
 watch(produtos, sincronizarItens);
+
+let conversaoTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(
+  () =>
+    itensForm.value
+      .map((item) => `${item.chave}|${item.produtoId}|${item.quantidadeRecebida}|${item.custoUnitario}`)
+      .join(';'),
+  () => {
+    if (recebimento.value?.origem !== 'Xml') {
+      return;
+    }
+    clearTimeout(conversaoTimer);
+    conversaoTimer = setTimeout(() => {
+      void sincronizarConversoes(itensForm.value);
+    }, 400);
+  },
+);
+
+let fiscalTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(
+  () =>
+    itensForm.value
+      .map(
+        (item) =>
+          `${item.chave}|${item.produtoId}|${item.ncm}|${item.cest}|${item.origem}|${item.cstIcms}|${item.csosn}|${item.aliquotaIcms}`,
+      )
+      .join(';'),
+  () => {
+    if (recebimento.value?.origem !== 'Xml') {
+      return;
+    }
+    clearTimeout(fiscalTimer);
+    fiscalTimer = setTimeout(() => {
+      void sincronizarDivergenciasFiscais(itensForm.value);
+    }, 400);
+  },
+);
 
 async function salvarItens(): Promise<void> {
   await atualizarItens(id.value, {
@@ -478,6 +626,11 @@ async function salvarDivergencia(): Promise<void> {
 }
 
 async function confirmarRecebimento(): Promise<void> {
+  if (itensSemNcmCadastro.value.length > 0) {
+    erro('Cadastre o NCM dos produtos antes de confirmar o recebimento.');
+    return;
+  }
+
   await salvarItens();
   await confirmar(id.value, {
     duplicatas: parcelas.value.map((p) => ({
@@ -500,6 +653,8 @@ async function confirmarRecebimento(): Promise<void> {
     informacaoComplementarEntrada: informacaoComplementarEntrada.value.trim() || null,
     centroCustoId: centroCustoId.value,
     planoContas: planoContas.value.trim() || null,
+    localizacaoEstoque: localizacaoEstoque.value.trim() || null,
+    gerarLancamentosEfdContribuicoes: gerarLancamentosEfdContribuicoes.value,
   });
 }
 
@@ -507,6 +662,7 @@ onMounted(async () => {
   void carregarFornecedores();
   void carregarProdutos();
   void carregarCentros();
+  void carregarPlanoContas();
   const ok = await obter(id.value);
   if (!ok) await router.replace({ name: 'recebimentos-compra' });
 });
@@ -522,6 +678,16 @@ onMounted(async () => {
   flex-wrap: wrap;
   gap: var(--spacing-2);
 }
+.aviso-fiscal {
+  margin: 0 0 var(--spacing-4);
+  padding: var(--spacing-4);
+  border: var(--border-width-thin) solid var(--color-warning-500);
+  border-left: var(--border-width-accent) solid var(--color-warning-500);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-50);
+  color: var(--color-warning-700);
+}
+
 .itens-lista {
   display: grid;
   gap: var(--spacing-4);

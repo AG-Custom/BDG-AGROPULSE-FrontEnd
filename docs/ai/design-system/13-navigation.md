@@ -110,6 +110,16 @@ Barra horizontal acima do `<router-view>` no `MainLayout`.
 - Scroll horizontal em viewports estreitas
 - Permanece em rotas de detalhe/form do módulo (prefixo de path)
 
+### Módulo com seções (`secoes`)
+
+Módulos com muitas telas (hoje só **Fiscal e Tributário**) declaram `secoes` em `navegacao-modulos.ts` (`filhos` é a lista plana das seções, usada pela busca e pela resolução do módulo ativo).
+
+- Sidebar expandida: com o módulo ativo, as seções aparecem indentadas sob o item (`AppSidebarSecoes`); a seção ativa usa fundo de item ativo, sem segunda barra de 3px
+- Sidebar recolhida: clicar no módulo abre um `q-menu` à direita com as seções
+- Subnav (`filhosSubnav`) mostra só as telas da seção ativa
+- `rotasRelacionadas` liga rotas sem aba (ex.: `fiscal-calculo-impostos`) a uma seção
+- Seção sem filho visível (permissão/flag) é omitida; clique na seção vai para a primeira tela visível
+
 ---
 
 ## Navbar / Header

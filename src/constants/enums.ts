@@ -418,37 +418,6 @@ export const InventarioStatusOpcoes = [
   { label: 'Concluído', value: InventarioStatus.Concluido },
 ];
 
-export const NivelLocalEstoque = {
-  Galpao: 'Galpao',
-  Deposito: 'Deposito',
-  Corredor: 'Corredor',
-  Prateleira: 'Prateleira',
-} as const;
-
-export type NivelLocalEstoqueValor = (typeof NivelLocalEstoque)[keyof typeof NivelLocalEstoque];
-
-export const NivelLocalEstoqueOpcoes = [
-  { label: 'Galpão', value: NivelLocalEstoque.Galpao },
-  { label: 'Depósito', value: NivelLocalEstoque.Deposito },
-  { label: 'Corredor', value: NivelLocalEstoque.Corredor },
-  { label: 'Prateleira', value: NivelLocalEstoque.Prateleira },
-];
-
-export const NivelLocalEstoqueLabels: Record<NivelLocalEstoqueValor, string> = {
-  [NivelLocalEstoque.Galpao]: 'Galpão',
-  [NivelLocalEstoque.Deposito]: 'Depósito',
-  [NivelLocalEstoque.Corredor]: 'Corredor',
-  [NivelLocalEstoque.Prateleira]: 'Prateleira',
-};
-
-export const NivelLocalEstoqueOrdem: NivelLocalEstoqueValor[] = [
-  NivelLocalEstoque.Galpao,
-  NivelLocalEstoque.Deposito,
-  NivelLocalEstoque.Corredor,
-  NivelLocalEstoque.Prateleira,
-];
-
-
 export const AtalhoPeriodoEstoque = {
   Hoje: 'hoje',
   SeteDias: '7d',
@@ -1185,6 +1154,207 @@ export const TipoSpedFiscalOpcoes = [
   { label: 'EFD Contribuições', value: TipoSpedFiscal.EfdContribuicoes },
   { label: 'SPED Contábil', value: TipoSpedFiscal.Contabil },
   { label: 'EFD-Reinf (R-1000 / Funrural)', value: TipoSpedFiscal.EfdReinf },
+];
+
+export const NaturezaContaContabil = {
+  Ativo: 'Ativo',
+  Passivo: 'Passivo',
+  PatrimonioLiquido: 'PatrimonioLiquido',
+  Resultado: 'Resultado',
+  Compensacao: 'Compensacao',
+  Outras: 'Outras',
+} as const;
+
+export type NaturezaContaContabilValor =
+  (typeof NaturezaContaContabil)[keyof typeof NaturezaContaContabil];
+
+export const NaturezaContaContabilOpcoes = [
+  { label: 'Ativo', value: NaturezaContaContabil.Ativo },
+  { label: 'Passivo', value: NaturezaContaContabil.Passivo },
+  { label: 'Patrimônio líquido', value: NaturezaContaContabil.PatrimonioLiquido },
+  { label: 'Resultado', value: NaturezaContaContabil.Resultado },
+  { label: 'Compensação', value: NaturezaContaContabil.Compensacao },
+  { label: 'Outras', value: NaturezaContaContabil.Outras },
+];
+
+export const TipoArquivoFiscal = {
+  Sintegra: 'Sintegra',
+  EfdIcmsIpi: 'EfdIcmsIpi',
+  EfdContribuicoes: 'EfdContribuicoes',
+} as const;
+
+export type TipoArquivoFiscalValor = (typeof TipoArquivoFiscal)[keyof typeof TipoArquivoFiscal];
+
+export const TipoArquivoFiscalOpcoes = [
+  { label: 'SINTEGRA', value: TipoArquivoFiscal.Sintegra },
+  { label: 'EFD ICMS/IPI', value: TipoArquivoFiscal.EfdIcmsIpi },
+  { label: 'EFD Contribuições', value: TipoArquivoFiscal.EfdContribuicoes },
+];
+
+export const FinalidadeArquivoFiscal = {
+  Normal: 'Normal',
+  RetificacaoTotal: 'RetificacaoTotal',
+  RetificacaoAditiva: 'RetificacaoAditiva',
+} as const;
+
+export type FinalidadeArquivoFiscalValor =
+  (typeof FinalidadeArquivoFiscal)[keyof typeof FinalidadeArquivoFiscal];
+
+export const FinalidadeArquivoFiscalOpcoes = [
+  { label: 'Normal', value: FinalidadeArquivoFiscal.Normal },
+  { label: 'Retificação total', value: FinalidadeArquivoFiscal.RetificacaoTotal },
+  { label: 'Retificação aditiva', value: FinalidadeArquivoFiscal.RetificacaoAditiva },
+];
+
+export const PerfilEfd = {
+  A: 'A',
+  B: 'B',
+  C: 'C',
+} as const;
+
+export type PerfilEfdValor = (typeof PerfilEfd)[keyof typeof PerfilEfd];
+
+export const PerfilEfdOpcoes = [
+  { label: 'Perfil A', value: PerfilEfd.A },
+  { label: 'Perfil B', value: PerfilEfd.B },
+  { label: 'Perfil C', value: PerfilEfd.C },
+];
+
+export const AtividadeEfd = {
+  IndustrialOuEquiparado: 'IndustrialOuEquiparado',
+  Outros: 'Outros',
+} as const;
+
+export type AtividadeEfdValor = (typeof AtividadeEfd)[keyof typeof AtividadeEfd];
+
+export const AtividadeEfdOpcoes = [
+  { label: 'Industrial ou equiparado a industrial', value: AtividadeEfd.IndustrialOuEquiparado },
+  { label: 'Outros', value: AtividadeEfd.Outros },
+];
+
+export const TipoItemSpedOpcoes = [
+  { label: '00 - Mercadoria para revenda', value: '00' },
+  { label: '01 - Matéria-prima', value: '01' },
+  { label: '02 - Embalagem', value: '02' },
+  { label: '03 - Produto em processo', value: '03' },
+  { label: '04 - Produto acabado', value: '04' },
+  { label: '05 - Subproduto', value: '05' },
+  { label: '06 - Produto intermediário', value: '06' },
+  { label: '07 - Material de uso e consumo', value: '07' },
+  { label: '08 - Ativo imobilizado', value: '08' },
+  { label: '09 - Serviços', value: '09' },
+  { label: '10 - Outros insumos', value: '10' },
+  { label: '99 - Outras', value: '99' },
+];
+
+export const IncidenciaContribuicoes = {
+  NaoCumulativo: 1,
+  Cumulativo: 2,
+} as const;
+
+export const IncidenciaContribuicoesOpcoes = [
+  { label: 'Não cumulativo', value: IncidenciaContribuicoes.NaoCumulativo },
+  { label: 'Cumulativo', value: IncidenciaContribuicoes.Cumulativo },
+];
+
+export const IndicadorRegimeCumulativoOpcoes = [
+  { label: 'Regime de caixa', value: 1 },
+  { label: 'Regime de competência - escrituração consolidada', value: 2 },
+  { label: 'Regime de competência - escrituração detalhada', value: 9 },
+];
+
+export const IndicadorAtividadeContribuicoesOpcoes = [
+  { label: '0 - Industrial ou equiparado', value: '0' },
+  { label: '1 - Prestador de serviços', value: '1' },
+  { label: '2 - Atividade de comércio', value: '2' },
+  { label: '3 - Pessoas jurídicas referidas nos §§ 6º, 8º e 9º do art. 3º da Lei 9.718/98', value: '3' },
+  { label: '4 - Atividade imobiliária', value: '4' },
+  { label: '9 - Outras', value: '9' },
+];
+
+export const NaturezaPessoaJuridicaOpcoes = [
+  { label: '00 - Pessoa jurídica em geral', value: '00' },
+  { label: '01 - Sociedade cooperativa', value: '01' },
+  { label: '02 - Entidade sujeita ao PIS/Pasep exclusivamente sobre a folha', value: '02' },
+  { label: '03 - Pessoa jurídica em geral participante de SCP como sócio ostensivo', value: '03' },
+  { label: '04 - Sociedade cooperativa participante de SCP como sócio ostensivo', value: '04' },
+  { label: '05 - Sociedade em conta de participação (SCP)', value: '05' },
+];
+
+export const CstEntradaContribuicoesOpcoes = [
+  { label: '50 - Crédito vinculado exclusivamente a receita tributada no mercado interno', value: '50' },
+  { label: '51 - Crédito vinculado exclusivamente a receita não tributada no mercado interno', value: '51' },
+  { label: '52 - Crédito vinculado exclusivamente a receita de exportação', value: '52' },
+  { label: '70 - Operação de aquisição sem direito a crédito', value: '70' },
+  { label: '71 - Operação de aquisição com isenção', value: '71' },
+  { label: '72 - Operação de aquisição com suspensão', value: '72' },
+  { label: '73 - Operação de aquisição a alíquota zero', value: '73' },
+  { label: '74 - Operação de aquisição sem incidência da contribuição', value: '74' },
+  { label: '75 - Operação de aquisição por substituição tributária', value: '75' },
+  { label: '98 - Outras operações de entrada', value: '98' },
+  { label: '99 - Outras operações', value: '99' },
+];
+
+export const NaturezaBaseCreditoOpcoes = [
+  { label: '01 - Aquisição de bens para revenda', value: '01' },
+  { label: '02 - Aquisição de bens utilizados como insumo', value: '02' },
+  { label: '03 - Aquisição de serviços utilizados como insumo', value: '03' },
+  { label: '04 - Energia elétrica e térmica', value: '04' },
+  { label: '05 - Aluguéis de prédios', value: '05' },
+  { label: '06 - Aluguéis de máquinas e equipamentos', value: '06' },
+  { label: '07 - Armazenagem de mercadoria e frete na operação de venda', value: '07' },
+  { label: '08 - Contraprestações de arrendamento mercantil', value: '08' },
+  { label: '09 - Máquinas e equipamentos (depreciação)', value: '09' },
+  { label: '10 - Máquinas e equipamentos (aquisição)', value: '10' },
+  { label: '11 - Amortização de edificações e benfeitorias', value: '11' },
+  { label: '12 - Devolução de vendas sujeitas à incidência não cumulativa', value: '12' },
+  { label: '13 - Outras operações com direito a crédito', value: '13' },
+  { label: '14 - Transporte de cargas - subcontratação', value: '14' },
+  { label: '15 - Atividade imobiliária - custo incorrido', value: '15' },
+  { label: '16 - Atividade imobiliária - custo orçado', value: '16' },
+  { label: '17 - Prestação de serviços de limpeza, conservação e manutenção', value: '17' },
+  { label: '18 - Estoque de abertura', value: '18' },
+];
+
+export const TributoApuracao = {
+  Icms: 'Icms',
+  Ipi: 'Ipi',
+} as const;
+
+export type TributoApuracaoValor = (typeof TributoApuracao)[keyof typeof TributoApuracao];
+
+export const DecisaoApuracao = {
+  Debito: 'Debito',
+  Credito: 'Credito',
+  Neutro: 'Neutro',
+} as const;
+
+export type DecisaoApuracaoValor = (typeof DecisaoApuracao)[keyof typeof DecisaoApuracao];
+
+export const DecisaoApuracaoOpcoes = [
+  { label: 'Débito', value: DecisaoApuracao.Debito },
+  { label: 'Crédito', value: DecisaoApuracao.Credito },
+  { label: 'Neutra', value: DecisaoApuracao.Neutro },
+];
+
+export const TipoAjusteApuracao = {
+  OutrosDebitos: 'OutrosDebitos',
+  EstornoCreditos: 'EstornoCreditos',
+  OutrosCreditos: 'OutrosCreditos',
+  EstornoDebitos: 'EstornoDebitos',
+  Deducoes: 'Deducoes',
+  SaldoCredorAnterior: 'SaldoCredorAnterior',
+} as const;
+
+export type TipoAjusteApuracaoValor = (typeof TipoAjusteApuracao)[keyof typeof TipoAjusteApuracao];
+
+export const TipoAjusteApuracaoOpcoes = [
+  { label: 'Outros débitos', value: TipoAjusteApuracao.OutrosDebitos },
+  { label: 'Estorno de créditos', value: TipoAjusteApuracao.EstornoCreditos },
+  { label: 'Outros créditos', value: TipoAjusteApuracao.OutrosCreditos },
+  { label: 'Estorno de débitos', value: TipoAjusteApuracao.EstornoDebitos },
+  { label: 'Deduções', value: TipoAjusteApuracao.Deducoes },
+  { label: 'Saldo credor anterior', value: TipoAjusteApuracao.SaldoCredorAnterior },
 ];
 
 export const FontePreco = {

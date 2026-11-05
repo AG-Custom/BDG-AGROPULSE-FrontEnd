@@ -219,6 +219,7 @@ body {
 .q-field--outlined .q-field__input,
 .q-field--outlined .q-field__prefix,
 .q-field--outlined .q-field__suffix {
+  color: var(--color-text-primary);
   font-size: var(--font-size-input);
 }
 
@@ -233,18 +234,13 @@ body {
 }
 
 .q-field__native::placeholder,
-.q-field__input::placeholder,
-.q-field__native::-webkit-input-placeholder,
-.q-field__input::-webkit-input-placeholder,
-.q-field__native::-moz-placeholder,
-.q-field__input::-moz-placeholder {
+.q-field__input::placeholder {
   color: var(--color-text-tertiary) !important;
   font-size: var(--font-size-input) !important;
   opacity: 1;
 }
 
 .q-placeholder {
-  color: var(--color-text-tertiary);
   font-size: var(--font-size-input) !important;
 }
 
@@ -360,6 +356,16 @@ body {
 .q-table__bottom {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+.q-table__bottom--nodata {
+  justify-content: center;
+  padding-left: var(--spacing-6);
+  padding-right: var(--spacing-6);
+}
+
+.q-table__bottom--nodata > .empty-state {
+  width: 100%;
 }
 
 // ─── Barra de filtros de listagem ───

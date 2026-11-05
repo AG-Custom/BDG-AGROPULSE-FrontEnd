@@ -36,11 +36,6 @@ export function criarEntradaFormVazia(): EntradaEstoqueFormModel {
     dataFabricacao: '',
     custoUnitario: '',
     quantidade: '',
-    deposito: '',
-    galpao: '',
-    corredor: '',
-    prateleira: '',
-    localEstoqueId: null,
   };
 }
 
@@ -52,7 +47,6 @@ export function formParaEntradaPayload(form: EntradaEstoqueFormModel): EntradaEs
     dataFabricacao: form.dataFabricacao || null,
     custoUnitario: parseMascaraMoeda(form.custoUnitario),
     quantidade: parseNumeroObrigatorio(form.quantidade),
-    localEstoqueId: form.localEstoqueId || null,
   };
 }
 

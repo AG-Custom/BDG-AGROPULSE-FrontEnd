@@ -90,42 +90,7 @@
 
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
-            <agro-card>
-              <div class="secao-header">
-                <div class="text-subtitle1">Alertas recentes</div>
-                <agro-btn
-                  flat
-                  dense
-                  color="primary"
-                  label="Ver todos"
-                  descricao="Ir para alertas"
-                  :to="{ name: 'relatorios' }"
-                />
-              </div>
-              <empty-state
-                v-if="alertasResumo.length === 0"
-                titulo="Sem alertas"
-                descricao="Nenhum alerta gerencial no momento."
-                icon="notifications_none"
-              />
-              <q-list v-else separator>
-                <q-item
-                  v-for="(alerta, idx) in alertasResumo"
-                  :key="`${alerta.tipo}-${idx}`"
-                >
-                  <q-item-section avatar>
-                    <agro-badge
-                      :label="alerta.severidade"
-                      :variant="variantSeveridade(alerta.severidade)"
-                    />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>{{ alerta.titulo }}</q-item-label>
-                    <q-item-label caption>{{ alerta.descricao }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </agro-card>
+            <dashboard-alertas-card :alertas="alertasResumo" />
           </div>
 
           <div class="col-12 col-md-6">
@@ -199,8 +164,8 @@
 </template>
 
 <script setup lang="ts">
+import DashboardAlertasCard from 'components/dashboard/DashboardAlertasCard.vue';
 import RelatorioExportButtons from 'components/relatorios/RelatorioExportButtons.vue';
-import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
@@ -319,13 +284,6 @@ const colunasRanking: QTableColumn[] = [
     align: 'right',
   },
 ];
-
-function variantSeveridade(severidade: string): 'error' | 'warning' | 'default' | 'success' {
-  const s = severidade.toLowerCase();
-  if (s.includes('crit')) return 'error';
-  if (s.includes('alerta')) return 'warning';
-  return 'default';
-}
 
 async function atualizar(): Promise<void> {
   await carregar({ dias: Number(dias.value) || 30 });

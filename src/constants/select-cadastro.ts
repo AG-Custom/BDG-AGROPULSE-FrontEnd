@@ -14,6 +14,7 @@ export const SelectCadastroEntidade = {
   Fazenda: 'fazenda',
   Gleba: 'gleba',
   CategoriaProduto: 'categoriaProduto',
+  Galpao: 'galpao',
   Veiculo: 'veiculo',
   Ativo: 'ativo',
   ReceitaProducao: 'receitaProducao',
@@ -92,6 +93,10 @@ export const SelectCadastroEntidadeConfig: Record<
   [SelectCadastroEntidade.CategoriaProduto]: {
     rotulo: 'categoria',
     routeName: 'categorias-produto',
+  },
+  [SelectCadastroEntidade.Galpao]: {
+    rotulo: 'galpão',
+    routeName: 'galpoes',
   },
   [SelectCadastroEntidade.Veiculo]: {
     rotulo: 'veículo',

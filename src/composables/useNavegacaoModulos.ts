@@ -9,13 +9,20 @@ import {
   type GrupoNavegacao,
   type ItemNavegacao,
   type ModuloNavegacao,
+  type SecaoNavegacao,
 } from 'constants/navegacao-modulos';
 import { Permissoes } from 'constants/permissoes';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+export interface SecaoNavegacaoVisivel extends SecaoNavegacao {
+  filhosVisiveis: ItemNavegacao[];
+  routeNameDestino: string;
+}
+
 export interface ModuloNavegacaoVisivel extends ModuloNavegacao {
   filhosVisiveis: ItemNavegacao[];
+  secoesVisiveis: SecaoNavegacaoVisivel[];
   routeNameDestino: string;
 }
 
@@ -112,7 +119,21 @@ export function useNavegacaoModulos() {
       return null;
     }
 
-    const filhosVisiveis = modulo.filhos.filter(itemVisivel);
+    const secoesVisiveis = (modulo.secoes ?? [])
+      .map((secao) => {
+        const filhos = secao.filhos.filter(itemVisivel);
+        return {
+          ...secao,
+          filhosVisiveis: filhos,
+          routeNameDestino: filhos[0]?.routeName ?? '',
+        };
+      })
+      .filter((secao) => secao.filhosVisiveis.length > 0);
+
+    const filhosVisiveis =
+      secoesVisiveis.length > 0
+        ? secoesVisiveis.flatMap((secao) => secao.filhosVisiveis)
+        : modulo.filhos.filter(itemVisivel);
     if (filhosVisiveis.length === 0) {
       return null;
     }
@@ -120,6 +141,7 @@ export function useNavegacaoModulos() {
     return {
       ...modulo,
       filhosVisiveis,
+      secoesVisiveis,
       routeNameDestino: filhosVisiveis[0]?.routeName ?? '',
     };
   }
@@ -202,7 +224,25 @@ export function useNavegacaoModulos() {
 
   const filhosVisiveis = computed(() => moduloAtivo.value?.filhosVisiveis ?? []);
 
-  const mostrarSubnav = computed(() => filhosVisiveis.value.length > 1);
+  const secoesVisiveis = computed(() => moduloAtivo.value?.secoesVisiveis ?? []);
+
+  const secaoAtiva = computed<SecaoNavegacaoVisivel | null>(() => {
+    const routeName = typeof route.name === 'string' ? route.name : null;
+
+    return (
+      secoesVisiveis.value.find(
+        (secao) =>
+          secao.filhosVisiveis.some(filhoAtivo) ||
+          (routeName != null && secao.rotasRelacionadas?.includes(routeName)),
+      ) ?? null
+    );
+  });
+
+  const filhosSubnav = computed(
+    () => secaoAtiva.value?.filhosVisiveis ?? filhosVisiveis.value,
+  );
+
+  const mostrarSubnav = computed(() => filhosSubnav.value.length > 1);
 
   function queryBate(item: ItemNavegacao): boolean {
     if (!item.query) {
@@ -260,6 +300,9 @@ export function useNavegacaoModulos() {
     modulosVisiveis,
     moduloAtivo,
     filhosVisiveis,
+    secoesVisiveis,
+    secaoAtiva,
+    filhosSubnav,
     mostrarSubnav,
     filhoAtivo,
     definirModuloPreferido,

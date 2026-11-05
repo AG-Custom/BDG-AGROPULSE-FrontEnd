@@ -238,6 +238,31 @@ export interface InutilizacaoPayload {
   modeloDocumento: ModeloDocumentoFiscalValor;
 }
 
+export interface CfopDto {
+  codigo: string;
+  descricao: string;
+  cfopSaida: string | null;
+  cfopSaidaDescricao: string | null;
+}
+
+export interface RelacionarCfopSaidaPayload {
+  cfopSaida: string | null;
+}
+
+export type TipoCodigoIcms = 'Cst' | 'Csosn';
+
+export interface IcmsDto {
+  tipo: TipoCodigoIcms;
+  codigo: string;
+  descricao: string;
+  icmsSaida: string | null;
+  icmsSaidaDescricao: string | null;
+}
+
+export interface RelacionarIcmsSaidaPayload {
+  icmsSaida: string | null;
+}
+
 export interface NcmPisCofinsDto {
   id: string;
   ncm: string;
@@ -529,4 +554,30 @@ export interface CancelarNotaFormModel {
 
 export interface CceFormModel {
   textoCorrecao: string;
+}
+
+export type FiltroNfeRecebida = 'Todas' | 'Pendente' | 'SemCiencia';
+
+export interface NfeRecebidaDto {
+  id: string;
+  nomeEmitente: string;
+  documentoEmitente: string;
+  cnpjDestinatario: string;
+  chaveNfe: string;
+  valorTotal: number;
+  dataEmissao: string | null;
+  situacao: string;
+  manifestacaoDestinatario: string | null;
+  nfeCompleta: boolean;
+  tipoNfe: number | null;
+  versao: number;
+  numeroCartaCorrecao: string | null;
+  cartaCorrecao: string | null;
+  dataCartaCorrecao: string | null;
+  dataCancelamento: string | null;
+  justificativaCancelamento: string | null;
+}
+
+export interface SincronizarNfesRecebidasDto {
+  quantidade: number;
 }

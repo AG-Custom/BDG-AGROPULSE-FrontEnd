@@ -78,12 +78,6 @@
             </q-td>
           </template>
 
-          <template #body-cell-localizacao="props">
-            <q-td :props="props">
-              {{ formatarLocalizacao(props.row) }}
-            </q-td>
-          </template>
-
           <template #body-cell-notaFiscalOrigemId="props">
             <q-td :props="props">
               {{ props.row.notaFiscalOrigemId ? props.row.notaFiscalOrigemId.slice(0, 8) + '…' : '—' }}
@@ -197,7 +191,23 @@
                 <q-input
                   :model-value="loteVisualizar?.numeroLote ?? ''"
                   outlined
-                  label="Número do lote"
+                  label="Lote interno"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="loteVisualizar?.numeroLoteEntrada || '—'"
+                  outlined
+                  label="Lote de entrada"
+                  readonly
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input
+                  :model-value="loteVisualizar?.localizacao || '—'"
+                  outlined
+                  label="Localização estoque"
                   readonly
                 />
               </div>
@@ -249,14 +259,6 @@
                   readonly
                 />
               </div>
-              <div class="col-12">
-                <q-input
-                  :model-value="loteVisualizar ? formatarLocalizacao(loteVisualizar) : ''"
-                  outlined
-                  label="Localização"
-                  readonly
-                />
-              </div>
             </div>
             <div class="agro-form-actions">
               <agro-btn flat label="Fechar" descricao="Fechar" @click="dialogVisualizar = false" />
@@ -302,7 +304,16 @@ const loteVisualizar = ref<LoteDto | null>(null);
 const colunas = computed(() => {
   const base: QTableColumn<LoteDto>[] = [
     { name: 'produtoId', label: 'Produto', field: 'produtoId', align: 'left', sortable: true },
-    { name: 'numeroLote', label: 'Lote', field: 'numeroLote', align: 'left', sortable: true },
+    { name: 'numeroLote', label: 'Lote interno', field: 'numeroLote', align: 'left', sortable: true },
+    {
+      name: 'numeroLoteEntrada',
+      label: 'Lote de entrada',
+      field: 'numeroLoteEntrada',
+      align: 'left',
+      sortable: true,
+      format: (valor: unknown) => (typeof valor === 'string' && valor.trim() ? valor : '—'),
+    },
+    { name: 'localizacao', label: 'Localização', field: 'localizacao', align: 'left', sortable: true },
     { name: 'quantidade', label: 'Quantidade', field: 'quantidade', align: 'right', sortable: true },
     {
       name: 'custoUnitario',
@@ -326,12 +337,6 @@ const colunas = computed(() => {
       sortable: true,
     },
     {
-      name: 'localizacao',
-      label: 'Localização',
-      field: 'deposito',
-      align: 'left',
-    },
-    {
       name: 'notaFiscalOrigemId',
       label: 'NF origem',
       field: 'notaFiscalOrigemId',
@@ -351,13 +356,6 @@ const descricaoVazia = computed(() =>
     ? 'Nenhum lote corresponde aos filtros aplicados.'
     : 'Ainda não há lotes cadastrados nesta unidade.',
 );
-
-function formatarLocalizacao(lote: LoteDto): string {
-  const partes = [lote.galpao, lote.deposito, lote.corredor, lote.prateleira].filter(
-    (parte) => !!parte?.trim(),
-  );
-  return partes.length > 0 ? partes.join(' / ') : '—';
-}
 
 async function abrirGenealogia(lote: LoteDto): Promise<void> {
   loteSelecionado.value = lote;

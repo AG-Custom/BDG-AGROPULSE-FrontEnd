@@ -3,7 +3,16 @@
     <fieldset class="agro-formulario__fieldset">
 <h3 class="produto-formulario__secao-titulo">Identificação</h3>
     <div class="row q-col-gutter-md">
-      <div class="col-12">
+      <div v-if="numero != null" class="col-12 col-md-3">
+        <q-input
+          outlined
+          readonly
+          label="Código"
+          class="text-metric"
+          :model-value="String(numero)"
+        />
+      </div>
+      <div class="col-12" :class="{ 'col-md-9': numero != null }">
         <q-input
           v-model="formulario.descricao"
           outlined
@@ -28,6 +37,30 @@
           :desabilitar-cadastro="somenteLeitura"
           :rules="[obrigatorio]"
           @atualizar="carregarCategorias({ ativo: true })"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="formulario.marca"
+          outlined
+          label="Marca"
+          maxlength="120"
+          hint="Opcional"
+          :readonly="somenteLeitura"
+        />
+      </div>
+      <div class="col-12 col-md-4">
+        <agro-select-cadastro
+          v-model="formulario.galpaoId"
+          entidade="galpao"
+          label="Galpão"
+          clearable
+          hint="Opcional"
+          :options="galpaoOpcoes"
+          :loading="carregandoGalpoes"
+          :readonly="somenteLeitura"
+          :desabilitar-cadastro="somenteLeitura"
+          @atualizar="carregarGalpoes({ ativo: true })"
         />
       </div>
       <div class="col-12 col-md-4">
@@ -118,7 +151,7 @@
           type="number"
           min="0"
           step="any"
-          hint="Unidade NF-e → estoque"
+          hint="Multiplica a quantidade da nota na entrada"
           :readonly="somenteLeitura"
         />
       </div>
@@ -181,6 +214,7 @@
 import AgroMoneyInput from 'components/ui/AgroMoneyInput.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCategoriasProduto } from 'composables/useCategoriasProduto';
+import { useGalpoes } from 'composables/useGalpoes';
 import { useUnidadesMedida } from 'composables/useUnidadesMedida';
 import { useVerCustos } from 'composables/useVerCustos';
 import { MetodoCusteioOpcoes, TipoProdutoOpcoes } from 'constants/enums';
@@ -194,6 +228,7 @@ defineProps<{
   modo: 'criar' | 'editar';
   somenteLeitura?: boolean;
   custoMedioPonderado?: number | null;
+  numero?: number | null;
 }>();
 
 const formulario = defineModel<ProdutoFormModel>('formulario', { required: true });
@@ -209,6 +244,13 @@ const {
 } = useCategoriasProduto();
 
 const {
+  galpoes,
+  carregando: carregandoGalpoes,
+  carregar: carregarGalpoes,
+  rotuloGalpao,
+} = useGalpoes();
+
+const {
   unidadesMedida,
   carregando: carregandoUnidadesMedida,
   carregar: carregarUnidadesMedida,
@@ -221,6 +263,15 @@ const categoriaOpcoes = computed(() =>
     .map((categoria) => ({
       label: rotuloCategoria(categoria),
       value: categoria.id,
+    })),
+);
+
+const galpaoOpcoes = computed(() =>
+  galpoes.value
+    .filter((galpao) => galpao.ativo || galpao.id === formulario.value.galpaoId)
+    .map((galpao) => ({
+      label: rotuloGalpao(galpao),
+      value: galpao.id,
     })),
 );
 
@@ -241,6 +292,7 @@ async function validar(): Promise<boolean> {
 
 onMounted(() => {
   void carregarCategorias({ ativo: true });
+  void carregarGalpoes({ ativo: true });
   void carregarUnidadesMedida({ ativo: true });
 });
 

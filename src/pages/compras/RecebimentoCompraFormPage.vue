@@ -72,6 +72,22 @@
                 label="Data de emissão"
               />
             </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <q-input
+                v-model="localizacaoEstoque"
+                outlined
+                label="Localização estoque"
+                maxlength="200"
+                hint="Opcional. Gravada nos lotes desta entrada"
+              />
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 flex items-center">
+              <q-toggle
+                v-model="gerarLancamentosEfdContribuicoes"
+                color="primary"
+                label="Gerar lançamentos EFD Contribuições"
+              />
+            </div>
           </div>
 
           <div v-if="fornecedorNaoCadastrado" class="banner-faltantes" role="status">
@@ -114,6 +130,7 @@
             v-model:parcelas="parcelas"
             :fatura="fatura"
             :centro-custo-opcoes="centroCustoOpcoes"
+            :plano-contas-opcoes="planoContasOpcoes"
             v-model:centro-custo-id="centroCustoId"
             v-model:plano-contas="planoContas"
           />
@@ -190,9 +207,11 @@
       :codigo-produto-xml="itemCadastroRapido?.codigoProdutoXml"
       :preco-sugerido="precoSugeridoCadastro"
       :ncm-xml="itemCadastroRapido?.ncm"
+      :cest-xml="itemCadastroRapido?.cest"
       :cfop-xml="itemCadastroRapido?.cfop"
       :ean-xml="itemCadastroRapido?.ean"
       :unidade-xml="itemCadastroRapido?.unidade"
+      :unidade-medida-id="itemCadastroRapido?.unidadeMedidaId"
       :origem-xml="itemCadastroRapido?.origem"
       :cst-icms-xml="itemCadastroRapido?.cstIcms"
       :csosn-xml="itemCadastroRapido?.csosn"
@@ -224,6 +243,7 @@ import RecebimentoNfeTotaisCard from 'components/compras/RecebimentoNfeTotaisCar
 import RecebimentoSecaoExpansivel from 'components/compras/RecebimentoSecaoExpansivel.vue';
 import AgroSelectCadastro from 'components/ui/AgroSelectCadastro.vue';
 import { useCentrosCusto } from 'composables/useCentrosCusto';
+import { usePlanoContas } from 'composables/usePlanoContas';
 import { useCompras } from 'composables/useCompras';
 import { useFornecedores } from 'composables/useFornecedores';
 import { useNotificacao } from 'composables/useNotificacao';
@@ -238,17 +258,28 @@ import type {
 import type { FornecedorDto } from 'types/dtos/fornecedor.dto';
 import type { ProdutoDto } from 'types/dtos/produto.dto';
 import { formatarMoedaParaInput, parseMascaraMoeda } from 'utils/formatters';
+import { produtoSemNcmNoCadastro } from 'utils/recebimento-fiscal';
 import { obrigatorio } from 'utils/validators';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const { salvando, previewXmlConteudo, criar, limparPreview } = useRecebimentosCompra();
+const {
+  salvando,
+  previewXmlConteudo,
+  criar,
+  limparPreview,
+  lembrarConversao,
+  sincronizarConversoes,
+  lembrarFiscal,
+  sincronizarDivergenciasFiscais,
+} = useRecebimentosCompra();
 const { receberPedido } = useCompras();
 const { fornecedores, carregar: carregarFornecedores } = useFornecedores();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 const { centroOpcoes: centroCustoOpcoes, carregar: carregarCentros } = useCentrosCusto();
+const { contaOpcoes: planoContasOpcoes, carregar: carregarPlanoContas } = usePlanoContas();
 const { erro } = useNotificacao();
 
 const arquivoXml = ref<File | null>(null);
@@ -260,6 +291,8 @@ const numeroNota = ref('');
 const serie = ref('');
 const naturezaOperacao = ref('');
 const dataEmissao = ref('');
+const localizacaoEstoque = ref('');
+const gerarLancamentosEfdContribuicoes = ref(false);
 const emitente = ref<PreviewRecebimentoXmlEmitenteDto | null>(null);
 const fatura = ref<PreviewRecebimentoXmlFaturaDto | null>(null);
 const totais = ref<PreviewRecebimentoXmlTotaisDto | null>(null);
@@ -314,10 +347,22 @@ const subtituloGerais = computed(() => {
   if (serie.value) partes.push(`série ${serie.value}`);
   return partes.join(' · ') || 'Fornecedor, chave e identificação da nota';
 });
+const itensComDivergenciaFiscal = computed(() =>
+  itens.value.filter((item) => item.divergenciasFiscais.length > 0),
+);
+const itensSemNcmCadastro = computed(() => itens.value.filter(produtoSemNcmNoCadastro));
 const subtituloProdutos = computed(() => {
-  const base = `${itens.value.length} item(ns)`;
-  if (itensSemProduto.value.length === 0) return base;
-  return `${base} · ${itensSemProduto.value.length} sem cadastro`;
+  const partes = [`${itens.value.length} item(ns)`];
+  if (itensSemProduto.value.length > 0) {
+    partes.push(`${itensSemProduto.value.length} sem cadastro`);
+  }
+  if (itensSemNcmCadastro.value.length > 0) {
+    partes.push(`${itensSemNcmCadastro.value.length} sem NCM no cadastro`);
+  }
+  if (itensComDivergenciaFiscal.value.length > 0) {
+    partes.push(`${itensComDivergenciaFiscal.value.length} com diferença fiscal`);
+  }
+  return partes.join(' · ');
 });
 const subtituloPagamentos = computed(() => {
   if (parcelas.value.length === 0) return 'Fatura e condições de pagamento';
@@ -331,8 +376,10 @@ function criarItemVazio(): RecebimentoItemForm {
     codigoProdutoXml: '',
     descricaoProdutoXml: '',
     ncm: '',
+    cest: '',
     cfop: '',
     unidade: '',
+    unidadeMedidaId: '',
     ean: '',
     origem: '',
     cstIcms: '',
@@ -352,6 +399,11 @@ function criarItemVazio(): RecebimentoItemForm {
     quantidadeNota: '1',
     quantidadeRecebida: '1',
     custoUnitario: formatarMoedaParaInput(0),
+    fatorDivisaoNfe: 1,
+    quantidadeEstoque: null,
+    custoUnitarioEstoque: null,
+    marcaXml: '',
+    divergenciasFiscais: [],
     numeroLote: '',
     dataValidade: '',
     tipoCusto: null,
@@ -471,8 +523,10 @@ async function analisarXml(): Promise<void> {
     codigoProdutoXml: item.codigoProdutoXml,
     descricaoProdutoXml: item.descricaoProdutoXml ?? '',
     ncm: item.ncm ?? '',
+    cest: item.cest ?? '',
     cfop: item.cfop ?? '',
     unidade: item.unidade ?? '',
+    unidadeMedidaId: item.unidadeMedidaId ?? '',
     ean: item.ean ?? '',
     origem: item.tributacao?.origem ?? '',
     cstIcms: item.tributacao?.cstIcms ?? '',
@@ -492,6 +546,11 @@ async function analisarXml(): Promise<void> {
     quantidadeNota: String(item.quantidade),
     quantidadeRecebida: String(item.quantidade),
     custoUnitario: formatarMoedaParaInput(item.custoUnitario),
+    fatorDivisaoNfe: item.fatorDivisaoNfe,
+    quantidadeEstoque: item.quantidadeEstoque,
+    custoUnitarioEstoque: item.custoUnitarioEstoque,
+    marcaXml: item.marcaXml ?? '',
+    divergenciasFiscais: item.divergenciasFiscais ?? [],
     numeroLote: item.numeroLote ?? '',
     dataValidade: item.dataValidade ?? '',
     tipoCusto: null,
@@ -500,6 +559,19 @@ async function analisarXml(): Promise<void> {
   }));
 
   if (itens.value.length === 0) itens.value = [criarItemVazio()];
+
+  for (const item of itens.value) {
+    lembrarFiscal(item);
+    if (item.quantidadeEstoque == null) {
+      continue;
+    }
+    lembrarConversao(
+      item.chave,
+      item.produtoId,
+      Number(item.quantidadeRecebida),
+      parseMascaraMoeda(item.custoUnitario) ?? 0,
+    );
+  }
 
   parcelas.value = preview.duplicatas.map((d) => ({
     chave: crypto.randomUUID(),
@@ -528,6 +600,11 @@ async function salvar(): Promise<void> {
     return;
   }
 
+  if (itensSemNcmCadastro.value.length > 0) {
+    erro('Cadastre o NCM dos produtos antes de criar o recebimento.');
+    return;
+  }
+
   const criado = await criar({
     fornecedorId: fornecedorId.value,
     pedidoCompraId: pedidoCompraId.value || null,
@@ -535,6 +612,8 @@ async function salvar(): Promise<void> {
     chaveAcesso: chaveAcesso.value.trim() || null,
     numeroNota: numeroNota.value.trim() || null,
     serie: serie.value.trim() || null,
+    localizacaoEstoque: localizacaoEstoque.value.trim() || null,
+    gerarLancamentosEfdContribuicoes: gerarLancamentosEfdContribuicoes.value,
     itens: itens.value.map((i) => ({
       produtoId: i.produtoId,
       codigoProdutoXml: i.codigoProdutoXml || null,
@@ -552,10 +631,44 @@ async function salvar(): Promise<void> {
   }
 }
 
+let conversaoTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(
+  () =>
+    itens.value
+      .map((item) => `${item.chave}|${item.produtoId}|${item.quantidadeRecebida}|${item.custoUnitario}`)
+      .join(';'),
+  () => {
+    clearTimeout(conversaoTimer);
+    conversaoTimer = setTimeout(() => {
+      void sincronizarConversoes(itens.value);
+    }, 400);
+  },
+);
+
+let fiscalTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(
+  () =>
+    itens.value
+      .map(
+        (item) =>
+          `${item.chave}|${item.produtoId}|${item.ncm}|${item.cest}|${item.origem}|${item.cstIcms}|${item.csosn}|${item.aliquotaIcms}`,
+      )
+      .join(';'),
+  () => {
+    clearTimeout(fiscalTimer);
+    fiscalTimer = setTimeout(() => {
+      void sincronizarDivergenciasFiscais(itens.value);
+    }, 400);
+  },
+);
+
 onMounted(async () => {
   void carregarFornecedores({ ativo: true });
   void carregarProdutos({ ativo: true });
   void carregarCentros();
+  void carregarPlanoContas();
   const pedidoId = route.query.pedidoCompraId;
   if (typeof pedidoId === 'string' && pedidoId) {
     pedidoCompraId.value = pedidoId;

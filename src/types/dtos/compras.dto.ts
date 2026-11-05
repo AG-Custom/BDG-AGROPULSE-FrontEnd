@@ -155,6 +155,27 @@ export interface ComprasConfigDto {
   fluxoCompletoHabilitado: boolean;
 }
 
+export interface DivergenciaFiscalEntradaDto {
+  campo: string;
+  rotulo: string;
+  valorNota: string | null;
+  valorCadastro: string | null;
+}
+
+export interface CompararFiscalEntradaPayload {
+  produtoId?: string | null;
+  ncm?: string | null;
+  cest?: string | null;
+  origem?: string | null;
+  cstIcms?: string | null;
+  csosn?: string | null;
+  aliquotaIcms?: number | null;
+}
+
+export interface CompararFiscalEntradaDto {
+  divergencias: DivergenciaFiscalEntradaDto[];
+}
+
 export interface PreviewRecebimentoXmlItemTributacaoDto {
   origem: string | null;
   cstIcms: string | null;
@@ -179,6 +200,7 @@ export interface PreviewRecebimentoXmlItemDto {
   ncm: string | null;
   cfop: string | null;
   unidade: string | null;
+  unidadeMedidaId?: string | null;
   ean: string | null;
   quantidade: number;
   custoUnitario: number;
@@ -187,6 +209,24 @@ export interface PreviewRecebimentoXmlItemDto {
   dataValidade: string | null;
   informacaoAdicional: string | null;
   tributacao: PreviewRecebimentoXmlItemTributacaoDto;
+  fatorDivisaoNfe: number;
+  quantidadeEstoque: number;
+  custoUnitarioEstoque: number;
+  marcaXml: string | null;
+  cest?: string | null;
+  divergenciasFiscais?: DivergenciaFiscalEntradaDto[] | null;
+}
+
+export interface ConverterQuantidadeNfePayload {
+  produtoId?: string | null;
+  quantidade: number;
+  custoUnitario: number;
+}
+
+export interface ConverterQuantidadeNfeDto {
+  fatorDivisaoNfe: number;
+  quantidadeEstoque: number;
+  custoUnitarioEstoque: number;
 }
 
 export interface PreviewRecebimentoXmlEmitenteDto {
@@ -297,6 +337,8 @@ export interface RecebimentoCompraDto {
   itens: RecebimentoCompraItemDto[];
   divergencias: RecebimentoCompraDivergenciaDto[];
   dadosNfe?: PreviewRecebimentoXmlDto | null;
+  localizacaoEstoque?: string | null;
+  gerarLancamentosEfdContribuicoes?: boolean;
 }
 
 export interface HistoricoCompraDto {
@@ -427,6 +469,8 @@ export interface CriarRecebimentoPayload {
   numeroNota?: string | null;
   serie?: string | null;
   itens: ItemRecebimentoPayload[];
+  localizacaoEstoque?: string | null;
+  gerarLancamentosEfdContribuicoes?: boolean;
 }
 
 export interface AtualizarItemRecebimentoPayload {
@@ -472,6 +516,8 @@ export interface ConfirmarRecebimentoPayload {
   informacaoComplementarEntrada?: string | null;
   centroCustoId?: string | null;
   planoContas?: string | null;
+  localizacaoEstoque?: string | null;
+  gerarLancamentosEfdContribuicoes?: boolean;
 }
 
 export interface ListarSolicitacoesCompraParams {
