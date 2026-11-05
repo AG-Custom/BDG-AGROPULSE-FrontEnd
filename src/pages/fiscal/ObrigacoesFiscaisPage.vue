@@ -6,6 +6,7 @@
     />
 
     <section class="agro-section">
+      <h2 class="obrigacoes__passo"><span class="obrigacoes__numero">1</span>Escolha o período</h2>
       <agro-card>
         <div class="agro-filter-bar obrigacoes__barra">
           <q-input
@@ -14,6 +15,7 @@
             outlined
             mask="####-##"
             label="Competência (AAAA-MM)"
+            hint="Mês de referência dos documentos"
           />
           <q-select
             v-model="finalidade"
@@ -22,29 +24,29 @@
             emit-value
             map-options
             label="Finalidade"
+            hint="Normal, substituto ou retificador"
             :options="FinalidadeArquivoFiscalOpcoes"
-          />
-          <agro-btn
-            v-for="obrigacao in obrigacoes"
-            :key="obrigacao.tipo"
-            color="primary"
-            unelevated
-            icon="description"
-            :label="obrigacao.label"
-            :descricao="obrigacao.descricao"
-            :loading="gerando === obrigacao.tipo"
-            :disable="!competenciaValida || gerando !== null"
-            @click="gerar(obrigacao.tipo)"
-          />
-          <agro-btn
-            flat
-            icon="tune"
-            label="Perfil EFD"
-            descricao="Configurar o perfil EFD ICMS/IPI do estabelecimento"
-            @click="perfilAberto = true"
           />
         </div>
       </agro-card>
+    </section>
+
+    <section class="agro-section">
+      <h2 class="obrigacoes__passo"><span class="obrigacoes__numero">2</span>Gere o arquivo fiscal</h2>
+      <div class="obrigacoes__grade">
+        <obrigacao-geracao-card
+          v-for="obrigacao in obrigacoes"
+          :key="obrigacao.tipo"
+          :titulo="obrigacao.titulo"
+          :descricao="obrigacao.descricao"
+          :tem-perfil="obrigacao.perfil !== null"
+          :perfil-configurado="obrigacao.perfil === 'efd' ? perfilEfd !== null : perfilContribuicoes !== null"
+          :gerando="gerando === obrigacao.tipo"
+          :desabilitado="!competenciaValida || gerando !== null"
+          @gerar="gerar(obrigacao.tipo)"
+          @configurar-perfil="abrirPerfil(obrigacao.perfil)"
+        />
+      </div>
     </section>
 
     <section v-if="pendencias.length > 0" class="agro-section">
@@ -52,6 +54,7 @@
     </section>
 
     <section class="agro-section">
+      <h2 class="obrigacoes__passo"><span class="obrigacoes__numero">3</span>Baixe os arquivos gerados</h2>
       <agro-card>
         <agro-table-skeleton v-if="carregando && arquivos.length === 0" :colunas="7" />
         <arquivos-fiscais-table
@@ -69,11 +72,18 @@
       :salvando="salvandoPerfil"
       @submit="salvarPerfil"
     />
+    <perfil-contribuicoes-dialog
+      v-model="perfilContribuicoesAberto"
+      :perfil="perfilContribuicoes"
+      :salvando="salvandoPerfilContribuicoes"
+      @submit="salvarPerfilContrib"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import ArquivosFiscaisTable from 'components/fiscal/ArquivosFiscaisTable.vue';
+import ObrigacaoGeracaoCard from 'components/fiscal/ObrigacaoGeracaoCard.vue';
 import PendenciasGeracaoList from 'components/fiscal/PendenciasGeracaoList.vue';
 import PerfilContribuicoesDialog from 'components/fiscal/PerfilContribuicoesDialog.vue';
 import PerfilEfdDialog from 'components/fiscal/PerfilEfdDialog.vue';
@@ -106,26 +116,41 @@ const {
   baixar,
 } = useObrigacoesFiscais();
 
-const obrigacoes: { tipo: TipoArquivoFiscalValor; label: string; descricao: string }[] = [
+type PerfilObrigacao = 'efd' | 'contribuicoes' | null;
+
+const obrigacoes: {
+  tipo: TipoArquivoFiscalValor;
+  titulo: string;
+  descricao: string;
+  perfil: PerfilObrigacao;
+}[] = [
   {
     tipo: TipoArquivoFiscal.Sintegra,
-    label: 'Gerar SINTEGRA',
-    descricao: 'Gerar o arquivo SINTEGRA da competência a partir da escrituração',
+    titulo: 'SINTEGRA',
+    descricao: 'Informações de ICMS para a SEFAZ estadual, geradas a partir da escrituração da competência.',
+    perfil: null,
   },
   {
     tipo: TipoArquivoFiscal.EfdIcmsIpi,
-    label: 'Gerar EFD ICMS/IPI',
-    descricao: 'Gerar o arquivo EFD ICMS/IPI da competência a partir da escrituração e das apurações',
+    titulo: 'EFD ICMS/IPI',
+    descricao: 'Escrituração fiscal digital de ICMS e IPI, a partir da escrituração e das apurações fechadas.',
+    perfil: 'efd',
   },
   {
     tipo: TipoArquivoFiscal.EfdContribuicoes,
-    label: 'Gerar EFD-Contribuições',
-    descricao: 'Gerar o arquivo EFD-Contribuições (PIS/COFINS) da competência a partir da escrituração',
+    titulo: 'EFD-Contribuições',
+    descricao: 'Escrituração de PIS e COFINS da competência, a partir da escrituração fiscal.',
+    perfil: 'contribuicoes',
   },
 ];
 
 const perfilAberto = ref(false);
 const perfilContribuicoesAberto = ref(false);
+
+function abrirPerfil(perfil: PerfilObrigacao): void {
+  if (perfil === 'efd') perfilAberto.value = true;
+  if (perfil === 'contribuicoes') perfilContribuicoesAberto.value = true;
+}
 
 async function salvarPerfil(form: PerfilEfdFormModel): Promise<void> {
   if (await salvarPerfilEfd(form)) perfilAberto.value = false;
@@ -150,5 +175,33 @@ onMounted(() => {
 .obrigacoes__campo {
   flex: 1 1 14rem;
   max-width: 20rem;
+}
+
+.obrigacoes__passo {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: flex;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  gap: var(--spacing-3);
+  margin: 0 0 var(--spacing-3);
+}
+
+.obrigacoes__numero {
+  align-items: center;
+  background: var(--color-primary-600);
+  border-radius: var(--radius-full);
+  color: var(--color-text-inverse);
+  display: inline-flex;
+  font-size: var(--font-size-sm);
+  height: var(--spacing-6);
+  justify-content: center;
+  width: var(--spacing-6);
+}
+
+.obrigacoes__grade {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
 }
 </style>
