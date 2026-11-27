@@ -41,6 +41,20 @@
                 color="primary"
               />
             </div>
+            <div class="col-12 col-md-6">
+              <q-toggle
+                v-model="formulario.emissaoProducaoHabilitada"
+                label="Emitir NFC-e em produção ao faturar pedidos"
+                color="primary"
+              />
+              <p class="dica">
+                {{
+                  formulario.emissaoProducaoHabilitada
+                    ? 'As notas emitidas ao faturar têm valor fiscal real.'
+                    : 'Desligado: as notas são emitidas em homologação, sem valor fiscal.'
+                }}
+              </p>
+            </div>
           </div>
           <div class="agro-form-actions">
             <agro-btn
@@ -131,6 +145,7 @@ const formulario = ref<ConfiguracaoFiscalFormModel>({
   regimeTributario: '',
   focusNfeToken: '',
   focusNfeHomologacao: true,
+  emissaoProducaoHabilitada: false,
 });
 const xmlConteudo = ref('');
 
@@ -140,6 +155,7 @@ watch(
     if (cfg) {
       formulario.value.regimeTributario = cfg.regimeTributario;
       formulario.value.focusNfeHomologacao = cfg.focusNfeHomologacao ?? true;
+      formulario.value.emissaoProducaoHabilitada = cfg.emissaoProducaoHabilitada ?? false;
     }
   },
   { immediate: true },
@@ -170,6 +186,11 @@ onMounted(() => {
   margin: 0 0 var(--spacing-4);
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
+}
+.dica {
+  margin: var(--spacing-1) 0 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
 }
 .acoes {
   display: flex;

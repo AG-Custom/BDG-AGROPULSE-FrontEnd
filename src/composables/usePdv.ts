@@ -4,6 +4,7 @@ import { messageService } from 'services/message.service';
 import { pdvService } from 'services/pdv.service';
 import type {
   ListarPdvVendasParams,
+  PdvNotaFiscalDto,
   PdvVendaDto,
   PdvVendaFormModel,
   PdvVendaResumoDto,
@@ -20,6 +21,7 @@ function parsePrecoOpcional(valor: string): number | null {
 export function usePdv() {
   const vendas = ref<PdvVendaResumoDto[]>([]);
   const venda = ref<PdvVendaDto | null>(null);
+  const nota = ref<PdvNotaFiscalDto | null>(null);
   const carregando = ref(false);
   const salvando = ref(false);
   const emitindoNfce = ref(false);
@@ -79,6 +81,9 @@ export function usePdv() {
               })),
       });
       sucesso('Venda PDV registrada com sucesso.');
+      if (criada.nfceStatus === 'Pendente') {
+        erro(`A NFC-e ficou pendente: ${criada.nfceMensagem ?? 'tente emitir novamente pela venda.'}`);
+      }
       return criada;
     } catch (e) {
       erro(mensagem(e));
@@ -88,13 +93,41 @@ export function usePdv() {
     }
   }
 
-  async function cancelar(vendaId: string): Promise<boolean> {
+  async function carregarNota(vendaId: string): Promise<void> {
+    try {
+      nota.value = await pdvService.obterNotaFiscal(vendaId);
+    } catch (e) {
+      erro(mensagem(e));
+    }
+  }
+
+  async function pedirConfirmacaoCancelamento(): Promise<{ confirmou: boolean; motivo?: string }> {
+    const status = nota.value?.status;
+    if (status === 'Emitida' || status === 'Contingencia') {
+      const motivo = await messageService.confirmarComJustificativa({
+        titulo: 'Cancelar venda PDV',
+        mensagem:
+          'A NFC-e desta venda será cancelada na SEFAZ, as contas a receber serão canceladas e o estoque estornado.',
+        textoConfirmar: 'Cancelar venda e NFC-e',
+        minimoCaracteres: 15,
+        maximoCaracteres: 255,
+        placeholder: 'Motivo do cancelamento da NFC-e (15 a 255 caracteres)',
+      });
+      return { confirmou: motivo !== null, motivo: motivo ?? undefined };
+    }
+
     const confirmou = await messageService.confirmarDestrutivo({
       titulo: 'Cancelar venda PDV',
-      mensagem: 'O estoque será estornado. Informe o motivo e confirme a digitação para cancelar esta venda.',
+      mensagem:
+        'O estoque será estornado e as contas a receber da venda serão canceladas. Confirme a digitação para cancelar.',
       textoConfirmar: 'Cancelar venda',
       icone: 'warning',
     });
+    return { confirmou: Boolean(confirmou) };
+  }
+
+  async function cancelar(vendaId: string): Promise<boolean> {
+    const { confirmou, motivo } = await pedirConfirmacaoCancelamento();
 
     if (!confirmou) {
       return false;
@@ -103,7 +136,8 @@ export function usePdv() {
     salvando.value = true;
 
     try {
-      venda.value = await pdvService.cancelar(vendaId);
+      venda.value = await pdvService.cancelar(vendaId, motivo);
+      await carregarNota(vendaId);
       sucesso('Venda PDV cancelada.');
       return true;
     } catch (e) {
@@ -122,9 +156,11 @@ export function usePdv() {
       const detalhe = [resultado.status, resultado.chaveAcesso].filter(Boolean).join(' · ');
       sucesso(resultado.mensagem ?? (detalhe ? `NFC-e: ${detalhe}` : 'NFC-e processada'));
       await obterVenda(vendaId);
+      await carregarNota(vendaId);
       return true;
     } catch (e) {
       erro(mensagem(e));
+      await carregarNota(vendaId);
       return false;
     } finally {
       emitindoNfce.value = false;
@@ -134,11 +170,13 @@ export function usePdv() {
   return {
     vendas,
     venda,
+    nota,
     carregando,
     salvando,
     emitindoNfce,
     carregarVendas,
     obterVenda,
+    carregarNota,
     vender,
     cancelar,
     emitirNfce,

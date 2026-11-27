@@ -88,8 +88,11 @@ export class MessageService {
     textoCancelar?: string;
     icone?: SweetAlertOptions['icon'];
     minimoCaracteres?: number;
+    maximoCaracteres?: number;
+    placeholder?: string;
   }): Promise<string | null> {
     const minimo = opcoes.minimoCaracteres ?? 10;
+    const maximo = opcoes.maximoCaracteres ?? 1000;
     const resultado = await Swal.fire({
       ...CONFIG_PADRAO,
       icon: opcoes.icone ?? 'warning',
@@ -97,17 +100,17 @@ export class MessageService {
       text: opcoes.mensagem,
       input: 'textarea',
       inputLabel: 'Justificativa',
-      inputPlaceholder: 'Informe o motivo da inativação (mín. 10 caracteres)',
+      inputPlaceholder: opcoes.placeholder ?? 'Informe o motivo da inativação (mín. 10 caracteres)',
       inputAttributes: {
-        maxlength: '1000',
+        maxlength: String(maximo),
       },
       inputValidator: (valor) => {
         const texto = String(valor ?? '').trim();
         if (texto.length < minimo) {
           return `Informe ao menos ${minimo} caracteres.`;
         }
-        if (texto.length > 1000) {
-          return 'Justificativa deve ter no máximo 1000 caracteres.';
+        if (texto.length > maximo) {
+          return `Justificativa deve ter no máximo ${maximo} caracteres.`;
         }
         return undefined;
       },

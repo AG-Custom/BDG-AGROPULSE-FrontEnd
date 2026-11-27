@@ -94,7 +94,14 @@ function abrirCadastro(): void {
 .agro-select-cadastro {
   display: grid;
   gap: var(--spacing-1);
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 100%;
+  min-width: 0;
   width: 100%;
+}
+
+.agro-select-cadastro > :deep(.q-field) {
+  min-width: 0;
 }
 
 .agro-select-cadastro__vazio {

@@ -642,6 +642,33 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'financeiro/configuracao',
+        name: 'configuracao-financeira',
+        component: () => import('pages/financeiro/ConfiguracaoFinanceiraPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.configuracaoFinanceira',
+          permissao: Permissoes.Financeiro.Configurar,
+        },
+      },
+      {
+        path: 'financeiro/boletos',
+        name: 'boletos',
+        component: () => import('pages/financeiro/BoletosListPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.boletos',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
+        path: 'financeiro/conciliacao-bancaria',
+        name: 'conciliacao-bancaria',
+        component: () => import('pages/financeiro/ConciliacaoBancariaPage.vue'),
+        meta: {
+          breadcrumb: 'navegacao.conciliacaoBancaria',
+          permissao: Permissoes.Financeiro.Visualizar,
+        },
+      },
+      {
         path: 'financeiro/regua-cobranca',
         name: 'regua-cobranca',
         component: () => import('pages/financeiro/ReguaCobrancaPage.vue'),

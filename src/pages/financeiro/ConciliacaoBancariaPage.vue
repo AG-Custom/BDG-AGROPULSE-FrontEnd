@@ -2,18 +2,17 @@
   <q-page class="agro-page">
     <app-page-header
       titulo="Conciliação bancária"
-      subtitulo="Importação OFX, vínculo e proposta de lançamentos."
+      subtitulo="Extrato do banco, vínculo automático com títulos e proposta de lançamentos."
     />
 
     <section class="agro-section">
       <q-banner v-if="conciliacao?.stub" rounded class="q-mb-md stub-banner">
-        Integração externa em modo stub — importação OFX pode retornar dados simulados.
-        <span v-if="conciliacao.mensagem"> {{ conciliacao.mensagem }}</span>
+        Dados simulados. <span v-if="conciliacao.mensagemStub">{{ conciliacao.mensagemStub }}</span>
       </q-banner>
 
-      <agro-card class="q-mb-md">
+      <agro-card v-if="podeEditar" class="q-mb-md">
         <div class="row q-col-gutter-md items-end">
-          <div class="col-12 col-md-5">
+          <div class="col-12 col-md-4">
             <q-select
               v-model="contaBancariaId"
               outlined
@@ -23,50 +22,60 @@
               :options="contaOpcoes"
             />
           </div>
-          <div class="col-12 col-md-4">
-            <q-file
-              v-model="arquivo"
-              outlined
-              label="Arquivo OFX"
-              accept=".ofx,.OFX"
-              clearable
-            />
+          <div class="col-6 col-md-2">
+            <q-input v-model="dataInicio" outlined type="date" label="De" />
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-6 col-md-2">
+            <q-input v-model="dataFim" outlined type="date" label="Até" />
+          </div>
+          <div class="col-12 col-md-4">
             <agro-btn
               color="primary"
               unelevated
               class="full-width"
-              label="Importar OFX"
-              descricao="Importar arquivo OFX"
+              label="Importar extrato"
+              descricao="Importar extrato do banco"
               :loading="salvando"
-              :disable="!contaBancariaId || !arquivo"
+              :disable="!periodoValido"
               @click="onImportar"
             />
           </div>
         </div>
+        <p v-if="dataInicio && dataFim && !periodoValido" class="aviso-periodo">
+          Informe um período de no máximo 31 dias.
+        </p>
       </agro-card>
 
       <agro-card>
         <template #header>
           <div class="header-acoes">
             <h3 class="secao-titulo">Lançamentos</h3>
-            <agro-btn
-              v-if="conciliacao"
-              flat
-              icon="auto_fix"
-              label="Propor lançamentos"
-              descricao="Gerar propostas"
-              :loading="salvando"
-              @click="propor"
-            />
+            <div v-if="conciliacao && podeEditar" class="header-acoes__botoes">
+              <agro-btn
+                flat
+                icon="auto_fix_high"
+                label="Conciliar automaticamente"
+                descricao="Vincular lançamentos a títulos de mesmo valor"
+                :loading="salvando"
+                @click="conciliarAutomaticamente"
+              />
+              <agro-btn
+                flat
+                icon="auto_fix"
+                label="Propor lançamentos"
+                descricao="Gerar propostas para o restante"
+                :loading="salvando"
+                @click="propor"
+              />
+            </div>
           </div>
         </template>
 
+        <agro-table-skeleton v-if="carregando && !conciliacao" :colunas="5" />
         <empty-state
-          v-if="!conciliacao"
+          v-else-if="!conciliacao"
           titulo="Nenhuma conciliação"
-          descricao="Importe um arquivo OFX para iniciar."
+          :descricao="podeEditar ? 'Importe o extrato de um período para iniciar.' : 'Ainda não há extrato importado.'"
           icon="sync_alt"
         />
         <q-table
@@ -74,7 +83,7 @@
           flat
           bordered
           row-key="id"
-          :rows="conciliacao.lancamentos"
+          :rows="conciliacao.transacoes"
           :columns="colunas"
           :rows-per-page-options="[15, 30, 50]"
         >
@@ -82,26 +91,15 @@
             <q-td :props="props">{{ formatarData(props.row.data) }}</q-td>
           </template>
           <template #body-cell-valor="props">
-            <q-td :props="props" class="text-metric">{{ formatarMoeda(props.row.valor) }}</q-td>
-          </template>
-          <template #body-cell-vinculado="props">
-            <q-td :props="props">
-              <agro-badge
-                :label="props.row.vinculado ? 'Vinculado' : 'Pendente'"
-                :variant="props.row.vinculado ? 'success' : 'warning'"
-              />
+            <q-td :props="props" class="text-metric">
+              {{ props.row.tipo === 'Debito' ? '-' : '' }}{{ formatarMoeda(props.row.valor) }}
             </q-td>
           </template>
-          <template #body-cell-acoes="props">
+          <template #body-cell-situacao="props">
             <q-td :props="props">
-              <agro-btn
-                v-if="!props.row.vinculado"
-                flat
-                dense
-                label="Vincular CR"
-                descricao="Vincular a conta a receber"
-                :loading="salvando"
-                @click="vincularCr(props.row.id)"
+              <agro-badge
+                :label="rotuloSituacao(props.row)"
+                :variant="varianteSituacao(props.row)"
               />
             </q-td>
           </template>
@@ -114,45 +112,72 @@
 <script setup lang="ts">
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
+import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useConciliacaoBancaria } from 'composables/useConciliacaoBancaria';
 import { useContasBancarias } from 'composables/useContasBancarias';
-import { useContasReceber } from 'composables/useContasReceber';
-import { ContaReceberStatus } from 'constants/enums';
+import { usePermissao } from 'composables/usePermissao';
+import { AreaAcesso } from 'constants/areas-acesso';
+import { NivelAcesso } from 'constants/niveis-acesso';
 import type { QTableColumn } from 'quasar';
-import type { ConciliacaoLancamentoDto } from 'types/dtos/financeiro-gestao.dto';
+import type { TransacaoBancariaDto } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-const { conciliacao, salvando, importarOfx, vincular, propor } = useConciliacaoBancaria();
+const {
+  conciliacao,
+  carregando,
+  salvando,
+  carregarUltima,
+  importarExtrato,
+  conciliarAutomaticamente,
+  propor,
+} = useConciliacaoBancaria();
 const { contaOpcoes, carregar: carregarContas } = useContasBancarias();
-const { contas, carregar: carregarCr } = useContasReceber();
 
+const { pode } = usePermissao();
+const podeEditar = computed(() => pode(AreaAcesso.Financeiro, NivelAcesso.Editar));
+
+const hoje = new Date();
+const trintaDiasAtras = new Date(hoje.getTime() - 30 * 24 * 60 * 60 * 1000);
 const contaBancariaId = ref('');
-const arquivo = ref<File | null>(null);
+const dataInicio = ref(trintaDiasAtras.toISOString().slice(0, 10));
+const dataFim = ref(hoje.toISOString().slice(0, 10));
 
-const colunas: QTableColumn<ConciliacaoLancamentoDto>[] = [
+const periodoValido = computed(() => {
+  if (!contaBancariaId.value || !dataInicio.value || !dataFim.value) return false;
+  const dias = (Date.parse(dataFim.value) - Date.parse(dataInicio.value)) / 86_400_000;
+  return dias >= 0 && dias <= 31;
+});
+
+const colunas: QTableColumn<TransacaoBancariaDto>[] = [
   { name: 'data', label: 'Data', field: 'data', align: 'left' },
   { name: 'descricao', label: 'Descrição', field: 'descricao', align: 'left' },
   { name: 'valor', label: 'Valor', field: 'valor', align: 'right' },
-  { name: 'vinculado', label: 'Status', field: 'vinculado', align: 'left' },
-  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
+  { name: 'situacao', label: 'Situação', field: 'conciliado', align: 'left' },
 ];
 
-async function onImportar(): Promise<void> {
-  if (!contaBancariaId.value || !arquivo.value) return;
-  await importarOfx(contaBancariaId.value, arquivo.value);
+function rotuloSituacao(t: TransacaoBancariaDto): string {
+  if (t.conciliado) return t.contaReceberId ? 'Conciliado (receber)' : 'Conciliado (pagar)';
+  return t.propostaLancamento ? 'Proposta de lançamento' : 'Pendente';
 }
 
-async function vincularCr(lancamentoId: string): Promise<void> {
-  const aberta = contas.value.find((c) => c.status === ContaReceberStatus.Aberta);
-  if (!aberta) return;
-  await vincular({ lancamentoId, contaReceberId: aberta.id });
+function varianteSituacao(t: TransacaoBancariaDto): 'success' | 'info' | 'warning' {
+  if (t.conciliado) return 'success';
+  return t.propostaLancamento ? 'info' : 'warning';
+}
+
+async function onImportar(): Promise<void> {
+  await importarExtrato({
+    contaBancariaId: contaBancariaId.value,
+    dataInicio: dataInicio.value,
+    dataFim: dataFim.value,
+  });
 }
 
 onMounted(() => {
   void carregarContas();
-  void carregarCr({ status: ContaReceberStatus.Aberta });
+  void carregarUltima();
 });
 </script>
 
@@ -172,5 +197,14 @@ onMounted(() => {
   justify-content: space-between;
   width: 100%;
   gap: var(--spacing-3);
+}
+.header-acoes__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+.aviso-periodo {
+  margin: var(--spacing-3) 0 0;
+  color: var(--color-text-secondary);
 }
 </style>

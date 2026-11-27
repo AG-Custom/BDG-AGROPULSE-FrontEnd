@@ -622,23 +622,21 @@ export const TipoAplicacaoOpcoes = [
 ];
 
 export const StatusBoleto = {
-  Pendente: 'Pendente',
-  Emitido: 'Emitido',
+  Gerado: 'Gerado',
   Registrado: 'Registrado',
   Pago: 'Pago',
   Cancelado: 'Cancelado',
-  Vencido: 'Vencido',
+  Baixado: 'Baixado',
 } as const;
 
 export type StatusBoletoValor = (typeof StatusBoleto)[keyof typeof StatusBoleto];
 
 export const StatusBoletoOpcoes = [
-  { label: 'Pendente', value: StatusBoleto.Pendente },
-  { label: 'Emitido', value: StatusBoleto.Emitido },
+  { label: 'Gerado', value: StatusBoleto.Gerado },
   { label: 'Registrado', value: StatusBoleto.Registrado },
   { label: 'Pago', value: StatusBoleto.Pago },
   { label: 'Cancelado', value: StatusBoleto.Cancelado },
-  { label: 'Vencido', value: StatusBoleto.Vencido },
+  { label: 'Baixado', value: StatusBoleto.Baixado },
 ];
 
 export const PeriodoFluxoCaixa = {
@@ -824,6 +822,7 @@ export const NotificacaoTipo = {
   MetasLoja: 'MetasLoja',
   PedidoAguardandoAprovacao: 'PedidoAguardandoAprovacao',
   ContingenciaSefaz: 'ContingenciaSefaz',
+  NotaFiscalPendente: 'NotaFiscalPendente',
   RecomendacaoPendente: 'RecomendacaoPendente',
   OsAgricolaAtrasada: 'OsAgricolaAtrasada',
   SaldoMinimoCaixa: 'SaldoMinimoCaixa',
@@ -855,6 +854,7 @@ export const NotificacaoTipoOpcoes = [
   { label: 'Metas da loja', value: NotificacaoTipo.MetasLoja },
   { label: 'Pedido aguardando aprovação', value: NotificacaoTipo.PedidoAguardandoAprovacao },
   { label: 'Contingência SEFAZ', value: NotificacaoTipo.ContingenciaSefaz },
+  { label: 'Nota fiscal pendente', value: NotificacaoTipo.NotaFiscalPendente },
   { label: 'Recomendação pendente', value: NotificacaoTipo.RecomendacaoPendente },
   { label: 'OS agrícola atrasada', value: NotificacaoTipo.OsAgricolaAtrasada },
   { label: 'Saldo mínimo de caixa', value: NotificacaoTipo.SaldoMinimoCaixa },
