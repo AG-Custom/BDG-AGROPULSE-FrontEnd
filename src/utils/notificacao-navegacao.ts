@@ -97,6 +97,10 @@ export function rotaDaNotificacao(item: NotificacaoDto): RouteLocationRaw | null
     return { name: 'metas-vendedor' };
   }
 
+  if (tipo === NotificacaoTipo.NotaFiscalPendente) {
+    return { name: 'fiscal-notas-fiscais' };
+  }
+
   if (tipo === NotificacaoTipo.ContingenciaSefaz) {
     return null;
   }

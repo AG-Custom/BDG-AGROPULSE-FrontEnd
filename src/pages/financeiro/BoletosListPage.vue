@@ -1,51 +1,23 @@
 <template>
   <q-page class="agro-page">
-    <app-page-header titulo="Boletos" subtitulo="Emissão, remessa e retorno bancário.">
+    <app-page-header titulo="Boletos" subtitulo="Emissão e acompanhamento de boletos com Pix.">
       <agro-btn
+        v-if="podeEditar"
         color="primary"
         unelevated
-        icon="upload_file"
-        label="Processar retorno"
-        descricao="Enviar arquivo de retorno"
-        @click="inputRetorno?.click()"
+        icon="receipt"
+        label="Emitir boleto"
+        descricao="Emitir boleto de uma conta a receber"
+        @click="dialogAberto = true"
       />
     </app-page-header>
 
     <section class="agro-section">
-      <q-banner
-        v-if="temStub"
-        rounded
-        class="q-mb-md stub-banner"
-      >
-        Integração externa em modo stub — emissão/remessa/retorno podem ser simulados.
+      <q-banner v-if="temSimulado" rounded class="q-mb-md stub-banner">
+        Há boletos simulados (sem banco). Configure a integração Sicoob para emitir boletos reais.
       </q-banner>
 
-      <input
-        ref="inputRetorno"
-        type="file"
-        class="hidden-input"
-        accept=".ret,.RET,.txt"
-        @change="onRetorno"
-      />
-
       <agro-card>
-        <div class="agro-filter-bar q-mb-md row q-col-gutter-md items-end">
-          <div class="col-12 col-md-3">
-            <filtro-escopo-select v-model="filtroEscopo" @update:model-value="aplicarFiltro" />
-          </div>
-          <div class="col-12 col-md-3">
-            <agro-btn
-              color="primary"
-              unelevated
-              label="Gerar remessa"
-              descricao="Gerar remessa dos selecionados"
-              :disable="selecionados.length === 0"
-              :loading="salvando"
-              @click="onRemessa"
-            />
-          </div>
-        </div>
-
         <agro-table-skeleton v-if="carregando && boletos.length === 0" :colunas="6" />
         <empty-state
           v-else-if="!carregando && boletos.length === 0"
@@ -55,11 +27,9 @@
         />
         <q-table
           v-else
-          v-model:selected="selecionados"
           flat
           bordered
           row-key="id"
-          selection="multiple"
           :rows="boletos"
           :columns="colunas"
           :loading="carregando"
@@ -73,86 +43,75 @@
           </template>
           <template #body-cell-status="props">
             <q-td :props="props">
-              <agro-badge :label="props.row.status" variant="default" />
+              <agro-badge :label="props.row.status" :variant="varianteStatus(props.row.status)" />
+            </q-td>
+          </template>
+          <template #body-cell-acoes="props">
+            <q-td :props="props" class="text-right">
+              <boleto-acoes
+                :boleto="props.row"
+                :salvando="salvando"
+                :pode-editar="podeEditar"
+                @sincronizar="sincronizar(props.row)"
+                @baixar="baixar(props.row)"
+                @copiar="copiar"
+              />
             </q-td>
           </template>
         </q-table>
-
-        <p v-if="ultimaRemessa" class="resultado text-metric">
-          Remessa: {{ ultimaRemessa.quantidade }} boleto(s)
-          <span v-if="ultimaRemessa.mensagem"> — {{ ultimaRemessa.mensagem }}</span>
-        </p>
-        <p v-if="ultimoRetorno" class="resultado text-metric">
-          Retorno: {{ ultimoRetorno.processados }} processados,
-          {{ ultimoRetorno.pagos }} pagos,
-          {{ ultimoRetorno.rejeitados }} rejeitados
-        </p>
       </agro-card>
     </section>
+
+    <emitir-boleto-dialog v-model="dialogAberto" :salvando="salvando" @emitir="onEmitir" />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import FiltroEscopoSelect from 'components/financeiro/FiltroEscopoSelect.vue';
+import BoletoAcoes from 'components/financeiro/BoletoAcoes.vue';
+import EmitirBoletoDialog from 'components/financeiro/EmitirBoletoDialog.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroTableSkeleton from 'components/ui/AgroTableSkeleton.vue';
 import EmptyState from 'components/ui/EmptyState.vue';
 import { useBoletos } from 'composables/useBoletos';
-import { EscopoFinanceiro, type EscopoFinanceiroValor } from 'constants/enums';
+import { usePermissao } from 'composables/usePermissao';
+import { AreaAcesso } from 'constants/areas-acesso';
+import { NivelAcesso } from 'constants/niveis-acesso';
+import { StatusBoleto, type StatusBoletoValor } from 'constants/enums';
 import type { QTableColumn } from 'quasar';
 import type { BoletoDto } from 'types/dtos/financeiro-gestao.dto';
 import { formatarData, formatarMoeda } from 'utils/formatters';
 import { computed, onMounted, ref } from 'vue';
 
-const {
-  boletos,
-  ultimaRemessa,
-  ultimoRetorno,
-  carregando,
-  salvando,
-  carregar,
-  gerarRemessa,
-  processarRetorno,
-} = useBoletos();
+const { boletos, carregando, salvando, carregar, emitir, sincronizar, baixar, copiar } = useBoletos();
 
-const filtroEscopo = ref<EscopoFinanceiroValor | null>(EscopoFinanceiro.Unidade);
-const selecionados = ref<BoletoDto[]>([]);
-const inputRetorno = ref<HTMLInputElement | null>(null);
-
-const temStub = computed(
-  () =>
-    boletos.value.some((b) => b.stub) ||
-    !!ultimaRemessa.value?.stub ||
-    !!ultimoRetorno.value?.stub,
-);
+const { pode } = usePermissao();
+const podeEditar = computed(() => pode(AreaAcesso.Financeiro, NivelAcesso.Editar));
+const dialogAberto = ref(false);
+const temSimulado = computed(() => boletos.value.some((b) => b.provedor === 'Stub'));
 
 const colunas: QTableColumn<BoletoDto>[] = [
   { name: 'nossoNumero', label: 'Nosso número', field: 'nossoNumero', align: 'left' },
   { name: 'valor', label: 'Valor', field: 'valor', align: 'right' },
   { name: 'vencimento', label: 'Vencimento', field: 'vencimento', align: 'left' },
   { name: 'status', label: 'Status', field: 'status', align: 'left' },
-  { name: 'linhaDigitavel', label: 'Linha digitável', field: 'linhaDigitavel', align: 'left' },
+  { name: 'provedor', label: 'Banco', field: 'provedor', align: 'left' },
+  { name: 'acoes', label: 'Ações', field: 'id', align: 'right' },
 ];
 
-async function aplicarFiltro(): Promise<void> {
-  await carregar({ escopo: filtroEscopo.value ?? undefined });
+function varianteStatus(status: StatusBoletoValor): 'success' | 'warning' | 'error' | 'default' {
+  if (status === StatusBoleto.Pago) return 'success';
+  if (status === StatusBoleto.Registrado) return 'warning';
+  if (status === StatusBoleto.Cancelado) return 'error';
+  return 'default';
 }
 
-async function onRemessa(): Promise<void> {
-  await gerarRemessa(selecionados.value.map((b) => b.id));
-}
-
-async function onRetorno(event: Event): Promise<void> {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
-  await processarRetorno(file);
-  input.value = '';
+async function onEmitir(contaReceberId: string): Promise<void> {
+  if (await emitir(contaReceberId)) dialogAberto.value = false;
 }
 
 onMounted(() => {
-  void aplicarFiltro();
+  void carregar();
 });
 </script>
 
@@ -160,12 +119,5 @@ onMounted(() => {
 .stub-banner {
   background: var(--color-surface-sunken);
   border: var(--border-width-thin) solid var(--color-border-default);
-}
-.hidden-input {
-  display: none;
-}
-.resultado {
-  margin-top: var(--spacing-4);
-  color: var(--color-text-secondary);
 }
 </style>

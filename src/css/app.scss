@@ -244,6 +244,33 @@ body {
   font-size: var(--font-size-input) !important;
 }
 
+.q-select:not(.q-select--multiple) .q-field__native {
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
+
+  > span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.q-select .q-field__control-container {
+  min-width: 0;
+}
+
+.q-select .q-field__control {
+  max-width: 100%;
+}
+
+.q-menu .q-item__label {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
 // ─── Formulários criar/editar — densidade confortável ───
 // ~48px acomoda texto de 16px (padrão web) sem parecer “esticado” como o Quasar 56px.
 .agro-formulario {

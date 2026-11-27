@@ -4,11 +4,11 @@ import type {
   AntecipacaoDto,
   AplicacaoFinanceiraDto,
   BoletoDto,
+  ConciliacaoBancariaDto,
+  ConfiguracaoFinanceiraDto,
   CaixaDto,
   CentroCustoDto,
   ChequeDto,
-  ConciliacaoLancamentoDto,
-  ConciliacaoOfxResultDto,
   ContaBancariaDto,
   CotacaoMoedaDto,
   CriarAplicacaoPayload,
@@ -28,28 +28,25 @@ import type {
   EditarContaBancariaPayload,
   EditarOrcamentoFinanceiroPayload,
   EmitirBoletoPayload,
+  ImportarExtratoPayload,
+  SalvarConfiguracaoFinanceiraPayload,
   EscopoListagemParams,
   ExposicaoCambialDto,
   FluxoCaixaDto,
   ListarChequesParams,
   ListarFluxoCaixaParams,
   OrcamentoFinanceiroDto,
-  ProporLancamentosPayload,
   ProcessarReguaDiaDto,
   ReguaCobrancaConfigEtapaDto,
   ReguaCobrancaPainelDto,
-  RemessaBoletoPayload,
-  RemessaBoletoResultDto,
   RenegociacaoDto,
   ResgatarAplicacaoPayload,
-  RetornoBoletoResultDto,
   SimularAntecipacaoPayload,
   SimularAntecipacaoResultDto,
   TesourariaProjecaoDto,
   TesourariaSaldoIntradayDto,
   TransferenciaFinanceiraDto,
   UpsertReguaCobrancaConfigPayload,
-  VincularConciliacaoPayload,
 } from 'types/dtos/financeiro-gestao.dto';
 
 export const financeiroGestaoService = {
@@ -190,49 +187,54 @@ export const financeiroGestaoService = {
       .then((r) => r.data);
   },
 
-  importarOfx(contaBancariaId: string, arquivo: File): Promise<ConciliacaoOfxResultDto> {
-    const form = new FormData();
-    form.append('contaBancariaId', contaBancariaId);
-    form.append('arquivo', arquivo);
+  obterConfiguracaoFinanceira(): Promise<ConfiguracaoFinanceiraDto> {
+    return api.get<ConfiguracaoFinanceiraDto>('/financeiro/configuracao').then((r) => r.data);
+  },
+
+  salvarConfiguracaoFinanceira(
+    payload: SalvarConfiguracaoFinanceiraPayload,
+  ): Promise<ConfiguracaoFinanceiraDto> {
     return api
-      .post<ConciliacaoOfxResultDto>('/conciliacoes-bancarias/importar-ofx', form)
+      .put<ConfiguracaoFinanceiraDto>('/financeiro/configuracao', payload)
       .then((r) => r.data);
   },
 
-  vincularLancamento(
-    payload: VincularConciliacaoPayload,
-  ): Promise<ConciliacaoLancamentoDto> {
+  listarConciliacoes(): Promise<ConciliacaoBancariaDto[]> {
+    return api.get<ConciliacaoBancariaDto[]>('/conciliacoes-bancarias').then((r) => r.data);
+  },
+
+  importarExtrato(payload: ImportarExtratoPayload): Promise<ConciliacaoBancariaDto> {
     return api
-      .post<ConciliacaoLancamentoDto>('/conciliacoes-bancarias/vincular', payload)
+      .post<ConciliacaoBancariaDto>('/conciliacoes-bancarias/importar-extrato', payload)
       .then((r) => r.data);
   },
 
-  proporLancamentos(
-    payload: ProporLancamentosPayload,
-  ): Promise<ConciliacaoOfxResultDto> {
+  conciliarAutomaticamente(id: string): Promise<ConciliacaoBancariaDto> {
     return api
-      .post<ConciliacaoOfxResultDto>('/conciliacoes-bancarias/propor-lancamentos', payload)
+      .post<ConciliacaoBancariaDto>(`/conciliacoes-bancarias/${id}/conciliar-automaticamente`)
       .then((r) => r.data);
   },
 
-  listarBoletos(params?: EscopoListagemParams): Promise<BoletoDto[]> {
-    return api.get<BoletoDto[]>('/boletos', { params }).then((r) => r.data);
+  proporLancamentos(id: string): Promise<void> {
+    return api.post(`/conciliacoes-bancarias/${id}/propor-lancamentos`).then(() => undefined);
+  },
+
+  listarBoletos(contaReceberId?: string): Promise<BoletoDto[]> {
+    return api
+      .get<BoletoDto[]>('/boletos', { params: contaReceberId ? { contaReceberId } : undefined })
+      .then((r) => r.data);
   },
 
   emitirBoleto(payload: EmitirBoletoPayload): Promise<BoletoDto> {
     return api.post<BoletoDto>('/boletos/emitir', payload).then((r) => r.data);
   },
 
-  gerarRemessa(payload: RemessaBoletoPayload): Promise<RemessaBoletoResultDto> {
-    return api.post<RemessaBoletoResultDto>('/boletos/remessa', payload).then((r) => r.data);
+  sincronizarBoleto(id: string): Promise<BoletoDto> {
+    return api.post<BoletoDto>(`/boletos/${id}/sincronizar`).then((r) => r.data);
   },
 
-  processarRetorno(arquivo: File): Promise<RetornoBoletoResultDto> {
-    const form = new FormData();
-    form.append('arquivo', arquivo);
-    return api
-      .post<RetornoBoletoResultDto>('/boletos/retorno', form)
-      .then((r) => r.data);
+  baixarBoleto(id: string): Promise<BoletoDto> {
+    return api.post<BoletoDto>(`/boletos/${id}/baixar`).then((r) => r.data);
   },
 
   obterReguaConfig(): Promise<ReguaCobrancaConfigEtapaDto[]> {

@@ -1,27 +1,22 @@
+import { copyToClipboard } from 'quasar';
 import { useNotificacao } from 'composables/useNotificacao';
 import { useTratarErroFormulario } from 'composables/useTratarErroFormulario';
 import { financeiroGestaoService } from 'services/financeiro-gestao.service';
-import type {
-  BoletoDto,
-  EscopoListagemParams,
-  RemessaBoletoResultDto,
-  RetornoBoletoResultDto,
-} from 'types/dtos/financeiro-gestao.dto';
+import { messageService } from 'services/message.service';
+import type { BoletoDto } from 'types/dtos/financeiro-gestao.dto';
 import { ref } from 'vue';
 
 export function useBoletos() {
   const boletos = ref<BoletoDto[]>([]);
-  const ultimaRemessa = ref<RemessaBoletoResultDto | null>(null);
-  const ultimoRetorno = ref<RetornoBoletoResultDto | null>(null);
   const carregando = ref(false);
   const salvando = ref(false);
   const { sucesso, erro } = useNotificacao();
   const { mensagem } = useTratarErroFormulario();
 
-  async function carregar(params?: EscopoListagemParams): Promise<void> {
+  async function carregar(): Promise<void> {
     carregando.value = true;
     try {
-      boletos.value = await financeiroGestaoService.listarBoletos(params);
+      boletos.value = await financeiroGestaoService.listarBoletos();
     } catch (e) {
       erro(mensagem(e));
       boletos.value = [];
@@ -30,14 +25,11 @@ export function useBoletos() {
     }
   }
 
-  async function emitir(contaReceberId: string, contaBancariaId?: string): Promise<boolean> {
+  async function executar(acao: () => Promise<unknown>, textoSucesso: string): Promise<boolean> {
     salvando.value = true;
     try {
-      await financeiroGestaoService.emitirBoleto({
-        contaReceberId,
-        contaBancariaId: contaBancariaId || null,
-      });
-      sucesso('Boleto emitido.');
+      await acao();
+      sucesso(textoSucesso);
       await carregar();
       return true;
     } catch (e) {
@@ -48,44 +40,33 @@ export function useBoletos() {
     }
   }
 
-  async function gerarRemessa(boletoIds: string[]): Promise<boolean> {
-    salvando.value = true;
+  function emitir(contaReceberId: string): Promise<boolean> {
+    return executar(() => financeiroGestaoService.emitirBoleto({ contaReceberId }), 'Boleto emitido.');
+  }
+
+  function sincronizar(boleto: BoletoDto): Promise<boolean> {
+    return executar(() => financeiroGestaoService.sincronizarBoleto(boleto.id), 'Situação atualizada.');
+  }
+
+  async function baixar(boleto: BoletoDto): Promise<boolean> {
+    const confirmou = await messageService.confirmar({
+      titulo: 'Baixar boleto',
+      mensagem: 'O boleto deixará de ser cobrado no banco. Deseja continuar?',
+      textoConfirmar: 'Baixar boleto',
+      icone: 'warning',
+    });
+    if (!confirmou) return false;
+    return executar(() => financeiroGestaoService.baixarBoleto(boleto.id), 'Boleto baixado.');
+  }
+
+  async function copiar(texto: string, descricao: string): Promise<void> {
     try {
-      ultimaRemessa.value = await financeiroGestaoService.gerarRemessa({ boletoIds });
-      sucesso('Remessa gerada.');
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
+      await copyToClipboard(texto);
+      sucesso(`${descricao} copiado.`);
+    } catch {
+      erro('Não foi possível copiar.');
     }
   }
 
-  async function processarRetorno(arquivo: File): Promise<boolean> {
-    salvando.value = true;
-    try {
-      ultimoRetorno.value = await financeiroGestaoService.processarRetorno(arquivo);
-      sucesso('Retorno processado.');
-      await carregar();
-      return true;
-    } catch (e) {
-      erro(mensagem(e));
-      return false;
-    } finally {
-      salvando.value = false;
-    }
-  }
-
-  return {
-    boletos,
-    ultimaRemessa,
-    ultimoRetorno,
-    carregando,
-    salvando,
-    carregar,
-    emitir,
-    gerarRemessa,
-    processarRetorno,
-  };
+  return { boletos, carregando, salvando, carregar, emitir, sincronizar, baixar, copiar };
 }

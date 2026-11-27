@@ -62,6 +62,7 @@ export function useFiscal() {
         regimeTributario: form.regimeTributario as RegimeTributarioValor,
         focusNfeToken: form.focusNfeToken.trim() || null,
         focusNfeHomologacao: form.focusNfeHomologacao,
+        emissaoProducaoHabilitada: form.emissaoProducaoHabilitada,
       });
       sucesso('Configuração fiscal salva.');
       return true;

@@ -187,6 +187,10 @@ export const MatrizAlertas: Record<NotificacaoTipoValor, PoliticaAlerta> = {
       PerfilUsuario.Operacional,
     ],
   },
+  [NotificacaoTipo.NotaFiscalPendente]: {
+    area: AreaAcesso.Fiscal,
+    perfisPermitidos: PERFIS_GESTAO,
+  },
   [NotificacaoTipo.RecomendacaoPendente]: {
     area: AreaAcesso.Safras,
     perfisPermitidos: [

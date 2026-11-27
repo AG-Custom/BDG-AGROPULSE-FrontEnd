@@ -267,71 +267,60 @@ export interface ResgatarAplicacaoPayload {
   dataResgate?: string | null;
 }
 
-export interface ConciliacaoOfxResultDto {
-  id: string;
-  contaBancariaId: string;
-  importadoEm: string;
-  lancamentos: ConciliacaoLancamentoDto[];
-  stub?: boolean;
-  mensagem?: string | null;
-}
+export type OrigemConciliacaoValor = 'OFX' | 'API' | 'Manual';
 
-export interface ConciliacaoLancamentoDto {
+export type TipoTransacaoBancariaValor = 'Credito' | 'Debito';
+
+export interface TransacaoBancariaDto {
   id: string;
   data: string;
-  valor: number;
   descricao: string;
-  vinculado: boolean;
-  contaPagarId: string | null;
+  valor: number;
+  tipo: TipoTransacaoBancariaValor;
+  conciliado: boolean;
   contaReceberId: string | null;
-  proposto: boolean;
+  contaPagarId: string | null;
+  propostaLancamento: boolean;
+  observacao: string | null;
 }
 
-export interface VincularConciliacaoPayload {
-  lancamentoId: string;
-  contaPagarId?: string | null;
-  contaReceberId?: string | null;
+export interface ConciliacaoBancariaDto {
+  id: string;
+  empresaId: string;
+  contaBancariaId: string;
+  dataInicio: string;
+  dataFim: string;
+  origem: OrigemConciliacaoValor;
+  status: string;
+  transacoes: TransacaoBancariaDto[];
+  stub: boolean;
+  mensagemStub: string | null;
 }
 
-export interface ProporLancamentosPayload {
-  conciliacaoId: string;
+export interface ImportarExtratoPayload {
+  contaBancariaId: string;
+  dataInicio: string;
+  dataFim: string;
 }
 
 export interface BoletoDto {
   id: string;
   empresaId: string;
-  unidadeId: string;
   contaReceberId: string;
-  nossoNumero: string | null;
-  linhaDigitavel: string | null;
+  nossoNumero: string;
+  linhaDigitavel: string;
+  codigoBarras: string;
   valor: number;
   vencimento: string;
   status: StatusBoletoValor;
-  stub?: boolean;
+  provedor: string;
+  pixCopiaECola?: string | null;
+  dataPagamento?: string | null;
+  valorPago?: number | null;
 }
 
 export interface EmitirBoletoPayload {
   contaReceberId: string;
-  contaBancariaId?: string | null;
-}
-
-export interface RemessaBoletoPayload {
-  boletoIds: string[];
-}
-
-export interface RemessaBoletoResultDto {
-  arquivo: string;
-  quantidade: number;
-  stub?: boolean;
-  mensagem?: string | null;
-}
-
-export interface RetornoBoletoResultDto {
-  processados: number;
-  pagos: number;
-  rejeitados: number;
-  stub?: boolean;
-  mensagem?: string | null;
 }
 
 export interface ReguaCobrancaConfigEtapaDto {
@@ -591,3 +580,52 @@ export interface ExposicaoCambialDto {
 export type EscopoListagemParams = FiltroEscopoFinanceiro & {
   escopo?: EscopoFinanceiroValor;
 };
+
+export interface ConfiguracaoFinanceiraDto {
+  empresaId: string;
+  sicoobHabilitado: boolean;
+  sicoobHomologacao: boolean;
+  sicoobClientId: string | null;
+  sicoobNumeroCliente: string | null;
+  sicoobNumeroContrato: string | null;
+  sicoobModalidade: number;
+  sicoobNumeroContaCorrente: string | null;
+  sicoobChavePix: string | null;
+  possuiToken: boolean;
+  possuiCertificado: boolean;
+  certificadoValidoAte: string | null;
+  possuiWebhookSegredo: boolean;
+  webhookCaminho: string;
+  webhookSegredoGerado: string | null;
+}
+
+export interface SalvarConfiguracaoFinanceiraPayload {
+  sicoobHabilitado: boolean;
+  sicoobHomologacao: boolean;
+  sicoobClientId: string | null;
+  sicoobNumeroCliente: string | null;
+  sicoobNumeroContrato: string | null;
+  sicoobModalidade: number;
+  sicoobNumeroContaCorrente: string | null;
+  sicoobChavePix: string | null;
+  sicoobToken: string | null;
+  sicoobCertificadoPfxBase64: string | null;
+  sicoobCertificadoSenha: string | null;
+  removerCertificado: boolean;
+  gerarWebhookSegredo: boolean;
+}
+
+export interface ConfiguracaoFinanceiraFormModel {
+  sicoobHabilitado: boolean;
+  sicoobHomologacao: boolean;
+  sicoobClientId: string;
+  sicoobNumeroCliente: string;
+  sicoobNumeroContrato: string;
+  sicoobModalidade: number;
+  sicoobNumeroContaCorrente: string;
+  sicoobChavePix: string;
+  sicoobToken: string;
+  sicoobCertificadoSenha: string;
+  removerCertificado: boolean;
+  gerarWebhookSegredo: boolean;
+}

@@ -51,6 +51,118 @@ function filhosDasSecoes(secoes: SecaoNavegacao[]): ItemNavegacao[] {
   return secoes.flatMap((secao) => secao.filhos);
 }
 
+const SECOES_FINANCEIRO: SecaoNavegacao[] = [
+  {
+    id: 'financeiro-titulos',
+    label: 'Receber e pagar',
+    icon: 'swap_vert',
+    filhos: [
+      {
+        label: 'Contas a Receber',
+        routeName: 'contas-receber',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Contas a Pagar',
+        routeName: 'contas-pagar',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Boletos',
+        routeName: 'boletos',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Cheques',
+        routeName: 'cheques',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Antecipações',
+        routeName: 'antecipacoes',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'financeiro-bancos',
+    label: 'Bancos e caixa',
+    icon: 'account_balance_wallet',
+    filhos: [
+      {
+        label: 'Contas bancárias',
+        routeName: 'contas-bancarias',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Conciliação bancária',
+        routeName: 'conciliacao-bancaria',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Transferências',
+        routeName: 'transferencias-financeiras',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Caixas',
+        routeName: 'caixas',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'financeiro-planejamento',
+    label: 'Planejamento',
+    icon: 'query_stats',
+    filhos: [
+      {
+        label: 'Fluxo de Caixa',
+        routeName: 'fluxo-caixa',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Orçamento vs. Realizado',
+        routeName: 'orcamento-financeiro',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Cotações / multi-moeda',
+        routeName: 'cotacoes-moeda',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+    ],
+  },
+  {
+    id: 'financeiro-cadastros',
+    label: 'Cadastros e regras',
+    icon: 'tune',
+    rotasRelacionadas: ['forma-pagamento-config-nova', 'forma-pagamento-config-editar', 'forma-pagamento-config-visualizar'],
+    filhos: [
+      {
+        label: 'Condições de pagamento',
+        routeName: 'condicoes-pagamento',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Formas de pagamento',
+        routeName: 'formas-pagamento-config',
+        permissao: Permissoes.FormasPagamentoConfig.Visualizar,
+      },
+      {
+        label: 'Centros de custo',
+        routeName: 'centros-custo',
+        permissao: Permissoes.Financeiro.Visualizar,
+      },
+      {
+        label: 'Configuração financeira',
+        routeName: 'configuracao-financeira',
+        permissao: Permissoes.Financeiro.Configurar,
+      },
+    ],
+  },
+];
+
 const SECOES_FISCAL: SecaoNavegacao[] = [
   {
     id: 'fiscal-notas',
@@ -530,73 +642,8 @@ export const NAVEGACAO_GRUPOS: GrupoNavegacao[] = [
         label: 'Financeiro',
         icon: 'account_balance',
         pathPrefixes: ['/financeiro', '/formas-pagamento-config'],
-        filhos: [
-          {
-            label: 'Contas a Pagar',
-            routeName: 'contas-pagar',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Contas a Receber',
-            routeName: 'contas-receber',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Fluxo de Caixa',
-            routeName: 'fluxo-caixa',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Orçamento vs. Realizado',
-            routeName: 'orcamento-financeiro',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Condições de pagamento',
-            routeName: 'condicoes-pagamento',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Formas de pagamento',
-            routeName: 'formas-pagamento-config',
-            permissao: Permissoes.FormasPagamentoConfig.Visualizar,
-          },
-          {
-            label: 'Contas bancárias',
-            routeName: 'contas-bancarias',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Caixas',
-            routeName: 'caixas',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Centros de custo',
-            routeName: 'centros-custo',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Transferências',
-            routeName: 'transferencias-financeiras',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Cheques',
-            routeName: 'cheques',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Antecipações',
-            routeName: 'antecipacoes',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-          {
-            label: 'Cotações / multi-moeda',
-            routeName: 'cotacoes-moeda',
-            permissao: Permissoes.Financeiro.Visualizar,
-          },
-        ],
+        secoes: SECOES_FINANCEIRO,
+        filhos: filhosDasSecoes(SECOES_FINANCEIRO),
       },
       {
         id: 'fiscal',

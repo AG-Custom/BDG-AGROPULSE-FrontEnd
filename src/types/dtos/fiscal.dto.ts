@@ -45,6 +45,7 @@ export interface ConfiguracaoFiscalDto {
   regimeTributario: RegimeTributarioValor;
   possuiTokenFocus: boolean;
   focusNfeHomologacao: boolean;
+  emissaoProducaoHabilitada: boolean;
   ativo: boolean;
   createdAt: string;
 }
@@ -53,6 +54,7 @@ export interface SalvarConfiguracaoFiscalPayload {
   regimeTributario: RegimeTributarioValor;
   focusNfeToken?: string | null;
   focusNfeHomologacao?: boolean;
+  emissaoProducaoHabilitada?: boolean;
 }
 
 export interface DocumentoSefazDto {
@@ -78,4 +80,5 @@ export interface ConfiguracaoFiscalFormModel {
   regimeTributario: RegimeTributarioValor | '';
   focusNfeToken: string;
   focusNfeHomologacao: boolean;
+  emissaoProducaoHabilitada: boolean;
 }

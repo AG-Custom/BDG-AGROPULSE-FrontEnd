@@ -33,6 +33,17 @@ export interface PdvVendaDto extends PdvVendaResumoDto {
   itens: PdvVendaItemDto[];
   pagamentos?: PdvPagamentoDto[];
   nfceId?: string | null;
+  nfceStatus?: string | null;
+  nfceMensagem?: string | null;
+}
+
+export interface PdvNotaFiscalDto {
+  notaFiscalId: string | null;
+  status: string | null;
+  chaveAcesso: string | null;
+  numero: string | null;
+  mensagemErro: string | null;
+  emitidaEm: string | null;
 }
 
 export interface PdvItemPayload {

@@ -45,6 +45,13 @@
           </div>
         </agro-card>
 
+        <pdv-nota-fiscal-card
+          :nota="nota"
+          :pode-emitir="podeCancelar"
+          :emitindo="emitindoNfce"
+          @emitir="emitirNfce(vendaId)"
+        />
+
         <agro-card>
           <q-table
             flat
@@ -85,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+import PdvNotaFiscalCard from 'components/pdv/PdvNotaFiscalCard.vue';
 import AgroBadge from 'components/ui/AgroBadge.vue';
 import AgroCard from 'components/ui/AgroCard.vue';
 import AgroFormSkeleton from 'components/ui/AgroFormSkeleton.vue';
@@ -100,7 +108,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const { venda, carregando, salvando, obterVenda, cancelar } = usePdv();
+const { venda, nota, carregando, salvando, emitindoNfce, obterVenda, carregarNota, cancelar, emitirNfce } = usePdv();
 const { clientes, carregar: carregarClientes } = useClientes();
 const { produtos, carregar: carregarProdutos } = useProdutos();
 
@@ -158,7 +166,11 @@ onMounted(async () => {
   void carregarClientes();
   void carregarProdutos();
   const ok = await obterVenda(vendaId.value);
-  if (!ok) await router.replace({ name: 'pdv-vendas' });
+  if (!ok) {
+    await router.replace({ name: 'pdv-vendas' });
+    return;
+  }
+  await carregarNota(vendaId.value);
 });
 </script>
 
